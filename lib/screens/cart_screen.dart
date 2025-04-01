@@ -1,9 +1,12 @@
 import 'package:cureeit_user_app/cards/cart_card.dart';
 import 'package:cureeit_user_app/screens/addresses_screen.dart';
+import 'package:cureeit_user_app/utils/razor_pay.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+
+import 'package:razorpay_flutter/razorpay_flutter.dart';
 
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
@@ -541,11 +544,37 @@ class _CartScreenState extends State<CartScreen> {
                                                       ),
                                                       child: GestureDetector(
                                                         onTap: () {
-                                                          createCheckout(
-                                                            totalAmount.toString(),
-                                                            60.00,
-                                                            "${selectedAddress!['address']}, ${selectedAddress!['landmark']}, ${selectedAddress!['floor']}, ${selectedAddress!['userLat']}, ${selectedAddress!['userLong']}",
-                                                          );
+                                                          // createCheckout(
+                                                          //   totalAmount.toString(),
+                                                          //   60.00,
+                                                          //   "${selectedAddress!['address']}, ${selectedAddress!['landmark']}, ${selectedAddress!['floor']}, ${selectedAddress!['userLat']}, ${selectedAddress!['userLong']}",
+                                                          // );
+
+                                                           RazorpayPayment razorpayPayment = RazorpayPayment(
+                onSuccess: (PaymentSuccessResponse response) {
+                  // Handle payment success
+                  print('Payment Success: ${response.paymentId}');
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text('Payment Success'),
+                  ));
+                },
+                onFailure: (PaymentFailureResponse response) {
+                  // Handle payment failure
+                  print('Payment Failed: ${response.message}');
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text('Payment Failed'),
+                  ));
+                },
+              );
+
+            
+              razorpayPayment.initiatePayment( // Replace with your Razorpay API Key
+                totalAmount.toInt(), // Amount in paise (e.g., 50000 = 500 INR)
+                'Cure it', // Product Name
+                'Please do the payment', // Description
+                '8890170172',
+                'yash123@gmail.com',
+              );
                                                         },
                                                         child: Center(
                                                           child: Text(
