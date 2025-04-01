@@ -532,35 +532,34 @@ class _CartScreenState extends State<CartScreen> {
                                                           .spaceBetween,
                                                   children: [
                                                     Container(
-  height: 50,
-  width: 80,
-  alignment: Alignment.center,
-  decoration: BoxDecoration(
-    color: primaryColor, // Setting the background color to primary color
-    borderRadius: BorderRadius.circular(10), // Setting the border radius to 10
-  ),
-  child: GestureDetector(
-    onTap: () {
-      createCheckout(
-        totalAmount.toString(),
-        60.00,
-        "${selectedAddress!['address']}, ${selectedAddress!['landmark']}, ${selectedAddress!['floor']}, ${selectedAddress!['userLat']}, ${selectedAddress!['userLong']}",
-      );
-    },
-    child: Center(
-      child: Text(
-        "Pay Now",
-        style: TextStyle(
-          color: Colors.white,
-          fontSize: 16,
-          fontFamily: "Urbanist",
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-    ),
-  ),
-),
-
+                                                      height: 50,
+                                                      width: 80,
+                                                      alignment: Alignment.center,
+                                                      decoration: BoxDecoration(
+                                                        color: primaryColor, // Setting the background color to primary color
+                                                        borderRadius: BorderRadius.circular(10), // Setting the border radius to 10
+                                                      ),
+                                                      child: GestureDetector(
+                                                        onTap: () {
+                                                          createCheckout(
+                                                            totalAmount.toString(),
+                                                            60.00,
+                                                            "${selectedAddress!['address']}, ${selectedAddress!['landmark']}, ${selectedAddress!['floor']}, ${selectedAddress!['userLat']}, ${selectedAddress!['userLong']}",
+                                                          );
+                                                        },
+                                                        child: Center(
+                                                          child: Text(
+                                                            "Pay Now",
+                                                            style: TextStyle(
+                                                              color: Colors.white,
+                                                              fontSize: 16,
+                                                              fontFamily: "Urbanist",
+                                                              fontWeight: FontWeight.w600,
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ),
                                                   Column(
                                                     children: [
                                                     Text(
@@ -668,9 +667,6 @@ class _CartScreenState extends State<CartScreen> {
                                  selectedAddress != null
               ? "${selectedAddress!['address']}, \nLandmark:${selectedAddress!['landmark']}, \nFloor:${selectedAddress!['floor']}"
               : "N/A",
-                                // addresses.isNotEmpty
-                                //     ? "${addresses[0]['address']}, \nLandmark:${addresses[0]['landmark']}, \nFloor:${addresses[0]['floor']}"
-                                //     : "N/A",
                                 style: TextStyle(
                                   fontWeight: FontWeight.w400,
                                   fontSize: 12,
@@ -689,105 +685,6 @@ class _CartScreenState extends State<CartScreen> {
                   )
                 ],
               ),
-              // Padding(
-              //   padding: const EdgeInsets.only(bottom: 50.0),
-              //   child: Container(
-              //     alignment: Alignment.bottomCenter,
-              //     width: MediaQuery.of(context).size.width,
-              //     height: MediaQuery.of(context).size.height,
-              //     child: Padding(
-              //       padding: const EdgeInsets.symmetric(vertical: 26.0),
-              //       child: Stack(
-              //         children: [
-              //           Container(
-              //             decoration: BoxDecoration(
-              //               boxShadow: [
-              //                 BoxShadow(
-              //                   color: secondaryColor
-              //                       .withOpacity(0.5), 
-              //                   offset: Offset(0,
-              //                       100), 
-              //                   blurRadius:
-              //                       110, 
-              //                   spreadRadius: 0,
-              //                 ),
-              //               ],
-              //             ),
-              //             child: Image.asset(
-              //               "lib/images/bottom_popup.png",
-              //               height: 80,
-              //               width: 325,
-              //               fit: BoxFit.contain,
-              //             ),
-              //           ),
-              //           // Container(
-              //           //   height: 80,
-              //           //   width: 325,
-              //           //   alignment: Alignment.centerRight,
-              //           //   child: Padding(
-              //           //     padding:
-              //           //         const EdgeInsets.symmetric(horizontal: 22.0),
-              //           //     child: GestureDetector(
-              //           //       onTap: () {
-              //           //         createCheckout(totalAmount.toString(), 60.00,
-              //           //             "${selectedAddress!['address']}, ${selectedAddress!['landmark']}, ${selectedAddress!['floor']}, ${selectedAddress!['userLat']}, ${selectedAddress!['userLong']}");
-              //           //       },
-              //           //       child: Stack(
-              //           //         alignment: Alignment.center,
-              //           //         children: [
-              //           //           Image.asset(
-              //           //             "lib/images/bottom_button.png",
-              //           //             height: 48,
-              //           //             width: 120,
-              //           //             fit: BoxFit.contain,
-              //           //           ),
-              //           //           Text(
-              //           //             "Pay Now",
-              //           //             style: TextStyle(
-              //           //               color: Colors.white,
-              //           //               fontSize: 16,
-              //           //               fontFamily: "Urbanist",
-              //           //               fontWeight: FontWeight.w600,
-              //           //             ),
-              //           //           ),
-              //           //         ],
-              //           //       ),
-              //           //     ),
-              //           //   ),
-              //           // ),
-              //           // SizedBox(
-              //           //   height: 80,
-              //           //   width: 325,
-              //           //   child: Padding(
-              //           //     padding:
-              //           //         const EdgeInsets.symmetric(horizontal: 28.0),
-              //           //     child: Row(
-              //           //       mainAxisAlignment: MainAxisAlignment.start,
-              //           //       crossAxisAlignment: CrossAxisAlignment.center,
-              //           //       spacing: 12,
-              //           //       children: [
-              //           //         Icon(
-              //           //           Icons.credit_card,
-              //           //           color: Colors.black,
-              //           //         ),
-              //           //         Text(
-              //           //           "COD",
-              //           //           style: TextStyle(
-              //           //             color: Colors.black,
-              //           //             fontSize: 14,
-              //           //             fontFamily: "JosefinSans",
-              //           //             fontWeight: FontWeight.w700,
-              //           //           ),
-              //           //         ),
-              //           //       ],
-              //           //     ),
-              //           //   ),
-              //           // )
-              //         ],
-              //       ),
-              //     ),
-              //   ),
-              // )
             ],
           ),
         ),
