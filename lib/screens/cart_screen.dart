@@ -1,8 +1,10 @@
 import 'package:cureeit_user_app/cards/cart_card.dart';
+import 'package:cureeit_user_app/screens/Order_SuccessScreen.dart';
 import 'package:cureeit_user_app/screens/addresses_screen.dart';
 import 'package:cureeit_user_app/utils/razor_pay.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -22,12 +24,16 @@ class _CartScreenState extends State<CartScreen> {
   Map<String, dynamic>? selectedAddress;
   bool isLoading = true;
   double totalAmount = 0.00;
+  double taxServices = 0.0;
+  double deliveryServiceFees = 0;
+  double totalWholeAmount = 0;
   @override
   void initState() {
     super.initState();
     fetchCartDetails();
     fetchAddresses();
   }
+
 
   Future<void> _removeAllFromCart() async {
     final String userId = "68fa72cbdc5f0a68"; // Example userId
@@ -86,6 +92,9 @@ class _CartScreenState extends State<CartScreen> {
         if (responseData['status'] == 200 && responseData['data'] != null) {
           List<dynamic> cartData = responseData['data'];
           List<Map<String, dynamic>> tempCart = [];
+          double totalFromApi = double.tryParse(responseData['totalAmount'].toString()) ?? 0.0;
+double taxFees = double.tryParse(responseData['taxServicesFees'].toString()) ?? 0.0;
+double deliveryFees = double.tryParse(responseData['deliveryFees'].toString()) ?? 0.0;
 
           for (var cartItem in cartData) {
             print(
@@ -95,16 +104,7 @@ class _CartScreenState extends State<CartScreen> {
                 await fetchProductDetails(cartItem['productId']);
 
             if (productDetails != null) {
-              if (productDetails['sellingPrice'] is int) {
-                totalAmount = totalAmount +
-                    (cartItem['quantity'] *
-                        productDetails['sellingPrice'].toDouble());
-              } else {
-                totalAmount = totalAmount +
-                    (cartItem['quantity'] * productDetails['sellingPrice']);
-              }
               print("🟢 Product Details Retrieved: $productDetails");
-
               tempCart.add({
                 "productId": cartItem['productId'],
                 "quantity": cartItem['quantity'],
@@ -126,9 +126,12 @@ class _CartScreenState extends State<CartScreen> {
           setState(() {
             cartItems = tempCart;
             isLoading = false;
+            totalAmount = totalFromApi;
+  taxServices = taxFees;
+  deliveryServiceFees = deliveryFees;
+  totalWholeAmount = taxServices + totalAmount + deliveryServiceFees;
           });
-
-          print("🟢 Updated cartItems: $cartItems");
+      
         } else {
           print("❌ Response did not contain valid cart data");
         }
@@ -183,13 +186,12 @@ class _CartScreenState extends State<CartScreen> {
       'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/address/savedAddress',
     );
 
-    // Create the GET request with the userId as query parameter
     var request = http.Request('GET', url)
       ..headers.addAll({
         'Content-Type': 'application/json',
       })
       ..body = jsonEncode(
-          {'userId': "68fa72cbdc5f0a68"}); // Send body with the userId
+          {'userId': "68fa72cbdc5f0a68"});
 
     var response = await http.Client().send(request);
 
@@ -235,26 +237,23 @@ class _CartScreenState extends State<CartScreen> {
         Map<String, dynamic> responseData = jsonDecode(responseBody);
 
         if (responseData['message'] == 'Order created successfully') {
-          showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                title: Text(
-                  "Order Created",
-                  style: TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 12,
-                    fontFamily: "Urbanist",
-                    color: secondaryColor,
-                  ),
-                ),
-              );
-            },
-          );
 
-          Future.delayed(Duration(seconds: 5), () {
-            Navigator.of(context).pop();
-          });
+  //            Navigator.push(
+  // context,
+  // MaterialPageRoute(
+  //   builder: (context) => OrderSuccessScreen(),
+  // ),
+  // );
+  final shouldRefresh = await Navigator.push(
+  context,
+  MaterialPageRoute(
+    builder: (context) => OrderSuccessScreen(),
+  ),
+);
+
+if (shouldRefresh == true) {
+  await fetchCartDetails();
+}
         }
       } else {
         var responseBody = await response.stream.bytesToString();
@@ -452,7 +451,7 @@ class _CartScreenState extends State<CartScreen> {
                                                       ),
                                                     ),
                                                     Text(
-                                                      "₹${(totalAmount * 0.7).toStringAsFixed(2) ?? '00'}",
+                                                      "₹${(totalAmount)}",
                                                       style: TextStyle(
                                                         fontWeight:
                                                             FontWeight.w400,
@@ -493,7 +492,7 @@ class _CartScreenState extends State<CartScreen> {
                                                       ],
                                                     ),
                                                     Text(
-                                                      "₹ 60",
+                                                      "₹${deliveryServiceFees}",
                                                       style: TextStyle(
                                                         fontWeight:
                                                             FontWeight.w400,
@@ -534,7 +533,7 @@ class _CartScreenState extends State<CartScreen> {
                                                       ],
                                                     ),
                                                     Text(
-                                                      "₹ ${totalAmount + 60}",
+                                                      "₹${taxServices}",
                                                       style: TextStyle(
                                                         fontWeight:
                                                             FontWeight.w400,
@@ -573,29 +572,18 @@ class _CartScreenState extends State<CartScreen> {
                                                       ),
                                                       child: GestureDetector(
                                                         onTap: () {
-                                                          // createCheckout(
-                                                          //   totalAmount.toString(),
-                                                          //   60.00,
-                                                          //   "${selectedAddress!['address']}, ${selectedAddress!['landmark']}, ${selectedAddress!['floor']}, ${selectedAddress!['userLat']}, ${selectedAddress!['userLong']}",
-                                                          // );
-
                                                           RazorpayPayment
                                                               razorpayPayment =
                                                               RazorpayPayment(
                                                             onSuccess:
                                                                 (PaymentSuccessResponse
                                                                     response) {
-                                                              // Handle payment success
-                                                              print(
-                                                                  'Payment Success: ${response.paymentId}');
-                                                              ScaffoldMessenger
-                                                                      .of(
-                                                                          context)
-                                                                  .showSnackBar(
-                                                                      SnackBar(
-                                                                content: Text(
-                                                                    'Payment Success'),
-                                                              ));
+                                                                      print("Total Amount is ${totalAmount.toStringAsFixed(2)}");
+                                                                createCheckout(
+                                                            totalWholeAmount.toStringAsFixed(2),
+                                                            deliveryServiceFees,
+                                                            "${selectedAddress!['address']}, ${selectedAddress!['landmark']}, ${selectedAddress!['floor']}, ${selectedAddress!['userLat']}, ${selectedAddress!['userLong']}",
+                                                          );
                                                             },
                                                             onFailure:
                                                                 (PaymentFailureResponse
@@ -616,9 +604,7 @@ class _CartScreenState extends State<CartScreen> {
 
                                                           razorpayPayment
                                                               .initiatePayment(
-                                                            // Replace with your Razorpay API Key
-                                                            totalAmount
-                                                                .toInt(), // Amount in paise (e.g., 50000 = 500 INR)
+                                                            totalWholeAmount, // Amount in paise (e.g., 50000 = 500 INR)
                                                             'Cure it', // Product Name
                                                             'Please do the payment', // Description
                                                             '8890170172',
@@ -655,7 +641,7 @@ class _CartScreenState extends State<CartScreen> {
                                                                 primaryColor),
                                                       ),
                                                       Text(
-                                                        "₹${totalAmount + 60}",
+                                                        "₹${totalWholeAmount.toStringAsFixed(2)}",
                                                         style: TextStyle(
                                                           fontWeight:
                                                               FontWeight.w700,

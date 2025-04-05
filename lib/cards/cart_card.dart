@@ -3,6 +3,7 @@ import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'dart:async';
 
 class CartCard extends StatefulWidget {
   final String productName;
@@ -14,24 +15,51 @@ class CartCard extends StatefulWidget {
   final Function onRemove;
   final List<dynamic> productImages;
 
-  const CartCard(
-      {super.key,
-      required this.productName,
-      required this.packLabel,
-      required this.quantity,
-      required this.productId,
-      required this.sellingPrice,
-      required this.onUpdate,
-      required this.onRemove,
-      required this.productImages});
+  const CartCard({
+    super.key,
+    required this.productName,
+    required this.packLabel,
+    required this.quantity,
+    required this.productId,
+    required this.sellingPrice,
+    required this.onUpdate,
+    required this.onRemove,
+    required this.productImages,
+  });
 
   @override
   State<CartCard> createState() => _CartCardState();
 }
 
 class _CartCardState extends State<CartCard> {
+  late int _localQuantity;
+  Timer? _debounceTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _localQuantity = widget.quantity;
+  }
+
+  @override
+  void dispose() {
+    _debounceTimer?.cancel();
+    super.dispose();
+  }
+
+  void _onQuantityChanged(int newQuantity) {
+    setState(() {
+      _localQuantity = newQuantity;
+    });
+
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(const Duration(milliseconds: 800), () {
+      _updateQuantity(_localQuantity);
+    });
+  }
+
   Future<void> _updateQuantity(int quantity) async {
-    final String userId = "68fa72cbdc5f0a68"; // Example userId
+    final String userId = "68fa72cbdc5f0a68";
     final String productId = widget.productId;
 
     final Map<String, dynamic> requestData = {
@@ -48,22 +76,21 @@ class _CartCardState extends State<CartCard> {
         headers: {'Content-Type': 'application/json'},
         body: json.encode(requestData),
       );
-
+      print("Quantity in API is $quantity");
       if (response.statusCode == 200) {
+        print("Success response is ${response.body}");
         widget.onUpdate();
-        // Optionally, handle the success, e.g., show a success message
       } else {
-        print('Failed to update quantity. Status code: ${response.statusCode}');
-        // Optionally, handle the error, e.g., show an error message
+        print(
+            'Failed to update quantity. Status code: ${response.statusCode} ${response.body}');
       }
     } catch (error) {
       print('Error updating quantity: $error');
-      // Optionally, handle the error, e.g., show an error message
     }
   }
 
   Future<void> _removeFromCart() async {
-    final String userId = "68fa72cbdc5f0a68"; // Example userId
+    final String userId = "68fa72cbdc5f0a68";
     final String productId = widget.productId;
 
     final Map<String, dynamic> requestData = {
@@ -82,10 +109,12 @@ class _CartCardState extends State<CartCard> {
 
       if (response.statusCode == 200) {
         widget.onRemove();
-        // Optionally, you can show a success message or update the UI
-        // For example, you could navigate back to the previous screen or refresh the cart
-      } else {}
-    } catch (error) {}
+      } else {
+        print('Failed to remove from cart');
+      }
+    } catch (error) {
+      print('Error removing from cart: $error');
+    }
   }
 
   @override
@@ -99,54 +128,56 @@ class _CartCardState extends State<CartCard> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Row(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              spacing: 10,
               children: [
                 Padding(
-                    padding: const EdgeInsets.only(top: 0),
-                    child: SizedBox(
-                        height: 40,
-                        width: 40,
-                        child: widget.productImages.isNotEmpty
-                            ? Image.network(
-                                widget.productImages[0],
-                                fit: BoxFit.contain,
-                                loadingBuilder:
-                                    (context, child, loadingProgress) {
-                                  if (loadingProgress == null) return child;
-                                  return const Center(
-                                      child: CircularProgressIndicator(
-                                    color: secondaryColor,
-                                  ));
-                                },
-                                errorBuilder: (context, error, stackTrace) {
-                                  return const Center(
-                                      child: Icon(
-                                    Icons.error,
-                                    color: Color.fromRGBO(7, 9, 84, 1),
-                                  ));
-                                },
-                              )
-                            : Icon(Icons.image))),
+                  padding: const EdgeInsets.only(top: 0),
+                  child: SizedBox(
+                    height: 40,
+                    width: 40,
+                    child: widget.productImages.isNotEmpty
+                        ? Image.network(
+                            widget.productImages[0],
+                            fit: BoxFit.contain,
+                            loadingBuilder: (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return const Center(
+                                child: CircularProgressIndicator(
+                                  color: secondaryColor,
+                                ),
+                              );
+                            },
+                            errorBuilder: (context, error, stackTrace) {
+                              return const Center(
+                                child: Icon(
+                                  Icons.error,
+                                  color: Color.fromRGBO(7, 9, 84, 1),
+                                ),
+                              );
+                            },
+                          )
+                        : const Icon(Icons.image),
+                  ),
+                ),
+                const SizedBox(width: 10),
                 GestureDetector(
                   onTap: () {
                     Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ItemDetailScreen(
-                                  productId: widget.productId,
-                                )));
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ItemDetailScreen(
+                          productId: widget.productId,
+                        ),
+                      ),
+                    );
                   },
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       SizedBox(
                         width: MediaQuery.of(context).size.width / 3,
                         child: Text(
                           widget.productName,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontWeight: FontWeight.w700,
                             fontSize: 14,
                             fontFamily: "JosefinSans",
@@ -158,7 +189,7 @@ class _CartCardState extends State<CartCard> {
                         width: MediaQuery.of(context).size.width / 3,
                         child: Text(
                           widget.packLabel,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontWeight: FontWeight.w400,
                             fontSize: 12,
                             fontFamily: "JosefinSans",
@@ -172,16 +203,14 @@ class _CartCardState extends State<CartCard> {
               ],
             ),
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              spacing: 16,
               children: [
                 Container(
                   width: 90,
                   height: 30,
                   decoration: BoxDecoration(
-                      color: secondaryColor.withOpacity(0.16),
-                      borderRadius: BorderRadius.circular(30)),
+                    color: secondaryColor.withOpacity(0.16),
+                    borderRadius: BorderRadius.circular(30),
+                  ),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 4.0),
                     child: Row(
@@ -189,11 +218,8 @@ class _CartCardState extends State<CartCard> {
                       children: [
                         GestureDetector(
                           onTap: () {
-                            if (widget.quantity > 1) {
-                              _updateQuantity(widget.quantity - 1);
-                            } else {
-                              _removeFromCart();
-                              widget.onRemove;
+                            if (_localQuantity > 1) {
+                              _onQuantityChanged(_localQuantity - 1);
                             }
                           },
                           child: Image.asset(
@@ -204,8 +230,8 @@ class _CartCardState extends State<CartCard> {
                           ),
                         ),
                         Text(
-                          "${widget.quantity}",
-                          style: TextStyle(
+                          "$_localQuantity",
+                          style: const TextStyle(
                             fontWeight: FontWeight.w700,
                             fontSize: 12,
                             fontFamily: "Urbanist",
@@ -214,7 +240,7 @@ class _CartCardState extends State<CartCard> {
                         ),
                         GestureDetector(
                           onTap: () {
-                            _updateQuantity(widget.quantity + 1);
+                            _onQuantityChanged(_localQuantity + 1);
                           },
                           child: Image.asset(
                             "lib/images/plus_button.png",
@@ -227,6 +253,7 @@ class _CartCardState extends State<CartCard> {
                     ),
                   ),
                 ),
+                const SizedBox(width: 8),
                 Container(
                   alignment: Alignment.centerRight,
                   width: 48,
@@ -235,8 +262,8 @@ class _CartCardState extends State<CartCard> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text(
-                        "₹ ${((widget.sellingPrice * 0.7 ?? 0) * widget.quantity.toDouble()).toStringAsFixed(2)}",
-                        style: TextStyle(
+                        "₹ ${((widget.sellingPrice * 0.7) * _localQuantity).toStringAsFixed(2)}",
+                        style: const TextStyle(
                           fontWeight: FontWeight.w800,
                           fontSize: 12,
                           fontFamily: "Urbanist",
@@ -244,8 +271,8 @@ class _CartCardState extends State<CartCard> {
                         ),
                       ),
                       Text(
-                        "₹ ${(widget.sellingPrice * widget.quantity.toDouble()).toString()}",
-                        style: TextStyle(
+                        "₹ ${(widget.sellingPrice * _localQuantity).toString()}",
+                        style: const TextStyle(
                           decoration: TextDecoration.lineThrough,
                           fontWeight: FontWeight.w500,
                           fontSize: 10,
@@ -257,7 +284,7 @@ class _CartCardState extends State<CartCard> {
                   ),
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),

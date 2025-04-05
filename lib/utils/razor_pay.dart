@@ -30,11 +30,11 @@ class RazorpayPayment {
     }
   }
 
-  void initiatePayment(int amount, String name, String description,
+  void initiatePayment(double amount, String name, String description,
       String contact, String email) {
     var options = {
       'key': "rzp_test_zVbDkK876DXdvr",
-      'amount': amount,
+      'amount': amount * 100,
       'name': name,
       'description': description,
       'prefill': {
