@@ -12,6 +12,14 @@ class FavoritesScreen extends StatefulWidget {
 }
 
 class _FavoritesScreenState extends State<FavoritesScreen> {
+  late Future<List<String>> favoritesFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    favoritesFuture = fetchFavorites();
+  }
+
   Future<List<String>> fetchFavorites() async {
     const url =
         'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/product/getfavouritesList';
@@ -35,6 +43,12 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
     }
   }
 
+  void refreshFavorites() {
+    setState(() {
+      favoritesFuture = fetchFavorites();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,7 +61,6 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: 20,
             children: [
               Text(
                 "Favorites",
@@ -62,40 +75,44 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         ),
       ),
       body: Container(
-          color: Colors.grey.shade100.withOpacity(0.5),
+        color: Colors.grey.shade100.withOpacity(0.5),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 18),
           child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 0.0, horizontal: 18),
-              child: Padding(
-                padding: const EdgeInsets.only(top: 6.0),
-                child: FutureBuilder<List<String>>(
-                  future: fetchFavorites(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(
-                          child: CircularProgressIndicator(
-                        color: secondaryColor,
-                      ));
-                    } else if (snapshot.hasError) {
-                      return Center(child: Text('Error: ${snapshot.error}'));
-                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return Center(child: Text('No favorites found.'));
-                    } else {
-                      final favoritesList = snapshot.data!;
-                      return ListView.builder(
-                        itemCount: favoritesList.length,
-                        itemBuilder: (context, index) {
-                          final productId = favoritesList[index];
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 6),
-                            child: FavoritesCard(productId: productId),
-                          );
-                        },
+            padding: const EdgeInsets.only(top: 6.0),
+            child: FutureBuilder<List<String>>(
+              future: favoritesFuture, // use stored future
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(
+                      child: CircularProgressIndicator(
+                    color: secondaryColor,
+                  ));
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return Center(child: Text('No favorites found.'));
+                } else {
+                  final favoritesList = snapshot.data!;
+                  return ListView.builder(
+                    itemCount: favoritesList.length,
+                    itemBuilder: (context, index) {
+                      final productId = favoritesList[index];
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 6),
+                        child: FavoritesCard(
+                          productId: productId,
+                          onUpdate: refreshFavorites, // trigger setState
+                        ),
                       );
-                    }
-                  },
-                ),
-              ))),
+                    },
+                  );
+                }
+              },
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
