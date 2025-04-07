@@ -110,6 +110,7 @@ class _CartCardState extends State<CartCard> {
       if (response.statusCode == 200) {
         widget.onRemove();
       } else {
+        print(response.statusCode);
         print('Failed to remove from cart');
       }
     } catch (error) {
@@ -223,6 +224,9 @@ class _CartCardState extends State<CartCard> {
                             }
                             else{
                               _removeFromCart();
+                              setState(() {
+                                
+                              });
                             };
                           },
                           child: Image.asset(

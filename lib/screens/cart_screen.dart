@@ -54,7 +54,9 @@ class _CartScreenState extends State<CartScreen> {
       if (response.statusCode == 200) {
         fetchCartDetails(); // Re-fetch cart details to update the UI
       } else {}
-    } catch (error) {}
+    } catch (error) {
+      print("item did not got removed $error");
+    }
   }
 
   void _navigateToAddressScreen() async {
@@ -207,6 +209,7 @@ double deliveryFees = double.tryParse(responseData['deliveryFees'].toString()) ?
 
   Future<void> createCheckout(
       String total, double shippingCost, String shippingAddress) async {
+        int Total=double.parse(total).toInt();
     try {
       var url = Uri.parse(
           'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/order/createCheckout');
@@ -218,7 +221,7 @@ double deliveryFees = double.tryParse(responseData['deliveryFees'].toString()) ?
           "userId": "68fa72cbdc5f0a68",
           "purchaseDate": "2025-03-19T10:30:00Z",
           "currentStatus": "Pending",
-          "totalAmount": total,
+          "totalAmount": Total,
           "shippingAddress": shippingAddress,
           "shippingCost": shippingCost,
           "userLat": selectedAddress!['userLat'],
@@ -237,7 +240,8 @@ double deliveryFees = double.tryParse(responseData['deliveryFees'].toString()) ?
         Map<String, dynamic> responseData = jsonDecode(responseBody);
 
         if (responseData['message'] == 'Order created successfully') {
-
+     _removeAllFromCart();  //removing cart item from backend , not using await so it will be done in background ,so user does not have to wait
+    cartItems.clear();
   //            Navigator.push(
   // context,
   // MaterialPageRoute(
@@ -416,8 +420,19 @@ if (shouldRefresh == true) {
                                                             0.0,
                                                         onUpdate:
                                                             fetchCartDetails,
-                                                        onRemove:
-                                                            fetchCartDetails,
+                                                        onRemove:(){
+                                                          setState(() {
+            cartItems.removeWhere((element) => element['productId'] == item['productId']);
+            if (cartItems.isEmpty) {
+              totalAmount = 0.0;
+              taxServices = 0.0;
+              deliveryServiceFees = 0.0;
+              totalWholeAmount = 0.0;
+            }
+          });
+          fetchAddresses();
+                                                        },
+                                                            
                                                         productImages:
                                                             item['imageUrls'] ??
                                                                 ''))
@@ -576,11 +591,10 @@ if (shouldRefresh == true) {
                                                               razorpayPayment =
                                                               RazorpayPayment(
                                                             onSuccess:
-                                                                (PaymentSuccessResponse
-                                                                    response) {
+                                                                (PaymentSuccessResponse response) {
                                                                       print("Total Amount is ${totalAmount.toStringAsFixed(2)}");
                                                                 createCheckout(
-                                                            totalWholeAmount.toStringAsFixed(2),
+                                                            (totalWholeAmount).toStringAsFixed(2),
                                                             deliveryServiceFees,
                                                             "${selectedAddress!['address']}, ${selectedAddress!['landmark']}, ${selectedAddress!['floor']}, ${selectedAddress!['userLat']}, ${selectedAddress!['userLong']}",
                                                           );
