@@ -155,7 +155,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 totalAmount = totalAmount +
                     (cartItem['quantity'] * productDetails['sellingPrice']);
               }
-              print("🟢 Product Details Retrieved: $productDetails");
 
               tempCart.add({
                 "productId": cartItem['productId'],
@@ -403,7 +402,9 @@ class _HomeScreenState extends State<HomeScreen> {
         Container(
           width: 110,
           padding: EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-          child: Text(
+          child: Column(
+              children: [
+                 Text(
             product['name'] ?? 'Product',
             textAlign: TextAlign.left,
             style: TextStyle(
@@ -411,8 +412,9 @@ class _HomeScreenState extends State<HomeScreen> {
               fontWeight: FontWeight.w500,
             ),
             maxLines: 2,
-            // overflow: TextOverflow.ellipsis,
-          ),
+          )
+        ],
+        )
         ),
        Text("${product['price']}rs")
       ],
@@ -512,51 +514,48 @@ class _HomeScreenState extends State<HomeScreen> {
                   context, MaterialPageRoute(builder: (context) => Search()));
             },
             child: Container(
-              margin: EdgeInsets.all(10),
-              height: 58,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(
-                    width: 1, color: Color.fromARGB(255, 202, 188, 188)),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      child: TextField(
-                        style: TextStyle(fontFamily: "Urbanist"),
-                        //controller: _controller,
-                        decoration: InputDecoration(
-                          enabled: false,
-                          hintText: "Search",
-                          hintStyle: TextStyle(fontFamily: "Urbanist"),
-                          border: InputBorder.none,
+               margin: EdgeInsets.all(10),
+                height: 58,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                      width: 1, color: Color.fromARGB(255, 202, 188, 188)),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        child: TextField(
+                          style: TextStyle(fontFamily: "Urbanist"),
+                          decoration: InputDecoration(
+                            enabled: false,
+                            hintText: "Search",
+                            hintStyle: TextStyle(fontFamily: "Urbanist"),
+                            border: InputBorder.none,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
-                    child: GestureDetector(
-                      onTap: () {
-                        //String searchQuery = _controller.text;
-                        //_fetchSearchResults(searchQuery);
-                      },
-                      child: Container(
-                        padding: EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: secondaryColor,
-                          borderRadius: BorderRadius.circular(20),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: GestureDetector(
+                        onTap: () {
+                        },
+                        child: Container(
+                          padding: EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: secondaryColor,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Icon(Icons.search, color: Colors.white),
                         ),
-                        child: Icon(Icons.search, color: Colors.white),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
           ),
           Expanded(
             child: Container(
@@ -584,7 +583,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             SizedBox(height: 10),
                             buildProductGrid(),
-                            //SizedBox(height: 60),
                           ],
                         ),
                       )

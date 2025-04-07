@@ -7,7 +7,9 @@ import 'dart:convert';
 
 class FavoritesCard extends StatefulWidget {
   final String productId;
-  const FavoritesCard({super.key, required this.productId});
+  final Function onUpdate;
+  const FavoritesCard({super.key, required this.productId, required this.onUpdate});
+
 
   @override
   State<FavoritesCard> createState() => _FavoritesCardState();
@@ -57,8 +59,35 @@ class _FavoritesCardState extends State<FavoritesCard> {
     }
   }
 
-  // Add product to the cart
-// Add product to the cart
+  Future<void> removeFromFav() async {
+    try {
+      var url = Uri.parse(
+          'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/product/removeFavourite');
+      var request = http.Request('DELETE', url)
+        ..headers.addAll({
+          'Content-Type': 'application/json',
+        })
+        ..body = jsonEncode({
+          "userId": "68fa72cbdc5f0a68",
+          "productId": widget.productId
+        });
+
+      var response = await http.Client().send(request);
+
+      if (response.statusCode == 200) {
+        var responseBody = await response.stream.bytesToString();
+        Map<String, dynamic> responseData = jsonDecode(responseBody);
+        print("Response od removeFromFav is ${responseData}");
+        if (responseData['message'] == 'Item removed from favourites successfully') {
+          widget.onUpdate();
+        }
+      } else {
+        throw Exception('Failed to remove fav');
+      }
+    } catch (error) {
+      print('Error removing : $error');
+    }
+  }
   Future<void> addToCart() async {
     try {
       var url = Uri.parse(
@@ -69,7 +98,7 @@ class _FavoritesCardState extends State<FavoritesCard> {
         })
         ..body = jsonEncode({
           "productId": widget.productId,
-          "userId": "68fa72cbdc5f0a68", // Replace with actual userId if needed
+          "userId": "68fa72cbdc5f0a68",
           "quantity": 1
         });
 
@@ -198,11 +227,18 @@ class _FavoritesCardState extends State<FavoritesCard> {
                             color: secondaryColor,
                             borderRadius: BorderRadius.circular(20)),
                       ),
-                      Icon(
+                      GestureDetector(
+                        onTap: () {
+                          print("Button Tapped of Delete");
+                        removeFromFav();
+                        },
+                        child: Icon(
                         Icons.delete,
                         color: Colors.white,
                         size: 22,
                       ),
+                      )
+                      
                     ]),
                   )
                 ],
