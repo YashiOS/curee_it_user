@@ -221,6 +221,9 @@ class _CartCardState extends State<CartCard> {
                             if (_localQuantity > 1) {
                               _onQuantityChanged(_localQuantity - 1);
                             }
+                            else{
+                              _removeFromCart();
+                            };
                           },
                           child: Image.asset(
                             "lib/images/minus_button.png",
