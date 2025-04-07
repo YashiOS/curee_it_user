@@ -24,7 +24,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
   @override
   void initState() {
     super.initState();
-    checkIfFav(); // Check if the product is in the favourites list
+    checkIfFav();
     productDetails = fetchProductDetails(widget.productId);
     _controller.addListener(() {
       if (_controller.page?.toInt() != _currentPage) {
@@ -89,16 +89,13 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         if (responseData['status'] == 200) {
-          print("added to fav !");
           checkIfFav();
+          Fluttertoast.showToast(msg: "Item added to Favourites");
         } else {
-          print("Failed to add item to favourites: ${response.body}");
         }
       } else {
-        print("Failed to add item to favourites: ${response.body}");
       }
     } catch (error) {
-      print("Error adding to favourites: $error");
     }
     checkIfFav();
   }
@@ -113,7 +110,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
         })
         ..body = jsonEncode({
           "productId": widget.productId,
-          "userId": "68fa72cbdc5f0a68", // Replace with actual userId if needed
+          "userId": "68fa72cbdc5f0a68", 
           "quantity": 1
         });
 
@@ -123,7 +120,6 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
         var responseBody = await response.stream.bytesToString();
         Map<String, dynamic> responseData = jsonDecode(responseBody);
 
-        // If the response contains "Added To Cart", show success message
         if (responseData['message'] == 'Added To Cart') {
           Fluttertoast.showToast(
             msg: "Added to Cart",
@@ -181,12 +177,10 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
             'Failed to load product details: ${response.statusCode}');
       }
     } catch (e) {
-      print("Exception: $e");
       throw Exception("Failed to fetch data");
     }
   }
 
-  // Function to decrease quantity
   void decreaseQuantity() {
     if (quantity > 1) {
       setState(() {
@@ -195,7 +189,6 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
     }
   }
 
-  // Function to increase quantity
   void increaseQuantity() {
     setState(() {
       quantity++;
@@ -411,7 +404,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                     height: 8,
                                     child: Row(
                                       mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                          MainAxisAlignment.center,
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
@@ -440,33 +433,6 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                                         : Color(0xFF1F1970)),
                                               );
                                             })),
-                                        Transform.translate(
-                                          //  offset: Offset(-12, -10),
-                                          offset: Offset(0, 0),
-                                          child: GestureDetector(
-                                            onTap: () {
-                                              addToFavourites();
-                                            },
-                                            child: Container(
-                                              decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          40)),
-                                              height: 40,
-                                              width: 40,
-                                              child: Icon(
-                                                isFav
-                                                    ? Icons.favorite
-                                                    : Icons.favorite_border,
-                                                color: isFav
-                                                    ? secondaryColor
-                                                    : Colors.black
-                                                        .withOpacity(0.6),
-                                                size: 24,
-                                              ),
-                                            ),
-                                          ),
-                                        )
                                       ],
                                     )),
                               ),
@@ -492,27 +458,6 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                             Row(
                                               spacing: 8,
                                               children: [
-                                                // Container(
-                                                //   padding: EdgeInsets.symmetric(
-                                                //       horizontal: 14,
-                                                //       vertical: 6),
-                                                //   decoration: BoxDecoration(
-                                                //       color: secondaryColor
-                                                //           .withOpacity(0.16),
-                                                //       borderRadius:
-                                                //           BorderRadius.circular(
-                                                //               30)),
-                                                //   child: Text(
-                                                //     "500 mg",
-                                                //     style: TextStyle(
-                                                //       fontWeight:
-                                                //           FontWeight.w500,
-                                                //       fontSize: 12,
-                                                //       fontFamily: "Urbanist",
-                                                //       color: secondaryColor,
-                                                //     ),
-                                                //   ),
-                                                // ),
                                                 Padding(
                                                   padding: const EdgeInsets
                                                       .symmetric(vertical: 6.0),
@@ -786,38 +731,13 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                           MainAxisAlignment.spaceBetween,
                                       spacing: 8,
                                       children: [
-                                        Container(
-                                          alignment: Alignment.center,
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width /
-                                              2.35,
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 14, vertical: 8),
-                                          decoration: BoxDecoration(
-                                              border: Border.all(
-                                                  color: primaryColor,
-                                                  width: 0.8),
-                                              borderRadius:
-                                                  BorderRadius.circular(10)),
-                                          child: Text(
-                                            "Buy Now",
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w500,
-                                              fontSize: 12,
-                                              fontFamily: "Urbanist",
-                                              color: primaryColor,
-                                            ),
-                                          ),
-                                        ),
                                         GestureDetector(
                                           onTap: addToCart,
                                           child: Container(
                                             alignment: Alignment.center,
                                             width: MediaQuery.of(context)
                                                     .size
-                                                    .width /
-                                                2.35,
+                                                    .width / 1.5,
                                             padding: EdgeInsets.symmetric(
                                                 horizontal: 14, vertical: 8),
                                             decoration: BoxDecoration(
@@ -836,6 +756,32 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                             ),
                                           ),
                                         ),
+                                        Transform.translate(
+                                          offset: Offset(-20, 0),
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              addToFavourites();
+                                            },
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          40)),
+                                              height: 40,
+                                              width: 40,
+                                              child: Icon(
+                                                isFav
+                                                    ? Icons.favorite
+                                                    : Icons.favorite_border,
+                                                color: isFav
+                                                    ? secondaryColor
+                                                    : Colors.black
+                                                        .withOpacity(0.6),
+                                                size: 24,
+                                              ),
+                                            ),
+                                          ),
+                                        )
                                       ],
                                     ),
                                   ],

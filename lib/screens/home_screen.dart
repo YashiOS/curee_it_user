@@ -155,7 +155,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 totalAmount = totalAmount +
                     (cartItem['quantity'] * productDetails['sellingPrice']);
               }
-              print("🟢 Product Details Retrieved: $productDetails");
 
               tempCart.add({
                 "productId": cartItem['productId'],
@@ -403,7 +402,9 @@ class _HomeScreenState extends State<HomeScreen> {
         Container(
           width: 110,
           padding: EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-          child: Text(
+          child: Column(
+              children: [
+                 Text(
             product['name'] ?? 'Product',
             textAlign: TextAlign.left,
             style: TextStyle(
@@ -411,8 +412,9 @@ class _HomeScreenState extends State<HomeScreen> {
               fontWeight: FontWeight.w500,
             ),
             maxLines: 2,
-            // overflow: TextOverflow.ellipsis,
-          ),
+          )
+        ],
+        )
         ),
       ],
     );
@@ -525,7 +527,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         padding: const EdgeInsets.symmetric(horizontal: 12),
                         child: TextField(
                           style: TextStyle(fontFamily: "Urbanist"),
-                          //controller: _controller,
                           decoration: InputDecoration(
                             enabled: false,
                             hintText: "Search",
@@ -539,8 +540,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       padding: const EdgeInsets.symmetric(horizontal: 8),
                       child: GestureDetector(
                         onTap: () {
-                          //String searchQuery = _controller.text;
-                          //_fetchSearchResults(searchQuery);
                         },
                         child: Container(
                           padding: EdgeInsets.all(8),
@@ -582,7 +581,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                             SizedBox(height: 10),
                             buildProductGrid(),
-                            //SizedBox(height: 60),
                           ],
                         ),
                       )
