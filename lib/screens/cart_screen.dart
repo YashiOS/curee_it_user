@@ -99,8 +99,7 @@ double taxFees = double.tryParse(responseData['taxServicesFees'].toString()) ?? 
 double deliveryFees = double.tryParse(responseData['deliveryFees'].toString()) ?? 0.0;
 
           for (var cartItem in cartData) {
-            print(
-                "🔵 Fetching product details for Product ID: ${cartItem['productId']}");
+            
 
             Map<String, dynamic>? productDetails =
                 await fetchProductDetails(cartItem['productId']);

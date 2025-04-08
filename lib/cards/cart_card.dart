@@ -78,11 +78,11 @@ class _CartCardState extends State<CartCard> {
       );
       print("Quantity in API is $quantity");
       if (response.statusCode == 200) {
-        print("Success response is ${response.body}");
+        print("sucessfully updated");
         widget.onUpdate();
       } else {
         print(
-            'Failed to update quantity. Status code: ${response.statusCode} ${response.body}');
+            'Failed to update quantity. Status code: ${response.statusCode} ');
       }
     } catch (error) {
       print('Error updating quantity: $error');
@@ -109,6 +109,7 @@ class _CartCardState extends State<CartCard> {
 
       if (response.statusCode == 200) {
         widget.onRemove();
+        print("*****product deleted**********");
       } else {
         print(response.statusCode);
         print('Failed to remove from cart');
@@ -221,6 +222,7 @@ class _CartCardState extends State<CartCard> {
                           onTap: () {
                             if (_localQuantity > 1) {
                               _onQuantityChanged(_localQuantity - 1);
+      
                             }
                             else{
                               _removeFromCart();

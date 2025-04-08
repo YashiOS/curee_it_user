@@ -31,11 +31,11 @@ class _HomeScreenState extends State<HomeScreen> {
   Map<int, int> quantities = {}; // To store product quantities
 
   @override
-  void initState() {
+  void initState(){
     super.initState();
-    fetchCartDetails();
-    fetchProducts();
-    fetchAddresses();
+     fetchCartDetails();
+     fetchProducts();
+     fetchAddresses();
   }
 
   Future<void> didAddToCart(int index) async {
@@ -612,7 +612,8 @@ class _HomeScreenState extends State<HomeScreen> {
               // Saved Addresses List Container
               Container(
                 constraints: BoxConstraints(
-                  maxHeight: MediaQuery.of(context).size.height *0.3, // Adjust as needed
+                  maxHeight: MediaQuery.of(context).size.height *
+                      0.3, // Adjust as needed
                 ),
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -632,11 +633,12 @@ class _HomeScreenState extends State<HomeScreen> {
                             leading: Container(
                               padding: EdgeInsets.all(8),
                               decoration: BoxDecoration(
-                                color: const Color.fromARGB(255, 204, 235, 231)
-                                    , // Soft blue background
+                                color: const Color.fromARGB(
+                                    255, 204, 235, 231), // Soft blue background
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
-                                  color:const Color.fromARGB(255, 171, 234, 225), // Light blue border
+                                  color: const Color.fromARGB(
+                                      255, 171, 234, 225), // Light blue border
                                   width: 1.5,
                                 ),
                               ),
@@ -663,7 +665,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                     .shade600, // Slightly lighter than title
                               ),
                             ),
-                            
                           );
                         },
                       ),

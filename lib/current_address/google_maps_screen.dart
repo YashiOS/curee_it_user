@@ -46,12 +46,16 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
     });
   }
 
+  
+
   @override
   void initState() {
     super.initState();
     determinePosition().then((value) {
       defaultLat = value.latitude;
       defaultLng = value.longitude;
+      print(value.latitude);
+      print(value.longitude);
     });
     getAddress();
   }
@@ -260,7 +264,9 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
                                     defaultLat = value.latitude;
                                     defaultLng = value.longitude;
                                     print(defaultLat);
-                                    getAddress();
+                                    print(defaultLng);
+                                    
+                                     getAddress();
                                     _changeCameraPosition(
                                         defaultLat, defaultLng);
                                   });
@@ -318,30 +324,33 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
                                   ),
                                   GestureDetector(
                                     onTap: () {
-                                    showModalBottomSheet(
-                                      context: context,
-                                      isScrollControlled: true,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                                      ),
-                                      builder: (context) {
-                                        return FractionallySizedBox(
-                                          heightFactor: 0.6,
-                                          child: Padding(
-                                            padding: EdgeInsets.only(
-                                              bottom: MediaQuery.of(context).viewInsets.bottom,
+                                      showModalBottomSheet(
+                                        context: context,
+                                        isScrollControlled: true,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.vertical(
+                                              top: Radius.circular(20)),
+                                        ),
+                                        builder: (context) {
+                                          return FractionallySizedBox(
+                                            heightFactor: 0.6,
+                                            child: Padding(
+                                              padding: EdgeInsets.only(
+                                                bottom: MediaQuery.of(context)
+                                                    .viewInsets
+                                                    .bottom,
+                                              ),
+                                              child: AddAddressScreen(
+                                                userId: "68fa72cbdc5f0a68",
+                                                userLat: defaultLat,
+                                                userLong: defaultLng,
+                                              ),
                                             ),
-                                            child: AddAddressScreen(
-                                              userId: "68fa72cbdc5f0a68",
-                                              userLat: defaultLat,
-                                              userLong: defaultLng,
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                    );
-                                  },
-                                  child: Container(
+                                          );
+                                        },
+                                      );
+                                    },
+                                    child: Container(
                                       padding: EdgeInsets.all(1),
                                       decoration: BoxDecoration(
                                         color: secondaryColor.withOpacity(0.3),
