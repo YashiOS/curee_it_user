@@ -282,22 +282,32 @@ class _HomeScreenState extends State<HomeScreen> {
       crossAxisCount: 3,
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
-      childAspectRatio: 0.5,
+      childAspectRatio: 0.54,
       crossAxisSpacing: 10,
       mainAxisSpacing: 10,
       children: productWidgets,
     );
   }
 
-  Widget buildProductItem(int index) {
-    final product = products[index];
+  
+Widget buildProductItem(int index){
+  final product = products[index];
     final bool isInCart = quantities[index] != null && quantities[index]! > 0;
 
-    return Column(
-      children: [
-        GestureDetector(
-          onTap: () {
-            Navigator.push(
+    return Container(
+      width: 120,
+      padding: EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: Colors.grey.shade300),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          GestureDetector(
+            onTap: (){
+              Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => ItemDetailScreen(
@@ -305,44 +315,47 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
             );
-          },
-          child: Container(
-            width: 110,
-            height: 120,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: Colors.grey.shade300),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Stack(
-              children: [
-                Transform.translate(
-                  offset: Offset(0, -10),
-                  child: Center(
-                    child: product['imageMediaUrls'][0] != null &&
-                            product['imageMediaUrls'][0].toString().isNotEmpty
-                        ? Image.network(
-                            product['imageMediaUrls'][0],
-                            fit: BoxFit.contain,
-                            width: 70,
-                            height: 70,
-                            errorBuilder: (context, error, stackTrace) => Icon(
-                                Icons.image_not_supported,
-                                size: 70,
-                                color: Colors.grey[200]),
-                          )
-                        : Icon(
-                            Icons.image_not_supported,
-                            size: 70,
-                            color: Colors.grey[200],
-                          ),
-                  ),
+            },
+            child: AspectRatio(
+              aspectRatio: 1,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                Positioned(
-                  bottom: 0,
-                  right: 0,
-                  left: 0,
-                  child: Container(
+                child: product['imageMediaUrls'][0] != null &&
+                              product['imageMediaUrls'][0].toString().isNotEmpty
+                    ? Image.network(
+                        product['imageMediaUrls'][0],
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) => Icon(
+                          Icons.image_not_supported,
+                          size: 40,
+                          color: Colors.grey.shade400,
+                        ),
+                      )
+                    : Icon(
+                        Icons.image_not_supported,
+                        size: 40,
+                        color: Colors.grey.shade400,
+                      ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 6),
+          SizedBox(
+            height: 34,
+            child: Text(
+              product['name'] ?? 'Product',
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+          Container(
                     height: 30,
                     decoration: BoxDecoration(
                       color: isInCart
@@ -394,33 +407,19 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                   ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        Container(
-          width: 110,
-          padding: EdgeInsets.symmetric(horizontal: 4, vertical: 4),
-          child: Column(
-              children: [
-                 Text(
-            product['name'] ?? 'Product',
-            textAlign: TextAlign.left,
+          const SizedBox(height: 4),
+          Text(
+            "₹ ${product['price']}",
             style: TextStyle(
               fontSize: 12,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.bold,
+              color: Colors.green.shade700,
             ),
-            maxLines: 2,
-          )
+          ),
         ],
-        )
-        ),
-       Text("${product['price']}rs")
-      ],
+      ),
     );
-  }
-
+}
   @override
   Widget build(BuildContext context) {
     return Scaffold(
