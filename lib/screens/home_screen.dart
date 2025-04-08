@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cureeit_user_app/current_address/google_maps_screen.dart';
 import 'package:cureeit_user_app/screens/cart_screen.dart';
 import 'package:cureeit_user_app/screens/item_detail_screen.dart';
 import 'package:cureeit_user_app/screens/profile_screen.dart';
@@ -9,6 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+import './add_address_screen.dart';
+import './addresses_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -18,6 +21,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  List<dynamic> addresses = [];
   List<dynamic> products = [];
   List<Map<String, dynamic>> cartItems = [];
   double totalAmount = 0.00;
@@ -31,6 +35,7 @@ class _HomeScreenState extends State<HomeScreen> {
     super.initState();
     fetchCartDetails();
     fetchProducts();
+    fetchAddresses();
   }
 
   Future<void> didAddToCart(int index) async {
@@ -289,9 +294,8 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  
-Widget buildProductItem(int index){
-  final product = products[index];
+  Widget buildProductItem(int index) {
+    final product = products[index];
     final bool isInCart = quantities[index] != null && quantities[index]! > 0;
 
     return Container(
@@ -306,15 +310,15 @@ Widget buildProductItem(int index){
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           GestureDetector(
-            onTap: (){
+            onTap: () {
               Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ItemDetailScreen(
-                  productId: product['productId'],
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ItemDetailScreen(
+                    productId: product['productId'],
+                  ),
                 ),
-              ),
-            );
+              );
             },
             child: AspectRatio(
               aspectRatio: 1,
@@ -324,7 +328,7 @@ Widget buildProductItem(int index){
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: product['imageMediaUrls'][0] != null &&
-                              product['imageMediaUrls'][0].toString().isNotEmpty
+                        product['imageMediaUrls'][0].toString().isNotEmpty
                     ? Image.network(
                         product['imageMediaUrls'][0],
                         fit: BoxFit.contain,
@@ -356,57 +360,54 @@ Widget buildProductItem(int index){
             ),
           ),
           Container(
-                    height: 30,
-                    decoration: BoxDecoration(
-                      color: isInCart
-                          ? Colors.white.withOpacity(0.8)
-                          : primaryColor,
-                      borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(8),
-                        bottomRight: Radius.circular(8),
+            height: 30,
+            decoration: BoxDecoration(
+              color: isInCart ? Colors.white.withOpacity(0.8) : primaryColor,
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(8),
+                bottomRight: Radius.circular(8),
+              ),
+            ),
+            child: isInCart
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      InkWell(
+                        onTap: () => DidUpdateQuantity(index, -1),
+                        child:
+                            Icon(Icons.remove, size: 20, color: primaryColor),
+                      ),
+                      Text(
+                        '${quantities[index]}',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 14),
+                      ),
+                      InkWell(
+                        onTap: () => DidUpdateQuantity(index, 1),
+                        child: Icon(Icons.add, size: 20, color: primaryColor),
+                      ),
+                    ],
+                  )
+                : InkWell(
+                    onTap: () {
+                      didAddToCart(index);
+                      setState(() {
+                        isLoading = true;
+                      });
+                      fetchCartDetails();
+                    },
+                    child: Center(
+                      child: Text(
+                        "Add To Cart",
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12,
+                        ),
                       ),
                     ),
-                    child: isInCart
-                        ? Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              InkWell(
-                                onTap: () => DidUpdateQuantity(index, -1),
-                                child: Icon(Icons.remove,
-                                    size: 20, color: primaryColor),
-                              ),
-                              Text(
-                                '${quantities[index]}',
-                                style: TextStyle(
-                                    fontWeight: FontWeight.bold, fontSize: 14),
-                              ),
-                              InkWell(
-                                onTap: () => DidUpdateQuantity(index, 1),
-                                child: Icon(Icons.add,
-                                    size: 20, color: primaryColor),
-                              ),
-                            ],
-                          )
-                        : InkWell(
-                            onTap: () {
-                              didAddToCart(index);
-                              setState(() {
-                                isLoading = true;
-                              });
-                              fetchCartDetails();
-                            },
-                            child: Center(
-                              child: Text(
-                                "Add To Cart",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ),
-                          ),
                   ),
+          ),
           const SizedBox(height: 4),
           Text(
             "₹ ${product['price']}",
@@ -419,7 +420,262 @@ Widget buildProductItem(int index){
         ],
       ),
     );
-}
+  }
+
+  Future<void> fetchAddresses() async {
+    var url = Uri.parse(
+      'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/address/savedAddress',
+    );
+
+    // Create the GET request with the userId as query parameter
+    var request = http.Request('GET', url)
+      ..headers.addAll({
+        'Content-Type': 'application/json',
+      })
+      ..body = jsonEncode({'userId': "68fa72cbdc5f0a68"});
+
+    var response = await http.Client().send(request);
+
+    if (response.statusCode == 200) {
+      final data = json.decode(await response.stream.bytesToString());
+      setState(() {
+        addresses = data['data']['address'];
+      });
+    } else {
+      print('Failed to load addresses');
+    }
+  }
+
+  void _locationBottomSheet() {
+    showModalBottomSheet(
+      backgroundColor: const Color.fromARGB(255, 228, 233, 233),
+      context: context,
+      isScrollControlled:
+          true, // Allows the sheet to expand to full height if needed
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (_) {
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Draggable handle and close button
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const SizedBox(width: 30),
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.center,
+                      child: Container(
+                        width: 60,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: Colors.grey.shade400,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+
+              // Title
+              const Center(
+                child: Text(
+                  "Select delivery location",
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+              const SizedBox(height: 10),
+
+              // Search field
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                child: TextField(
+                  decoration: InputDecoration(
+                    hintText: 'Search for area or apartment',
+                    prefixIcon: const Icon(Icons.search),
+                    filled: true,
+                    fillColor: Colors.grey.shade100,
+                    contentPadding:
+                        const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Current Location Container
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => GoogleMapsScreen()));
+                  },
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: Colors.green.shade100,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.my_location,
+                          color: Colors.green,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      const Text(
+                        "Use my current location",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // Add New Address Container
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: GestureDetector(
+                  onTap: () {},
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: Colors.blue.shade100,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.add,
+                          color: Colors.blue,
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      const Text(
+                        "Add new address",
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Saved Addresses Header
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8.0),
+                child: Text(
+                  "Your saved addresses",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.grey,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+
+              // Saved Addresses List Container
+              Container(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height *0.3, // Adjust as needed
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: addresses.isEmpty
+                    ? const Center(child: Text("No saved addresses"))
+                    : ListView.builder(
+                        shrinkWrap: true,
+                        physics: const ClampingScrollPhysics(),
+                        itemCount: addresses.length,
+                        itemBuilder: (context, index) {
+                          var address = addresses[index];
+                          return ListTile(
+                            contentPadding: EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 12),
+                            leading: Container(
+                              padding: EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: const Color.fromARGB(255, 204, 235, 231)
+                                    , // Soft blue background
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color:const Color.fromARGB(255, 171, 234, 225), // Light blue border
+                                  width: 1.5,
+                                ),
+                              ),
+                              child: Icon(
+                                Icons.home_rounded, // More modern home icon
+                                color: primaryColor, // Matching blue icon
+                                size: 22,
+                              ),
+                            ),
+                            title: Text(
+                              address['address'] ?? '',
+                              style: TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.grey
+                                    .shade800, // Darker text for better readability
+                              ),
+                            ),
+                            subtitle: Text(
+                              address['landmark'] ?? '',
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.grey
+                                    .shade600, // Slightly lighter than title
+                              ),
+                            ),
+                            
+                          );
+                        },
+                      ),
+              ),
+              const SizedBox(height: 16), // Extra space at bottom
+            ],
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -506,55 +762,89 @@ Widget buildProductItem(int index){
         ),
       ),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          GestureDetector(
+            onTap: () {
+              _locationBottomSheet();
+              // Handle tap to show city selection
+              print('Location selector tapped');
+            },
+            child: Container(
+              padding: EdgeInsets.only(left: 10),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.location_on,
+                    color: primaryColor,
+                    size: 20,
+                  ),
+                  SizedBox(width: 8),
+                  Text(
+                    'New York', // Replace with your city variable
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                      color: Color.fromARGB(255, 85, 83, 83),
+                    ),
+                  ),
+                  SizedBox(width: 4),
+                  Icon(
+                    Icons.arrow_drop_down,
+                    color: Colors.grey,
+                  ),
+                ],
+              ),
+            ),
+          ),
           GestureDetector(
             onTap: () {
               Navigator.push(
                   context, MaterialPageRoute(builder: (context) => Search()));
             },
             child: Container(
-               margin: EdgeInsets.all(10),
-                height: 58,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                      width: 1, color: Color.fromARGB(255, 202, 188, 188)),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        child: TextField(
-                          style: TextStyle(fontFamily: "Urbanist"),
-                          decoration: InputDecoration(
-                            enabled: false,
-                            hintText: "Search",
-                            hintStyle: TextStyle(fontFamily: "Urbanist"),
-                            border: InputBorder.none,
-                          ),
-                        ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      child: GestureDetector(
-                        onTap: () {
-                        },
-                        child: Container(
-                          padding: EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: secondaryColor,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Icon(Icons.search, color: Colors.white),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+              margin: EdgeInsets.all(10),
+              height: 58,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(
+                    width: 1, color: Color.fromARGB(255, 202, 188, 188)),
               ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: TextField(
+                        style: TextStyle(fontFamily: "Urbanist"),
+                        decoration: InputDecoration(
+                          enabled: false,
+                          hintText: "Search",
+                          hintStyle: TextStyle(fontFamily: "Urbanist"),
+                          border: InputBorder.none,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    child: GestureDetector(
+                      onTap: () {},
+                      child: Container(
+                        padding: EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: secondaryColor,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Icon(Icons.search, color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
           Expanded(
             child: Container(
@@ -631,7 +921,7 @@ Widget buildProductItem(int index){
                                                           .withOpacity(0.3)),
                                                 ),
                                                 child: cartItems[0]['imageUrls']
-                                                       .isNotEmpty
+                                                        .isNotEmpty
                                                     ? Image.network(
                                                         cartItems[0]
                                                             ['imageUrls'][0],
