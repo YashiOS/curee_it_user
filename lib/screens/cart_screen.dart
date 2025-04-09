@@ -33,6 +33,27 @@ class _CartScreenState extends State<CartScreen> {
     fetchCartDetails();
     fetchAddresses();
   }
+  void reBuild(){
+    setState(() {});
+    print("ruBuild done");
+  }
+  void removeItemFromCart(String productId) {
+  setState(() {
+    cartItems.removeWhere((item) => item['productId'] == productId);
+  print("product delected from front end");
+    if (cartItems.isEmpty) {
+      totalAmount = 0.0;
+      taxServices = 0.0;
+      deliveryServiceFees = 0.0;
+      totalWholeAmount = 0.0;
+    }
+    setState(() {
+      
+    });
+    print("****updated cart item LIST****");
+    print(cartItems);
+  });
+}
 
 
   Future<void> _removeAllFromCart() async {
@@ -75,6 +96,7 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   Future<void> fetchCartDetails() async {
+    print("****fetching cart******");
     var cartApiUrl = Uri.parse(
         "http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/cart/cartDetails");
     final String userId = "68fa72cbdc5f0a68"; // Replace with the actual userId
@@ -94,18 +116,20 @@ class _CartScreenState extends State<CartScreen> {
         if (responseData['status'] == 200 && responseData['data'] != null) {
           List<dynamic> cartData = responseData['data'];
           List<Map<String, dynamic>> tempCart = [];
-          double totalFromApi = double.tryParse(responseData['totalAmount'].toString()) ?? 0.0;
-double taxFees = double.tryParse(responseData['taxServicesFees'].toString()) ?? 0.0;
-double deliveryFees = double.tryParse(responseData['deliveryFees'].toString()) ?? 0.0;
+          double totalFromApi =
+              double.tryParse(responseData['totalAmount'].toString()) ?? 0.0;
+          double taxFees =
+              double.tryParse(responseData['taxServicesFees'].toString()) ??
+                  0.0;
+          double deliveryFees =
+              double.tryParse(responseData['deliveryFees'].toString()) ?? 0.0;
 
           for (var cartItem in cartData) {
-            
-
             Map<String, dynamic>? productDetails =
                 await fetchProductDetails(cartItem['productId']);
 
             if (productDetails != null) {
-              print("🟢 Product Details Retrieved: $productDetails");
+              //print("🟢 Product Details Retrieved: $productDetails");
               tempCart.add({
                 "productId": cartItem['productId'],
                 "quantity": cartItem['quantity'],
@@ -123,16 +147,15 @@ double deliveryFees = double.tryParse(responseData['deliveryFees'].toString()) ?
                   "❌ Failed to fetch details for Product ID: ${cartItem['productId']}");
             }
           }
-
+          
           setState(() {
             cartItems = tempCart;
             isLoading = false;
             totalAmount = totalFromApi;
-  taxServices = taxFees;
-  deliveryServiceFees = deliveryFees;
-  totalWholeAmount = taxServices + totalAmount + deliveryServiceFees;
+            taxServices = taxFees;
+            deliveryServiceFees = deliveryFees;
+            totalWholeAmount = taxServices + totalAmount + deliveryServiceFees;
           });
-      
         } else {
           print("❌ Response did not contain valid cart data");
         }
@@ -149,6 +172,7 @@ double deliveryFees = double.tryParse(responseData['deliveryFees'].toString()) ?
     } catch (error) {
       print("❌ Error fetching cart details: $error");
     }
+    print(cartItems);
   }
 
   Future<Map<String, dynamic>?> fetchProductDetails(String productId) async {
@@ -191,8 +215,7 @@ double deliveryFees = double.tryParse(responseData['deliveryFees'].toString()) ?
       ..headers.addAll({
         'Content-Type': 'application/json',
       })
-      ..body = jsonEncode(
-          {'userId': "68fa72cbdc5f0a68"});
+      ..body = jsonEncode({'userId': "68fa72cbdc5f0a68"});
 
     var response = await http.Client().send(request);
 
@@ -208,7 +231,7 @@ double deliveryFees = double.tryParse(responseData['deliveryFees'].toString()) ?
 
   Future<void> createCheckout(
       String total, double shippingCost, String shippingAddress) async {
-        int Total=double.parse(total).toInt();
+    int Total = double.parse(total).toInt();
     try {
       var url = Uri.parse(
           'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/order/createCheckout');
@@ -239,24 +262,24 @@ double deliveryFees = double.tryParse(responseData['deliveryFees'].toString()) ?
         Map<String, dynamic> responseData = jsonDecode(responseBody);
 
         if (responseData['message'] == 'Order created successfully') {
-     _removeAllFromCart();  //removing cart item from backend , not using await so it will be done in background ,so user does not have to wait
-    cartItems.clear();
-  //            Navigator.push(
-  // context,
-  // MaterialPageRoute(
-  //   builder: (context) => OrderSuccessScreen(),
-  // ),
-  // );
-  final shouldRefresh = await Navigator.push(
-  context,
-  MaterialPageRoute(
-    builder: (context) => OrderSuccessScreen(),
-  ),
-);
+          _removeAllFromCart(); //removing cart item from backend , not using await so it will be done in background ,so user does not have to wait
+          cartItems.clear();
+          //            Navigator.push(
+          // context,
+          // MaterialPageRoute(
+          //   builder: (context) => OrderSuccessScreen(),
+          // ),
+          // );
+          final shouldRefresh = await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => OrderSuccessScreen(),
+            ),
+          );
 
-if (shouldRefresh == true) {
-  await fetchCartDetails();
-}
+          if (shouldRefresh == true) {
+            await fetchCartDetails();
+          }
         }
       } else {
         var responseBody = await response.stream.bytesToString();
@@ -404,6 +427,7 @@ if (shouldRefresh == true) {
                                               Column(
                                                 children: cartItems
                                                     .map((item) => CartCard(
+                                                      reBuild: reBuild,
                                                         productName:
                                                             item['name'],
                                                         packLabel: item[
@@ -419,19 +443,15 @@ if (shouldRefresh == true) {
                                                             0.0,
                                                         onUpdate:
                                                             fetchCartDetails,
-                                                        onRemove:(){
-                                                          setState(() {
-            cartItems.removeWhere((element) => element['productId'] == item['productId']);
-            if (cartItems.isEmpty) {
-              totalAmount = 0.0;
-              taxServices = 0.0;
-              deliveryServiceFees = 0.0;
-              totalWholeAmount = 0.0;
-            }
-          });
-          fetchAddresses();
+                                                        onRemove: () async{
+                                                          print("on remove is called");
+                                                          removeItemFromCart(item['productId']);
+                                                          await fetchCartDetails();
+                                                          print(" on remove mai fetch karke print${cartItems}");
+                                                         setState(() {
+                                                           
+                                                         });
                                                         },
-                                                            
                                                         productImages:
                                                             item['imageUrls'] ??
                                                                 ''))
@@ -590,13 +610,17 @@ if (shouldRefresh == true) {
                                                               razorpayPayment =
                                                               RazorpayPayment(
                                                             onSuccess:
-                                                                (PaymentSuccessResponse response) {
-                                                                      print("Total Amount is ${totalAmount.toStringAsFixed(2)}");
-                                                                createCheckout(
-                                                            (totalWholeAmount).toStringAsFixed(2),
-                                                            deliveryServiceFees,
-                                                            "${selectedAddress!['address']}, ${selectedAddress!['landmark']}, ${selectedAddress!['floor']}, ${selectedAddress!['userLat']}, ${selectedAddress!['userLong']}",
-                                                          );
+                                                                (PaymentSuccessResponse
+                                                                    response) {
+                                                              print(
+                                                                  "Total Amount is ${totalAmount.toStringAsFixed(2)}");
+                                                              createCheckout(
+                                                                (totalWholeAmount)
+                                                                    .toStringAsFixed(
+                                                                        2),
+                                                                deliveryServiceFees,
+                                                                "${selectedAddress!['address']}, ${selectedAddress!['landmark']}, ${selectedAddress!['floor']}, ${selectedAddress!['userLat']}, ${selectedAddress!['userLong']}",
+                                                              );
                                                             },
                                                             onFailure:
                                                                 (PaymentFailureResponse

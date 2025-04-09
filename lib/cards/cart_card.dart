@@ -13,6 +13,7 @@ class CartCard extends StatefulWidget {
   final double sellingPrice;
   final Function onUpdate;
   final Function onRemove;
+  final Function reBuild;
   final List<dynamic> productImages;
 
   const CartCard({
@@ -25,6 +26,7 @@ class CartCard extends StatefulWidget {
     required this.onUpdate,
     required this.onRemove,
     required this.productImages,
+    required this.reBuild,
   });
 
   @override
@@ -46,6 +48,16 @@ class _CartCardState extends State<CartCard> {
     _debounceTimer?.cancel();
     super.dispose();
   }
+  @override
+void didUpdateWidget(covariant CartCard oldWidget) {
+  super.didUpdateWidget(oldWidget);
+  if (widget.quantity != oldWidget.quantity) {
+    setState(() {
+      _localQuantity = widget.quantity;
+    });
+  }
+}
+
 
   void _onQuantityChanged(int newQuantity) {
     setState(() {
@@ -61,7 +73,7 @@ class _CartCardState extends State<CartCard> {
   Future<void> _updateQuantity(int quantity) async {
     final String userId = "68fa72cbdc5f0a68";
     final String productId = widget.productId;
-
+  
     final Map<String, dynamic> requestData = {
       "userId": userId,
       "productId": productId,
@@ -79,6 +91,7 @@ class _CartCardState extends State<CartCard> {
       print("Quantity in API is $quantity");
       if (response.statusCode == 200) {
         print("sucessfully updated");
+        
         widget.onUpdate();
       } else {
         print(
@@ -109,7 +122,8 @@ class _CartCardState extends State<CartCard> {
 
       if (response.statusCode == 200) {
         widget.onRemove();
-        print("*****product deleted**********");
+        print("*****product deleted from backend**********");
+        widget.reBuild();
       } else {
         print(response.statusCode);
         print('Failed to remove from cart');
@@ -121,6 +135,7 @@ class _CartCardState extends State<CartCard> {
 
   @override
   Widget build(BuildContext context) {
+    
     return Padding(
       padding: const EdgeInsets.only(left: 0.0, right: 0, top: 28, bottom: 14),
       child: Container(
@@ -219,17 +234,16 @@ class _CartCardState extends State<CartCard> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         GestureDetector(
-                          onTap: () {
+                          onTap: (){
+                            if(widget.quantity==1||_localQuantity==1){
+                                  _removeFromCart();
+                              
+                            }
                             if (_localQuantity > 1) {
                               _onQuantityChanged(_localQuantity - 1);
-      
+                              
                             }
-                            else{
-                              _removeFromCart();
-                              setState(() {
-                                
-                              });
-                            };
+                           
                           },
                           child: Image.asset(
                             "lib/images/minus_button.png",

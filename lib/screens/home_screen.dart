@@ -10,8 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import './add_address_screen.dart';
-import './addresses_screen.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -359,6 +358,15 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
+          Text(
+            "₹ ${product['price']}",
+            style: TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: Colors.green.shade700,
+            ),
+          ),
+          SizedBox(height: 2,),
           Container(
             height: 30,
             decoration: BoxDecoration(
@@ -409,14 +417,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
           ),
           const SizedBox(height: 4),
-          Text(
-            "₹ ${product['price']}",
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.bold,
-              color: Colors.green.shade700,
-            ),
-          ),
+          
         ],
       ),
     );
@@ -455,6 +456,7 @@ class _HomeScreenState extends State<HomeScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
+    
       builder: (_) {
         return Padding(
           padding: const EdgeInsets.all(16.0),
@@ -519,17 +521,17 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 16),
 
               // Current Location Container
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => GoogleMapsScreen()));
-                  },
+              GestureDetector(
+                onTap: (){
+                  Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => GoogleMapsScreen()));
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   child: Row(
                     children: [
                       Container(

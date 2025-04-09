@@ -69,6 +69,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         backgroundColor: Colors.white,
         leading: GestureDetector(
@@ -81,66 +82,68 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
           style: TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
         ),
       ),
-      body: Container(
-        color: Colors.white,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              TextField(
-                controller: _line1Controller,
-                decoration: InputDecoration(
-                  labelText: "Address Line 1",
-                  border: OutlineInputBorder(),
+      body: SingleChildScrollView(
+        child: Container(
+          color: Colors.white,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                TextField(
+                  controller: _line1Controller,
+                  decoration: InputDecoration(
+                    labelText: "Address Line 1",
+                    border: OutlineInputBorder(),
+                  ),
                 ),
-              ),
-              SizedBox(height: 10),
-              TextField(
-                controller: _line2Controller,
-                decoration: InputDecoration(
-                  labelText: "Address Line 2",
-                  border: OutlineInputBorder(),
+                SizedBox(height: 10),
+                TextField(
+                  controller: _line2Controller,
+                  decoration: InputDecoration(
+                    labelText: "Address Line 2",
+                    border: OutlineInputBorder(),
+                  ),
                 ),
-              ),
-              SizedBox(height: 10),
-              TextField(
-                controller: _landmarkController,
-                decoration: InputDecoration(
-                    labelText: "Landmark (Optional)",
-                    border: OutlineInputBorder()),
-              ),
-              SizedBox(height: 10),
-              TextField(
-                controller: _floorController,
-                decoration: InputDecoration(
-                    labelText: "Floor (Optional)",
-                    border: OutlineInputBorder()),
-              ),
-              SizedBox(height: 10),
-              TextField(
-                controller: _typeController,
-                decoration: InputDecoration(
-                  labelText: "Type (e.g., Home, Office)",
-                  border: OutlineInputBorder(),
+                SizedBox(height: 10),
+                TextField(
+                  controller: _landmarkController,
+                  decoration: InputDecoration(
+                      labelText: "Landmark (Optional)",
+                      border: OutlineInputBorder()),
                 ),
-              ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: addAddress,
-                style: ElevatedButton.styleFrom(
-                  iconColor: const Color.fromARGB(255, 10, 21, 81),
-                  backgroundColor: const Color.fromARGB(255, 10, 21, 81),
-                  padding: EdgeInsets.all(15),
-                  textStyle: TextStyle(fontSize: 18),
+                SizedBox(height: 10),
+                TextField(
+                  controller: _floorController,
+                  decoration: InputDecoration(
+                      labelText: "Floor (Optional)",
+                      border: OutlineInputBorder()),
                 ),
-                child: Text(
-                  "Add Address",
-                  style: TextStyle(
-                      fontWeight: FontWeight.w700, color: Colors.white),
+                SizedBox(height: 10),
+                TextField(
+                  controller: _typeController,
+                  decoration: InputDecoration(
+                    labelText: "Type (e.g., Home, Office)",
+                    border: OutlineInputBorder(),
+                  ),
                 ),
-              ),
-            ],
+                SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: addAddress,
+                  style: ElevatedButton.styleFrom(
+                    iconColor: const Color.fromARGB(255, 10, 21, 81),
+                    backgroundColor: const Color.fromARGB(255, 10, 21, 81),
+                    padding: EdgeInsets.all(15),
+                    textStyle: TextStyle(fontSize: 18),
+                  ),
+                  child: Text(
+                    "Add Address",
+                    style: TextStyle(
+                        fontWeight: FontWeight.w700, color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
