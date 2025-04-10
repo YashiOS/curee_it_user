@@ -1,54 +1,17 @@
-import 'dart:convert';
-
 import 'package:cureeit_user_app/screens/base_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
+
 class OrderTrackingScreen extends StatefulWidget {
-  final String userId = "68fa72cbdc5f0a68";
-  late String orderId;
-   OrderTrackingScreen({super.key,required this.NavigatingFrom,required this.orderId});
+   OrderTrackingScreen({super.key,required this.NavigatingFrom});
    final String NavigatingFrom;
   @override
   State<OrderTrackingScreen> createState() => _OrderTrackingScreenState();
 }
 
 class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
-  
-Map<String, dynamic> orderTrackingDetails = {};
-
-
-  Future<void> fetchOrderTracking() async {
-    var url = Uri.parse(
-      'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/order/orderTracking',
-    );
-    var request = http.Request('GET', url)
-      ..headers.addAll({
-        'Content-Type': 'application/json',
-      })
-      ..body = jsonEncode({
-        'userId': widget.userId,
-        'orderId': widget.orderId
-    });
-
-    var response = await http.Client().send(request);
-
-    if (response.statusCode == 200) {
-      final responseBody = await response.stream.bytesToString(); // 🔐 only once
-  final data = json.decode(responseBody);
-  print("API response: $responseBody");
-
-      setState(() {
-        orderTrackingDetails = (data['data'] as List).isNotEmpty ? data['data'][0] : {};
-      });
-    } else {
-      print('Failed to load tracking details');
-    }
-  }
-
   @override
  void initState(){
    super.initState();
-   fetchOrderTracking();
   }
 
   Widget MedicineCard(
@@ -71,7 +34,7 @@ Map<String, dynamic> orderTrackingDetails = {};
           ClipRRect(
             borderRadius: BorderRadius.circular(width * 0.02),
             child: Image.asset(
-              Imgurl,
+              Imgurl, // Change path as needed
               width: width * 0.15,
               height: width * 0.15,
               fit: BoxFit.cover,
@@ -464,8 +427,8 @@ Map<String, dynamic> orderTrackingDetails = {};
                   alignment: Alignment.topRight,
                   child: GestureDetector(
                     onTap: () {
-                      // Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>BaseScreen()));
-                      Navigator.pop(context);
+                      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>BaseScreen()));
+                      print("Close tapped");
                     },
                     child: Icon(
                       Icons.close,
@@ -574,9 +537,9 @@ Map<String, dynamic> orderTrackingDetails = {};
                         children: [
                           OrderDetail(
                             icon: Icons.home_outlined,
-                            title: "Delivery at:",
+                            title: "Delivery at Other",
                             subtitle:
-                                orderTrackingDetails['shippingAddress'] ?? "Unknown",
+                                "123 Main Street, Apt 4B New York, NY 10001",
                             width: width,
                           ),
                           OrderDetail(

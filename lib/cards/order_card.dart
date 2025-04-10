@@ -1,3 +1,4 @@
+import 'package:cureeit_user_app/screens/order_tracking_screen.dart';
 import 'package:cureeit_user_app/screens/orderdetail_screen_new.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
@@ -39,6 +40,7 @@ class OrderCard extends StatelessWidget {
     String purchaseDate = orderData['createdAt'];
     double shippingCost = double.parse(orderData['totalAmount']);
     List orderItems = orderData['orderItems'];
+    String orderId = orderData['orderId'];
 
     String allItems = formatOrderItems(orderItems);
 
@@ -48,12 +50,21 @@ class OrderCard extends StatelessWidget {
   ),
   child: GestureDetector(
     onTap: () {
+      if (orderStatus == "Order Placed" || orderStatus == "Packing" || orderStatus == "On the way") {
+          Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => OrderTrackingScreen(NavigatingFrom: "Order History", orderId: orderId,),
+      ),
+    );
+   } else {
       Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => OrderdetailScreenNew(orderData: orderData),
         ),
       );
+    }
     },
     child: LayoutBuilder(
       builder: (context, constraints) {

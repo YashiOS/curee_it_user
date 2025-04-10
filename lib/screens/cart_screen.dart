@@ -273,7 +273,7 @@ class _CartScreenState extends State<CartScreen> {
           final shouldRefresh = await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => OrderSuccessScreen(),
+              builder: (context) => OrderSuccessScreen(orderId: responseData['orderId'],),
             ),
           );
 

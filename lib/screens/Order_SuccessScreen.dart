@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
 class OrderSuccessScreen extends StatefulWidget {
+  final String orderId;
+  OrderSuccessScreen({super.key, required this.orderId});
   @override
   _OrderSuccessScreenState createState() => _OrderSuccessScreenState();
 }
@@ -14,7 +16,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
   void initState() {
     super.initState();
    Future.delayed(Duration(seconds: 4), () {
-      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>OrderTrackingScreen(NavigatingFrom: "Order_SuccessScreen",)));
+      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>OrderTrackingScreen(NavigatingFrom: "Order_SuccessScreen", orderId: widget.orderId,)));
     });
   }
 
