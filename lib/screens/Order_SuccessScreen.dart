@@ -1,4 +1,5 @@
 import 'package:cureeit_user_app/screens/cart_screen.dart';
+import 'package:cureeit_user_app/screens/order_tracking_screen.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
@@ -12,8 +13,8 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
   @override
   void initState() {
     super.initState();
-   Future.delayed(Duration(seconds: 2), () {
-      Navigator.pop(context, true);
+   Future.delayed(Duration(seconds: 4), () {
+      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>OrderTrackingScreen(NavigatingFrom: "Order_SuccessScreen",)));
     });
   }
 

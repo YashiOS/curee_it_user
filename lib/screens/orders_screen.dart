@@ -16,9 +16,10 @@ class _OrdersScreenState extends State<OrdersScreen> {
   bool isLoading = true;
 
   Future<void> fetchOrderHistory() async {
+    print("fetching order history");
     var url = Uri.parse(
         'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/order/orderHistory');
-    var request = http.Request('GET', url)
+    var request =  http.Request('GET', url)
       ..headers.addAll({
         'Content-Type': 'application/json',
       })
@@ -37,11 +38,18 @@ class _OrdersScreenState extends State<OrdersScreen> {
     } else {
       throw Exception('Failed to load order history');
     }
+    print("first order");
+    print(orders[0]);
+    print("2ND order");
+    print(orders[1]);
+    print("total in history");
+    print(orders.length);
   }
 
   @override
   void initState() {
     super.initState();
+    print("intistate");
     fetchOrderHistory();
   }
 

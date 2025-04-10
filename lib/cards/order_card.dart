@@ -36,7 +36,7 @@ class OrderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String orderStatus = orderData['currentStatus'];
-    String purchaseDate = orderData['purchaseDate'];
+    String purchaseDate = orderData['createdAt'];
     double shippingCost = double.parse(orderData['totalAmount']);
     List orderItems = orderData['orderItems'];
 
