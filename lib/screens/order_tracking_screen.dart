@@ -12,12 +12,6 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
   @override
  void initState(){
    super.initState();
-   if(widget.NavigatingFrom=="Order_SuccessScreen"){
-    Future.delayed(Duration(seconds: 4),(){
-      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>BaseScreen()));
-    });
-
-   }
   }
 
   Widget MedicineCard(

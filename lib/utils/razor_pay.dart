@@ -34,7 +34,7 @@ class RazorpayPayment {
       String contact, String email) {
     var options = {
       'key': "rzp_test_zVbDkK876DXdvr",
-      'amount': amount * 100,
+      'amount': (amount * 100).toInt(),
       'name': name,
       'description': description,
       'prefill': {

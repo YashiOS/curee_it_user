@@ -299,7 +299,6 @@ class _HomeScreenState extends State<HomeScreen> {
     final bool isInCart = quantities[index] != null && quantities[index]! > 0;
 
     return Container(
-  // Dynamic width based on screen size (3 items per row with spacing)
   width: MediaQuery.of(context).size.width * 0.3,
   padding: EdgeInsets.all(8),
   decoration: BoxDecoration(
@@ -320,7 +319,6 @@ class _HomeScreenState extends State<HomeScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Image Section (40% of container height)
           SizedBox(
             height: constraints.maxHeight * 0.4,
             child: GestureDetector(
