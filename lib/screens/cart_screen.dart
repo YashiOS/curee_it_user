@@ -324,6 +324,7 @@ class _CartScreenState extends State<CartScreen> {
         ),
       ),
       body: Container(
+        margin: EdgeInsets.only(bottom: MediaQuery.of(context).size.height*0.06),
         color: Colors.grey.shade100.withOpacity(0.5),
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,

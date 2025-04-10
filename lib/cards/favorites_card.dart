@@ -123,78 +123,78 @@ class _FavoritesCardState extends State<FavoritesCard> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 0.0),
-      child: Column(
-        spacing: 10,
+  padding: const EdgeInsets.symmetric(vertical: 0.0),
+  child: LayoutBuilder(
+    builder: (context, constraints) {
+      double imageSize = constraints.maxWidth * 0.18; // dynamic image size
+      double iconSize = constraints.maxWidth * 0.05;  // dynamic icon size
+      double deleteButtonSize = constraints.maxWidth * 0.08;  //Ddelete button
+
+      return Column(
         children: [
           GestureDetector(
             onTap: () {
               Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => ItemDetailScreen(
-                            productId: widget.productId,
-                          )));
+                context,
+                MaterialPageRoute(
+                  builder: (context) => ItemDetailScreen(
+                    productId: widget.productId,
+                  ),
+                ),
+              );
             },
             child: Container(
-              padding: EdgeInsets.symmetric(horizontal: 8),
+              padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width*0.02),
               decoration: BoxDecoration(
-                  color: Colors.white, borderRadius: BorderRadius.circular(60)),
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(60),
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    spacing: 12,
                     children: [
                       ClipRRect(
-                          borderRadius: BorderRadius.circular(72),
-                          child: SizedBox(
-                            height: 68,
-                            width: 68,
-                            child: Container(
-                                padding: EdgeInsets.all(8),
-                                child: productImage != ''
-                                    ? Image.network(
-                                        productImage,
-                                        fit: BoxFit.contain,
-                                        loadingBuilder:
-                                            (context, child, loadingProgress) {
-                                          if (loadingProgress == null) {
-                                            return child;
-                                          }
-                                          return const Center(
-                                              child: CircularProgressIndicator(
-                                            color: secondaryColor,
-                                          ));
-                                        },
-                                        errorBuilder:
-                                            (context, error, stackTrace) {
-                                          return const Center(
-                                              child: Icon(
-                                            Icons.error,
-                                            color: Color.fromRGBO(7, 9, 84, 1),
-                                          ));
-                                        },
-                                      )
-                                    : Icon(Icons.image)),
-                          )),
+                        borderRadius: BorderRadius.circular(imageSize),
+                        child: Container(
+                          height: imageSize,
+                          width: imageSize,
+                          padding: EdgeInsets.all(8),
+                          child: productImage != ''
+                              ? Image.network(
+                                  productImage,
+                                  fit: BoxFit.contain,
+                                  loadingBuilder: (context, child, loadingProgress) {
+                                    if (loadingProgress == null) return child;
+                                    return Center(
+                                      child: CircularProgressIndicator(color: secondaryColor),
+                                    );
+                                  },
+                                  errorBuilder: (context, error, stackTrace) {
+                                    return Center(
+                                      child: Icon(Icons.error, color: Color.fromRGBO(7, 9, 84, 1)),
+                                    );
+                                  },
+                                )
+                              : Icon(Icons.image, size: iconSize),
+                        ),
+                      ),
+                      SizedBox(width: 8),
                       Padding(
-                        padding: const EdgeInsets.only(top: 8.0, left: 8),
+                        padding: const EdgeInsets.only(top: 8.0),
                         child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
-                          spacing: 8,
                           children: [
                             SizedBox(
-                              width: MediaQuery.of(context).size.width / 2,
+                              width: constraints.maxWidth * 0.5,
                               child: Text(
                                 productName.isNotEmpty ? productName : '...',
                                 maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
                                   fontWeight: FontWeight.w600,
-                                  fontSize: 14,
+                                  fontSize: constraints.maxWidth * 0.035,
                                   fontFamily: "JosefinSans",
                                   color: Color(0xFF1F1970),
                                 ),
@@ -206,7 +206,7 @@ class _FavoritesCardState extends State<FavoritesCard> {
                                 "ADD TO CART",
                                 style: TextStyle(
                                   fontWeight: FontWeight.w900,
-                                  fontSize: 12,
+                                  fontSize: constraints.maxWidth * 0.03,
                                   fontFamily: "Urbanist",
                                   color: secondaryColor,
                                 ),
@@ -219,41 +219,48 @@ class _FavoritesCardState extends State<FavoritesCard> {
                   ),
                   Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Stack(alignment: Alignment.center, children: [
-                      Container(
-                        height: 28,
-                        width: 28,
-                        decoration: BoxDecoration(
-                            color: secondaryColor,
-                            borderRadius: BorderRadius.circular(20)),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          print("Button Tapped of Delete");
+                    child: GestureDetector(
+                      onTap: () {
+                        print("Button Tapped of Delete");
                         removeFromFav();
-                        },
-                        child: Icon(
-                        Icons.delete,
-                        color: Colors.white,
-                        size: 22,
+                      },
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Container(
+                            height: deleteButtonSize,
+                            width: deleteButtonSize,
+                            decoration: BoxDecoration(
+                              color: secondaryColor,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                          Icon(
+                            Icons.delete,
+                            color: Colors.white,
+                            size: iconSize,
+                          ),
+                        ],
                       ),
-                      )
-                      
-                    ]),
-                  )
+                    ),
+                  ),
                 ],
               ),
             ),
           ),
+          SizedBox(height: 10,),
           Padding(
             padding: const EdgeInsets.only(bottom: 4.0),
             child: Image.asset(
               "lib/images/dotted_divider.png",
-              width: MediaQuery.of(context).size.width / 1.3,
+              width: constraints.maxWidth * 0.85,
             ),
           ),
         ],
-      ),
-    );
+      );
+    },
+  ),
+);
+
   }
 }

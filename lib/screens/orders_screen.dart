@@ -77,6 +77,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
               color: secondaryColor,
             )) // Show loader while data is loading
           : Container(
+            margin: EdgeInsets.only(bottom: MediaQuery.of(context).size.height*0.03),
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height,
               color: Colors.grey.shade100.withOpacity(0.5),

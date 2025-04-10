@@ -90,137 +90,139 @@ class _SearchCardState extends State<SearchCard> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => ItemDetailScreen(
-                      productId: "NEULEA33", // Pass the correct product ID here
-                    )));
-      },
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0),
-        child: Container(
-          padding: EdgeInsets.symmetric(vertical: 12),
-          decoration: BoxDecoration(
-              color: Colors.white, borderRadius: BorderRadius.circular(20)),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-            child: Padding(
-              padding: const EdgeInsets.only(top: 0.0),
-              child: Column(
-                children: [
-                  Row(
-                    spacing: 8,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width / 4,
-                        child: Image.asset("lib/images/neurobionForte.png"),
-                      ),
-                      Column(
-                        spacing: 8,
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              SizedBox(
-                                width: MediaQuery.of(context).size.width / 2,
-                                child: Text(
-                                  "Neurobion Forte Tablet with Vitamin B12 | Helps Manage Numbness and Tingling Sensation",
-                                  style: TextStyle(
-                                    fontFamily: "JosefinSans",
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w700,
-                                    color: Color(0xFF1F1970),
-                                  ),
-                                  maxLines: 2,
-                                ),
-                              ),
-                              Container(
-                                alignment: Alignment.bottomRight,
-                                child: GestureDetector(
-                                  onTap: () {
-                                    // Handle the logic to toggle the fav status
-                                    setState(() {
-                                      isFav = !isFav;
-                                    });
-                                  },
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      addToFavourites();
-                                    },
-                                    child: Icon(
-                                      isFav
-                                          ? Icons.favorite
-                                          : Icons.favorite_border_rounded,
-                                      color:
-                                          isFav ? secondaryColor : primaryColor,
-                                    ),
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                          Text(
-                            "10 Tablets",
-                            style: TextStyle(
-                                fontFamily: "Urbanist",
-                                fontSize: 10,
-                                fontWeight: FontWeight.w700,
-                                color: Colors.black.withOpacity(0.8)),
-                          ),
-                          SizedBox(
-                            width: MediaQuery.of(context).size.width / 1.8,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(
-                                  children: [
-                                    Text(
-                                      "₹ ",
-                                      style: TextStyle(
-                                          fontFamily: "Urbanist",
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.black.withOpacity(0.6)),
-                                    ),
-                                    Text(
-                                      "208.50",
-                                      style: TextStyle(
-                                          fontFamily: "Urbanist",
-                                          fontSize: 10,
-                                          decoration:
-                                              TextDecoration.lineThrough,
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.black.withOpacity(0.6)),
-                                    ),
-                                  ],
-                                ),
-                                Text(
-                                  "₹ 140.30",
-                                  style: TextStyle(
-                                      fontFamily: "Urbanist",
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w800,
-                                      color: Colors.black.withOpacity(0.8)),
-                                ),
-                              ],
-                            ),
-                          )
-                        ],
-                      )
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
+  onTap: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ItemDetailScreen(productId: "NEULEA33"),
       ),
     );
+  },
+  child: Padding(
+    padding: const EdgeInsets.symmetric(vertical: 8.0),
+    child: Container(
+      padding:  EdgeInsets.symmetric(vertical: 12, horizontal: MediaQuery.of(context).size.width*0.03),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Product Image
+          SizedBox(
+            width: MediaQuery.of(context).size.width * 0.25,
+            child: Image.asset("lib/images/neurobionForte.png"),
+          ),
+          const SizedBox(width: 8),
+
+          // Right Section
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                /// Title and Fav Icon Row
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Product Title
+                    Expanded(
+                      child: Text(
+                        "Neurobion Forte Tablet with Vitamin B12 | Helps Manage Numbness and Tingling Sensation",
+                        style: const TextStyle(
+                          fontFamily: "JosefinSans",
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF1F1970),
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    // Favourite Button
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          isFav = !isFav;
+                        });
+                        addToFavourites();
+                      },
+                      child: Icon(
+                        isFav
+                            ? Icons.favorite
+                            : Icons.favorite_border_rounded,
+                        color: isFav ? secondaryColor : primaryColor,
+                        size: 20,
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 4),
+
+                /// Pack Label
+                Text(
+                  "10 Tablets",
+                  style: TextStyle(
+                    fontFamily: "Urbanist",
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    color: Colors.black.withOpacity(0.8),
+                  ),
+                ),
+
+                const SizedBox(height: 4),
+
+                /// Price Row
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    // Original Price
+                    Row(
+                      children: [
+                        Text(
+                          "₹ ",
+                          style: TextStyle(
+                            fontFamily: "Urbanist",
+                            fontSize: 10,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black.withOpacity(0.6),
+                          ),
+                        ),
+                        Text(
+                          "208.50",
+                          style: TextStyle(
+                            fontFamily: "Urbanist",
+                            fontSize: 10,
+                            decoration: TextDecoration.lineThrough,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black.withOpacity(0.6),
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    // Discounted Price
+                    Text(
+                      "₹ 140.30",
+                      style: TextStyle(
+                        fontFamily: "Urbanist",
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                        color: Colors.black.withOpacity(0.8),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          )
+        ],
+      ),
+    ),
+  ),
+);
+
   }
 }

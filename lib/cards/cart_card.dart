@@ -137,180 +137,179 @@ void didUpdateWidget(covariant CartCard oldWidget) {
   Widget build(BuildContext context) {
     
     return Padding(
-      padding: const EdgeInsets.only(left: 0.0, right: 0, top: 28, bottom: 14),
-      child: Container(
-        padding: EdgeInsets.only(right: 12),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Row(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 0),
-                  child: SizedBox(
-                    height: 40,
-                    width: 40,
-                    child: widget.productImages.isNotEmpty
-                        ? Image.network(
-                            widget.productImages[0],
-                            fit: BoxFit.contain,
-                            loadingBuilder: (context, child, loadingProgress) {
-                              if (loadingProgress == null) return child;
-                              return const Center(
-                                child: CircularProgressIndicator(
-                                  color: secondaryColor,
-                                ),
-                              );
-                            },
-                            errorBuilder: (context, error, stackTrace) {
-                              return const Center(
-                                child: Icon(
-                                  Icons.error,
-                                  color: Color.fromRGBO(7, 9, 84, 1),
-                                ),
-                              );
-                            },
-                          )
-                        : const Icon(Icons.image),
-                  ),
-                ),
-                const SizedBox(width: 10),
-                GestureDetector(
+  padding: EdgeInsets.only(
+    top: MediaQuery.of(context).size.height * 0.035,
+    bottom: MediaQuery.of(context).size.height * 0.018,
+  ),
+  child: Container(
+    padding: EdgeInsets.only(right: 12),
+    child: Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.center,
+      children: [
+        /// LEFT SECTION - Image + Name + Label
+        Expanded(
+          child: Row(
+            children: [
+              // Product Image
+              SizedBox(
+                height: 40,
+                width: 40,
+                child: widget.productImages.isNotEmpty
+                    ? Image.network(
+                        widget.productImages[0],
+                        fit: BoxFit.contain,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return const Center(
+                            child: CircularProgressIndicator(
+                              color: secondaryColor,
+                            ),
+                          );
+                        },
+                        errorBuilder: (context, error, stackTrace) {
+                          return const Icon(Icons.error, color: Colors.red);
+                        },
+                      )
+                    : const Icon(Icons.image),
+              ),
+              const SizedBox(width: 10),
+
+              /// Product Info
+              Expanded(
+                child: GestureDetector(
                   onTap: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => ItemDetailScreen(
-                          productId: widget.productId,
-                        ),
+                        builder: (context) =>
+                            ItemDetailScreen(productId: widget.productId),
                       ),
                     );
                   },
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width / 3,
-                        child: Text(
-                          widget.productName,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 14,
-                            fontFamily: "JosefinSans",
-                            color: Color(0xFF1F1970),
-                          ),
-                        ),
-                      ),
-                      SizedBox(
-                        width: MediaQuery.of(context).size.width / 3,
-                        child: Text(
-                          widget.packLabel,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w400,
-                            fontSize: 12,
-                            fontFamily: "JosefinSans",
-                            color: Color(0xFF1F1970),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                )
-              ],
-            ),
-            Row(
-              children: [
-                Container(
-                  width: 90,
-                  height: 30,
-                  decoration: BoxDecoration(
-                    color: secondaryColor.withOpacity(0.16),
-                    borderRadius: BorderRadius.circular(30),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        GestureDetector(
-                          onTap: (){
-                            if(widget.quantity==1||_localQuantity==1){
-                                  _removeFromCart();
-                              
-                            }
-                            if (_localQuantity > 1) {
-                              _onQuantityChanged(_localQuantity - 1);
-                              
-                            }
-                           
-                          },
-                          child: Image.asset(
-                            "lib/images/minus_button.png",
-                            height: 20,
-                            width: 20,
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                        Text(
-                          "$_localQuantity",
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 12,
-                            fontFamily: "Urbanist",
-                            color: Color(0xFF1F1970),
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: () {
-                            _onQuantityChanged(_localQuantity + 1);
-                          },
-                          child: Image.asset(
-                            "lib/images/plus_button.png",
-                            height: 20,
-                            width: 20,
-                            fit: BoxFit.contain,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Container(
-                  alignment: Alignment.centerRight,
-                  width: 48,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
                       Text(
-                        "₹ ${((widget.sellingPrice * 0.7) * _localQuantity).toStringAsFixed(2)}",
+                        widget.productName,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
-                          fontWeight: FontWeight.w800,
-                          fontSize: 12,
-                          fontFamily: "Urbanist",
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
+                          fontFamily: "JosefinSans",
                           color: Color(0xFF1F1970),
                         ),
                       ),
                       Text(
-                        "₹ ${(widget.sellingPrice * _localQuantity).toString()}",
+                        widget.packLabel,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
-                          decoration: TextDecoration.lineThrough,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 10,
-                          fontFamily: "Urbanist",
-                          color: Colors.grey,
+                          fontWeight: FontWeight.w400,
+                          fontSize: 12,
+                          fontFamily: "JosefinSans",
+                          color: Color(0xFF1F1970),
                         ),
                       ),
                     ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        /// RIGHT SECTION - Quantity control + price
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Quantity Control
+            Container(
+              width: 90,
+              height: 30,
+              decoration: BoxDecoration(
+                color: secondaryColor.withOpacity(0.16),
+                borderRadius: BorderRadius.circular(30),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      if (widget.quantity == 1 || _localQuantity == 1) {
+                        _removeFromCart();
+                      }
+                      if (_localQuantity > 1) {
+                        _onQuantityChanged(_localQuantity - 1);
+                      }
+                    },
+                    child: Image.asset(
+                      "lib/images/minus_button.png",
+                      height: 20,
+                      width: 20,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                  Text(
+                    "$_localQuantity",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 12,
+                      fontFamily: "Urbanist",
+                      color: Color(0xFF1F1970),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      _onQuantityChanged(_localQuantity + 1);
+                    },
+                    child: Image.asset(
+                      "lib/images/plus_button.png",
+                      height: 20,
+                      width: 20,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+
+            // Price Column
+            Column(
+              mainAxisAlignment: MainAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  "₹ ${((widget.sellingPrice * 0.7) * _localQuantity).toStringAsFixed(2)}",
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 12,
+                    fontFamily: "Urbanist",
+                    color: Color(0xFF1F1970),
+                  ),
+                ),
+                Text(
+                  "₹ ${(widget.sellingPrice * _localQuantity).toString()}",
+                  style: const TextStyle(
+                    decoration: TextDecoration.lineThrough,
+                    fontWeight: FontWeight.w500,
+                    fontSize: 10,
+                    fontFamily: "Urbanist",
+                    color: Colors.grey,
                   ),
                 ),
               ],
             ),
           ],
         ),
-      ),
-    );
+      ],
+    ),
+  ),
+);
+
+
   }
 }

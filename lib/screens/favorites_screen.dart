@@ -57,7 +57,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         leadingWidth: 200,
         toolbarHeight: 60,
         leading: Padding(
-          padding: const EdgeInsets.only(left: 12.0, top: 16),
+          padding:  EdgeInsets.only(left: 12.0, top: 16, ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -75,6 +75,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         ),
       ),
       body: Container(
+        margin: EdgeInsets.only(bottom: MediaQuery.of(context).size.height*0.1),
         color: Colors.grey.shade100.withOpacity(0.5),
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 18),

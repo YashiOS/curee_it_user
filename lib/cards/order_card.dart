@@ -43,24 +43,32 @@ class OrderCard extends StatelessWidget {
     String allItems = formatOrderItems(orderItems);
 
     return Padding(
-      padding: const EdgeInsets.only(top: 16.0),
-      child: GestureDetector(
-        onTap: () {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => OrderdetailScreenNew(
-                        orderData: orderData,
-                      )));
-        },
-        child: Container(
-          padding: EdgeInsets.symmetric(vertical: 10, horizontal: 14),
+  padding: EdgeInsets.only(
+    top: MediaQuery.of(context).size.height * 0.02,
+  ),
+  child: GestureDetector(
+    onTap: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => OrderdetailScreenNew(orderData: orderData),
+        ),
+      );
+    },
+    child: LayoutBuilder(
+      builder: (context, constraints) {
+        final screenWidth = MediaQuery.of(context).size.width;
+
+        return Container(
+          padding: EdgeInsets.symmetric(
+            vertical: screenWidth * 0.025,
+            horizontal: screenWidth * 0.035,
+          ),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
             color: Colors.white,
           ),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
@@ -68,97 +76,102 @@ class OrderCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Column(
-                    spacing: 1,
-                    mainAxisAlignment: MainAxisAlignment.start,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Order ID: " + orderData['orderId'] ?? "?",
+                        "Order ID: ${orderData['orderId'] ?? '?'}",
                         style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 14,
-                            fontFamily: "Urbanist",
-                            color: primaryColor),
+                          fontWeight: FontWeight.w700,
+                          fontSize: screenWidth * 0.035,
+                          fontFamily: "Urbanist",
+                          color: primaryColor,
+                        ),
                       ),
                       Text(
                         "Date: ${formatDate(purchaseDate) ?? "N/A"}",
                         style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 12,
-                            fontFamily: "Urbanist",
-                            color: Colors.black.withOpacity(0.6)),
+                          fontWeight: FontWeight.w600,
+                          fontSize: screenWidth * 0.03,
+                          fontFamily: "Urbanist",
+                          color: Colors.black.withOpacity(0.6),
+                        ),
                       ),
                       SizedBox(
-                        width: MediaQuery.of(context).size.width / 1.6,
+                        width: screenWidth * 0.6,
                         child: Text(
                           orderData['shippingAddress'],
                           style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 12,
-                              fontFamily: "Urbanist",
-                              color: Colors.black.withOpacity(0.6)),
+                            fontWeight: FontWeight.w600,
+                            fontSize: screenWidth * 0.03,
+                            fontFamily: "Urbanist",
+                            color: Colors.black.withOpacity(0.6),
+                          ),
                         ),
                       ),
                       Text(
                         "₹ ${shippingCost.toStringAsFixed(2)}",
                         style: TextStyle(
-                            fontWeight: FontWeight.w500,
-                            fontSize: 14,
-                            fontFamily: "JosefinSans",
-                            color: Colors.black),
+                          fontWeight: FontWeight.w500,
+                          fontSize: screenWidth * 0.035,
+                          fontFamily: "JosefinSans",
+                          color: Colors.black,
+                        ),
                       ),
                     ],
                   ),
-                  Row(
-                    spacing: 4,
-                    children: [
-                      Text(
-                        orderStatus.toUpperCase(),
-                        style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 12,
-                            fontFamily: "Urbanist",
-                            color: Colors.black),
-                      ),
-                    ],
+                  Text(
+                    orderStatus.toUpperCase(),
+                    style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: screenWidth * 0.03,
+                      fontFamily: "Urbanist",
+                      color: Colors.black,
+                    ),
                   ),
                 ],
               ),
               Padding(
-                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                padding: EdgeInsets.symmetric(
+                  vertical: screenWidth * 0.02,
+                ),
                 child: Image.asset("lib/images/dotted_divider.png"),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   SizedBox(
-                    width: MediaQuery.of(context).size.width / 1.4,
+                    width: screenWidth * 0.7,
                     child: Text(
-                      allItems, // Display the formatted order items
+                      allItems,
                       style: TextStyle(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 12,
-                          fontFamily: "Urbanist",
-                          color: Colors.black.withOpacity(0.5)),
+                        fontWeight: FontWeight.w500,
+                        fontSize: screenWidth * 0.03,
+                        fontFamily: "Urbanist",
+                        color: Colors.black.withOpacity(0.5),
+                      ),
                     ),
                   ),
                   Container(
                     decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20),
-                        color: secondaryColor.withOpacity(0.2)),
+                      borderRadius: BorderRadius.circular(20),
+                      color: secondaryColor.withOpacity(0.2),
+                    ),
                     child: Icon(
                       Icons.chevron_right,
                       color: secondaryColor,
-                      size: 28,
+                      size: screenWidth * 0.07,
                     ),
                   )
                 ],
-              )
+              ),
             ],
           ),
-        ),
-      ),
-    );
+        );
+      },
+    ),
+  ),
+);
+
   }
 
   // Helper function to format the orderItems list into a string
