@@ -1,21 +1,32 @@
 import 'dart:convert';
-
+import 'dart:async';
 import 'package:cureeit_user_app/screens/base_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
+
 class OrderTrackingScreen extends StatefulWidget {
+  OrderTrackingScreen(
+      {super.key, required this.NavigatingFrom, required this.orderId});
   final String userId = "68fa72cbdc5f0a68";
   late String orderId;
-   OrderTrackingScreen({super.key,required this.NavigatingFrom,required this.orderId});
-   final String NavigatingFrom;
+  final String NavigatingFrom;
   @override
   State<OrderTrackingScreen> createState() => _OrderTrackingScreenState();
 }
 
 class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
-  
-Map<String, dynamic> orderTrackingDetails = {};
+  Map<String, dynamic> orderTrackingDetails = {};
 
+  String formatDate(String isoDate) {
+    // Parse the ISO 8601 string into a DateTime object
+    DateTime dateTime = DateTime.parse(isoDate);
+
+    // Format the date to the desired format without suffix for day
+    String formattedDate = DateFormat("d MMMM yyyy, h:mm a").format(dateTime);
+
+    return formattedDate;
+  }
 
   Future<void> fetchOrderTracking() async {
     var url = Uri.parse(
@@ -25,20 +36,20 @@ Map<String, dynamic> orderTrackingDetails = {};
       ..headers.addAll({
         'Content-Type': 'application/json',
       })
-      ..body = jsonEncode({
-        'userId': widget.userId,
-        'orderId': widget.orderId
-    });
+      ..body = jsonEncode({'userId': widget.userId, 'orderId': widget.orderId});
 
     var response = await http.Client().send(request);
 
     if (response.statusCode == 200) {
-      final responseBody = await response.stream.bytesToString(); // 🔐 only once
-  final data = json.decode(responseBody);
-  print("API response: $responseBody");
+      final responseBody =
+          await response.stream.bytesToString(); // 🔐 only once
+      final data = json.decode(responseBody);
 
       setState(() {
-        orderTrackingDetails = (data['data'] as List).isNotEmpty ? data['data'][0] : {};
+        if (data["data"].isNotEmpty) {
+          orderTrackingDetails = Map<String, dynamic>.from(data["data"][0]);
+        }
+        print("*****ORDER DETAILS*********** ${orderTrackingDetails}");
       });
     } else {
       print('Failed to load tracking details');
@@ -46,73 +57,25 @@ Map<String, dynamic> orderTrackingDetails = {};
   }
 
   @override
- void initState(){
-   super.initState();
-   fetchOrderTracking();
+  void initState() {
+    super.initState();
+    fetchOrderTracking();
   }
 
-  Widget MedicineCard(
-      {required String Imgurl,
-      required String MedicineName,
-      required int quantities,
-      required double price}) {
-    final size = MediaQuery.of(context).size;
-    final width = size.width;
-    final height = size.height;
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: height * 0.01),
-      padding: EdgeInsets.all(width * 0.03),
-      decoration: BoxDecoration(
-        color: Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(width * 0.04),
-      ),
-      child: Row(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(width * 0.02),
-            child: Image.asset(
-              Imgurl,
-              width: width * 0.15,
-              height: width * 0.15,
-              fit: BoxFit.cover,
-            ),
-          ),
-          SizedBox(width: width * 0.04),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  MedicineName,
-                  style: TextStyle(
-                    fontSize: width * 0.04,
-                    fontWeight: FontWeight.w600,
-                    fontFamily: "Urbanist",
-                  ),
-                ),
-                SizedBox(height: height * 0.005),
-                Text(
-                  "$quantities x ₹$price",
-                  style: TextStyle(
-                    fontSize: width * 0.035,
-                    color: Colors.grey.shade600,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Text(
-            "₹${quantities * price}",
-            style: TextStyle(
-              fontSize: width * 0.04,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    );
+  Timer? _timerStart;
+  Timer? _timerEnd;
+
+  void _hittingApi() {
+    _timerStart = Timer.periodic(Duration(seconds: 10), (timer) {
+      fetchOrderTracking();
+    });
+
+    _timerEnd = Timer(Duration(minutes: 5), () {
+      _timerStart?.cancel();
+    });
   }
 
+  
   void showOrderSummaryBottomSheet() {
     final size = MediaQuery.of(context).size;
     final width = size.width;
@@ -149,7 +112,7 @@ Map<String, dynamic> orderTrackingDetails = {};
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Order #3956",
+                    "Order ${orderTrackingDetails["orderId"]}",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: width * 0.045,
@@ -166,22 +129,17 @@ Map<String, dynamic> orderTrackingDetails = {};
               Row(
                 children: [
                   Text(
-                    "10/4",
+                    formatDate(orderTrackingDetails['createdAt']),
                     style: TextStyle(fontSize: width * 0.035),
                   ),
                   Text(" • "),
                   Text(
-                    "1:35 PM",
+                    "${orderTrackingDetails["orderItems"][0]["quantity"].toString()} item",
                     style: TextStyle(fontSize: width * 0.035),
                   ),
                   Text(" • "),
                   Text(
-                    "1 item",
-                    style: TextStyle(fontSize: width * 0.035),
-                  ),
-                  Text(" • "),
-                  Text(
-                    "₹28",
+                    "₹${orderTrackingDetails["orderItems"][0]["productPrice"].toString()}",
                     style: TextStyle(fontSize: width * 0.035),
                   ),
                 ],
@@ -195,9 +153,10 @@ Map<String, dynamic> orderTrackingDetails = {};
               // Item Card
               MedicineCard(
                   Imgurl: "lib/images/capsule_image.png",
-                  MedicineName: "Capule 450MG",
-                  price: 30.5,
-                  quantities: 2),
+                  MedicineName:"${orderTrackingDetails["orderItems"][0]["productName"]}",
+                  price: "${orderTrackingDetails["orderItems"][0]["productPrice"]}",
+                  quantities:"${orderTrackingDetails["orderItems"][0]["quantity"]}",
+                  ),
 
               SizedBox(height: height * 0.015),
               Align(
@@ -217,7 +176,7 @@ Map<String, dynamic> orderTrackingDetails = {};
                 height: height * 0.035,
               ),
               SizedBox(height: height * 0.01),
-              
+
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
@@ -239,7 +198,7 @@ Map<String, dynamic> orderTrackingDetails = {};
                       ),
                     ),
                     Text(
-                      "₹ 28",
+                      "₹ ${orderTrackingDetails["orderItems"][0]["productPrice"]}",
                       style: TextStyle(
                         fontSize: width * 0.04,
                         fontWeight: FontWeight.bold,
@@ -300,7 +259,7 @@ Map<String, dynamic> orderTrackingDetails = {};
                       ),
                     ),
                     Text(
-                      "₹ 1",
+                      "₹ ${orderTrackingDetails["shippingCost"]}",
                       style: TextStyle(
                         fontSize: width * 0.04,
                         fontFamily: "Urbanist",
@@ -316,30 +275,31 @@ Map<String, dynamic> orderTrackingDetails = {};
               ),
               SizedBox(height: height * 0.01),
               Padding(
-                padding: const EdgeInsets.fromLTRB(0,2,8,40),
-                child: Row(mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                padding: const EdgeInsets.fromLTRB(0, 2, 8, 40),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                    "Grand total",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: width * 0.050,
-                      fontFamily: "Urbanist",
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      Icon(Icons.currency_rupee),
-                      Text(
-                        "37.5",
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
-                          fontSize: width * 0.050,
-                          fontFamily: "Urbanist",
-                        ),
+                      "Grand total",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: width * 0.050,
+                        fontFamily: "Urbanist",
                       ),
-                    ],
-                  ),
+                    ),
+                    Row(
+                      children: [
+                        Icon(Icons.currency_rupee),
+                        Text(
+                          "${orderTrackingDetails["totalAmount"]}",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: width * 0.050,
+                            fontFamily: "Urbanist",
+                          ),
+                        ),
+                      ],
+                    ),
                   ],
                 ),
               )
@@ -444,6 +404,70 @@ Map<String, dynamic> orderTrackingDetails = {};
     );
   }
 
+Widget MedicineCard(
+      {required String Imgurl,
+      required String MedicineName,
+      required String quantities,
+      required String price}) {
+    final size = MediaQuery.of(context).size;
+    final width = size.width;
+    final height = size.height;
+    int quantity=int.parse(quantities);
+    double Price=double.parse(price);
+    return Container(
+      margin: EdgeInsets.symmetric(vertical: height * 0.01),
+      padding: EdgeInsets.all(width * 0.03),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(width * 0.04),
+      ),
+      child: Row(
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(width * 0.02),
+            child: Image.asset(
+              Imgurl,
+              width: width * 0.15,
+              height: width * 0.15,
+              fit: BoxFit.cover,
+            ),
+          ),
+          SizedBox(width: width * 0.04),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "$MedicineName",
+                  style: TextStyle(
+                    fontSize: width * 0.04,
+                    fontWeight: FontWeight.w600,
+                    fontFamily: "Urbanist",
+                  ),
+                ),
+                SizedBox(height: height * 0.005),
+                Text(
+                  "$quantity x ₹$Price",
+                   style: TextStyle(
+                   fontSize: width * 0.035,
+                  color: Colors.grey.shade600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Text(
+            "₹ ${quantity* Price}",
+            style: TextStyle(
+              fontSize: width * 0.04,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -522,7 +546,10 @@ Map<String, dynamic> orderTrackingDetails = {};
                         label: "Order placed",
                         color: Colors.green,
                         size: width,
-                        isInactive: false,
+                        isInactive: orderTrackingDetails["currentStatus"] ==
+                                "Order Placed"
+                            ? false
+                            : true,
                       ),
                       Expanded(
                         child: Divider(
@@ -535,7 +562,10 @@ Map<String, dynamic> orderTrackingDetails = {};
                         label: "Packing",
                         color: Colors.orange,
                         size: width,
-                        isInactive: true,
+                        isInactive:
+                            orderTrackingDetails["currentStatus"] == "Packing"
+                                ? false
+                                : true,
                       ),
                       Expanded(
                         child: Divider(
@@ -548,7 +578,10 @@ Map<String, dynamic> orderTrackingDetails = {};
                         label: "On the Way",
                         color: Colors.blue,
                         size: width,
-                        isInactive: true,
+                        isInactive: orderTrackingDetails["currentStatus"] ==
+                                "On the Way"
+                            ? false
+                            : true,
                       ),
                       Expanded(
                         child: Divider(
@@ -561,7 +594,10 @@ Map<String, dynamic> orderTrackingDetails = {};
                         label: "Delivered",
                         color: Colors.green,
                         size: width,
-                        isInactive: true,
+                        isInactive:
+                            orderTrackingDetails["currentStatus"] == "Delivered"
+                                ? false
+                                : true,
                       ),
                     ],
                   ),
@@ -575,8 +611,8 @@ Map<String, dynamic> orderTrackingDetails = {};
                           OrderDetail(
                             icon: Icons.home_outlined,
                             title: "Delivery at:",
-                            subtitle:
-                                orderTrackingDetails['shippingAddress'] ?? "Unknown",
+                            subtitle: orderTrackingDetails['shippingAddress'] ??
+                                "Unknown",
                             width: width,
                           ),
                           OrderDetail(
@@ -593,7 +629,8 @@ Map<String, dynamic> orderTrackingDetails = {};
                             child: OrderDetail(
                               icon: Icons.receipt_outlined,
                               title: "Bill Details",
-                              subtitle: "₹37.52",
+                              subtitle:
+                                  "₹${orderTrackingDetails["totalAmount"]}",
                               width: width,
                             ),
                           ),

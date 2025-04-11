@@ -1,14 +1,14 @@
 import 'package:cureeit_user_app/screens/base_screen.dart';
 import 'package:flutter/material.dart';
 
-class OrderTrackingScreen extends StatefulWidget {
-   OrderTrackingScreen({super.key,required this.NavigatingFrom});
+class orderTrackingScreen extends StatefulWidget {
+   orderTrackingScreen({super.key,required this.NavigatingFrom});
    final String NavigatingFrom;
   @override
-  State<OrderTrackingScreen> createState() => _OrderTrackingScreenState();
+  State<orderTrackingScreen> createState() => _orderTrackingScreenState2();
 }
 
-class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
+class _orderTrackingScreenState2 extends State<orderTrackingScreen> {
   @override
  void initState(){
    super.initState();

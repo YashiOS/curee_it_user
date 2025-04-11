@@ -270,10 +270,11 @@ class _CartScreenState extends State<CartScreen> {
           //   builder: (context) => OrderSuccessScreen(),
           // ),
           // );
+          print("*****ORDER-ID-CART-SCREEN********${responseData["data"]['orderId']}");
           final shouldRefresh = await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => OrderSuccessScreen(orderId: responseData['orderId'],),
+              builder: (context) => OrderSuccessScreen(orderId: responseData['data']['orderId'],),
             ),
           );
 

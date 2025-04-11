@@ -228,8 +228,13 @@ class _SearchState extends State<Search> {
                                   ],
                                 ),
                                 trailing: item['prescriptionRequired']
-                                    ? Icon(Icons.medical_services,
-                                        color: Colors.red)
+                                    ? GestureDetector(
+                                      onTap: (){
+                                        print("add to cart tapped");
+                                      },
+                                      child: Icon(Icons.medical_services,
+                                          color: Colors.red),
+                                    )
                                     : Icon(Icons.check_circle,
                                         color: Colors.green),
                                 onTap: () {

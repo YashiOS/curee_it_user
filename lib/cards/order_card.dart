@@ -5,8 +5,9 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class OrderCard extends StatelessWidget {
+  final int index;
   final dynamic orderData;
-  const OrderCard({super.key, required this.orderData});
+  const OrderCard({super.key, required this.orderData,required this.index});
 
   String formatDate(String isoDate) {
     // Parse the ISO 8601 string into a DateTime object
@@ -41,6 +42,10 @@ class OrderCard extends StatelessWidget {
     double shippingCost = double.parse(orderData['totalAmount']);
     List orderItems = orderData['orderItems'];
     String orderId = orderData['orderId'];
+    print("Order details $index");
+    print(purchaseDate);
+    print(orderData["createdAt"]);
+    print(orderData["updatedAt"]);
 
     String allItems = formatOrderItems(orderItems);
 
@@ -51,19 +56,14 @@ class OrderCard extends StatelessWidget {
   child: GestureDetector(
     onTap: () {
       if (orderStatus == "Order Placed" || orderStatus == "Packing" || orderStatus == "On the way") {
-          Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => OrderTrackingScreen(NavigatingFrom: "Order History", orderId: orderId,),
-      ),
-    );
-   } else {
-      Navigator.push(
+           Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => OrderdetailScreenNew(orderData: orderData),
         ),
       );
+   } else {
+     
     }
     },
     child: LayoutBuilder(
@@ -89,6 +89,7 @@ class OrderCard extends StatelessWidget {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Text("Index : ${index}"),
                       Text(
                         "Order ID: ${orderData['orderId'] ?? '?'}",
                         style: TextStyle(

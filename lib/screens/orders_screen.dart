@@ -26,11 +26,12 @@ class _OrdersScreenState extends State<OrdersScreen> {
       ..body = jsonEncode({'userId': "68fa72cbdc5f0a68"});
 
     var response = await http.Client().send(request);
-
+print("got responese");
     if (response.statusCode == 200) {
       var responseBody = await response.stream.bytesToString();
       Map<String, dynamic> data = jsonDecode(responseBody);
-
+      print("*******THIS IS ORDER SCREEN DATA******");
+      print(data);
       setState(() {
         orders = data['data'];
         isLoading = false;
@@ -38,12 +39,10 @@ class _OrdersScreenState extends State<OrdersScreen> {
     } else {
       throw Exception('Failed to load order history');
     }
-    print("first order");
-    print(orders[0]);
-    print("2ND order");
-    print(orders[1]);
-    print("total in history");
+    print("********THIS IS ORDER LIST LENGHT");
     print(orders.length);
+    print("******THIS IS ORDER LIST DATA");
+    print(orders);
   }
 
   @override
@@ -97,6 +96,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                       orders.length, // Use the length of the orders array
                   itemBuilder: (context, index) {
                     return OrderCard(
+                      index: index,
                         orderData:
                             orders[index]); // Pass the order data to the card
                   },

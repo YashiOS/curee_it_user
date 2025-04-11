@@ -15,8 +15,15 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
   @override
   void initState() {
     super.initState();
-   Future.delayed(Duration(seconds: 4), () {
-      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>OrderTrackingScreen(NavigatingFrom: "Order_SuccessScreen", orderId: widget.orderId,)));
+    print(
+      "****Order-Id******${widget.orderId}",
+    );
+    Future.delayed(Duration(seconds: 4), () {
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
+          builder: (context) => OrderTrackingScreen(
+                NavigatingFrom: "Order_SuccessScreen",
+                orderId: widget.orderId,
+              )));
     });
   }
 
