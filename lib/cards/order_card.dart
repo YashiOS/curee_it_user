@@ -57,13 +57,18 @@ class OrderCard extends StatelessWidget {
     onTap: () {
       if (orderStatus == "Order Placed" || orderStatus == "Packing" || orderStatus == "On the way") {
            Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => OrderTrackingScreen(NavigatingFrom: "Order History", orderId: orderId,),
+      ),
+    );
+   } else {
+     Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => OrderdetailScreenNew(orderData: orderData),
         ),
       );
-   } else {
-     
     }
     },
     child: LayoutBuilder(

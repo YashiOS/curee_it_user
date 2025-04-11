@@ -26,7 +26,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
       ..body = jsonEncode({'userId': "68fa72cbdc5f0a68"});
 
     var response = await http.Client().send(request);
-print("got responese");
+   print("got responese");
     if (response.statusCode == 200) {
       var responseBody = await response.stream.bytesToString();
       Map<String, dynamic> data = jsonDecode(responseBody);
@@ -34,6 +34,12 @@ print("got responese");
       print(data);
       setState(() {
         orders = data['data'];
+        orders.sort((item1, item2) {
+  final dateA = DateTime.parse(item1['createdAt']);
+  final dateB = DateTime.parse(item2['createdAt']);
+  return dateB.compareTo(dateA); // descending = most recent first
+});
+
         isLoading = false;
       });
     } else {

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:cureeit_user_app/screens/item_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -88,6 +89,34 @@ class _SearchState extends State<Search> {
     _controller.dispose();
     super.dispose();
   }
+
+Future<void> didAddToCart({
+  required String userId,
+  required String productId,
+  int quantity = 1,
+}) async {
+  try {
+    final response = await http.post(
+      Uri.parse('http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/cart/addToCart'),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
+        'userId': userId,
+        'productId': productId,
+        'quantity': quantity,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      Fluttertoast.showToast(msg: "Added To Cart");
+    } else {
+      print('❌ Failed to add item to cart. Status: ${response.statusCode}');
+    }
+  } catch (e) {
+    print('❌ Network error: $e');
+  }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -231,6 +260,7 @@ class _SearchState extends State<Search> {
                                     ? GestureDetector(
                                       onTap: (){
                                         print("add to cart tapped");
+                                        didAddToCart(userId:"68fa72cbdc5f0a68" ,productId:item["productId"] );
                                       },
                                       child: Icon(Icons.medical_services,
                                           color: Colors.red),
@@ -238,6 +268,7 @@ class _SearchState extends State<Search> {
                                     : Icon(Icons.check_circle,
                                         color: Colors.green),
                                 onTap: () {
+                                  print("clicked");
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(
