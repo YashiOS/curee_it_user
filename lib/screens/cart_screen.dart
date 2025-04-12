@@ -1,6 +1,7 @@
 import 'package:cureeit_user_app/cards/cart_card.dart';
 import 'package:cureeit_user_app/screens/Order_SuccessScreen.dart';
 import 'package:cureeit_user_app/screens/addresses_screen.dart';
+import 'package:cureeit_user_app/selected_Address/currentAddress.dart';
 import 'package:cureeit_user_app/utils/razor_pay.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
@@ -223,6 +224,10 @@ class _CartScreenState extends State<CartScreen> {
       final data = json.decode(await response.stream.bytesToString());
       setState(() {
         selectedAddress = data['data']['address'][0];
+        print("****FETCHING ADDRESSS SE SELECTED ADDRESS*****");
+        print(selectedAddress);
+        print("****CURRENT ADDRESS*****");
+        print(Address.CurrentAddress);
       });
     } else {
       print('Failed to load addresses');
@@ -231,6 +236,8 @@ class _CartScreenState extends State<CartScreen> {
 
   Future<void> createCheckout(
       String total, double shippingCost, String shippingAddress) async {
+        print("***SHIPPING ADDRESS****");
+        print(shippingAddress);
     int Total = double.parse(total).toInt();
     try {
       var url = Uri.parse(
@@ -621,7 +628,7 @@ class _CartScreenState extends State<CartScreen> {
                                                                     .toStringAsFixed(
                                                                         2),
                                                                 deliveryServiceFees,
-                                                                "${selectedAddress!['address']}, ${selectedAddress!['landmark']}, ${selectedAddress!['floor']}, ${selectedAddress!['userLat']}, ${selectedAddress!['userLong']}",
+                                                                "${Address.CurrentAddress!["address"]}, ${Address.CurrentAddress!['landmark']}, ${Address.CurrentAddress!['floor']}, ${Address.CurrentAddress!['userLat']}, ${Address.CurrentAddress!['userLong']}",
                                                               );
                                                             },
                                                             onFailure:
@@ -775,7 +782,7 @@ class _CartScreenState extends State<CartScreen> {
                               ),
                               Text(
                                 selectedAddress != null
-                                    ? "${selectedAddress!['address']}, \nLandmark:${selectedAddress!['landmark']}, \nFloor:${selectedAddress!['floor']}"
+                                    ? "${Address.CurrentAddress!['address']} ${Address.CurrentAddress!['landmark']!=""?"\n landmark : ${Address.CurrentAddress!['landmark']}":"" } ${Address.CurrentAddress!["floor"]!=""?"\n floor : ${Address.CurrentAddress!["floor"]}":""}"
                                     : "N/A",
                                 style: TextStyle(
                                   fontWeight: FontWeight.w400,

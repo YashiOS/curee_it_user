@@ -1,5 +1,6 @@
 import 'package:cureeit_user_app/cards/address_card.dart';
 import 'package:cureeit_user_app/current_address/google_maps_screen.dart';
+import 'package:cureeit_user_app/selected_Address/currentAddress.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
@@ -48,9 +49,12 @@ class _AddressesScreenState extends State<AddressesScreen> {
     }
   }
 
-  void selectAddress(Map<String, dynamic> address) {
+  void selectAddress(Map<String, dynamic> address,int index) {
     setState(() {
+      Address.CurrentAddress = address;
+      Address.selectedIndex=index;
       selectedAddress = address;
+
     });
 
     Navigator.pop(context, address);
@@ -107,15 +111,21 @@ class _AddressesScreenState extends State<AddressesScreen> {
                         fontFamily: "JosefinSans",
                         color: primaryColor),
                   ),
-                  Column(
-                      children: addresses
-                          .map(
-                            (address) => AddressCard(
-                                isSelected: true,
-                                address: address,
-                                onTap: () => selectAddress(address)),
-                          )
-                          .toList()),
+                  ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: addresses.length,
+                    
+                    itemBuilder: (context, index) {
+                      bool isSelected= Address.selectedIndex==index;
+                      final address = addresses[index];
+                      return AddressCard(
+                        isSelected: isSelected,
+                        address: address,
+                        onTap: () => selectAddress(address,index),
+                      );
+                    },
+                  ),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 12.0),
                     child: GestureDetector(
