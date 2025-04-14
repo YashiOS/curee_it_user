@@ -3,6 +3,7 @@ import 'package:cureeit_user_app/current_address/location_permission_helper.dart
 import 'package:cureeit_user_app/current_address/models/get_places.dart';
 import 'package:cureeit_user_app/current_address/models/place_from_coordinates.dart';
 import 'package:cureeit_user_app/screens/add_address_screen.dart';
+import 'package:cureeit_user_app/selected_Address/currentAddress.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -32,7 +33,8 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
     );
 
     // Animate the camera to the new position
-    _mapController?.animateCamera(CameraUpdate.newCameraPosition(newPosition));
+     _mapController?.animateCamera(CameraUpdate.newCameraPosition(newPosition));
+     
   }
 
   getAddress() {
@@ -44,6 +46,7 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
         isLoading = false;
       });
     });
+    
   }
 
   
@@ -62,6 +65,18 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print("*********MY ADDRESS*****");
+     print(placeFromCoordinates.results?[0].formattedAddress);
+     Address.CurrentAddress={
+      "address":placeFromCoordinates.results?[0].formattedAddress,
+      "landmark":"",
+      "floor":"",
+      "userLat":defaultLat,
+      "userLong":defaultLng,
+      "type":"",
+      "_id":""
+     };
+     Address.selectedIndex=null;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -270,12 +285,14 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
                                     _changeCameraPosition(
                                         defaultLat, defaultLng);
                                   });
+                                  
                                 }).onError((error, stackTrace) {
                                   print("Location Error $error");
                                 });
                               },
                               child: Container(
-                                padding: EdgeInsets.all(8),
+                                padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.02),
+
                                 width: MediaQuery.of(context).size.width / 2,
                                 decoration: BoxDecoration(
                                     color: Colors.blueGrey,
@@ -332,19 +349,16 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
                                               top: Radius.circular(20)),
                                         ),
                                         builder: (context) {
-                                          return FractionallySizedBox(
-                                            heightFactor: 0.6,
-                                            child: Padding(
-                                              padding: EdgeInsets.only(
-                                                bottom: MediaQuery.of(context)
-                                                    .viewInsets
-                                                    .bottom,
-                                              ),
-                                              child: AddAddressScreen(
-                                                userId: "68fa72cbdc5f0a68",
-                                                userLat: defaultLat,
-                                                userLong: defaultLng,
-                                              ),
+                                          return Padding(
+                                            padding: EdgeInsets.only(
+                                              bottom: MediaQuery.of(context)
+                                                  .viewInsets
+                                                  .bottom,
+                                            ),
+                                            child: AddAddressScreen(
+                                              userId: "68fa72cbdc5f0a68",
+                                              userLat: defaultLat,
+                                              userLong: defaultLng,
                                             ),
                                           );
                                         },

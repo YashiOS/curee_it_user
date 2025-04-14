@@ -34,28 +34,27 @@ class _CartScreenState extends State<CartScreen> {
     fetchCartDetails();
     fetchAddresses();
   }
-  void reBuild(){
+
+  void reBuild() {
     setState(() {});
     print("ruBuild done");
   }
-  void removeItemFromCart(String productId) {
-  setState(() {
-    cartItems.removeWhere((item) => item['productId'] == productId);
-  print("product delected from front end");
-    if (cartItems.isEmpty) {
-      totalAmount = 0.0;
-      taxServices = 0.0;
-      deliveryServiceFees = 0.0;
-      totalWholeAmount = 0.0;
-    }
-    setState(() {
-      
-    });
-    print("****updated cart item LIST****");
-    print(cartItems);
-  });
-}
 
+  void removeItemFromCart(String productId) {
+    setState(() {
+      cartItems.removeWhere((item) => item['productId'] == productId);
+      print("product delected from front end");
+      if (cartItems.isEmpty) {
+        totalAmount = 0.0;
+        taxServices = 0.0;
+        deliveryServiceFees = 0.0;
+        totalWholeAmount = 0.0;
+      }
+      setState(() {});
+      print("****updated cart item LIST****");
+      print(cartItems);
+    });
+  }
 
   Future<void> _removeAllFromCart() async {
     final String userId = "68fa72cbdc5f0a68"; // Example userId
@@ -88,7 +87,9 @@ class _CartScreenState extends State<CartScreen> {
         builder: (context) => AddressesScreen(userId: "68fa72cbdc5f0a68"),
       ),
     );
-
+    setState(() {
+      
+    });
     if (address != null) {
       setState(() {
         selectedAddress = address;
@@ -148,7 +149,7 @@ class _CartScreenState extends State<CartScreen> {
                   "❌ Failed to fetch details for Product ID: ${cartItem['productId']}");
             }
           }
-          
+
           setState(() {
             cartItems = tempCart;
             isLoading = false;
@@ -236,8 +237,8 @@ class _CartScreenState extends State<CartScreen> {
 
   Future<void> createCheckout(
       String total, double shippingCost, String shippingAddress) async {
-        print("***SHIPPING ADDRESS****");
-        print(shippingAddress);
+    print("***SHIPPING ADDRESS****");
+    print(shippingAddress);
     int Total = double.parse(total).toInt();
     try {
       var url = Uri.parse(
@@ -277,11 +278,14 @@ class _CartScreenState extends State<CartScreen> {
           //   builder: (context) => OrderSuccessScreen(),
           // ),
           // );
-          print("*****ORDER-ID-CART-SCREEN********${responseData["data"]['orderId']}");
+          print(
+              "*****ORDER-ID-CART-SCREEN********${responseData["data"]['orderId']}");
           final shouldRefresh = await Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => OrderSuccessScreen(orderId: responseData['data']['orderId'],),
+              builder: (context) => OrderSuccessScreen(
+                orderId: responseData['data']['orderId'],
+              ),
             ),
           );
 
@@ -300,6 +304,8 @@ class _CartScreenState extends State<CartScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
     return Scaffold(
       appBar: AppBar(
         toolbarHeight: widget.isNavigated ? 48 : 0,
@@ -332,7 +338,8 @@ class _CartScreenState extends State<CartScreen> {
         ),
       ),
       body: Container(
-        margin: EdgeInsets.only(bottom: MediaQuery.of(context).size.height*0.06),
+        margin:
+            EdgeInsets.only(bottom: MediaQuery.of(context).size.height * 0.06),
         color: Colors.grey.shade100.withOpacity(0.5),
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
@@ -352,7 +359,8 @@ class _CartScreenState extends State<CartScreen> {
                           "Cart",
                           style: TextStyle(
                               fontWeight: FontWeight.w600,
-                              fontSize: 24,
+                              fontSize:
+                                  MediaQuery.of(context).size.width * 0.06,
                               fontFamily: "JosefinSans",
                               color: primaryColor),
                         )
@@ -362,7 +370,14 @@ class _CartScreenState extends State<CartScreen> {
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(10)),
                         padding: EdgeInsets.only(
-                            top: 14, bottom: 14, right: 18, left: 28),
+                          top: MediaQuery.of(context).size.height *
+                              0.02, // 2% of screen height
+                          bottom: MediaQuery.of(context).size.height * 0.02,
+                          left: MediaQuery.of(context).size.width *
+                              0.07, // 7% of screen width
+                          right: MediaQuery.of(context).size.width *
+                              0.045, // 4.5% of screen width
+                        ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -377,7 +392,9 @@ class _CartScreenState extends State<CartScreen> {
                                   "Apply Coupon",
                                   style: TextStyle(
                                     fontWeight: FontWeight.w400,
-                                    fontSize: 12,
+                                    fontSize:
+                                        MediaQuery.of(context).size.width *
+                                            0.03,
                                     fontFamily: "Urbanist",
                                     color: Color(0xFF1F1970),
                                   ),
@@ -420,7 +437,11 @@ class _CartScreenState extends State<CartScreen> {
                                               child: Text(
                                                 "No Items in Cart",
                                                 style: TextStyle(
-                                                    fontSize: 28,
+                                                    fontSize:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .width *
+                                                            0.07,
                                                     fontWeight: FontWeight.bold,
                                                     color: Colors.grey
                                                         .withOpacity(0.5)),
@@ -436,7 +457,7 @@ class _CartScreenState extends State<CartScreen> {
                                               Column(
                                                 children: cartItems
                                                     .map((item) => CartCard(
-                                                      reBuild: reBuild,
+                                                        reBuild: reBuild,
                                                         productName:
                                                             item['name'],
                                                         packLabel: item[
@@ -452,14 +473,16 @@ class _CartScreenState extends State<CartScreen> {
                                                             0.0,
                                                         onUpdate:
                                                             fetchCartDetails,
-                                                        onRemove: () async{
-                                                          print("on remove is called");
-                                                          removeItemFromCart(item['productId']);
+                                                        onRemove: () async {
+                                                          print(
+                                                              "on remove is called");
+                                                          removeItemFromCart(
+                                                              item[
+                                                                  'productId']);
                                                           await fetchCartDetails();
-                                                          print(" on remove mai fetch karke print${cartItems}");
-                                                         setState(() {
-                                                           
-                                                         });
+                                                          print(
+                                                              " on remove mai fetch karke print${cartItems}");
+                                                          setState(() {});
                                                         },
                                                         productImages:
                                                             item['imageUrls'] ??
@@ -469,13 +492,17 @@ class _CartScreenState extends State<CartScreen> {
                                             ],
                                           ),
                                           Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 30.0,
-                                                right: 22,
-                                                top: 28,
-                                                bottom: 14),
+                                            padding: EdgeInsets.only(
+                                              left: screenWidth *
+                                                  0.075, // ≈30 for width ≈ 400
+                                              right: screenWidth * 0.055, // ≈22
+                                              top: screenHeight *
+                                                  0.035, // ≈28 for height ≈ 800
+                                              bottom:
+                                                  screenHeight * 0.0175, // ≈14
+                                            ),
                                             child: Column(
-                                              spacing: 18,
+                                              spacing: screenWidth * 0.045,
                                               children: [
                                                 Row(
                                                   mainAxisAlignment:
@@ -487,7 +514,8 @@ class _CartScreenState extends State<CartScreen> {
                                                       style: TextStyle(
                                                         fontWeight:
                                                             FontWeight.w400,
-                                                        fontSize: 12,
+                                                        fontSize:
+                                                            screenWidth * 0.03,
                                                         fontFamily: "Urbanist",
                                                         color:
                                                             Color(0xFF1F1970),
@@ -498,7 +526,8 @@ class _CartScreenState extends State<CartScreen> {
                                                       style: TextStyle(
                                                         fontWeight:
                                                             FontWeight.w400,
-                                                        fontSize: 12,
+                                                        fontSize:
+                                                            screenWidth * 0.03,
                                                         fontFamily: "Urbanist",
                                                         color:
                                                             Color(0xFF1F1970),
@@ -512,14 +541,17 @@ class _CartScreenState extends State<CartScreen> {
                                                           .spaceBetween,
                                                   children: [
                                                     Row(
-                                                      spacing: 18,
+                                                      spacing:
+                                                          screenWidth * 0.05,
                                                       children: [
                                                         Text(
                                                           "Delivery Fee",
                                                           style: TextStyle(
                                                             fontWeight:
                                                                 FontWeight.w400,
-                                                            fontSize: 12,
+                                                            fontSize:
+                                                                screenWidth *
+                                                                    0.03,
                                                             fontFamily:
                                                                 "Urbanist",
                                                             color: Color(
@@ -539,7 +571,8 @@ class _CartScreenState extends State<CartScreen> {
                                                       style: TextStyle(
                                                         fontWeight:
                                                             FontWeight.w400,
-                                                        fontSize: 12,
+                                                        fontSize:
+                                                            screenWidth * 0.03,
                                                         fontFamily: "Urbanist",
                                                         color:
                                                             Color(0xFF1F1970),
@@ -553,14 +586,17 @@ class _CartScreenState extends State<CartScreen> {
                                                           .spaceBetween,
                                                   children: [
                                                     Row(
-                                                      spacing: 18,
+                                                      spacing:
+                                                          screenWidth * 0.05,
                                                       children: [
                                                         Text(
                                                           "Tax and Charges",
                                                           style: TextStyle(
                                                             fontWeight:
                                                                 FontWeight.w400,
-                                                            fontSize: 12,
+                                                            fontSize:
+                                                                screenWidth *
+                                                                    0.03,
                                                             fontFamily:
                                                                 "Urbanist",
                                                             color: Color(
@@ -580,7 +616,8 @@ class _CartScreenState extends State<CartScreen> {
                                                       style: TextStyle(
                                                         fontWeight:
                                                             FontWeight.w400,
-                                                        fontSize: 12,
+                                                        fontSize:
+                                                            screenWidth * 0.03,
                                                         fontFamily: "Urbanist",
                                                         color:
                                                             Color(0xFF1F1970),
@@ -589,9 +626,8 @@ class _CartScreenState extends State<CartScreen> {
                                                   ],
                                                 ),
                                                 Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          top: 18.0),
+                                                  padding: EdgeInsets.only(
+                                                      top: screenHeight * 0.05),
                                                   child: Image.asset(
                                                     "lib/images/dotted_divider.png",
                                                   ),
@@ -602,8 +638,9 @@ class _CartScreenState extends State<CartScreen> {
                                                           .spaceBetween,
                                                   children: [
                                                     Container(
-                                                      height: 50,
-                                                      width: 80,
+                                                      height:
+                                                          screenHeight * 0.06,
+                                                      width: screenWidth * 0.3,
                                                       alignment:
                                                           Alignment.center,
                                                       decoration: BoxDecoration(
@@ -663,7 +700,9 @@ class _CartScreenState extends State<CartScreen> {
                                                             style: TextStyle(
                                                               color:
                                                                   Colors.white,
-                                                              fontSize: 16,
+                                                              fontSize:
+                                                                  screenWidth *
+                                                                      0.045,
                                                               fontFamily:
                                                                   "Urbanist",
                                                               fontWeight:
@@ -680,7 +719,9 @@ class _CartScreenState extends State<CartScreen> {
                                                         style: TextStyle(
                                                             fontWeight:
                                                                 FontWeight.w600,
-                                                            fontSize: 16,
+                                                            fontSize:
+                                                                screenWidth *
+                                                                    0.04,
                                                             fontFamily:
                                                                 "Urbanist",
                                                             color:
@@ -691,7 +732,9 @@ class _CartScreenState extends State<CartScreen> {
                                                         style: TextStyle(
                                                           fontWeight:
                                                               FontWeight.w700,
-                                                          fontSize: 20,
+                                                          fontSize:
+                                                              screenWidth *
+                                                                  0.05,
                                                           fontFamily:
                                                               "Urbanist",
                                                           color:
@@ -721,14 +764,22 @@ class _CartScreenState extends State<CartScreen> {
                         padding: const EdgeInsets.symmetric(vertical: 0.0),
                         child: Container(
                           padding: EdgeInsets.only(
-                              right: 14, left: 20, top: 20, bottom: 20),
+                            right: MediaQuery.of(context).size.width *
+                                0.04, // 4% of screen width
+                            left: MediaQuery.of(context).size.width *
+                                0.05, // 5% of screen width
+                            top: MediaQuery.of(context).size.height *
+                                0.04, // 5% of screen height
+                            bottom: MediaQuery.of(context).size.height *
+                                0.04, // 5% of screen height
+                          ),
                           decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(10)),
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start,
-                            spacing: 16,
+                            spacing: screenHeight * 0.02,
                             children: [
                               Row(
                                 mainAxisAlignment:
@@ -738,7 +789,7 @@ class _CartScreenState extends State<CartScreen> {
                                     "Delivery Address",
                                     style: TextStyle(
                                       fontWeight: FontWeight.w700,
-                                      fontSize: 14,
+                                      fontSize: screenWidth * 0.035,
                                       fontFamily: "JosefinSans",
                                       color: Color(0xFF1F1970),
                                     ),
@@ -747,7 +798,13 @@ class _CartScreenState extends State<CartScreen> {
                                     onTap: _navigateToAddressScreen,
                                     child: Container(
                                       padding: EdgeInsets.symmetric(
-                                          horizontal: 14, vertical: 6),
+                                        horizontal:
+                                            MediaQuery.of(context).size.width *
+                                                0.035, // ~14 on 400px width
+                                        vertical:
+                                            MediaQuery.of(context).size.height *
+                                                0.0075, // ~6 on 800px height
+                                      ),
                                       decoration: BoxDecoration(
                                           color:
                                               secondaryColor.withOpacity(0.16),
@@ -782,11 +839,12 @@ class _CartScreenState extends State<CartScreen> {
                               ),
                               Text(
                                 selectedAddress != null
-                                    ? "${Address.CurrentAddress!['address']} ${Address.CurrentAddress!['landmark']!=""?"\n landmark : ${Address.CurrentAddress!['landmark']}":"" } ${Address.CurrentAddress!["floor"]!=""?"\n floor : ${Address.CurrentAddress!["floor"]}":""}"
+                                    ? "${Address.CurrentAddress!['address']} ${Address.CurrentAddress!['landmark'] != "" ? "\n landmark : ${Address.CurrentAddress!['landmark']}" : ""} ${Address.CurrentAddress!["floor"] != "" ? "\n floor : ${Address.CurrentAddress!["floor"]}" : ""}"
                                     : "N/A",
                                 style: TextStyle(
                                   fontWeight: FontWeight.w400,
-                                  fontSize: 12,
+                                  fontSize:
+                                      MediaQuery.of(context).size.width * 0.03,
                                   fontFamily: "Urbanist",
                                   color: Color(0xFF1F1970).withOpacity(0.6),
                                 ),
@@ -798,7 +856,8 @@ class _CartScreenState extends State<CartScreen> {
                     ],
                   ),
                   SizedBox(
-                    height: 40,
+                    height: MediaQuery.of(context).size.height *
+                        0.05, // ~40 on 800px height
                   )
                 ],
               ),

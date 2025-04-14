@@ -20,7 +20,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  
+  bool newUser=false;
+  Map<int, bool> isAddingMap = {}; 
   List<dynamic> addresses = [];
   List<dynamic> products = [];
   Map<String,dynamic>? SelectedAddress;
@@ -41,16 +42,24 @@ class _HomeScreenState extends State<HomeScreen> {
     fetchProducts();
     
   }
+   void UpdateAddress1(){
+    
+    localAddress=Address.CurrentAddress!["address"];
+          
+    setState(() {});
+  }
 
   void UpdateAddress(Map<String,dynamic> address){
     Address.CurrentAddress=address;
-    String fullAddress=Address.CurrentAddress!["address"];
-          List<String> words=fullAddress.split(" ");
-          localAddress=words.length>=2?"${words[0]} ${words[1]}":fullAddress;
+    localAddress=Address.CurrentAddress!["address"];
+          
     setState(() {});
   }
 
   Future<void> didAddToCart(int index) async {
+    setState(() {
+      isAddingMap[index]=true;
+    });
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final product = products[index];
     final productId = product['productId'];
@@ -73,6 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
           quantities[index] = 1;
           fetchCartDetails();
           isTapped = true;
+          isAddingMap[index]=false;
         });
         Fluttertoast.showToast(msg: "Added To Cart");
       } else {
@@ -377,9 +387,11 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: constraints.maxHeight * 0.2,
                 child: Text(
                   product['name'] ?? 'Product',
+                  
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
+                    fontFamily: "Urbanist",
                     fontSize: constraints.maxHeight * 0.07, // Dynamic font size
                     fontWeight: FontWeight.w600,
                   ),
@@ -390,6 +402,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Text(
                 "₹ ${product['price']}",
                 style: TextStyle(
+                  fontFamily: "Urbanist",
                   fontSize: constraints.maxHeight * 0.060,
                   fontWeight: FontWeight.bold,
                   color: Colors.green.shade700,
@@ -458,12 +471,20 @@ class _HomeScreenState extends State<HomeScreen> {
                             fetchCartDetails();
                           },
                           child: Center(
-                            child: Text(
+                            child: isAddingMap[index]==true?SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            ) :Text(
                               "Add To Cart",
                               style: TextStyle(
                                 color: Colors.white,
+                                fontFamily: "Urbanist",
                                 fontWeight: FontWeight.bold,
-                                fontSize: constraints.maxHeight * 0.060,
+                                fontSize: constraints.maxHeight * 0.070,
                               ),
                             ),
                           ),
@@ -494,7 +515,14 @@ class _HomeScreenState extends State<HomeScreen> {
 
     if (response.statusCode == 200) {
       final data = json.decode(await response.stream.bytesToString());
-      setState(() {
+      final fetchAddress=data["data"]["address"];
+      if(fetchAddress==null||fetchAddress.isEmpty){
+        setState(() {
+          newUser=true;
+        });
+      }
+      else{
+          setState(() {
         SelectedAddress=data['data']['address'][0];
         addresses = data['data']['address'];
         if(Address.CurrentAddress==null&&SelectedAddress!=null){
@@ -507,11 +535,14 @@ class _HomeScreenState extends State<HomeScreen> {
           localAddress=words.length>=2?"${words[0]} ${words[1]}":fullAddress;
         }
       });
+      }  
     } else {
       print('Failed to load addresses');
     }
     print("****CURRENT ADDRESS*****");
     print(Address.CurrentAddress);
+    print("***New User****");
+    print(newUser);
   }
 
   void _locationBottomSheet() {
@@ -554,7 +585,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   IconButton(
                     icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: (){
+                      Navigator.pop(context);
+                      setState(() {
+                        
+                      });
+                    } ,
+                    
                   ),
                 ],
               ),
@@ -564,7 +601,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const Center(
                 child: Text(
                   "Select delivery location",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold,fontFamily: "Urbanist"),
                 ),
               ),
               const SizedBox(height: 10),
@@ -574,14 +611,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: GestureDetector(
-                  onTap: (){
-                    Navigator.of(context).push(MaterialPageRoute(
+                  onTap: ()async{
+                   await Navigator.of(context).push(MaterialPageRoute(
                       builder: (context) => GoogleMapsScreen()));
+                      Navigator.pop(context);
+                      UpdateAddress1();
                   },
                   child: TextField(
                     enabled: false,
                     decoration: InputDecoration(
                       hintText: 'Search for area or apartment',
+                      
                       prefixIcon: const Icon(Icons.search),
                       filled: true,
                       fillColor: Colors.grey.shade100,
@@ -599,9 +639,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
               // Current Location Container
               GestureDetector(
-                onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(
+                onTap: () async{
+                 await Navigator.of(context).push(MaterialPageRoute(
                       builder: (context) => GoogleMapsScreen()));
+                     Navigator.pop(context);
+                      UpdateAddress1();
                 },
                 child: Container(
                   padding: const EdgeInsets.all(12),
@@ -627,6 +669,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       const Text(
                         "Use my current location",
                         style: TextStyle(
+                          fontFamily: "Urbanist",
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                         ),
@@ -645,9 +688,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).push(MaterialPageRoute(
+                  onTap: () async{
+                    await Navigator.of(context).push(MaterialPageRoute(
                       builder: (context) => GoogleMapsScreen()));
+                      Navigator.pop(context);
+                      UpdateAddress1();
+                      
                   },
                   child: Row(
                     children: [
@@ -667,6 +713,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       const Text(
                         "Add new address",
                         style: TextStyle(
+                          fontFamily: "Urbanist",
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                         ),
@@ -683,6 +730,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Text(
                   "Your saved addresses",
                   style: TextStyle(
+                    fontFamily: "Urbanist",
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: Colors.grey,
@@ -692,91 +740,91 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 8),
 
               // Saved Addresses List Container
-              Container(
-                constraints: BoxConstraints(
-                  maxHeight: MediaQuery.of(context).size.height *
-                      0.3, // Adjust as needed
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: addresses.isEmpty
-                    ? const Center(child: Text("No saved addresses"))
-                    : ListView.builder(
-                        shrinkWrap: true,
-                        physics: const ClampingScrollPhysics(),
-                        itemCount: addresses.length,
-                        itemBuilder: (context, index) {
-                          var address = addresses[index];
-                          bool isSelected= Address.selectedIndex==index;
-                          return GestureDetector(
-                            onTap: (){
-                              print(address);
-                              UpdateAddress(address);
-                              Navigator.of(context).pop();
-                              setState(() {
-                                Address.selectedIndex=index;
-                              });
-                              
-                            },
-                            child: Column(
-                              children: [
-                                Container(
-                                  color: isSelected?const Color.fromARGB(255, 194, 226, 205):Colors.white,
-                                  child: ListTile(
-                                    contentPadding: EdgeInsets.symmetric(
-                                        horizontal: 16, vertical: 3),
-                                    leading: Container(
-                                      
-                                      padding: EdgeInsets.all(8),
-                                      decoration: BoxDecoration(
-                                        color:  Color.fromARGB(255, 204, 235,
-                                            231), // Soft blue background
-                                        borderRadius: BorderRadius.circular(12),
-                                        border: Border.all(
-                                          color: isSelected?Colors.white: Color.fromARGB(255, 171, 234,
-                                              225), // Light blue border
-                                          width: 1.5,
+              ClipRRect(
+                borderRadius: const BorderRadius.only(topLeft: Radius.circular(10),topRight: Radius.circular(10),bottomLeft: Radius.circular(10),bottomRight: Radius.circular(10)),
+                child: Container(
+                  constraints: BoxConstraints(
+                    maxHeight: MediaQuery.of(context).size.height *
+                        0.3, // Adjust as needed
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    
+                  ),
+                  child: addresses.isEmpty
+                      ? const Center(child: Text("No saved addresses",style: TextStyle(fontFamily: "Urbanist",),))
+                      : ListView.builder(
+                          shrinkWrap: true,
+                          physics: const ClampingScrollPhysics(),
+                          itemCount: addresses.length,
+                          itemBuilder: (context, index) {
+                            var address = addresses[index];
+                            bool isSelected= Address.selectedIndex==index;
+                            return GestureDetector(
+                              onTap: (){
+                                print(address);
+                                UpdateAddress(address);
+                                Navigator.of(context).pop();
+                                setState(() {
+                                  Address.selectedIndex=index;
+                                });
+                                
+                              },
+                              child: Column(
+                                children: [
+                                  Container(
+                                    color: isSelected?const Color.fromARGB(255, 194, 226, 205):Colors.white,
+                                    child: ListTile(
+                                      contentPadding: EdgeInsets.symmetric(
+                                          horizontal: 16, vertical: 3),
+                                      leading: Container(
+                                        padding: EdgeInsets.all(8),
+                                        decoration: BoxDecoration(
+                                          color:  Color.fromARGB(255, 204, 235,
+                                              231), // Soft blue background
+                                          borderRadius: BorderRadius.circular(12),
+                                          border: Border.all(
+                                            color: isSelected?Colors.white: Color.fromARGB(255, 171, 234,
+                                                225), // Light blue border
+                                            width: 1.5,
+                                          ),
+                                        ),
+                                        child: Icon(
+                                          Icons.home_rounded, // More modern home icon
+                                          color: primaryColor, // Matching blue icon
+                                          size: 22,
                                         ),
                                       ),
-                                      child: Icon(
-                                        Icons.home_rounded, // More modern home icon
-                                        color: primaryColor, // Matching blue icon
-                                        size: 22,
+                                      title: Text(
+                                        address['address'] ?? '',
+                                        style: TextStyle(
+                                          fontFamily: "Urbanist",
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors.grey
+                                              .shade800, // Darker text for better readability
+                                        ),
                                       ),
-                                    ),
-                                    title: Text(
-                                      address['address'] ?? '',
-                                      style: TextStyle(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w600,
-                                        color: Colors.grey
-                                            .shade800, // Darker text for better readability
-                                      ),
-                                    ),
-                                    subtitle: Text(
-                                      address['landmark'] ?? '',
-                                      style: TextStyle(
-                                        fontSize: 13,
-                                        color: Colors.grey
-                                            .shade600, // Slightly lighter than title
+                                      subtitle: Text(
+                                        address['landmark'] ?? '',
+                                        style: TextStyle(
+                                          fontFamily: "Urbanist",
+                                          fontSize: 13,
+                                          color: Colors.grey
+                                              .shade600, // Slightly lighter than title
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                                Divider(
-                                  color: const Color.fromARGB(
-                                      255, 221, 220, 220), // custom gray
-                                  height: 1, // space above and below the divider
-                                  thickness:
-                                      1, // actual line thickness (use 1 or 2)
-                                )
-                              ],
-                            ),
-                          );
-                        },
-                      ),
+                                  Image.asset(
+                                    "lib/images/dotted_divider.png",
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
+                ),
               ),
 
               const SizedBox(height: 16), // Extra space at bottom
@@ -823,6 +871,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 )),
           ),
         ),
+        centerTitle: true,
         actions: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -849,27 +898,14 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
         title: Transform.translate(
           offset: Offset(0, -10),
-          child: Column(
-            children: [
-              Text(
-                "Curee it",
-                style: TextStyle(
-                  color: primaryColor,
-                  fontSize: 20,
-                  fontFamily: "Urbanist",
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              Text(
-                "Get in 15 mins",
-                style: TextStyle(
-                  color: const Color.fromARGB(255, 85, 83, 83),
-                  fontSize: 18,
-                  fontFamily: "JosefinSans",
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
+          child: Text(
+            "Curee it",
+            style: TextStyle(
+              color: primaryColor,
+              fontSize: 20,
+              fontFamily: "Urbanist",
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
       ),
@@ -885,32 +921,75 @@ class _HomeScreenState extends State<HomeScreen> {
                 print('Location selector tapped');
               },
               child: Container(
-                padding: EdgeInsets.only(left: 10),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(
-                      Icons.location_on,
-                      color: primaryColor,
-                      size: 20,
-                    ),
-                    SizedBox(width: 8),
-                    Text(
-                      localAddress, // Replace with your city variable
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Color.fromARGB(255, 85, 83, 83),
-                      ),
-                    ),
-                    SizedBox(width: 4),
-                    Icon(
-                      Icons.arrow_drop_down,
-                      color: Colors.grey,
-                    ),
-                  ],
-                ),
+  padding: EdgeInsets.only(left: 10),
+  child: Row(
+    mainAxisSize: MainAxisSize.min,
+    children: [
+      // Location Icon
+      Icon(
+        Icons.location_on,
+        color: primaryColor,
+        size: 24, // Slightly larger icon
+      ),
+      SizedBox(width: 8),
+      
+      // Address Text Column
+      Flexible(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children:newUser?[Text(
+              "ADD ADDRESS",
+              style: TextStyle(
+                fontFamily: "Urbanist",
+                fontSize: 14,
+                fontWeight: FontWeight.w700, // Bold
+                color: primaryColor,
+                letterSpacing: 0.5,
               ),
+            ),
+            SizedBox(height: 2), // Small gap between lines
+            
+           ]: [
+            // "HOME" Label
+            Text(
+              "HOME",
+              style: TextStyle(
+                fontFamily: "Urbanist",
+                fontSize: 14,
+                fontWeight: FontWeight.w700, // Bold
+                color: primaryColor,
+                letterSpacing: 0.5,
+              ),
+            ),
+            SizedBox(height: 2), // Small gap between lines
+            
+            // Actual Address
+            Text(
+              localAddress,
+              style: TextStyle(
+                fontFamily: "Urbanist",
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+                color: Color.fromARGB(255, 85, 83, 83),
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
+      SizedBox(width: 4),
+      
+      // Dropdown Icon
+      Icon(
+        Icons.arrow_drop_down,
+        color: Colors.grey,
+        size: 20,
+      ),
+    ],
+  ),
+)
             ),
             GestureDetector(
               onTap: () {
@@ -981,14 +1060,16 @@ class _HomeScreenState extends State<HomeScreen> {
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
+                                  fontFamily: "JosefinSans",
                                   color: primaryColor,
                                 ),
                               ),
                               SizedBox(height: 10),
                               Container(
+                                
                                   height: cartItems.isNotEmpty
                                       ? MediaQuery.of(context).size.height *
-                                          0.475
+                                          0.47
                                       : null,
                                   child: buildProductGrid()),
                             ],
@@ -998,14 +1079,15 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     if ((!isLoading && cartItems.isNotEmpty) || (isTapped)) ...[
                       Positioned(
-                          bottom: 72,
+                          bottom: MediaQuery.of(context).padding.bottom + 75,
                           child: Container(
                             color: Colors.white,
                             width: MediaQuery.of(context).size.width,
-                            height: 96,
+                            height: MediaQuery.of(context).size.height * 0.12, // 12% of screen height
+
                             child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 18.0, vertical: 10),
+                              padding:  EdgeInsets.symmetric(
+                                  horizontal: MediaQuery.of(context).size.width * 0.045,  vertical: MediaQuery.of(context).size.height * 0.012),
                               child: Column(
                                 spacing: 8,
                                 mainAxisAlignment: MainAxisAlignment.start,
@@ -1108,7 +1190,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           },
                                           child: Container(
                                             padding: EdgeInsets.symmetric(
-                                                vertical: 14, horizontal: 22),
+                                                vertical: MediaQuery.of(context).size.height*0.0175, horizontal: MediaQuery.of(context).size.width*0.055),
                                             decoration: BoxDecoration(
                                                 color: secondaryColor,
                                                 borderRadius:
@@ -1118,7 +1200,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               style: TextStyle(
                                                   color: Colors.white,
                                                   fontFamily: "Urbanist",
-                                                  fontSize: 14,
+                                                  fontSize: MediaQuery.of(context).size.height*0.0175,
                                                   fontWeight: FontWeight.bold),
                                             ),
                                           ))

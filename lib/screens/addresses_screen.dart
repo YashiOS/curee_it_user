@@ -129,8 +129,8 @@ class _AddressesScreenState extends State<AddressesScreen> {
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 12.0),
                     child: GestureDetector(
-                      onTap: () {
-                        Navigator.push(
+                      onTap: () async{
+                       await Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) => GoogleMapsScreen()
@@ -139,6 +139,9 @@ class _AddressesScreenState extends State<AddressesScreen> {
                               // ),
                               ),
                         );
+                        setState(() {
+                          
+                        });
                       },
                       child: Container(
                         padding:

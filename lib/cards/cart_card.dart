@@ -135,6 +135,8 @@ void didUpdateWidget(covariant CartCard oldWidget) {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+  final screenHeight = MediaQuery.of(context).size.height;
     
     return Padding(
   padding: EdgeInsets.only(
@@ -142,7 +144,7 @@ void didUpdateWidget(covariant CartCard oldWidget) {
     bottom: MediaQuery.of(context).size.height * 0.018,
   ),
   child: Container(
-    padding: EdgeInsets.only(right: 12),
+    padding: EdgeInsets.only(right: MediaQuery.of(context).size.width * 0.03),
     child: Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -153,8 +155,8 @@ void didUpdateWidget(covariant CartCard oldWidget) {
             children: [
               // Product Image
               SizedBox(
-                height: 40,
-                width: 40,
+                height: MediaQuery.of(context).size.width * 0.1,
+                width: MediaQuery.of(context).size.width * 0.1,
                 child: widget.productImages.isNotEmpty
                     ? Image.network(
                         widget.productImages[0],
@@ -194,9 +196,9 @@ void didUpdateWidget(covariant CartCard oldWidget) {
                         widget.productName,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style:  TextStyle(
                           fontWeight: FontWeight.w700,
-                          fontSize: 14,
+                          fontSize:  MediaQuery.of(context).size.height*0.0175,
                           fontFamily: "JosefinSans",
                           color: Color(0xFF1F1970),
                         ),
@@ -205,9 +207,9 @@ void didUpdateWidget(covariant CartCard oldWidget) {
                         widget.packLabel,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: const TextStyle(
+                        style:  TextStyle(
                           fontWeight: FontWeight.w400,
-                          fontSize: 12,
+                          fontSize: MediaQuery.of(context).size.height*0.015,
                           fontFamily: "JosefinSans",
                           color: Color(0xFF1F1970),
                         ),
@@ -226,8 +228,8 @@ void didUpdateWidget(covariant CartCard oldWidget) {
           children: [
             // Quantity Control
             Container(
-              width: 90,
-              height: 30,
+              width: MediaQuery.of(context).size.width*0.25,
+              height: MediaQuery.of(context).size.height*0.04,
               decoration: BoxDecoration(
                 color: secondaryColor.withOpacity(0.16),
                 borderRadius: BorderRadius.circular(30),
@@ -247,8 +249,8 @@ void didUpdateWidget(covariant CartCard oldWidget) {
                     },
                     child: Image.asset(
                       "lib/images/minus_button.png",
-                      height: 20,
-                      width: 20,
+                      height: screenHeight * 0.025,
+                      width: screenWidth * 0.05,
                       fit: BoxFit.contain,
                     ),
                   ),
@@ -267,8 +269,8 @@ void didUpdateWidget(covariant CartCard oldWidget) {
                     },
                     child: Image.asset(
                       "lib/images/plus_button.png",
-                      height: 20,
-                      width: 20,
+                      height: screenHeight * 0.025,
+                      width: screenWidth * 0.05,
                       fit: BoxFit.contain,
                     ),
                   ),
@@ -284,19 +286,19 @@ void didUpdateWidget(covariant CartCard oldWidget) {
               children: [
                 Text(
                   "₹ ${((widget.sellingPrice * 0.7) * _localQuantity).toStringAsFixed(2)}",
-                  style: const TextStyle(
+                  style:  TextStyle(
                     fontWeight: FontWeight.w800,
-                    fontSize: 12,
+                    fontSize: screenWidth* 0.03,
                     fontFamily: "Urbanist",
                     color: Color(0xFF1F1970),
                   ),
                 ),
                 Text(
                   "₹ ${(widget.sellingPrice * _localQuantity).toString()}",
-                  style: const TextStyle(
+                  style:  TextStyle(
                     decoration: TextDecoration.lineThrough,
                     fontWeight: FontWeight.w500,
-                    fontSize: 10,
+                    fontSize: screenWidth * 0.025,
                     fontFamily: "Urbanist",
                     color: Colors.grey,
                   ),

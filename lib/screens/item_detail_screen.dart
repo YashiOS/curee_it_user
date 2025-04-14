@@ -91,12 +91,9 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
         if (responseData['status'] == 200) {
           checkIfFav();
           Fluttertoast.showToast(msg: "Item added to Favourites");
-        } else {
-        }
-      } else {
-      }
-    } catch (error) {
-    }
+        } else {}
+      } else {}
+    } catch (error) {}
     checkIfFav();
   }
 
@@ -110,7 +107,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
         })
         ..body = jsonEncode({
           "productId": widget.productId,
-          "userId": "68fa72cbdc5f0a68", 
+          "userId": "68fa72cbdc5f0a68",
           "quantity": 1
         });
 
@@ -469,8 +466,17 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                                             1.28,
                                                     padding:
                                                         EdgeInsets.symmetric(
-                                                            horizontal: 14,
-                                                            vertical: 6),
+                                                      horizontal: MediaQuery.of(
+                                                                  context)
+                                                              .size
+                                                              .width *
+                                                          0.035, // ~14 on 400px width
+                                                      vertical: MediaQuery.of(
+                                                                  context)
+                                                              .size
+                                                              .height *
+                                                          0.0075, // ~6 on 800px height
+                                                    ),
                                                     decoration: BoxDecoration(
                                                         color: Colors.white,
                                                         border: Border.all(
@@ -737,7 +743,8 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                             alignment: Alignment.center,
                                             width: MediaQuery.of(context)
                                                     .size
-                                                    .width / 1.5,
+                                                    .width /
+                                                1.5,
                                             padding: EdgeInsets.symmetric(
                                                 horizontal: 14, vertical: 8),
                                             decoration: BoxDecoration(

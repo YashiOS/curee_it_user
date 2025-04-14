@@ -3,9 +3,11 @@ import 'package:cureeit_user_app/screens/order_tracking_screen.dart';
 import 'package:flutter/material.dart';
 import 'dart:io' show Platform;
 
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+
 
 void main() {
-  
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const MyApp());
 }
 
