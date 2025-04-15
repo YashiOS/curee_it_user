@@ -102,7 +102,6 @@ class _OrdersScreenState extends State<OrdersScreen> {
                       orders.length, // Use the length of the orders array
                   itemBuilder: (context, index) {
                     return OrderCard(
-                      index: index,
                         orderData:
                             orders[index]); // Pass the order data to the card
                   },

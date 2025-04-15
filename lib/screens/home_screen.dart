@@ -1,5 +1,14 @@
 import 'dart:convert';
-
+import 'package:cureeit_user_app/current_address/api_services.dart';
+import 'package:cureeit_user_app/current_address/location_permission_helper.dart';
+import 'package:cureeit_user_app/current_address/models/get_places.dart';
+import 'package:cureeit_user_app/current_address/models/place_from_coordinates.dart';
+import 'package:cureeit_user_app/screens/add_address_screen.dart';
+import 'package:cureeit_user_app/selected_Address/currentAddress.dart';
+import 'package:cureeit_user_app/utils/theme.dart';
+import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:cureeit_user_app/current_address/google_maps_screen.dart';
 import 'package:cureeit_user_app/screens/cart_screen.dart';
 import 'package:cureeit_user_app/screens/item_detail_screen.dart';
@@ -20,19 +29,22 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  bool newUser=false;
-  Map<int, bool> isAddingMap = {}; 
+  bool newUser = false;
+  Map<int, bool> isAddingMap = {};
   List<dynamic> addresses = [];
   List<dynamic> products = [];
-  Map<String,dynamic>? SelectedAddress;
+  Map<String, dynamic>? SelectedAddress;
   List<Map<String, dynamic>> cartItems = [];
   double totalAmount = 0.00;
   bool isLoading = true;
   bool isTapped = false;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   Map<int, int> quantities = {};
-  String localAddress="";
-   // To store product quantities
+  String localAddress = "";
+  double defaultLat = 26.9124;
+  double defaultLng = 75.7873;
+  PlaceFromCoordinates placeFromCoordinates = PlaceFromCoordinates();
+  // To store product quantities
 
   @override
   void initState() {
@@ -40,25 +52,24 @@ class _HomeScreenState extends State<HomeScreen> {
     fetchAddresses();
     fetchCartDetails();
     fetchProducts();
-    
   }
-   void UpdateAddress1(){
-    
-    localAddress=Address.CurrentAddress!["address"];
-          
+
+  void UpdateAddress1() {
+    localAddress = Address.CurrentAddress!["address"];
+
     setState(() {});
   }
 
-  void UpdateAddress(Map<String,dynamic> address){
-    Address.CurrentAddress=address;
-    localAddress=Address.CurrentAddress!["address"];
-          
+  void UpdateAddress(Map<String, dynamic> address) {
+    Address.CurrentAddress = address;
+    localAddress = Address.CurrentAddress!["address"];
+
     setState(() {});
   }
 
   Future<void> didAddToCart(int index) async {
     setState(() {
-      isAddingMap[index]=true;
+      isAddingMap[index] = true;
     });
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final product = products[index];
@@ -82,7 +93,8 @@ class _HomeScreenState extends State<HomeScreen> {
           quantities[index] = 1;
           fetchCartDetails();
           isTapped = true;
-          isAddingMap[index]=false;
+          isAddingMap[index] = false;
+          
         });
         Fluttertoast.showToast(msg: "Added To Cart");
       } else {
@@ -387,27 +399,25 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: constraints.maxHeight * 0.2,
                 child: Text(
                   product['name'] ?? 'Product',
-                  
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                   style: TextStyle(
-                    fontFamily: "Urbanist",
-                    fontSize: constraints.maxHeight * 0.07, // Dynamic font size
-                    fontWeight: FontWeight.w600,
+                    fontFamily: "Roboto", // 👈 Use Roboto
+                    fontSize: constraints.maxHeight * 0.07,
+                    
                   ),
+                ),
+              ),
+              Text(
+                "₹${product['price']}",
+                style: GoogleFonts.inter(
+                  fontSize: constraints.maxHeight * 0.060,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.teal.shade800,
                 ),
               ),
 
               // Price (10% of container height)
-              Text(
-                "₹ ${product['price']}",
-                style: TextStyle(
-                  fontFamily: "Urbanist",
-                  fontSize: constraints.maxHeight * 0.060,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.green.shade700,
-                ),
-              ),
 
               // Spacer
               SizedBox(height: constraints.maxHeight * 0.01),
@@ -463,7 +473,6 @@ class _HomeScreenState extends State<HomeScreen> {
                           style: TextButton.styleFrom(
                             padding: EdgeInsets.zero,
                             minimumSize: Size.zero,
-                      
                           ),
                           onPressed: () {
                             didAddToCart(index);
@@ -471,22 +480,23 @@ class _HomeScreenState extends State<HomeScreen> {
                             fetchCartDetails();
                           },
                           child: Center(
-                            child: isAddingMap[index]==true?SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
-                              ),
-                            ) :Text(
-                              "Add To Cart",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontFamily: "Urbanist",
-                                fontWeight: FontWeight.bold,
-                                fontSize: constraints.maxHeight * 0.070,
-                              ),
-                            ),
+                            child: isAddingMap[index] == true
+                                ? SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : Text(
+                                    "Add to Cart",
+                                    style: GoogleFonts.lato(
+                                      fontSize: constraints.maxHeight * 0.070,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                    ),
+                                  ),
                           ),
                         ),
                 ),
@@ -515,27 +525,46 @@ class _HomeScreenState extends State<HomeScreen> {
 
     if (response.statusCode == 200) {
       final data = json.decode(await response.stream.bytesToString());
-      final fetchAddress=data["data"]["address"];
-      if(fetchAddress==null||fetchAddress.isEmpty){
+      final fetchAddress = data["data"]["address"];
+      if (fetchAddress == null || fetchAddress.isEmpty) {
         setState(() {
-          newUser=true;
+          newUser = true;
         });
-      }
-      else{
-          setState(() {
-        SelectedAddress=data['data']['address'][0];
+      } else {
+        SelectedAddress = data['data']['address'][0];
         addresses = data['data']['address'];
-        if(Address.CurrentAddress==null&&SelectedAddress!=null){
-          Address.CurrentAddress=SelectedAddress;
-          
+        if (Address.CurrentAddress == null && SelectedAddress != null) {
+          print("in 1st if condition");
+          localAddress = "loading...";
+          String address = await fetchLocationAndAddress();
+          setState(() {
+            Address.CurrentAddress = {
+              "address": address,
+              "landmark": "",
+              "floor": "",
+              "userLat": defaultLat,
+              "userLong": defaultLng,
+              "type": "",
+              "_id": ""
+            };
+            print("this is loacal address");
+            localAddress = address;
+            print(localAddress);
+            Address.selectedIndex = null;
+          });
+
+          return;
         }
-        if(Address.CurrentAddress!=null){
-        String fullAddress=Address.CurrentAddress!["address"];
-          List<String> words=fullAddress.split(" ");
-          localAddress=words.length>=2?"${words[0]} ${words[1]}":fullAddress;
+        if (Address.CurrentAddress != null) {
+          String fullAddress = Address.CurrentAddress!["address"];
+
+          print("in 2nd if condition");
+
+          setState(() {
+            localAddress = fullAddress;
+          });
         }
-      });
-      }  
+      }
     } else {
       print('Failed to load addresses');
     }
@@ -546,7 +575,6 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   void _locationBottomSheet() {
-   
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
     showModalBottomSheet(
@@ -585,13 +613,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   IconButton(
                     icon: const Icon(Icons.close),
-                    onPressed: (){
+                    onPressed: () {
                       Navigator.pop(context);
-                      setState(() {
-                        
-                      });
-                    } ,
-                    
+                      setState(() {});
+                    },
                   ),
                 ],
               ),
@@ -601,7 +626,10 @@ class _HomeScreenState extends State<HomeScreen> {
               const Center(
                 child: Text(
                   "Select delivery location",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold,fontFamily: "Urbanist"),
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: "Urbanist"),
                 ),
               ),
               const SizedBox(height: 10),
@@ -611,22 +639,21 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: GestureDetector(
-                  onTap: ()async{
-                   await Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => GoogleMapsScreen()));
-                      Navigator.pop(context);
-                      UpdateAddress1();
+                  onTap: () async {
+                    await Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => GoogleMapsScreen()));
+                    Navigator.pop(context);
+                    UpdateAddress1();
                   },
                   child: TextField(
                     enabled: false,
                     decoration: InputDecoration(
                       hintText: 'Search for area or apartment',
-                      
                       prefixIcon: const Icon(Icons.search),
                       filled: true,
                       fillColor: Colors.grey.shade100,
-                      contentPadding:
-                          const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+                      contentPadding: const EdgeInsets.symmetric(
+                          vertical: 0, horizontal: 16),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                         borderSide: BorderSide.none,
@@ -639,11 +666,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
               // Current Location Container
               GestureDetector(
-                onTap: () async{
-                 await Navigator.of(context).push(MaterialPageRoute(
+                onTap: () async {
+                  await Navigator.of(context).push(MaterialPageRoute(
                       builder: (context) => GoogleMapsScreen()));
-                     Navigator.pop(context);
-                      UpdateAddress1();
+                  Navigator.pop(context);
+                  UpdateAddress1();
                 },
                 child: Container(
                   padding: const EdgeInsets.all(12),
@@ -688,12 +715,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: GestureDetector(
-                  onTap: () async{
+                  onTap: () async {
                     await Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => GoogleMapsScreen()));
-                      Navigator.pop(context);
-                      UpdateAddress1();
-                      
+                        builder: (context) => GoogleMapsScreen()));
+                    Navigator.pop(context);
+                    UpdateAddress1();
                   },
                   child: Row(
                     children: [
@@ -741,7 +767,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
               // Saved Addresses List Container
               ClipRRect(
-                borderRadius: const BorderRadius.only(topLeft: Radius.circular(10),topRight: Radius.circular(10),bottomLeft: Radius.circular(10),bottomRight: Radius.circular(10)),
+                borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(10),
+                    topRight: Radius.circular(10),
+                    bottomLeft: Radius.circular(10),
+                    bottomRight: Radius.circular(10)),
                 child: Container(
                   constraints: BoxConstraints(
                     maxHeight: MediaQuery.of(context).size.height *
@@ -749,49 +779,61 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    
                   ),
                   child: addresses.isEmpty
-                      ? const Center(child: Text("No saved addresses",style: TextStyle(fontFamily: "Urbanist",),))
+                      ? const Center(
+                          child: Text(
+                          "No saved addresses",
+                          style: TextStyle(
+                            fontFamily: "Urbanist",
+                          ),
+                        ))
                       : ListView.builder(
                           shrinkWrap: true,
                           physics: const ClampingScrollPhysics(),
                           itemCount: addresses.length,
                           itemBuilder: (context, index) {
                             var address = addresses[index];
-                            bool isSelected= Address.selectedIndex==index;
+                            bool isSelected = Address.selectedIndex == index;
                             return GestureDetector(
-                              onTap: (){
+                              onTap: () {
                                 print(address);
                                 UpdateAddress(address);
                                 Navigator.of(context).pop();
                                 setState(() {
-                                  Address.selectedIndex=index;
+                                  Address.selectedIndex = index;
                                 });
-                                
                               },
                               child: Column(
                                 children: [
                                   Container(
-                                    color: isSelected?const Color.fromARGB(255, 194, 226, 205):Colors.white,
+                                    color: isSelected
+                                        ? const Color.fromARGB(
+                                            255, 194, 226, 205)
+                                        : Colors.white,
                                     child: ListTile(
                                       contentPadding: EdgeInsets.symmetric(
                                           horizontal: 16, vertical: 3),
                                       leading: Container(
                                         padding: EdgeInsets.all(8),
                                         decoration: BoxDecoration(
-                                          color:  Color.fromARGB(255, 204, 235,
+                                          color: Color.fromARGB(255, 204, 235,
                                               231), // Soft blue background
-                                          borderRadius: BorderRadius.circular(12),
+                                          borderRadius:
+                                              BorderRadius.circular(12),
                                           border: Border.all(
-                                            color: isSelected?Colors.white: Color.fromARGB(255, 171, 234,
-                                                225), // Light blue border
+                                            color: isSelected
+                                                ? Colors.white
+                                                : Color.fromARGB(255, 171, 234,
+                                                    225), // Light blue border
                                             width: 1.5,
                                           ),
                                         ),
                                         child: Icon(
-                                          Icons.home_rounded, // More modern home icon
-                                          color: primaryColor, // Matching blue icon
+                                          Icons
+                                              .home_rounded, // More modern home icon
+                                          color:
+                                              primaryColor, // Matching blue icon
                                           size: 22,
                                         ),
                                       ),
@@ -835,9 +877,34 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  Future<String> fetchLocationAndAddress() async {
+    try {
+      // Get current position
+      final position = await determinePosition();
+      defaultLat = position.latitude;
+      defaultLng = position.longitude;
+      print("📍 Location: $defaultLat, $defaultLng");
+
+      // Get address from coordinates
+      var value =
+          await ApiServices().placeFromCoordinates(defaultLat, defaultLng);
+
+      placeFromCoordinates = value;
+      isLoading = false;
+      defaultLat = value.results?[0].geometry?.location?.lat ?? 0.0;
+      defaultLng = value.results?[0].geometry?.location?.lng ?? 0.0;
+      String address = placeFromCoordinates.results?[0].formattedAddress ?? '';
+      // Update Address model here
+
+      return address;
+    } catch (e) {
+      print("❌ Error: $e");
+      return "";
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    
     return Scaffold(
       key: _scaffoldKey,
       appBar: AppBar(
@@ -915,82 +982,69 @@ class _HomeScreenState extends State<HomeScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             GestureDetector(
-              onTap: () {
-                _locationBottomSheet();
-                // Handle tap to show city selection
-                print('Location selector tapped');
-              },
-              child: Container(
-  padding: EdgeInsets.only(left: 10),
-  child: Row(
-    mainAxisSize: MainAxisSize.min,
-    children: [
-      // Location Icon
-      Icon(
-        Icons.location_on,
-        color: primaryColor,
-        size: 24, // Slightly larger icon
-      ),
-      SizedBox(width: 8),
-      
-      // Address Text Column
-      Flexible(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children:newUser?[Text(
-              "ADD ADDRESS",
-              style: TextStyle(
-                fontFamily: "Urbanist",
-                fontSize: 14,
-                fontWeight: FontWeight.w700, // Bold
-                color: primaryColor,
-                letterSpacing: 0.5,
-              ),
-            ),
-            SizedBox(height: 2), // Small gap between lines
-            
-           ]: [
-            // "HOME" Label
-            Text(
-              "HOME",
-              style: TextStyle(
-                fontFamily: "Urbanist",
-                fontSize: 14,
-                fontWeight: FontWeight.w700, // Bold
-                color: primaryColor,
-                letterSpacing: 0.5,
-              ),
-            ),
-            SizedBox(height: 2), // Small gap between lines
-            
-            // Actual Address
-            Text(
-              localAddress,
-              style: TextStyle(
-                fontFamily: "Urbanist",
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-                color: Color.fromARGB(255, 85, 83, 83),
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-        ),
-      ),
-      SizedBox(width: 4),
-      
-      // Dropdown Icon
-      Icon(
-        Icons.arrow_drop_down,
-        color: Colors.grey,
-        size: 20,
-      ),
-    ],
-  ),
-)
-            ),
+                onTap: () {
+                  _locationBottomSheet();
+                  // Handle tap to show city selection
+                  print('Location selector tapped');
+                },
+                child: Container(
+                  padding: EdgeInsets.only(left: 10),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Location Icon
+                      Icon(
+                        Icons.location_on,
+                        color: primaryColor,
+                        size: 24, // Slightly larger icon
+                      ),
+                      SizedBox(width: 8),
+
+                      // Address Text Column
+                      Flexible(
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // "HOME" Label
+                            Text(
+                              "HOME",
+                              style: TextStyle(
+                                fontFamily: "Urbanist",
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700, // Bold
+                                color: primaryColor,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                            SizedBox(height: 2), // Small gap between lines
+
+                            // Actual Address
+                            Text(
+                              localAddress,
+                              style: TextStyle(
+                                fontFamily: "Urbanist",
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                                color: Color.fromARGB(255, 85, 83, 83),
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(width: 4),
+
+                      // Dropdown Icon
+                      Icon(
+                        Icons.arrow_drop_down,
+                        color: Colors.grey,
+                        size: 20,
+                      ),
+                    ],
+                  ),
+                )),
             GestureDetector(
               onTap: () {
                 Navigator.push(
@@ -1051,7 +1105,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       children: [
                         Padding(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 18.0, vertical: 10.0),
+                              horizontal: 10.0, vertical: 5.0),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -1059,14 +1113,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                 "Featured Products",
                                 style: TextStyle(
                                   fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  fontFamily: "JosefinSans",
+                                  fontWeight: FontWeight.w700,
+                                  fontFamily: "Urbanist",
                                   color: primaryColor,
                                 ),
                               ),
                               SizedBox(height: 10),
                               Container(
-                                
                                   height: cartItems.isNotEmpty
                                       ? MediaQuery.of(context).size.height *
                                           0.47
@@ -1079,15 +1132,19 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     if ((!isLoading && cartItems.isNotEmpty) || (isTapped)) ...[
                       Positioned(
-                          bottom: MediaQuery.of(context).padding.bottom + 75,
+                          bottom: 76,
                           child: Container(
                             color: Colors.white,
                             width: MediaQuery.of(context).size.width,
-                            height: MediaQuery.of(context).size.height * 0.12, // 12% of screen height
+                            height: MediaQuery.of(context).size.height *
+                                0.12, // 12% of screen height
 
                             child: Padding(
-                              padding:  EdgeInsets.symmetric(
-                                  horizontal: MediaQuery.of(context).size.width * 0.045,  vertical: MediaQuery.of(context).size.height * 0.012),
+                              padding: EdgeInsets.symmetric(
+                                  horizontal:
+                                      MediaQuery.of(context).size.width * 0.045,
+                                  vertical: MediaQuery.of(context).size.height *
+                                      0.012),
                               child: Column(
                                 spacing: 8,
                                 mainAxisAlignment: MainAxisAlignment.start,
@@ -1190,7 +1247,15 @@ class _HomeScreenState extends State<HomeScreen> {
                                           },
                                           child: Container(
                                             padding: EdgeInsets.symmetric(
-                                                vertical: MediaQuery.of(context).size.height*0.0175, horizontal: MediaQuery.of(context).size.width*0.055),
+                                                vertical: MediaQuery.of(context)
+                                                        .size
+                                                        .height *
+                                                    0.0175,
+                                                horizontal:
+                                                    MediaQuery.of(context)
+                                                            .size
+                                                            .width *
+                                                        0.055),
                                             decoration: BoxDecoration(
                                                 color: secondaryColor,
                                                 borderRadius:
@@ -1200,7 +1265,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                               style: TextStyle(
                                                   color: Colors.white,
                                                   fontFamily: "Urbanist",
-                                                  fontSize: MediaQuery.of(context).size.height*0.0175,
+                                                  fontSize:
+                                                      MediaQuery.of(context)
+                                                              .size
+                                                              .height *
+                                                          0.0175,
                                                   fontWeight: FontWeight.bold),
                                             ),
                                           ))

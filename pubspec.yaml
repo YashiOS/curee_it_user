@@ -45,6 +45,8 @@ dependencies:
   intl: ^0.17.0
   shared_preferences: ^2.5.3
   lottie: ^2.7.0
+  google_fonts: ^6.2.1
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter

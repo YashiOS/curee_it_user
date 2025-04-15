@@ -34,6 +34,7 @@ class CartCard extends StatefulWidget {
 }
 
 class _CartCardState extends State<CartCard> {
+  int _lastSentQuantity = -1;
   late int _localQuantity;
   Timer? _debounceTimer;
 
@@ -65,7 +66,7 @@ void didUpdateWidget(covariant CartCard oldWidget) {
     });
 
     _debounceTimer?.cancel();
-    _debounceTimer = Timer(const Duration(milliseconds: 800), () {
+    _debounceTimer = Timer(const Duration(milliseconds: 400), () {
       _updateQuantity(_localQuantity);
     });
   }
@@ -73,6 +74,8 @@ void didUpdateWidget(covariant CartCard oldWidget) {
   Future<void> _updateQuantity(int quantity) async {
     final String userId = "68fa72cbdc5f0a68";
     final String productId = widget.productId;
+    if (_lastSentQuantity == quantity) return;
+  _lastSentQuantity = quantity;
   
     final Map<String, dynamic> requestData = {
       "userId": userId,

@@ -21,6 +21,7 @@ class _SearchState extends State<Search> {
 
   // Function to call search API
   Future<void> _fetchSearchResults(String query) async {
+    
     if (query.length < 3) {
       setState(() {
         _searchResults.clear();
@@ -68,9 +69,18 @@ class _SearchState extends State<Search> {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 500), () {
       final query = _controller.text.trim();
+      
       print("Query  sent is $query");
+      if (query.isEmpty) {
+    // Clear results immediately
+    setState(() {
+      _searchResults.clear();
+    });
+    return;
+  }
       if (query.isNotEmpty) {
         _fetchSearchResults(query);
+        print("done sent");
       }
     });
   }

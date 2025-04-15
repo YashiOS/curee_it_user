@@ -489,8 +489,8 @@ Widget MedicineCard(
                   alignment: Alignment.topRight,
                   child: GestureDetector(
                     onTap: () {
-                      // Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>BaseScreen()));
-                      Navigator.pop(context);
+                       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>BaseScreen()));
+                      //Navigator.pop(context);
                     },
                     child: Icon(
                       Icons.close,

@@ -44,6 +44,16 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
         defaultLng = value.results?[0].geometry?.location?.lng ?? 0.0;
         placeFromCoordinates = value;
         isLoading = false;
+        Address.CurrentAddress={
+      "address":placeFromCoordinates.results?[0].formattedAddress,
+      "landmark":"",
+      "floor":"",
+      "userLat":defaultLat,
+      "userLong":defaultLng,
+      "type":"",
+      "_id":""
+     };
+     Address.selectedIndex=null;
       });
     });
     
@@ -67,16 +77,7 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
   Widget build(BuildContext context) {
     print("*********MY ADDRESS*****");
      print(placeFromCoordinates.results?[0].formattedAddress);
-     Address.CurrentAddress={
-      "address":placeFromCoordinates.results?[0].formattedAddress,
-      "landmark":"",
-      "floor":"",
-      "userLat":defaultLat,
-      "userLong":defaultLng,
-      "type":"",
-      "_id":""
-     };
-     Address.selectedIndex=null;
+     
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,

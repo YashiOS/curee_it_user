@@ -87,9 +87,7 @@ class _CartScreenState extends State<CartScreen> {
         builder: (context) => AddressesScreen(userId: "68fa72cbdc5f0a68"),
       ),
     );
-    setState(() {
-      
-    });
+    setState(() {});
     if (address != null) {
       setState(() {
         selectedAddress = address;
@@ -235,8 +233,10 @@ class _CartScreenState extends State<CartScreen> {
     }
   }
 
-  Future<void> createCheckout(
-      String total, double shippingCost, String shippingAddress) async {
+  Future<void> createCheckout(String total, double shippingCost,
+      String shippingAddress, String transactionId) async {
+        
+        
     print("***SHIPPING ADDRESS****");
     print(shippingAddress);
     int Total = double.parse(total).toInt();
@@ -254,11 +254,11 @@ class _CartScreenState extends State<CartScreen> {
           "totalAmount": Total,
           "shippingAddress": shippingAddress,
           "shippingCost": shippingCost,
-          "userLat": selectedAddress!['userLat'],
-          "userLong": selectedAddress!['userLong'],
+          "userLat":Address.CurrentAddress?["userLat"] ??0.0,
+          "userLong": Address.CurrentAddress?["userLong"]??0.0,
           "paymentDetails": {
             "gateway": "Paytm",
-            "transactionId": "txn_123456789",
+            "transactionId": transactionId,
             "status": "Paid"
           }
         });
@@ -659,13 +659,22 @@ class _CartScreenState extends State<CartScreen> {
                                                                 (PaymentSuccessResponse
                                                                     response) {
                                                               print(
-                                                                  "Total Amount is ${totalAmount.toStringAsFixed(2)}");
+                                                                  "***PAYMENT RESPONSE***");
+                                                             
+                                                              print(response.data);
+                                                              print(response.signature);
+                                                             
+                                                              
+
                                                               createCheckout(
                                                                 (totalWholeAmount)
                                                                     .toStringAsFixed(
                                                                         2),
                                                                 deliveryServiceFees,
                                                                 "${Address.CurrentAddress!["address"]}, ${Address.CurrentAddress!['landmark']}, ${Address.CurrentAddress!['floor']}, ${Address.CurrentAddress!['userLat']}, ${Address.CurrentAddress!['userLong']}",
+                                                                response
+                                                                    .paymentId
+                                                                    .toString(),
                                                               );
                                                             },
                                                             onFailure:
@@ -838,7 +847,7 @@ class _CartScreenState extends State<CartScreen> {
                                 ],
                               ),
                               Text(
-                                selectedAddress != null
+                                Address.CurrentAddress != null
                                     ? "${Address.CurrentAddress!['address']} ${Address.CurrentAddress!['landmark'] != "" ? "\n landmark : ${Address.CurrentAddress!['landmark']}" : ""} ${Address.CurrentAddress!["floor"] != "" ? "\n floor : ${Address.CurrentAddress!["floor"]}" : ""}"
                                     : "N/A",
                                 style: TextStyle(
