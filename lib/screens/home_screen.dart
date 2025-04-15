@@ -38,6 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
   double totalAmount = 0.00;
   bool isLoading = true;
   bool isTapped = false;
+  bool isInRadius = false;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   Map<int, int> quantities = {};
   String localAddress = "";
@@ -56,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void UpdateAddress1() {
     localAddress = Address.CurrentAddress!["address"];
-
+    print("Local Address is ${localAddress}");
     setState(() {});
   }
 
@@ -301,6 +302,39 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  Widget buildOutOfRadius() {
+  return Center(
+    child: Column(
+      mainAxisSize: MainAxisSize.min, // Ensures column takes only as much space as needed
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Text(
+          "Sorry! Our services are not available in your area yet.",
+          textAlign: TextAlign.center, // Center the text inside the widget
+          style: TextStyle(
+            fontWeight: FontWeight.w700,
+            fontSize: 24,
+            fontFamily: "Urbanist",
+            color: primaryColor,
+          ),
+        ),
+        SizedBox(height: 12), // Add spacing between the two texts
+        Text(
+          "We will notify you as soon as the services are available",
+          textAlign: TextAlign.center, // Center this text too
+          style: TextStyle(
+            fontWeight: FontWeight.w500,
+            fontSize: 14,
+            fontFamily: "Urbanist",
+            color: primaryColor,
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
   Widget buildProductGrid() {
     if (products.isEmpty) {
       return Center(
@@ -537,6 +571,7 @@ class _HomeScreenState extends State<HomeScreen> {
           print("in 1st if condition");
           localAddress = "loading...";
           String address = await fetchLocationAndAddress();
+          checkLocation();
           setState(() {
             Address.CurrentAddress = {
               "address": address,
@@ -547,9 +582,7 @@ class _HomeScreenState extends State<HomeScreen> {
               "type": "",
               "_id": ""
             };
-            print("this is loacal address");
             localAddress = address;
-            print(localAddress);
             Address.selectedIndex = null;
           });
 
@@ -562,6 +595,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
           setState(() {
             localAddress = fullAddress;
+            checkLocation();
           });
         }
       }
@@ -574,6 +608,32 @@ class _HomeScreenState extends State<HomeScreen> {
     print(newUser);
   }
 
+   Future<void> checkLocation() async {
+    final String apiUrl =
+        "http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/home/check_location";
+
+    try {
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode({
+          "latitude": defaultLat,
+          "longitude": defaultLng,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        setState(() {
+        isInRadius = responseData['status'] == 200;
+      });
+      } else {
+        print("Failed to check_location: ${response.body}");
+      }
+    } catch (error) {
+      print("Error to check_location: $error");
+    }
+  }
   void _locationBottomSheet() {
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
@@ -1110,7 +1170,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "Featured Products",
+                               isInRadius ? "Featured Products" : "",
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w700,
@@ -1124,7 +1184,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                       ? MediaQuery.of(context).size.height *
                                           0.47
                                       : null,
-                                  child: buildProductGrid()),
+                                  child: isInRadius ? buildProductGrid() : buildOutOfRadius()),
                             ],
                           ),
                         )
