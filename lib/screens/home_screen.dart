@@ -57,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void UpdateAddress1() {
     localAddress = Address.CurrentAddress!["address"];
-    print("Local Address is ${localAddress}");
+    checkLocation();
     setState(() {});
   }
 
@@ -625,7 +625,8 @@ class _HomeScreenState extends State<HomeScreen> {
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         setState(() {
-        isInRadius = responseData['status'] == 200;
+        isInRadius = responseData['insideRadius'] == true;
+        print("IsInRadius value is ${isInRadius}");
       });
       } else {
         print("Failed to check_location: ${response.body}");
@@ -780,6 +781,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         builder: (context) => GoogleMapsScreen()));
                     Navigator.pop(context);
                     UpdateAddress1();
+
                   },
                   child: Row(
                     children: [
