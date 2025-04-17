@@ -220,7 +220,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                     "Back",
                     style: TextStyle(
                         fontWeight: FontWeight.w600,
-                        fontSize: 14,
+                        fontSize: MediaQuery.of(context).size.height * 0.018,
                         fontFamily: "Urbanist",
                         color: primaryColor),
                   )
@@ -289,7 +289,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                     product['name'] ?? 'Unknown Product',
                                     style: TextStyle(
                                         fontWeight: FontWeight.w500,
-                                        fontSize: 20,
+                                        fontSize: MediaQuery.of(context).size.height * 0.026,
                                         fontFamily: "JosefinSans",
                                         color: Colors.black),
                                   ),
@@ -298,7 +298,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                         'Manufacturer not available',
                                     style: TextStyle(
                                         fontWeight: FontWeight.w400,
-                                        fontSize: 12,
+                                        fontSize: MediaQuery.of(context).size.height * 0.015,
                                         fontFamily: "Urbanist",
                                         color: Color(0xFF585858)),
                                   ),
@@ -318,7 +318,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                                 width: MediaQuery.of(context)
                                                     .size
                                                     .width,
-                                                height: 176,
+                                                height: MediaQuery.of(context).size.height * 0.263,
                                                 child: Padding(
                                                     padding: EdgeInsets.only(
                                                         top: 28),
@@ -326,7 +326,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                                                 'imageUrls'] !=
                                                             []
                                                         ? SizedBox(
-                                                            height: 176,
+                                                            height: MediaQuery.of(context).size.height * 0.263,
                                                             width: 176,
                                                             child:
                                                                 Image.network(
@@ -369,7 +369,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                                         : Text(
                                                             "No Image",
                                                             style: TextStyle(
-                                                                fontSize: 18,
+                                                                fontSize: MediaQuery.of(context).size.height * 0.027,
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .bold,
@@ -491,7 +491,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                                       style: TextStyle(
                                                         fontWeight:
                                                             FontWeight.w400,
-                                                        fontSize: 12,
+                                                        fontSize: MediaQuery.of(context).size.height * 0.018,
                                                         fontFamily: "Urbanist",
                                                         color: Colors.black,
                                                       ),
@@ -505,7 +505,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                                   'N/A',
                                               style: TextStyle(
                                                 fontWeight: FontWeight.w500,
-                                                fontSize: 14,
+                                               fontSize: MediaQuery.of(context).size.height * 0.020,
                                                 fontFamily: "Urbanist",
                                                 color: Colors.black,
                                               ),
@@ -521,7 +521,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                                   "USE : ",
                                                   style: TextStyle(
                                                     fontWeight: FontWeight.w700,
-                                                    fontSize: 10,
+                                                    fontSize: MediaQuery.of(context).size.height * 0.012,
                                                     fontFamily: "Urbanist",
                                                     color: Colors.black,
                                                   ),
@@ -531,7 +531,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                                   maxLines: readMore ? 50 : 2,
                                                   style: TextStyle(
                                                     fontWeight: FontWeight.w400,
-                                                    fontSize: 12,
+                                                    fontSize: MediaQuery.of(context).size.height * 0.015,
                                                     fontFamily: "Urbanist",
                                                     color: Colors.black,
                                                   ),
@@ -544,7 +544,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                                 maxLines: readMore ? 50 : 2,
                                                 style: TextStyle(
                                                   fontWeight: FontWeight.w300,
-                                                  fontSize: 12,
+                                                  fontSize: MediaQuery.of(context).size.height * 0.015,
                                                   fontFamily: "Urbanist",
                                                   color: Colors.black,
                                                 ),
@@ -561,7 +561,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                                   "INSTRUCTIONS : ",
                                                   style: TextStyle(
                                                     fontWeight: FontWeight.w700,
-                                                    fontSize: 10,
+                                                    fontSize: MediaQuery.of(context).size.height * 0.012,
                                                     fontFamily: "Urbanist",
                                                     color: Colors.black,
                                                   ),
@@ -572,7 +572,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                                   maxLines: readMore ? 50 : 2,
                                                   style: TextStyle(
                                                     fontWeight: FontWeight.w300,
-                                                    fontSize: 12,
+                                                    fontSize: MediaQuery.of(context).size.height * 0.013,
                                                     fontFamily: "Urbanist",
                                                     color: Colors.black,
                                                   ),
@@ -607,7 +607,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                                     style: TextStyle(
                                                       fontWeight:
                                                           FontWeight.w500,
-                                                      fontSize: 12,
+                                                      fontSize: MediaQuery.of(context).size.height * 0.015,
                                                       fontFamily: "Urbanist",
                                                       color: secondaryColor,
                                                     ),
@@ -658,7 +658,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                         "Check Similar Product",
                                         style: TextStyle(
                                           fontWeight: FontWeight.w500,
-                                          fontSize: 12,
+                                          fontSize: MediaQuery.of(context).size.height * 0.013,
                                           fontFamily: "Urbanist",
                                           color: secondaryColor,
                                         ),
@@ -678,7 +678,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                               "₹${(product['sellingPrice'] * 0.7).toInt() ?? 00}",
                                               style: TextStyle(
                                                 fontWeight: FontWeight.w600,
-                                                fontSize: 14,
+                                                fontSize: MediaQuery.of(context).size.height * 0.017,
                                                 fontFamily: "Urbanist",
                                                 color: Colors.black,
                                               ),
@@ -690,7 +690,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                                   "MRP",
                                                   style: TextStyle(
                                                     fontWeight: FontWeight.w400,
-                                                    fontSize: 14,
+                                                    fontSize: MediaQuery.of(context).size.height * 0.017,
                                                     fontFamily: "Urbanist",
                                                     color: Colors.black
                                                         .withOpacity(0.6),
@@ -702,7 +702,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                                     decoration: TextDecoration
                                                         .lineThrough,
                                                     fontWeight: FontWeight.w400,
-                                                    fontSize: 14,
+                                                    fontSize: MediaQuery.of(context).size.height * 0.017,
                                                     fontFamily: "Urbanist",
                                                     color: Colors.black
                                                         .withOpacity(0.6),
@@ -714,7 +714,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                               "30% off",
                                               style: TextStyle(
                                                 fontWeight: FontWeight.w600,
-                                                fontSize: 10,
+                                                fontSize: MediaQuery.of(context).size.height * 0.014,
                                                 fontFamily: "Urbanist",
                                                 color: Colors.black,
                                               ),
@@ -725,7 +725,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                           "+ 1% Cashback",
                                           style: TextStyle(
                                             fontWeight: FontWeight.w500,
-                                            fontSize: 10,
+                                            fontSize: MediaQuery.of(context).size.height * 0.014,
                                             fontFamily: "Urbanist",
                                             color: Colors.black,
                                           ),
@@ -756,7 +756,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                               "Add to Cart",
                                               style: TextStyle(
                                                 fontWeight: FontWeight.w500,
-                                                fontSize: 12,
+                                                fontSize: MediaQuery.of(context).size.height * 0.015,
                                                 fontFamily: "Urbanist",
                                                 color: secondaryColor,
                                               ),
@@ -774,8 +774,8 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                                   borderRadius:
                                                       BorderRadius.circular(
                                                           40)),
-                                              height: 40,
-                                              width: 40,
+                                              height: MediaQuery.of(context).size.height * 0.06, // 40/667 ≈ 0.06
+  width: MediaQuery.of(context).size.height * 0.06,
                                               child: Icon(
                                                 isFav
                                                     ? Icons.favorite
@@ -796,7 +796,9 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                               ),
                               Padding(
                                 padding: EdgeInsets.symmetric(
-                                    horizontal: 22, vertical: 12),
+    horizontal: MediaQuery.of(context).size.width * 0.058,  // 22/375 ≈ 0.058
+    vertical: MediaQuery.of(context).size.height * 0.018,   // 12/667 ≈ 0.018
+  ),
                                 child: Container(
                                   width: MediaQuery.of(context).size.width,
                                   decoration: BoxDecoration(
@@ -805,8 +807,8 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                   child: Stack(
                                     children: [
                                       Padding(
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 18.0, vertical: 8),
+                                        padding:  EdgeInsets.symmetric(
+                                            horizontal: MediaQuery.of(context).size.width * 0.048, vertical: MediaQuery.of(context).size.height * 0.012),
                                         child: Column(
                                           spacing: 12,
                                           mainAxisAlignment:
@@ -818,7 +820,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                               "Return & Expiry",
                                               style: TextStyle(
                                                 fontWeight: FontWeight.w500,
-                                                fontSize: 12,
+                                                fontSize:  MediaQuery.of(context).size.height * 0.015,
                                                 fontFamily: "Urbanist",
                                                 color: Colors.black,
                                               ),
@@ -834,7 +836,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                                   "7 day free return",
                                                   style: TextStyle(
                                                     fontWeight: FontWeight.w600,
-                                                    fontSize: 12,
+                                                    fontSize: MediaQuery.of(context).size.height * 0.014,
                                                     fontFamily: "Urbanist",
                                                     color: Colors.black,
                                                   ),
@@ -843,7 +845,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                                   "Easily return the medicine if you have not used it.",
                                                   style: TextStyle(
                                                     fontWeight: FontWeight.w300,
-                                                    fontSize: 12,
+                                                    fontSize: MediaQuery.of(context).size.height * 0.014,
                                                     fontFamily: "Urbanist",
                                                     color: Colors.black,
                                                   ),
@@ -861,7 +863,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                                   "Expires after Jun 2025",
                                                   style: TextStyle(
                                                     fontWeight: FontWeight.w600,
-                                                    fontSize: 12,
+                                                    fontSize: MediaQuery.of(context).size.height * 0.014,
                                                     fontFamily: "Urbanist",
                                                     color: Colors.black,
                                                   ),
@@ -870,7 +872,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                                   "The product will have this expiry date on the packet",
                                                   style: TextStyle(
                                                     fontWeight: FontWeight.w300,
-                                                    fontSize: 12,
+                                                    fontSize:MediaQuery.of(context).size.height * 0.014,
                                                     fontFamily: "Urbanist",
                                                     color: Colors.black,
                                                   ),

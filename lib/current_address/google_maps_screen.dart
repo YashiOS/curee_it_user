@@ -44,16 +44,7 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
         defaultLng = value.results?[0].geometry?.location?.lng ?? 0.0;
         placeFromCoordinates = value;
         isLoading = false;
-        Address.CurrentAddress={
-      "address":placeFromCoordinates.results?[0].formattedAddress,
-      "landmark":"",
-      "floor":"",
-      "userLat":defaultLat,
-      "userLong":defaultLng,
-      "type":"",
-      "_id":""
-     };
-     Address.selectedIndex=null;
+        
       });
     });
     
@@ -75,8 +66,7 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    print("*********MY ADDRESS*****");
-     print(placeFromCoordinates.results?[0].formattedAddress);
+   
      
     return Scaffold(
       appBar: AppBar(
@@ -120,7 +110,6 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
                               value.results?[0].geometry?.location?.lng ?? 0.0;
                           placeFromCoordinates = value;
                           isLoading = false;
-                          print(defaultLat);
                         });
                       });
                     },
@@ -279,8 +268,7 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
                                   setState(() {
                                     defaultLat = value.latitude;
                                     defaultLng = value.longitude;
-                                    print(defaultLat);
-                                    print(defaultLng);
+                                    
                                     
                                      getAddress();
                                     _changeCameraPosition(
@@ -311,7 +299,7 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
                                       style: TextStyle(
                                           color: Colors.white,
                                           fontFamily: "Urbanist",
-                                          // fontSize: 18,
+                                          fontSize:MediaQuery.of(context).size.height*0.016 ,
                                           fontWeight: FontWeight.bold),
                                     )
                                   ],
@@ -342,6 +330,8 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
                                   ),
                                   GestureDetector(
                                     onTap: () {
+                                      print(defaultLat);
+                                      print(defaultLng);
                                       showModalBottomSheet(
                                         context: context,
                                         isScrollControlled: true,

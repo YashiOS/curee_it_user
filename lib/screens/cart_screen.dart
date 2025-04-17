@@ -365,46 +365,8 @@ class _CartScreenState extends State<CartScreen> {
                               color: primaryColor),
                         )
                       ]),
-                      Container(
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10)),
-                        padding: EdgeInsets.only(
-                          top: MediaQuery.of(context).size.height *
-                              0.02, // 2% of screen height
-                          bottom: MediaQuery.of(context).size.height * 0.02,
-                          left: MediaQuery.of(context).size.width *
-                              0.07, // 7% of screen width
-                          right: MediaQuery.of(context).size.width *
-                              0.045, // 4.5% of screen width
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              spacing: 12,
-                              children: [
-                                Icon(
-                                  Icons.discount,
-                                  color: secondaryColor,
-                                ),
-                                Text(
-                                  "Apply Coupon",
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.w400,
-                                    fontSize:
-                                        MediaQuery.of(context).size.width *
-                                            0.03,
-                                    fontFamily: "Urbanist",
-                                    color: Color(0xFF1F1970),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            Icon(Icons.arrow_forward, color: Color(0xFF1F1970))
-                          ],
-                        ),
-                      ),
+                      
+                      
                       Container(
                         width: MediaQuery.of(context).size.width,
                         decoration: BoxDecoration(

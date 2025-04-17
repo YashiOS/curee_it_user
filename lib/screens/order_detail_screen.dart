@@ -33,7 +33,7 @@ class OrderDetailScreen extends StatelessWidget {
                     "Back",
                     style: TextStyle(
                         fontWeight: FontWeight.w600,
-                        fontSize: 14,
+                        fontSize: MediaQuery.of(context).size.height * 0.021,
                         fontFamily: "Urbanist",
                         color: primaryColor),
                   )

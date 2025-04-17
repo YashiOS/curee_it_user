@@ -43,9 +43,7 @@ class OrderCard extends StatelessWidget {
     List orderItems = orderData['orderItems'];
     String orderId = orderData['orderId'];
     
-    print(purchaseDate);
-    print(orderData["createdAt"]);
-    print(orderData["updatedAt"]);
+    print(orderData);
 
     String allItems = formatOrderItems(orderItems);
 
@@ -74,10 +72,11 @@ class OrderCard extends StatelessWidget {
     child: LayoutBuilder(
       builder: (context, constraints) {
         final screenWidth = MediaQuery.of(context).size.width;
+        final screenheight=MediaQuery.of(context).size.height;
 
         return Container(
           padding: EdgeInsets.symmetric(
-            vertical: screenWidth * 0.025,
+            vertical: screenheight * 0.015,
             horizontal: screenWidth * 0.035,
           ),
           decoration: BoxDecoration(
@@ -99,7 +98,7 @@ class OrderCard extends StatelessWidget {
                         "Order ID: ${orderData['orderId'] ?? '?'}",
                         style: TextStyle(
                           fontWeight: FontWeight.w700,
-                          fontSize: screenWidth * 0.035,
+                          fontSize: screenheight * 0.016,
                           fontFamily: "Urbanist",
                           color: primaryColor,
                         ),
@@ -108,7 +107,7 @@ class OrderCard extends StatelessWidget {
                         "Date: ${formatDate(purchaseDate) ?? "N/A"}",
                         style: TextStyle(
                           fontWeight: FontWeight.w600,
-                          fontSize: screenWidth * 0.03,
+                          fontSize: screenheight * 0.013,
                           fontFamily: "Urbanist",
                           color: Colors.black.withOpacity(0.6),
                         ),
@@ -119,7 +118,7 @@ class OrderCard extends StatelessWidget {
                           orderData['shippingAddress'],
                           style: TextStyle(
                             fontWeight: FontWeight.w600,
-                            fontSize: screenWidth * 0.03,
+                            fontSize: screenheight * 0.0128,
                             fontFamily: "Urbanist",
                             color: Colors.black.withOpacity(0.6),
                           ),
@@ -129,7 +128,7 @@ class OrderCard extends StatelessWidget {
                         "₹ ${shippingCost.toStringAsFixed(2)}",
                         style: TextStyle(
                           fontWeight: FontWeight.w500,
-                          fontSize: screenWidth * 0.035,
+                          fontSize: screenheight * 0.018,
                           fontFamily: "JosefinSans",
                           color: Colors.black,
                         ),
@@ -140,7 +139,7 @@ class OrderCard extends StatelessWidget {
                     orderStatus.toUpperCase(),
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
-                      fontSize: screenWidth * 0.03,
+                      fontSize: screenheight * 0.014,
                       fontFamily: "Urbanist",
                       color: Colors.black,
                     ),
@@ -162,7 +161,7 @@ class OrderCard extends StatelessWidget {
                       allItems,
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
-                        fontSize: screenWidth * 0.03,
+                        fontSize: screenheight * 0.0145,
                         fontFamily: "Urbanist",
                         color: Colors.black.withOpacity(0.5),
                       ),

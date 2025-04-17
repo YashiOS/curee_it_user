@@ -17,6 +17,7 @@ class OrderTrackingScreen extends StatefulWidget {
 
 class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
   Map<String, dynamic> orderTrackingDetails = {};
+  bool HittingApi = false;
 
   String formatDate(String isoDate) {
     // Parse the ISO 8601 string into a DateTime object
@@ -54,29 +55,44 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     } else {
       print('Failed to load tracking details');
     }
+    if (HittingApi == false) {
+      _hittingApi();
+    }
   }
 
   @override
   void initState() {
     super.initState();
     fetchOrderTracking();
-    
+  }
+
+  void _stopTimer() {
+    print("✅ Stopping API hit timer");
+    _timerStart?.cancel();
+    _timerStart = null;
+    HittingApi = false;
   }
 
   Timer? _timerStart;
-  Timer? _timerEnd;
 
-  void _hittingApi() {
-    _timerStart = Timer.periodic(Duration(seconds: 10), (timer) {
-      fetchOrderTracking();
-    });
-
-    _timerEnd = Timer(Duration(minutes: 5), () {
-      _timerStart?.cancel();
-    });
+  @override
+  void dispose() {
+    _stopTimer(); // ✅ Cancel timer when screen is destroyed
+    super.dispose();
   }
 
-  
+  void _hittingApi() {
+    HittingApi = true;
+    _timerStart = Timer.periodic(Duration(seconds: 10), (timer) {
+      fetchOrderTracking();
+      print("Hitting api every 10 sec");
+    });
+
+    if (orderTrackingDetails["currentStatus"] == "Delivered") {
+      _timerStart?.cancel();
+    }
+  }
+
   void showOrderSummaryBottomSheet() {
     final size = MediaQuery.of(context).size;
     final width = size.width;
@@ -153,11 +169,14 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
 
               // Item Card
               MedicineCard(
-                  Imgurl: "lib/images/capsule_image.png",
-                  MedicineName:"${orderTrackingDetails["orderItems"][0]["productName"]}",
-                  price: "${orderTrackingDetails["orderItems"][0]["productPrice"]}",
-                  quantities:"${orderTrackingDetails["orderItems"][0]["quantity"]}",
-                  ),
+                Imgurl: "lib/images/capsule_image.png",
+                MedicineName:
+                    "${orderTrackingDetails["orderItems"][0]["productName"]}",
+                price:
+                    "${orderTrackingDetails["orderItems"][0]["productPrice"]}",
+                quantities:
+                    "${orderTrackingDetails["orderItems"][0]["quantity"]}",
+              ),
 
               SizedBox(height: height * 0.015),
               Align(
@@ -405,7 +424,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     );
   }
 
-Widget MedicineCard(
+  Widget MedicineCard(
       {required String Imgurl,
       required String MedicineName,
       required String quantities,
@@ -413,8 +432,8 @@ Widget MedicineCard(
     final size = MediaQuery.of(context).size;
     final width = size.width;
     final height = size.height;
-    int quantity=int.parse(quantities);
-    double Price=double.parse(price);
+    int quantity = int.parse(quantities);
+    double Price = double.parse(price);
     return Container(
       margin: EdgeInsets.symmetric(vertical: height * 0.01),
       padding: EdgeInsets.all(width * 0.03),
@@ -449,16 +468,16 @@ Widget MedicineCard(
                 SizedBox(height: height * 0.005),
                 Text(
                   "$quantity x ₹$Price",
-                   style: TextStyle(
-                   fontSize: width * 0.035,
-                  color: Colors.grey.shade600,
+                  style: TextStyle(
+                    fontSize: width * 0.035,
+                    color: Colors.grey.shade600,
                   ),
                 ),
               ],
             ),
           ),
           Text(
-            "₹ ${quantity* Price}",
+            "₹ ${quantity * Price}",
             style: TextStyle(
               fontSize: width * 0.04,
               fontWeight: FontWeight.bold,
@@ -489,7 +508,15 @@ Widget MedicineCard(
                   alignment: Alignment.topRight,
                   child: GestureDetector(
                     onTap: () {
-                       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>BaseScreen()));
+                      _stopTimer();
+                      if (widget.NavigatingFrom == "Order History") {
+                        Navigator.of(context).pop();
+                      }
+                      if (widget.NavigatingFrom == "Order_SuccessScreen") {
+                        Navigator.of(context).pushReplacement(MaterialPageRoute(
+                            builder: (context) => BaseScreen()));
+                      }
+
                       //Navigator.pop(context);
                     },
                     child: Icon(
@@ -548,7 +575,13 @@ Widget MedicineCard(
                         color: Colors.green,
                         size: width,
                         isInactive: orderTrackingDetails["currentStatus"] ==
-                                "Order Placed"
+                                    "Order Placed" ||
+                                orderTrackingDetails["currentStatus"] ==
+                                    "Packing" ||
+                                orderTrackingDetails["currentStatus"] ==
+                                    "On the way" ||
+                                orderTrackingDetails["currentStatus"] ==
+                                    "Delivered"
                             ? false
                             : true,
                       ),
@@ -563,10 +596,14 @@ Widget MedicineCard(
                         label: "Packing",
                         color: Colors.orange,
                         size: width,
-                        isInactive:
-                            orderTrackingDetails["currentStatus"] == "Packing"
-                                ? false
-                                : true,
+                        isInactive: orderTrackingDetails["currentStatus"] ==
+                                    "Packing" ||
+                                orderTrackingDetails["currentStatus"] ==
+                                    "On the way" ||
+                                orderTrackingDetails["currentStatus"] ==
+                                    "Delivered"
+                            ? false
+                            : true,
                       ),
                       Expanded(
                         child: Divider(
@@ -580,7 +617,9 @@ Widget MedicineCard(
                         color: Colors.blue,
                         size: width,
                         isInactive: orderTrackingDetails["currentStatus"] ==
-                                "On the Way"
+                                    "On the way" ||
+                                orderTrackingDetails["currentStatus"] ==
+                                    "Delivered"
                             ? false
                             : true,
                       ),

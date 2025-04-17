@@ -66,7 +66,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 "Favorites",
                 style: TextStyle(
                     fontWeight: FontWeight.w600,
-                    fontSize: 24,
+                    fontSize: MediaQuery.of(context).size.width * 0.06,
                     fontFamily: "JosefinSans",
                     color: primaryColor),
               ),
