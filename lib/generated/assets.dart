@@ -7,6 +7,8 @@ class Assets {
   static const String cardsFavoritesCard = 'lib/cards/favorites_card.dart';
   static const String cardsOrderCard = 'lib/cards/order_card.dart';
   static const String cardsSearchCard = 'lib/cards/search_card.dart';
+  static const String cubitServiceAvilableCubit = 'lib/cubit/service_avilable_cubit.dart';
+  static const String cubitServiceAvilableState = 'lib/cubit/service_avilable_state.dart';
   static const String currentAddressApiServices = 'lib/current_address/api_services.dart';
   static const String currentAddressGoogleMapsScreen = 'lib/current_address/google_maps_screen.dart';
   static const String currentAddressLocationPermissionHelper = 'lib/current_address/location_permission_helper.dart';
@@ -47,9 +49,12 @@ class Assets {
   static const String imagesOrderTracking_2 = 'lib/images/OrderTracking 2.png';
   static const String imagesPlusButton = 'lib/images/plus_button.png';
   static const String imagesPrescription = 'lib/images/prescription.png';
+  static const String imagesSaveButton = 'lib/images/saveButton.png';
   static const String imagesSearchButton = 'lib/images/search_button.png';
   static const String imagesSelectedButton = 'lib/images/selected_button.png';
   static const String imagesSuccessOrder = 'lib/images/Success_order.json';
+  static const String imagesUnablesaveButton = 'lib/images/unablesaveButton.png';
+  static const String isInRadiusServicesAvilable = 'lib/isInRadius/ServicesAvilable.dart';
   static const String libMain = 'lib/main.dart';
   static const String modelsGetCoordinatesFromPlaceId = 'lib/current_address/models/get_coordinates_from_placeId.dart';
   static const String modelsGetPlaces = 'lib/current_address/models/get_places.dart';

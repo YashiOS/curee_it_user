@@ -1,6 +1,9 @@
+import 'package:cureeit_user_app/cubit/service_avilable_cubit.dart';
 import 'package:cureeit_user_app/screens/base_screen.dart';
 import 'package:cureeit_user_app/screens/order_tracking_screen.dart';
+import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:io' show Platform;
 
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -8,7 +11,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const MyApp());
+  runApp(BlocProvider(create: (context)=>ServiceAvilableCubit(),child: const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
@@ -23,7 +26,7 @@ class MyApp extends StatelessWidget {
       },
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.greenAccent),
+        colorScheme: ColorScheme.fromSeed(seedColor:greenColor),
         useMaterial3: true,
       ),
       home: BaseScreen(),

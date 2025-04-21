@@ -1,15 +1,14 @@
 import 'dart:convert';
+import 'package:cureeit_user_app/cubit/service_avilable_cubit.dart';
 import 'package:cureeit_user_app/current_address/api_services.dart';
 import 'package:cureeit_user_app/current_address/location_permission_helper.dart';
-import 'package:cureeit_user_app/current_address/models/get_places.dart';
 import 'package:cureeit_user_app/current_address/models/place_from_coordinates.dart';
-import 'package:cureeit_user_app/isInRadius/ServicesAvilable.dart';
-import 'package:cureeit_user_app/screens/add_address_screen.dart';
 import 'package:cureeit_user_app/selected_Address/currentAddress.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
+import 'package:cureeit_user_app/widgets/LoadingIndicater.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:cureeit_user_app/current_address/google_maps_screen.dart';
 import 'package:cureeit_user_app/screens/cart_screen.dart';
 import 'package:cureeit_user_app/screens/item_detail_screen.dart';
@@ -20,6 +19,7 @@ import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
+import 'package:loading_indicator/loading_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -31,6 +31,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  bool loaded = false;
   bool newUser = false;
   Map<int, bool> isAddingMap = {};
   List<dynamic> addresses = [];
@@ -40,7 +41,7 @@ class _HomeScreenState extends State<HomeScreen> {
   double totalAmount = 0.00;
   bool isLoading = true;
   bool isTapped = false;
-  bool isInRadius = false;
+  bool? isInRadius;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   Map<int, int> quantities = {};
   String localAddress = "";
@@ -51,11 +52,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
+    print("in intit state");
     super.initState();
     fetchAddresses();
     fetchCartDetails();
     fetchProducts();
-    
   }
 
   void UpdateAddress1() {
@@ -98,7 +99,6 @@ class _HomeScreenState extends State<HomeScreen> {
           fetchCartDetails();
           isTapped = true;
           isAddingMap[index] = false;
-          
         });
         Fluttertoast.showToast(msg: "Added To Cart");
       } else {
@@ -306,64 +306,41 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget buildOutOfRadius() {
-  return localAddress == null || localAddress.isEmpty
-    ? Shimmer.fromColors(
-        baseColor: Colors.grey[300]!,
-        highlightColor: Colors.grey[100]!,
-        child: Center(
-          child: Column(
-            children: [
-              Container(
-                width: 300,
-                height: 50, // Matches your text height
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(4),
-                ),
+    return Container(
+      color: scaffoldBlackColor,
+      child: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize
+              .min, // Ensures column takes only as much space as needed
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              "Sorry! Our services are not available in your area yet.",
+              textAlign: TextAlign.center, // Center the text inside the widget
+              style: TextStyle(
+                fontWeight: FontWeight.w700,
+                fontSize: 24,
+                fontFamily: "Urbanist",
+                color: whiteColor,
               ),
-              SizedBox(height: 20,),
-              Container(
-                width: 250,
-                height: 20, // Matches your text height
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(4),
-                ),
+            ),
+            SizedBox(height: 12), // Add spacing between the two texts
+            Text(
+              "We will notify you as soon as the services are available",
+              textAlign: TextAlign.center, // Center this text too
+              style: TextStyle(
+                fontWeight: FontWeight.w500,
+                fontSize: 14,
+                fontFamily: "Urbanist",
+                color: greenColor,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
-      ): Center(
-    child: Column(
-      mainAxisSize: MainAxisSize.min, // Ensures column takes only as much space as needed
-      crossAxisAlignment: CrossAxisAlignment.center,
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Text(
-          "Sorry! Our services are not available in your area yet.",
-          textAlign: TextAlign.center, // Center the text inside the widget
-          style: TextStyle(
-            fontWeight: FontWeight.w700,
-            fontSize: 24,
-            fontFamily: "Urbanist",
-            color: primaryColor,
-          ),
-        ),
-        SizedBox(height: 12), // Add spacing between the two texts
-        Text(
-          "We will notify you as soon as the services are available",
-          textAlign: TextAlign.center, // Center this text too
-          style: TextStyle(
-            fontWeight: FontWeight.w500,
-            fontSize: 14,
-            fontFamily: "Urbanist",
-            color: primaryColor,
-          ),
-        ),
-      ],
-    ),
-  );
-}
+      ),
+    );
+  }
 
   Widget buildProductGrid() {
     if (products.isEmpty) {
@@ -382,10 +359,10 @@ class _HomeScreenState extends State<HomeScreen> {
     }
 
     return GridView.count(
-      crossAxisCount: 3,
+      crossAxisCount: 2,
       shrinkWrap: true,
       scrollDirection: Axis.vertical,
-      childAspectRatio: 0.54,
+      childAspectRatio: 0.8,
       crossAxisSpacing: 10,
       mainAxisSpacing: 10,
       children: productWidgets,
@@ -393,185 +370,196 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget buildProductItem(int index) {
-  final product = products[index];
-  final bool isInCart = quantities[index] != null && quantities[index]! > 0;
-  final height = MediaQuery.of(context).size.height;
-  final width = MediaQuery.of(context).size.width;
+    print(products[index]);
+    final product = products[index];
+    final bool isInCart = quantities[index] != null && quantities[index]! > 0;
+    final height = MediaQuery.of(context).size.height;
+    final width = MediaQuery.of(context).size.width;
 
-  final containerHeight = height * 0.5; // 🟢 Half screen height
-  final containerWidth = width * 0.3;
+    final containerHeight = height * 0.45; // 🟢 Half screen height
+    final containerWidth = width * 0.3;
 
-  return Container(
-    width: containerWidth,
-    height: containerHeight,
-    padding: EdgeInsets.all(8),
-    decoration: BoxDecoration(
-      color: Colors.white,
-      border: Border.all(color: Colors.grey.shade300),
-      borderRadius: BorderRadius.circular(10),
-      boxShadow: [
-        BoxShadow(
-          color: Colors.black.withOpacity(0.05),
-          blurRadius: 4,
-          offset: Offset(0, 2),
-        ),
-      ],
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // 🔵 Product Image (30%)
-        SizedBox(
-          height: containerHeight * 0.2,
-          child: GestureDetector(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ItemDetailScreen(
-                    productId: product['productId'],
+    return Container(
+      width: containerWidth,
+      height: containerHeight,
+      padding: EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: ligtBlackColor,
+        borderRadius: BorderRadius.circular(10),
+        boxShadow: [
+          BoxShadow(
+            color: ligtBlackColor,
+            blurRadius: 4,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // 🔵 Product Image (30%)
+          SizedBox(
+            width: width,
+            height: containerHeight * 0.3,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ItemDetailScreen(
+                      productId: product['productId'],
+                    ),
                   ),
+                );
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  color: ligtBlackColor,
+                  borderRadius: BorderRadius.circular(8),
                 ),
-              );
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.grey.shade100,
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: product['imageMediaUrls'][0] != null &&
-                      product['imageMediaUrls'][0].toString().isNotEmpty
-                  ? Image.network(
-                      product['imageMediaUrls'][0],
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stackTrace) => Icon(
+                child: product['imageMediaUrls'][0] != null &&
+                        product['imageMediaUrls'][0].toString().isNotEmpty
+                    ? Image.network(
+                        product['imageMediaUrls'][0],
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) => Icon(
+                          Icons.image_not_supported,
+                          size: containerHeight * 0.1,
+                          color: Colors.grey.shade400,
+                        ),
+                      )
+                    : Icon(
                         Icons.image_not_supported,
                         size: containerHeight * 0.1,
                         color: Colors.grey.shade400,
                       ),
-                    )
-                  : Icon(
-                      Icons.image_not_supported,
-                      size: containerHeight * 0.1,
-                      color: Colors.grey.shade400,
-                    ),
+              ),
             ),
           ),
-        ),
 
-        SizedBox(height: containerHeight * 0.02),
+          SizedBox(height: containerHeight * 0.01),
 
-        // 🔵 Product Name (15%)
-        SizedBox(
-          height: containerHeight * 0.08,
-          child: Text(
-            product['name'] ?? 'Product',
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontFamily: "Roboto",
-              fontSize: containerHeight * 0.03,
+          // 🔵 Product Name (15%)
+          SizedBox(
+            height: containerHeight * 0.12,
+            child: Text(
+              product['name'] ?? 'Product',
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                  fontFamily: "Roboto",
+                  fontSize: containerHeight * 0.04,
+                  color: whiteColor),
             ),
           ),
-        ),
 
-        // 🔵 Price (7%)
-        Text(
-          "₹${product['price']}",
-          style: GoogleFonts.inter(
-            fontSize: containerHeight * 0.03,
-            fontWeight: FontWeight.w600,
-            color: Colors.teal.shade800,
-          ),
-        ),
-
-        SizedBox(height: containerHeight * 0.01),
-
-        // 🔵 Add to Cart or Quantity Buttons (30%)
-        Center(
-          child: Container(
-            height: containerHeight * 0.11,
-            decoration: BoxDecoration(
-              color:
-                  isInCart ? Colors.white.withOpacity(0.8) : primaryColor,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: isInCart
-                ? FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        IconButton(
-                          padding: EdgeInsets.zero,
-                          constraints: BoxConstraints(),
-                          icon: Icon(
-                            Icons.remove,
-                            size: containerHeight * 0.05,
-                            color: primaryColor,
-                          ),
-                          onPressed: () => DidUpdateQuantity(index, -1),
-                        ),
-                        Text(
-                          '${quantities[index]}',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: containerHeight * 0.04,
-                          ),
-                        ),
-                        IconButton(
-                          padding: EdgeInsets.zero,
-                          constraints: BoxConstraints(),
-                          icon: Icon(
-                            Icons.add,
-                            size: containerHeight * 0.05,
-                            color: primaryColor,
-                          ),
-                          onPressed: () => DidUpdateQuantity(index, 1),
-                        ),
-                      ],
-                    ),
-                  )
-                : TextButton(
-                    style: TextButton.styleFrom(
-                      padding: EdgeInsets.zero,
-                      minimumSize: Size.zero,
-                    ),
-                    onPressed: () {
-                      didAddToCart(index);
-                      setState(() => isLoading = true);
-                      fetchCartDetails();
-                    },
-                    child: Center(
-                      child: isAddingMap[index] == true
-                          ? SizedBox(
-                              width: 18,
-                              height: 18,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
+          // 🔵 Price (7%)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                "₹${product['price']}",
+                style: GoogleFonts.inter(
+                  fontSize: containerHeight * 0.04,
+                  color: greyColor,
+                ),
+              ),
+              SizedBox(width: containerWidth * 0.01),
+              Container(
+                width: width * 0.25,
+                height: containerHeight * 0.09,
+                decoration: BoxDecoration(
+                  color: ligtBlackColor,
+                  border: Border.all(
+                    color: greenColor,
+                    width: 1,
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: isInCart
+                    ? FittedBox(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            IconButton(
+                              padding: EdgeInsets.zero,
+                              constraints: BoxConstraints(),
+                              icon: Icon(
+                                Icons.remove,
+                                size: containerHeight * 0.06,
+                                color: whiteColor,
                               ),
-                            )
-                          : Text(
-                              "Add to Cart",
-                              style: GoogleFonts.lato(
-                                fontSize: containerHeight * 0.03,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
+                              onPressed: () => DidUpdateQuantity(index, -1),
+                            ),
+                            Text(
+                              '${quantities[index]}',
+                              style: TextStyle(
+                                color: whiteColor,
+                                fontWeight: FontWeight.bold,
+                                fontSize: containerHeight * 0.05,
                               ),
                             ),
-                    ),
-                  ),
-          ),
-        ),
-      ],
-    ),
-  );
-}
-
+                            IconButton(
+                              padding: EdgeInsets.zero,
+                              constraints: BoxConstraints(),
+                              icon: Icon(
+                                Icons.add,
+                                size: containerHeight * 0.06,
+                                color: whiteColor,
+                              ),
+                              onPressed: () => DidUpdateQuantity(index, 1),
+                            ),
+                          ],
+                        ),
+                      )
+                    : TextButton(
+                        style: TextButton.styleFrom(
+                          padding: EdgeInsets.zero,
+                          minimumSize: Size.zero,
+                        ),
+                        onPressed: () {
+                          didAddToCart(index);
+                          setState(() => isLoading = true);
+                          fetchCartDetails();
+                        },
+                        child: Center(
+                          child: isAddingMap[index] == true
+                              ? SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                )
+                              : Text(
+                                  "Add to Cart",
+                                  style: GoogleFonts.lato(
+                                    fontSize: containerHeight * 0.03,
+                                    fontWeight: FontWeight.w600,
+                                    color: greenColor,
+                                  ),
+                                ),
+                        ),
+                      ),
+              ),
+            ],
+          ), // 🔵 Add to Cart or Quantity Buttons (30%)
+        ],
+      ),
+    );
+  }
 
   Future<void> fetchAddresses() async {
-    
+    if (Address.CurrentAddress != null) {
+      String fullAddress = Address.CurrentAddress!["address"];
+      print("in 2nd if condition");
+
+      setState(() {
+        localAddress = fullAddress;
+        checkLocation();
+      });
+    }
     var url = Uri.parse(
       'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/address/savedAddress',
     );
@@ -597,6 +585,7 @@ class _HomeScreenState extends State<HomeScreen> {
         addresses = data['data']['address'];
         if (Address.CurrentAddress == null && SelectedAddress != null) {
           String address = await fetchLocationAndAddress();
+
           setState(() {
             Address.CurrentAddress = {
               "address": address,
@@ -614,24 +603,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
           return;
         }
-        if (Address.CurrentAddress != null) {
-          String fullAddress = Address.CurrentAddress!["address"];
-
-          print("in 2nd if condition");
-
-          setState(() {
-            localAddress = fullAddress;
-            checkLocation();
-          });
-        }
       }
     } else {
       print('Failed to load addresses');
     }
-
   }
 
-   Future<void> checkLocation() async {
+  Future<void> checkLocation() async {
     final String apiUrl =
         "http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/home/check_location";
 
@@ -648,10 +626,16 @@ class _HomeScreenState extends State<HomeScreen> {
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         setState(() {
-          
-        isInRadius = responseData['insideRadius'] ==true;
-        print("IsInRadius value is ${isInRadius}");
-      });
+          isInRadius = responseData['insideRadius'] == true;
+          if (isInRadius == true) {
+            context.read<ServiceAvilableCubit>().UpdateServiceAvilable(true);
+          } else {
+            isInRadius = false;
+            context.read<ServiceAvilableCubit>().UpdateServiceAvilable(false);
+          }
+
+          print("IsInRadius value is ${isInRadius}");
+        });
       } else {
         print("Failed to check_location: ${response.body}");
       }
@@ -659,6 +643,7 @@ class _HomeScreenState extends State<HomeScreen> {
       print("Error to check_location: $error");
     }
   }
+
   void _locationBottomSheet() {
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
@@ -805,7 +790,6 @@ class _HomeScreenState extends State<HomeScreen> {
                         builder: (context) => GoogleMapsScreen()));
                     Navigator.pop(context);
                     UpdateAddress1();
-
                   },
                   child: Row(
                     children: [
@@ -885,7 +869,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               onTap: () {
                                 print(address);
                                 UpdateAddress(address);
-                                
+
                                 setState(() {
                                   Address.selectedIndex = index;
                                 });
@@ -981,22 +965,37 @@ class _HomeScreenState extends State<HomeScreen> {
       isLoading = false;
       defaultLat = value.results?[0].geometry?.location?.lat ?? 0.0;
       defaultLng = value.results?[0].geometry?.location?.lng ?? 0.0;
-      String address = placeFromCoordinates.results?[0].formattedAddress ?? '';
+      List<dynamic> components =
+          placeFromCoordinates.results?[0].addressComponents ?? [];
+      String city = "";
+      for (var component in components) {
+        if (component.types?.contains("locality") ?? false) {
+          city = component.longName ?? "";
+          break;
+        }
+      }
       // Update Address model here
 
-      return address;
+      return city;
     } catch (e) {
       print("❌ Error: $e");
       return "";
     }
   }
 
+  Widget LoadingIndicatorBallClip() {
+    return LoadingIndicator(indicatorType: Indicator.ballClipRotateMultiple);
+  }
+
   @override
   Widget build(BuildContext context) {
+    bool ISserviceAvilable =
+        context.watch<ServiceAvilableCubit>().ServiceAvilable;
     return Scaffold(
+      backgroundColor: scaffoldBlackColor,
       key: _scaffoldKey,
       appBar: AppBar(
-        backgroundColor: Colors.grey.shade100.withOpacity(0.5),
+        backgroundColor: scaffoldBlackColor,
         toolbarHeight: 90,
         leadingWidth: 90,
         leading: Container(
@@ -1007,8 +1006,12 @@ class _HomeScreenState extends State<HomeScreen> {
             offset: Offset(0, -12),
             child: GestureDetector(
                 onTap: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => ProfileScreen()));
+                  if (ISserviceAvilable) {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ProfileScreen()));
+                  }
                 },
                 child: Padding(
                   padding: const EdgeInsets.all(20.0),
@@ -1018,10 +1021,15 @@ class _HomeScreenState extends State<HomeScreen> {
                             color: Colors.blueGrey.withOpacity(0.2),
                             width: 1.6),
                         borderRadius: BorderRadius.circular(10)),
-                    child: Icon(
-                      Icons.person,
-                      color: primaryColor,
-                    ),
+                    child: ISserviceAvilable
+                        ? Icon(
+                            Icons.person,
+                            color: greenColor,
+                          )
+                        : Icon(
+                            Icons.person_off,
+                            color: Colors.grey,
+                          ),
                   ),
                 )),
           ),
@@ -1037,34 +1045,36 @@ class _HomeScreenState extends State<HomeScreen> {
               padding: const EdgeInsets.all(0.0),
               child: GestureDetector(
                 onTap: () {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => Search()));
+                  if (ISserviceAvilable) {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => Search()));
+                  }
                 },
                 child: Transform.translate(
                   offset: Offset(0, -10),
-                  child: Image.asset(
-                    'lib/images/search_button.png',
-                    fit: BoxFit.contain,
-                  ),
+                  child: ISserviceAvilable
+                      ? Icon(
+                          Icons.search, // You can use any suitable icon
+                          size: 32, // Adjust size as needed
+                          color: whiteColor, // Optional color
+                        )
+                      : Icon(
+                          Icons
+                              .search_off, // A suitable icon to indicate "unavailable"
+                          size: 32,
+                          color: Colors.red,
+                        ),
                 ),
               ),
             ),
           ),
         ],
         title: Transform.translate(
-          offset: Offset(0, -10),
-          child: Text(
-            "Curee it",
-            style: TextStyle(
-              color: primaryColor,
-              fontSize: 20,
-              fontFamily: "Urbanist",
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ),
+            offset: Offset(0, -10),
+            child: Image.asset("lib/images/medkarolog.png")),
       ),
       body: Container(
+        color: scaffoldBlackColor,
         margin: EdgeInsets.only(bottom: cartItems.isEmpty ? 45 : 0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1083,7 +1093,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       // Location Icon
                       Icon(
                         Icons.location_on,
-                        color: primaryColor,
+                        color: greenColor,
                         size: 24, // Slightly larger icon
                       ),
                       SizedBox(width: 8),
@@ -1096,12 +1106,18 @@ class _HomeScreenState extends State<HomeScreen> {
                           children: [
                             // "HOME" Label
                             Text(
-                              "HOME",
+                              (Address.CurrentAddress != null &&
+                                      Address.CurrentAddress!["type"] != null &&
+                                      Address.CurrentAddress!["type"] != "")
+                                  ? Address.CurrentAddress!["type"]
+                                      .toString()
+                                      .toUpperCase()
+                                  : "HOME",
                               style: TextStyle(
                                 fontFamily: "Urbanist",
                                 fontSize: 14,
-                                fontWeight: FontWeight.w700, // Bold
-                                color: primaryColor,
+                                fontWeight: FontWeight.w700,
+                                color: greenColor,
                                 letterSpacing: 0.5,
                               ),
                             ),
@@ -1109,29 +1125,30 @@ class _HomeScreenState extends State<HomeScreen> {
 
                             // Actual Address
                             localAddress == null || localAddress.isEmpty
-    ? Shimmer.fromColors(
-        baseColor: Colors.grey[300]!,
-        highlightColor: Colors.grey[100]!,
-        child: Container(
-          width: MediaQuery.of(context).size.width * 0.2,
-          height: 16, // Matches your text height
-          decoration: BoxDecoration(
-            color: Colors.grey[300],
-            borderRadius: BorderRadius.circular(4),
-          ),
-        ),
-      )
-    : Text(
-        localAddress,
-        style: TextStyle(
-          fontFamily: "Urbanist",
-          fontSize: 12,
-          fontWeight: FontWeight.w500,
-          color: const Color.fromARGB(255, 85, 83, 83),
-        ),
-        maxLines: 1,
-        overflow: TextOverflow.ellipsis,
-      ),
+                                ? Shimmer.fromColors(
+                                    baseColor: ligtBlackColor!,
+                                    highlightColor: greenColor!,
+                                    child: Container(
+                                      width: MediaQuery.of(context).size.width *
+                                          0.2,
+                                      height: 16, // Matches your text height
+                                      decoration: BoxDecoration(
+                                        color: whiteColor,
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                    ),
+                                  )
+                                : Text(
+                                    localAddress,
+                                    style: TextStyle(
+                                      fontFamily: "Urbanist",
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                      color: whiteColor,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                           ],
                         ),
                       ),
@@ -1140,7 +1157,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       // Dropdown Icon
                       Icon(
                         Icons.arrow_drop_down,
-                        color: Colors.grey,
+                        color: whiteColor,
                         size: 20,
                       ),
                     ],
@@ -1148,17 +1165,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 )),
             GestureDetector(
               onTap: () {
-                Navigator.push(
-                    context, MaterialPageRoute(builder: (context) => Search()));
+                if (ISserviceAvilable) {
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => Search()));
+                }
               },
               child: Container(
                 margin: EdgeInsets.all(10),
                 height: 58,
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: ligtBlackColor,
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                      width: 1, color: Color.fromARGB(255, 202, 188, 188)),
                 ),
                 child: Row(
                   children: [
@@ -1179,14 +1196,24 @@ class _HomeScreenState extends State<HomeScreen> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8),
                       child: GestureDetector(
-                        onTap: () {},
+                        onTap: () {
+                          if (ISserviceAvilable) {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => Search()));
+                          }
+                        },
                         child: Container(
                           padding: EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: secondaryColor,
+                            color:
+                                ISserviceAvilable ? greenColor : Colors.white,
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          child: Icon(Icons.search, color: Colors.white),
+                          child: ISserviceAvilable
+                              ? Icon(Icons.search, color: Colors.white)
+                              : Icon(Icons.search_off, color: Colors.grey),
                         ),
                       ),
                     ),
@@ -1196,7 +1223,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             Expanded(
               child: Container(
-                color: Colors.grey.shade100.withOpacity(0.5),
+                color: scaffoldBlackColor,
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.height,
                 child: Stack(
@@ -1211,31 +1238,50 @@ class _HomeScreenState extends State<HomeScreen> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                               isInRadius ? "Featured Products" : "",
+                                isInRadius == null
+                                    ? ""
+                                    : isInRadius!
+                                        ? "Featured Products"
+                                        : "",
                                 style: TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.w700,
                                   fontFamily: "Urbanist",
-                                  color: primaryColor,
+                                  color: greenColor,
                                 ),
                               ),
                               SizedBox(height: 10),
                               Container(
+                                  color: scaffoldBlackColor,
                                   height: cartItems.isNotEmpty
                                       ? MediaQuery.of(context).size.height *
                                           0.47
                                       : null,
-                                  child: isInRadius ? buildProductGrid() : buildOutOfRadius()),
+                                  child: isInRadius == null
+                                      ? Shimmer.fromColors(
+                                          baseColor: Colors.grey[300]!,
+                                          highlightColor: Colors.grey[100]!,
+                                          child: LoadingIndicatorBallClip(),
+                                        )
+                                      : isInRadius!
+                                          ? buildProductGrid()
+                                          : buildOutOfRadius()),
                             ],
                           ),
                         )
                       ],
                     ),
-                    if ((!isLoading && cartItems.isNotEmpty) || (isTapped)) ...[
+                    if ((!isLoading &&
+                            cartItems.isNotEmpty &&
+                            ISserviceAvilable &&
+                            totalAmount != 0) ||
+                        (isTapped) &&
+                            ISserviceAvilable &&
+                            totalAmount != 0) ...[
                       Positioned(
                           bottom: 76,
                           child: Container(
-                            color: Colors.white,
+                            color: ligtBlackColor,
                             width: MediaQuery.of(context).size.width,
                             height: MediaQuery.of(context).size.height *
                                 0.12, // 12% of screen height
@@ -1254,7 +1300,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   Text(
                                     'Delivering in 20 minutes !',
                                     style: TextStyle(
-                                        color: primaryColor,
+                                        color: greenColor,
                                         fontFamily: "Urbanist",
                                         fontSize: 12,
                                         fontWeight: FontWeight.w600),
@@ -1277,8 +1323,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                             10),
                                                     border: Border.all(
                                                         width: 2,
-                                                        color: Colors.grey
-                                                            .withOpacity(0.3)),
+                                                        color: greyColor),
                                                   ),
                                                   child: cartItems[0]
                                                               ['imageUrls']
@@ -1297,8 +1342,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                             return const Center(
                                                                 child:
                                                                     CircularProgressIndicator(
-                                                              color:
-                                                                  secondaryColor,
+                                                              color: whiteColor,
                                                             ));
                                                           },
                                                           errorBuilder:
@@ -1307,9 +1351,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                             return const Center(
                                                                 child: Icon(
                                                               Icons.error,
-                                                              color: Color
-                                                                  .fromRGBO(7,
-                                                                      9, 84, 1),
+                                                              color: whiteColor,
                                                             ));
                                                           },
                                                         )
@@ -1319,6 +1361,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               Text(
                                                 '${cartItems.length} Item(s)  ',
                                                 style: TextStyle(
+                                                    color: greyColor,
                                                     fontFamily: "Urbanist",
                                                     fontSize: 14,
                                                     fontWeight:
@@ -1327,6 +1370,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                               Text(
                                                 "|  ₹ ${(totalAmount * 0.7).toStringAsFixed(2) ?? ''}",
                                                 style: TextStyle(
+                                                    color: whiteColor,
                                                     fontFamily: "Urbanist",
                                                     fontSize: 14,
                                                     fontWeight:
@@ -1358,13 +1402,13 @@ class _HomeScreenState extends State<HomeScreen> {
                                                             .width *
                                                         0.055),
                                             decoration: BoxDecoration(
-                                                color: secondaryColor,
+                                                color: greenColor,
                                                 borderRadius:
                                                     BorderRadius.circular(10)),
                                             child: Text(
                                               'Checkout',
                                               style: TextStyle(
-                                                  color: Colors.white,
+                                                  color: whiteColor,
                                                   fontFamily: "Urbanist",
                                                   fontSize:
                                                       MediaQuery.of(context)

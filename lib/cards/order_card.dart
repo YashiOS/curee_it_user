@@ -81,7 +81,7 @@ class OrderCard extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
-            color: Colors.white,
+            color: ligtBlackColor,
           ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -100,7 +100,7 @@ class OrderCard extends StatelessWidget {
                           fontWeight: FontWeight.w700,
                           fontSize: screenheight * 0.016,
                           fontFamily: "Urbanist",
-                          color: primaryColor,
+                          color:greenColor,
                         ),
                       ),
                       Text(
@@ -109,7 +109,7 @@ class OrderCard extends StatelessWidget {
                           fontWeight: FontWeight.w600,
                           fontSize: screenheight * 0.013,
                           fontFamily: "Urbanist",
-                          color: Colors.black.withOpacity(0.6),
+                          color: greyColor,
                         ),
                       ),
                       SizedBox(
@@ -120,7 +120,7 @@ class OrderCard extends StatelessWidget {
                             fontWeight: FontWeight.w600,
                             fontSize: screenheight * 0.0128,
                             fontFamily: "Urbanist",
-                            color: Colors.black.withOpacity(0.6),
+                            color:greyColor,
                           ),
                         ),
                       ),
@@ -130,7 +130,7 @@ class OrderCard extends StatelessWidget {
                           fontWeight: FontWeight.w500,
                           fontSize: screenheight * 0.018,
                           fontFamily: "JosefinSans",
-                          color: Colors.black,
+                          color: whiteColor,
                         ),
                       ),
                     ],
@@ -141,7 +141,7 @@ class OrderCard extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                       fontSize: screenheight * 0.014,
                       fontFamily: "Urbanist",
-                      color: Colors.black,
+                      color: whiteColor,
                     ),
                   ),
                 ],
@@ -163,18 +163,18 @@ class OrderCard extends StatelessWidget {
                         fontWeight: FontWeight.w500,
                         fontSize: screenheight * 0.0145,
                         fontFamily: "Urbanist",
-                        color: Colors.black.withOpacity(0.5),
+                        color: greyColor,
                       ),
                     ),
                   ),
                   Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(20),
-                      color: secondaryColor.withOpacity(0.2),
+                      color:greenColor,
                     ),
                     child: Icon(
                       Icons.chevron_right,
-                      color: secondaryColor,
+                      color:whiteColor,
                       size: screenWidth * 0.07,
                     ),
                   )

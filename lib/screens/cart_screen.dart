@@ -1,9 +1,11 @@
 import 'package:cureeit_user_app/cards/cart_card.dart';
+import 'package:cureeit_user_app/current_address/google_maps_screen.dart';
 import 'package:cureeit_user_app/screens/Order_SuccessScreen.dart';
 import 'package:cureeit_user_app/screens/addresses_screen.dart';
 import 'package:cureeit_user_app/selected_Address/currentAddress.dart';
 import 'package:cureeit_user_app/utils/razor_pay.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
+import 'package:cureeit_user_app/widgets/LoadingIndicater.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
@@ -20,6 +22,7 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
+  bool isDeleting = false;
   List<Map<String, dynamic>> cartItems = [];
   List<dynamic> addresses = [];
   Map<String, dynamic>? selectedAddress;
@@ -40,19 +43,29 @@ class _CartScreenState extends State<CartScreen> {
     print("ruBuild done");
   }
 
+  void ItemDeleting(bool value) {
+    print("is deleting $value");
+    if (value) {
+      setState(() {
+        isDeleting = true;
+      });
+    } else {
+      setState(() {
+        isDeleting = false;
+      });
+    }
+  }
+
   void removeItemFromCart(String productId) {
     setState(() {
       cartItems.removeWhere((item) => item['productId'] == productId);
-      print("product delected from front end");
+
       if (cartItems.isEmpty) {
         totalAmount = 0.0;
         taxServices = 0.0;
         deliveryServiceFees = 0.0;
         totalWholeAmount = 0.0;
       }
-      setState(() {});
-      print("****updated cart item LIST****");
-      print(cartItems);
     });
   }
 
@@ -221,13 +234,9 @@ class _CartScreenState extends State<CartScreen> {
 
     if (response.statusCode == 200) {
       final data = json.decode(await response.stream.bytesToString());
-      setState(() {
-        selectedAddress = data['data']['address'][0];
-        print("****FETCHING ADDRESSS SE SELECTED ADDRESS*****");
-        print(selectedAddress);
-        print("****CURRENT ADDRESS*****");
-        print(Address.CurrentAddress);
-      });
+      addresses = data['data']['address'];
+
+      selectedAddress = data['data']['address'][0];
     } else {
       print('Failed to load addresses');
     }
@@ -235,8 +244,6 @@ class _CartScreenState extends State<CartScreen> {
 
   Future<void> createCheckout(String total, double shippingCost,
       String shippingAddress, String transactionId) async {
-        
-        
     print("***SHIPPING ADDRESS****");
     print(shippingAddress);
     int Total = double.parse(total).toInt();
@@ -254,8 +261,8 @@ class _CartScreenState extends State<CartScreen> {
           "totalAmount": Total,
           "shippingAddress": shippingAddress,
           "shippingCost": shippingCost,
-          "userLat":Address.CurrentAddress?["userLat"] ??0.0,
-          "userLong": Address.CurrentAddress?["userLong"]??0.0,
+          "userLat": Address.CurrentAddress?["userLat"] ?? 0.0,
+          "userLong": Address.CurrentAddress?["userLong"] ?? 0.0,
           "paymentDetails": {
             "gateway": "Paytm",
             "transactionId": transactionId,
@@ -278,8 +285,7 @@ class _CartScreenState extends State<CartScreen> {
           //   builder: (context) => OrderSuccessScreen(),
           // ),
           // );
-          print(
-              "*****ORDER-ID-CART-SCREEN********${responseData["data"]['orderId']}");
+          print("*****ORDER-ID-CART-SCREEN********${responseData["data"]}");
           final shouldRefresh = await Navigator.push(
             context,
             MaterialPageRoute(
@@ -306,536 +312,599 @@ class _CartScreenState extends State<CartScreen> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: widget.isNavigated ? 48 : 0,
-        backgroundColor: Colors.grey[100],
-        leadingWidth: 100,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 12.0),
-          child: GestureDetector(
-            onTap: () {
-              Navigator.pop(context);
-            },
+    return Stack(
+      children: [
+        Scaffold(
+          appBar: AppBar(
+            toolbarHeight: widget.isNavigated ? 48 : 0,
+            backgroundColor: scaffoldBlackColor,
+            leadingWidth: 100,
+            leading: Padding(
+              padding: const EdgeInsets.only(left: 12.0),
+              child: GestureDetector(
+                onTap: () {
+                  Navigator.pop(context);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 4.0),
+                  child: Row(
+                    spacing: 4,
+                    children: [
+                      Icon(Icons.arrow_back, color: greenColor),
+                      Text(
+                        "Back",
+                        style: TextStyle(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                            fontFamily: "Urbanist",
+                            color: whiteColor),
+                      )
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+          body: Container(
+            padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).size.height * 0.06),
+            color: scaffoldBlackColor,
+            width: MediaQuery.of(context).size.width,
+            height: MediaQuery.of(context).size.height,
             child: Padding(
-              padding: const EdgeInsets.only(left: 4.0),
-              child: Row(
-                spacing: 4,
+              padding:
+                  const EdgeInsets.symmetric(vertical: 0.0, horizontal: 18),
+              child: Stack(
                 children: [
-                  Icon(Icons.arrow_back, color: primaryColor),
-                  Text(
-                    "Back",
-                    style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                        fontFamily: "Urbanist",
-                        color: primaryColor),
-                  )
+                  ListView(
+                    children: [
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        spacing: 16,
+                        children: [
+                          Row(children: [
+                            Text(
+                              "Cart",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize:
+                                      MediaQuery.of(context).size.width * 0.06,
+                                  fontFamily: "JosefinSans",
+                                  color: whiteColor),
+                            )
+                          ]),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            height: 56,
+                            decoration: BoxDecoration(
+                              color: const Color(
+                                  0xFF1A1A1A), // or any color you want
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  'Upload your prescription',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontFamily: "JosefinSans",
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                Container(
+                                  width: 16,
+                                  height: 16,
+                                  decoration: BoxDecoration(
+                                    color: Colors.black,
+                                    shape: BoxShape.circle,
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                          Container(
+                            width: MediaQuery.of(context).size.width,
+                            decoration: BoxDecoration(
+                                color: ligtBlackColor,
+                                borderRadius: BorderRadius.circular(10)),
+                            child: Stack(
+                              children: [
+                                isLoading
+                                    ? Center(
+                                        child: Padding(
+                                        padding: const EdgeInsets.all(12.0),
+                                        child: CircularProgressIndicator(
+                                          color: whiteColor,
+                                        ),
+                                      ))
+                                    : cartItems.isEmpty
+                                        ? SizedBox(
+                                            width: MediaQuery.of(context)
+                                                .size
+                                                .width,
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                Padding(
+                                                  padding: const EdgeInsets
+                                                      .symmetric(
+                                                      vertical: 16.0),
+                                                  child: Text(
+                                                    "No Items in Cart",
+                                                    style: TextStyle(
+                                                        fontSize: MediaQuery.of(
+                                                                    context)
+                                                                .size
+                                                                .width *
+                                                            0.07,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color:
+                                                            Color(0xFFFFFFFF)),
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          )
+                                        : Column(
+                                            children: [
+                                              Column(
+                                                children: [
+                                                  Column(
+                                                    children: cartItems
+                                                        .map((item) => CartCard(
+                                                            reBuild: reBuild,
+                                                            productName:
+                                                                item['name'],
+                                                            packLabel: item[
+                                                                    'packagingDetail'] ??
+                                                                " ",
+                                                            quantity: item[
+                                                                    'quantity'] ??
+                                                                1,
+                                                            productId: item[
+                                                                'productId'],
+                                                            sellingPrice:
+                                                                item['sellingPrice'] ??
+                                                                    0.0,
+                                                            onUpdate:
+                                                                fetchCartDetails,
+                                                            onRemove: () async {
+                                                              print(
+                                                                  "on remove is called");
+                                                              removeItemFromCart(
+                                                                  item[
+                                                                      'productId']);
+                                                            },
+                                                            isDeleting:
+                                                                ItemDeleting,
+                                                            productImages: item[
+                                                                    'imageUrls'] ??
+                                                                ''))
+                                                        .toList(),
+                                                  ),
+                                                ],
+                                              ),
+                                              Padding(
+                                                padding: EdgeInsets.only(
+                                                  left: screenWidth *
+                                                      0.075, // ≈30 for width ≈ 400
+                                                  right: screenWidth *
+                                                      0.055, // ≈22
+                                                  top: screenHeight *
+                                                      0.035, // ≈28 for height ≈ 800
+                                                  bottom: screenHeight *
+                                                      0.0175, // ≈14
+                                                ),
+                                                child: Column(
+                                                  spacing: screenWidth * 0.045,
+                                                  children: [
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        Text(
+                                                          "Item Total",
+                                                          style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.w400,
+                                                            fontSize:
+                                                                screenWidth *
+                                                                    0.03,
+                                                            fontFamily:
+                                                                "Urbanist",
+                                                            color: greyColor,
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          "₹${(totalAmount)}",
+                                                          style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.w400,
+                                                            fontSize:
+                                                                screenWidth *
+                                                                    0.03,
+                                                            fontFamily:
+                                                                "Urbanist",
+                                                            color: greyColor,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        Row(
+                                                          spacing: screenWidth *
+                                                              0.05,
+                                                          children: [
+                                                            Text(
+                                                              "Delivery Fee",
+                                                              style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400,
+                                                                fontSize:
+                                                                    screenWidth *
+                                                                        0.03,
+                                                                fontFamily:
+                                                                    "Urbanist",
+                                                                color:
+                                                                    greyColor,
+                                                              ),
+                                                            ),
+                                                            Image.asset(
+                                                              "lib/images/cart_i_button.png",
+                                                              height: 10,
+                                                              width: 10,
+                                                              fit: BoxFit
+                                                                  .contain,
+                                                            )
+                                                          ],
+                                                        ),
+                                                        Text(
+                                                          "₹${deliveryServiceFees}",
+                                                          style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.w400,
+                                                            fontSize:
+                                                                screenWidth *
+                                                                    0.03,
+                                                            fontFamily:
+                                                                "Urbanist",
+                                                            color: greyColor,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        Row(
+                                                          spacing: screenWidth *
+                                                              0.05,
+                                                          children: [
+                                                            Text(
+                                                              "Tax and Charges",
+                                                              style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w400,
+                                                                fontSize:
+                                                                    screenWidth *
+                                                                        0.03,
+                                                                fontFamily:
+                                                                    "Urbanist",
+                                                                color:
+                                                                    greyColor,
+                                                              ),
+                                                            ),
+                                                            Image.asset(
+                                                              "lib/images/cart_i_button.png",
+                                                              height: 10,
+                                                              width: 10,
+                                                              fit: BoxFit
+                                                                  .contain,
+                                                            )
+                                                          ],
+                                                        ),
+                                                        Text(
+                                                          "₹${taxServices}",
+                                                          style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.w400,
+                                                            fontSize:
+                                                                screenWidth *
+                                                                    0.03,
+                                                            fontFamily:
+                                                                "Urbanist",
+                                                            color: greyColor,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    Padding(
+                                                      padding: EdgeInsets.only(
+                                                          top: screenHeight *
+                                                              0.05),
+                                                      child: Image.asset(
+                                                        "lib/images/dotted_divider.png",
+                                                      ),
+                                                    ),
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        Container(
+                                                          height: screenHeight *
+                                                              0.06,
+                                                          width:
+                                                              screenWidth * 0.3,
+                                                          alignment:
+                                                              Alignment.center,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            border: Border.all(
+                                                              color: greenColor,
+                                                              width: 1,
+                                                            ),
+                                                            color:
+                                                                ligtBlackColor, // Setting the background color to primary color
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        10), // Setting the border radius to 10
+                                                          ),
+                                                          child:
+                                                              GestureDetector(
+                                                            onTap: () {
+                                                              if (addresses
+                                                                      .length ==
+                                                                  0) {
+                                                                Navigator.of(
+                                                                        context)
+                                                                    .pushReplacement(MaterialPageRoute(
+                                                                        builder:
+                                                                            (context) =>
+                                                                                GoogleMapsScreen()));
+                                                                return;
+                                                              }
+                                                              RazorpayPayment
+                                                                  razorpayPayment =
+                                                                  RazorpayPayment(
+                                                                onSuccess:
+                                                                    (PaymentSuccessResponse
+                                                                        response) {
+                                                                  createCheckout(
+                                                                    (totalWholeAmount)
+                                                                        .toStringAsFixed(
+                                                                            2),
+                                                                    deliveryServiceFees,
+                                                                    "${Address.CurrentAddress!["address"]}, ${Address.CurrentAddress!['landmark']}, ${Address.CurrentAddress!['floor']}, ${Address.CurrentAddress!['userLat']}, ${Address.CurrentAddress!['userLong']}",
+                                                                    response
+                                                                        .paymentId
+                                                                        .toString(),
+                                                                  );
+                                                                },
+                                                                onFailure:
+                                                                    (PaymentFailureResponse
+                                                                        response) {
+                                                                  // Handle payment failure
+                                                                  print(
+                                                                      'Payment Failed: ${response.message}');
+                                                                  ScaffoldMessenger.of(
+                                                                          context)
+                                                                      .showSnackBar(
+                                                                          SnackBar(
+                                                                    content: Text(
+                                                                        'Payment Failed'),
+                                                                  ));
+                                                                },
+                                                              );
+
+                                                              razorpayPayment
+                                                                  .initiatePayment(
+                                                                totalWholeAmount, // Amount in paise (e.g., 50000 = 500 INR)
+                                                                'Cure it', // Product Name
+                                                                'Please do the payment', // Description
+                                                                '8890170172',
+                                                                'yash123@gmail.com',
+                                                              );
+                                                            },
+                                                            child: Center(
+                                                              child: addresses
+                                                                          .length ==
+                                                                      0
+                                                                  ? Text(
+                                                                      "Add your address first",
+                                                                      style:
+                                                                          TextStyle(
+                                                                        color:
+                                                                            greenColor,
+                                                                        fontFamily:
+                                                                            "Urbanist",
+                                                                        fontSize:
+                                                                            screenWidth *
+                                                                                0.025,
+                                                                      ),
+                                                                    )
+                                                                  : Text(
+                                                                      "Pay Now",
+                                                                      style:
+                                                                          TextStyle(
+                                                                        color:
+                                                                            greenColor,
+                                                                        fontSize:
+                                                                            screenWidth *
+                                                                                0.045,
+                                                                        fontFamily:
+                                                                            "Urbanist",
+                                                                        fontWeight:
+                                                                            FontWeight.w600,
+                                                                      ),
+                                                                    ),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                        Column(children: [
+                                                          Text(
+                                                            "To Pay",
+                                                            style: TextStyle(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w600,
+                                                                fontSize:
+                                                                    screenWidth *
+                                                                        0.04,
+                                                                fontFamily:
+                                                                    "Urbanist",
+                                                                color:
+                                                                    greyColor),
+                                                          ),
+                                                          Text(
+                                                            "₹${totalWholeAmount.toStringAsFixed(2)}",
+                                                            style: TextStyle(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w700,
+                                                              fontSize:
+                                                                  screenWidth *
+                                                                      0.05,
+                                                              fontFamily:
+                                                                  "Urbanist",
+                                                              color: whiteColor,
+                                                            ),
+                                                          ),
+                                                        ])
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                              ],
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 0.0),
+                            child: Container(
+                              padding: EdgeInsets.only(
+                                right: MediaQuery.of(context).size.width *
+                                    0.04, // 4% of screen width
+                                left: MediaQuery.of(context).size.width *
+                                    0.05, // 5% of screen width
+                                top: MediaQuery.of(context).size.height *
+                                    0.04, // 5% of screen height
+                                bottom: MediaQuery.of(context).size.height *
+                                    0.04, // 5% of screen height
+                              ),
+                              margin: EdgeInsets.only(bottom: 60),
+                              decoration: BoxDecoration(
+                                  color: ligtBlackColor,
+                                  borderRadius: BorderRadius.circular(10)),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                spacing: screenHeight * 0.02,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "Delivery Address",
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: screenWidth * 0.035,
+                                          fontFamily: "JosefinSans",
+                                          color: whiteColor,
+                                        ),
+                                      ),
+                                      GestureDetector(
+                                        onTap: _navigateToAddressScreen,
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.035, // ~14 on 400px width
+                                            vertical: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.0075, // ~6 on 800px height
+                                          ),
+                                          decoration: BoxDecoration(
+                                              color: greenColor,
+                                              borderRadius:
+                                                  BorderRadius.circular(30)),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                selectedAddress != null
+                                                    ? selectedAddress!['type']
+                                                    : "",
+                                                // addresses.isNotEmpty ? addresses[0]['type'] ?? 'N/A' : 'Others',
+                                                style: TextStyle(
+                                                  fontWeight: FontWeight.w400,
+                                                  fontSize: 12,
+                                                  fontFamily: "Urbanist",
+                                                  color: whiteColor,
+                                                ),
+                                              ),
+                                              Icon(
+                                                Icons.play_arrow,
+                                                color: whiteColor,
+                                                size: 18,
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      )
+                                    ],
+                                  ),
+                                  Text(
+                                    Address.CurrentAddress != null
+                                        ? "${Address.CurrentAddress!['address']} ${Address.CurrentAddress!['landmark'] != "" ? "\n landmark : ${Address.CurrentAddress!['landmark']}" : ""} ${Address.CurrentAddress!["floor"] != "" ? "\n floor : ${Address.CurrentAddress!["floor"]}" : ""}"
+                                        : "N/A",
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.w400,
+                                      fontSize:
+                                          MediaQuery.of(context).size.width *
+                                              0.03,
+                                      fontFamily: "Urbanist",
+                                      color: whiteColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
           ),
         ),
-      ),
-      body: Container(
-        margin:
-            EdgeInsets.only(bottom: MediaQuery.of(context).size.height * 0.06),
-        color: Colors.grey.shade100.withOpacity(0.5),
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 18),
-          child: Stack(
-            children: [
-              ListView(
-                children: [
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    spacing: 16,
-                    children: [
-                      Row(children: [
-                        Text(
-                          "Cart",
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize:
-                                  MediaQuery.of(context).size.width * 0.06,
-                              fontFamily: "JosefinSans",
-                              color: primaryColor),
-                        )
-                      ]),
-                      
-                      
-                      Container(
-                        width: MediaQuery.of(context).size.width,
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10)),
-                        child: Stack(
-                          children: [
-                            isLoading
-                                ? Center(
-                                    child: Padding(
-                                    padding: const EdgeInsets.all(12.0),
-                                    child: CircularProgressIndicator(
-                                      color: secondaryColor,
-                                    ),
-                                  ))
-                                : cartItems.isEmpty
-                                    ? SizedBox(
-                                        width:
-                                            MediaQuery.of(context).size.width,
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          children: [
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                      vertical: 16.0),
-                                              child: Text(
-                                                "No Items in Cart",
-                                                style: TextStyle(
-                                                    fontSize:
-                                                        MediaQuery.of(context)
-                                                                .size
-                                                                .width *
-                                                            0.07,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.grey
-                                                        .withOpacity(0.5)),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      )
-                                    : Column(
-                                        children: [
-                                          Column(
-                                            children: [
-                                              Column(
-                                                children: cartItems
-                                                    .map((item) => CartCard(
-                                                        reBuild: reBuild,
-                                                        productName:
-                                                            item['name'],
-                                                        packLabel: item[
-                                                                'packagingDetail'] ??
-                                                            " ",
-                                                        quantity:
-                                                            item['quantity'] ??
-                                                                1,
-                                                        productId:
-                                                            item['productId'],
-                                                        sellingPrice: item[
-                                                                'sellingPrice'] ??
-                                                            0.0,
-                                                        onUpdate:
-                                                            fetchCartDetails,
-                                                        onRemove: () async {
-                                                          print(
-                                                              "on remove is called");
-                                                          removeItemFromCart(
-                                                              item[
-                                                                  'productId']);
-                                                          await fetchCartDetails();
-                                                          print(
-                                                              " on remove mai fetch karke print${cartItems}");
-                                                          setState(() {});
-                                                        },
-                                                        productImages:
-                                                            item['imageUrls'] ??
-                                                                ''))
-                                                    .toList(),
-                                              ),
-                                            ],
-                                          ),
-                                          Padding(
-                                            padding: EdgeInsets.only(
-                                              left: screenWidth *
-                                                  0.075, // ≈30 for width ≈ 400
-                                              right: screenWidth * 0.055, // ≈22
-                                              top: screenHeight *
-                                                  0.035, // ≈28 for height ≈ 800
-                                              bottom:
-                                                  screenHeight * 0.0175, // ≈14
-                                            ),
-                                            child: Column(
-                                              spacing: screenWidth * 0.045,
-                                              children: [
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    Text(
-                                                      "Item Total",
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                        fontSize:
-                                                            screenWidth * 0.03,
-                                                        fontFamily: "Urbanist",
-                                                        color:
-                                                            Color(0xFF1F1970),
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      "₹${(totalAmount)}",
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                        fontSize:
-                                                            screenWidth * 0.03,
-                                                        fontFamily: "Urbanist",
-                                                        color:
-                                                            Color(0xFF1F1970),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    Row(
-                                                      spacing:
-                                                          screenWidth * 0.05,
-                                                      children: [
-                                                        Text(
-                                                          "Delivery Fee",
-                                                          style: TextStyle(
-                                                            fontWeight:
-                                                                FontWeight.w400,
-                                                            fontSize:
-                                                                screenWidth *
-                                                                    0.03,
-                                                            fontFamily:
-                                                                "Urbanist",
-                                                            color: Color(
-                                                                0xFF1F1970),
-                                                          ),
-                                                        ),
-                                                        Image.asset(
-                                                          "lib/images/cart_i_button.png",
-                                                          height: 10,
-                                                          width: 10,
-                                                          fit: BoxFit.contain,
-                                                        )
-                                                      ],
-                                                    ),
-                                                    Text(
-                                                      "₹${deliveryServiceFees}",
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                        fontSize:
-                                                            screenWidth * 0.03,
-                                                        fontFamily: "Urbanist",
-                                                        color:
-                                                            Color(0xFF1F1970),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    Row(
-                                                      spacing:
-                                                          screenWidth * 0.05,
-                                                      children: [
-                                                        Text(
-                                                          "Tax and Charges",
-                                                          style: TextStyle(
-                                                            fontWeight:
-                                                                FontWeight.w400,
-                                                            fontSize:
-                                                                screenWidth *
-                                                                    0.03,
-                                                            fontFamily:
-                                                                "Urbanist",
-                                                            color: Color(
-                                                                0xFF1F1970),
-                                                          ),
-                                                        ),
-                                                        Image.asset(
-                                                          "lib/images/cart_i_button.png",
-                                                          height: 10,
-                                                          width: 10,
-                                                          fit: BoxFit.contain,
-                                                        )
-                                                      ],
-                                                    ),
-                                                    Text(
-                                                      "₹${taxServices}",
-                                                      style: TextStyle(
-                                                        fontWeight:
-                                                            FontWeight.w400,
-                                                        fontSize:
-                                                            screenWidth * 0.03,
-                                                        fontFamily: "Urbanist",
-                                                        color:
-                                                            Color(0xFF1F1970),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                                Padding(
-                                                  padding: EdgeInsets.only(
-                                                      top: screenHeight * 0.05),
-                                                  child: Image.asset(
-                                                    "lib/images/dotted_divider.png",
-                                                  ),
-                                                ),
-                                                Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
-                                                  children: [
-                                                    Container(
-                                                      height:
-                                                          screenHeight * 0.06,
-                                                      width: screenWidth * 0.3,
-                                                      alignment:
-                                                          Alignment.center,
-                                                      decoration: BoxDecoration(
-                                                        color:
-                                                            primaryColor, // Setting the background color to primary color
-                                                        borderRadius:
-                                                            BorderRadius.circular(
-                                                                10), // Setting the border radius to 10
-                                                      ),
-                                                      child: GestureDetector(
-                                                        onTap: () {
-                                                          RazorpayPayment
-                                                              razorpayPayment =
-                                                              RazorpayPayment(
-                                                            onSuccess:
-                                                                (PaymentSuccessResponse
-                                                                    response) {
-                                                              print(
-                                                                  "***PAYMENT RESPONSE***");
-                                                             
-                                                              print(response.data);
-                                                              print(response.signature);
-                                                             
-                                                              
-
-                                                              createCheckout(
-                                                                (totalWholeAmount)
-                                                                    .toStringAsFixed(
-                                                                        2),
-                                                                deliveryServiceFees,
-                                                                "${Address.CurrentAddress!["address"]}, ${Address.CurrentAddress!['landmark']}, ${Address.CurrentAddress!['floor']}, ${Address.CurrentAddress!['userLat']}, ${Address.CurrentAddress!['userLong']}",
-                                                                response
-                                                                    .paymentId
-                                                                    .toString(),
-                                                              );
-                                                            },
-                                                            onFailure:
-                                                                (PaymentFailureResponse
-                                                                    response) {
-                                                              // Handle payment failure
-                                                              print(
-                                                                  'Payment Failed: ${response.message}');
-                                                              ScaffoldMessenger
-                                                                      .of(
-                                                                          context)
-                                                                  .showSnackBar(
-                                                                      SnackBar(
-                                                                content: Text(
-                                                                    'Payment Failed'),
-                                                              ));
-                                                            },
-                                                          );
-
-                                                          razorpayPayment
-                                                              .initiatePayment(
-                                                            totalWholeAmount, // Amount in paise (e.g., 50000 = 500 INR)
-                                                            'Cure it', // Product Name
-                                                            'Please do the payment', // Description
-                                                            '8890170172',
-                                                            'yash123@gmail.com',
-                                                          );
-                                                        },
-                                                        child: Center(
-                                                          child: Text(
-                                                            "Pay Now",
-                                                            style: TextStyle(
-                                                              color:
-                                                                  Colors.white,
-                                                              fontSize:
-                                                                  screenWidth *
-                                                                      0.045,
-                                                              fontFamily:
-                                                                  "Urbanist",
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w600,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    Column(children: [
-                                                      Text(
-                                                        "To Pay",
-                                                        style: TextStyle(
-                                                            fontWeight:
-                                                                FontWeight.w600,
-                                                            fontSize:
-                                                                screenWidth *
-                                                                    0.04,
-                                                            fontFamily:
-                                                                "Urbanist",
-                                                            color:
-                                                                primaryColor),
-                                                      ),
-                                                      Text(
-                                                        "₹${totalWholeAmount.toStringAsFixed(2)}",
-                                                        style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.w700,
-                                                          fontSize:
-                                                              screenWidth *
-                                                                  0.05,
-                                                          fontFamily:
-                                                              "Urbanist",
-                                                          color:
-                                                              Color(0xFF1F1970),
-                                                        ),
-                                                      ),
-                                                    ])
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                          )
-                                        ],
-                                      ),
-                            Transform.translate(
-                              offset: Offset(-10, 8),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [],
-                              ),
-                            )
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 0.0),
-                        child: Container(
-                          padding: EdgeInsets.only(
-                            right: MediaQuery.of(context).size.width *
-                                0.04, // 4% of screen width
-                            left: MediaQuery.of(context).size.width *
-                                0.05, // 5% of screen width
-                            top: MediaQuery.of(context).size.height *
-                                0.04, // 5% of screen height
-                            bottom: MediaQuery.of(context).size.height *
-                                0.04, // 5% of screen height
-                          ),
-                          decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(10)),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            spacing: screenHeight * 0.02,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    "Delivery Address",
-                                    style: TextStyle(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: screenWidth * 0.035,
-                                      fontFamily: "JosefinSans",
-                                      color: Color(0xFF1F1970),
-                                    ),
-                                  ),
-                                  GestureDetector(
-                                    onTap: _navigateToAddressScreen,
-                                    child: Container(
-                                      padding: EdgeInsets.symmetric(
-                                        horizontal:
-                                            MediaQuery.of(context).size.width *
-                                                0.035, // ~14 on 400px width
-                                        vertical:
-                                            MediaQuery.of(context).size.height *
-                                                0.0075, // ~6 on 800px height
-                                      ),
-                                      decoration: BoxDecoration(
-                                          color:
-                                              secondaryColor.withOpacity(0.16),
-                                          borderRadius:
-                                              BorderRadius.circular(30)),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(
-                                            selectedAddress != null
-                                                ? selectedAddress!['type']
-                                                : "",
-                                            // addresses.isNotEmpty ? addresses[0]['type'] ?? 'N/A' : 'Others',
-                                            style: TextStyle(
-                                              fontWeight: FontWeight.w400,
-                                              fontSize: 12,
-                                              fontFamily: "Urbanist",
-                                              color: secondaryColor,
-                                            ),
-                                          ),
-                                          Icon(
-                                            Icons.play_arrow,
-                                            color: secondaryColor,
-                                            size: 18,
-                                          )
-                                        ],
-                                      ),
-                                    ),
-                                  )
-                                ],
-                              ),
-                              Text(
-                                Address.CurrentAddress != null
-                                    ? "${Address.CurrentAddress!['address']} ${Address.CurrentAddress!['landmark'] != "" ? "\n landmark : ${Address.CurrentAddress!['landmark']}" : ""} ${Address.CurrentAddress!["floor"] != "" ? "\n floor : ${Address.CurrentAddress!["floor"]}" : ""}"
-                                    : "N/A",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w400,
-                                  fontSize:
-                                      MediaQuery.of(context).size.width * 0.03,
-                                  fontFamily: "Urbanist",
-                                  color: Color(0xFF1F1970).withOpacity(0.6),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      )
-                    ],
-                  ),
-                  SizedBox(
-                    height: MediaQuery.of(context).size.height *
-                        0.05, // ~40 on 800px height
-                  )
-                ],
-              ),
-            ],
-          ),
-        ),
-      ),
+        if (isDeleting) const BubbleLoadingOverlay(),
+      ],
     );
   }
 }

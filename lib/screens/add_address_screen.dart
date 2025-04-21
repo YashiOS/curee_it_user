@@ -1,3 +1,4 @@
+import 'package:cureeit_user_app/screens/base_screen.dart';
 import 'package:cureeit_user_app/screens/home_screen.dart';
 import 'package:cureeit_user_app/selected_Address/currentAddress.dart';
 import 'package:flutter/material.dart';
@@ -69,7 +70,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
           "_id": widget.userId,
         };
         Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => HomeScreen()));
+            MaterialPageRoute(builder: (context) => BaseScreen()));
       } else {
         Fluttertoast.showToast(msg: "Failed to add address");
       }
@@ -97,6 +98,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
   void initState() {
     _line1Controller.addListener(_checkFields);
     _line2Controller.addListener(_checkFields);
+    _typeController.addListener(_checkFields);
     // TODO: implement initState
     super.initState();
   }
@@ -104,7 +106,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
   void _checkFields() {
   setState(() {
     isButtonEnabled = _line1Controller.text.trim().isNotEmpty &&
-                      _line2Controller.text.trim().isNotEmpty;
+                      _line2Controller.text.trim().isNotEmpty&&_typeController.text.trim().isNotEmpty;
   });
 }
 

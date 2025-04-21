@@ -146,7 +146,7 @@ class _FavoritesCardState extends State<FavoritesCard> {
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width*0.02),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: ligtBlackColor,
                 borderRadius: BorderRadius.circular(60),
               ),
               child: Row(
@@ -168,16 +168,16 @@ class _FavoritesCardState extends State<FavoritesCard> {
                                   loadingBuilder: (context, child, loadingProgress) {
                                     if (loadingProgress == null) return child;
                                     return Center(
-                                      child: CircularProgressIndicator(color: secondaryColor),
+                                      child: CircularProgressIndicator(color:whiteColor),
                                     );
                                   },
                                   errorBuilder: (context, error, stackTrace) {
                                     return Center(
-                                      child: Icon(Icons.error, color: Color.fromRGBO(7, 9, 84, 1)),
+                                      child: Icon(Icons.error, color: whiteColor),
                                     );
                                   },
                                 )
-                              : Icon(Icons.image, size: iconSize),
+                              : Icon(Icons.image, size: iconSize,color: whiteColor,),
                         ),
                       ),
                       SizedBox(width: 8),
@@ -196,7 +196,7 @@ class _FavoritesCardState extends State<FavoritesCard> {
                                   fontWeight: FontWeight.w600,
                                   fontSize: constraints.maxWidth * 0.035,
                                   fontFamily: "JosefinSans",
-                                  color: Color(0xFF1F1970),
+                                  color: whiteColor,
                                 ),
                               ),
                             ),
@@ -208,7 +208,7 @@ class _FavoritesCardState extends State<FavoritesCard> {
                                   fontWeight: FontWeight.w900,
                                   fontSize: constraints.maxWidth * 0.03,
                                   fontFamily: "Urbanist",
-                                  color: secondaryColor,
+                                  color: greenColor,
                                 ),
                               ),
                             ),
@@ -231,7 +231,7 @@ class _FavoritesCardState extends State<FavoritesCard> {
                             height: deleteButtonSize,
                             width: deleteButtonSize,
                             decoration: BoxDecoration(
-                              color: secondaryColor,
+                              color: greenColor,
                               borderRadius: BorderRadius.circular(20),
                             ),
                           ),

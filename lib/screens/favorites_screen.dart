@@ -53,7 +53,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.grey.shade100.withOpacity(0.5),
+        backgroundColor: scaffoldBlackColor,
         leadingWidth: 200,
         toolbarHeight: 60,
         leading: Padding(
@@ -68,15 +68,16 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                     fontWeight: FontWeight.w600,
                     fontSize: MediaQuery.of(context).size.width * 0.06,
                     fontFamily: "JosefinSans",
-                    color: primaryColor),
+                    color: whiteColor),
               ),
             ],
           ),
         ),
       ),
       body: Container(
-        margin: EdgeInsets.only(bottom: MediaQuery.of(context).size.height*0.1),
-        color: Colors.grey.shade100.withOpacity(0.5),
+        margin: EdgeInsets.only(bottom: MediaQuery.of(context).size.height*0.03),
+        padding: EdgeInsets.only(bottom: MediaQuery.of(context).size.height*0.05),
+        color: scaffoldBlackColor,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 18),
           child: Padding(
@@ -85,10 +86,13 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
               future: favoritesFuture, // use stored future
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Center(
-                      child: CircularProgressIndicator(
-                    color: secondaryColor,
-                  ));
+                  return Container(
+                    color: scaffoldBlackColor,
+                    child: Center(
+                        child: CircularProgressIndicator(
+                      color: whiteColor,
+                    )),
+                  );
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else if (!snapshot.hasData || snapshot.data!.isEmpty) {

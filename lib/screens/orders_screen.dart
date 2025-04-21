@@ -62,7 +62,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.grey.shade100.withOpacity(0.5),
+        backgroundColor:scaffoldBlackColor,
         leadingWidth: 200,
         toolbarHeight: 60,
         leading: Padding(
@@ -78,22 +78,25 @@ class _OrdersScreenState extends State<OrdersScreen> {
                     fontWeight: FontWeight.w600,
                     fontSize: MediaQuery.of(context).size.width * 0.06,
                     fontFamily: "JosefinSans",
-                    color: primaryColor),
+                    color: whiteColor),
               ),
             ],
           ),
         ),
       ),
       body: isLoading
-          ? Center(
-              child: CircularProgressIndicator(
-              color: secondaryColor,
-            )) // Show loader while data is loading
+          ? Container(
+            color:scaffoldBlackColor,
+            child: Center(
+                child: CircularProgressIndicator(
+                color: whiteColor,
+              )),
+          ) // Show loader while data is loading
           : Container(
             margin: EdgeInsets.only(bottom: MediaQuery.of(context).size.height*0.03),
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height,
-              color: Colors.grey.shade100.withOpacity(0.5),
+              color: scaffoldBlackColor,
               child: Padding(
                 padding: const EdgeInsets.only(
                     top: 6.0, left: 18, right: 18, bottom: 60),
