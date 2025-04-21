@@ -11,6 +11,7 @@ class CartCard extends StatefulWidget {
   final int quantity;
   final String productId;
   final double sellingPrice;
+  final double productPrice;
   final Function onUpdate;
   final Function onRemove;
   final Function reBuild;
@@ -24,6 +25,7 @@ class CartCard extends StatefulWidget {
       required this.quantity,
       required this.productId,
       required this.sellingPrice,
+      required this.productPrice,
       required this.onUpdate,
       required this.onRemove,
       required this.productImages,
@@ -150,7 +152,8 @@ class _CartCardState extends State<CartCard> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-
+   print(widget.productPrice);
+   print(widget.sellingPrice);
     return Padding(
       padding: EdgeInsets.only(
         top: MediaQuery.of(context).size.height * 0.035,
@@ -312,7 +315,7 @@ class _CartCardState extends State<CartCard> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      "₹ ${((widget.sellingPrice * 0.7) * _localQuantity).toStringAsFixed(2)}",
+                      "₹ ${((widget.sellingPrice ) * _localQuantity).toStringAsFixed(2)}",
                       style: TextStyle(
                         fontWeight: FontWeight.w800,
                         fontSize: screenWidth * 0.03,
@@ -321,7 +324,7 @@ class _CartCardState extends State<CartCard> {
                       ),
                     ),
                     Text(
-                      "₹ ${(widget.sellingPrice * _localQuantity).toString()}",
+                      "₹ ${(widget.productPrice * _localQuantity).toString()}",
                       style: TextStyle(
                         decoration: TextDecoration.lineThrough,
                         fontWeight: FontWeight.w500,
@@ -330,6 +333,7 @@ class _CartCardState extends State<CartCard> {
                         color: greyColor,
                       ),
                     ),
+                    Text("${widget.productPrice*_localQuantity}")
                   ],
                 ),
               ],

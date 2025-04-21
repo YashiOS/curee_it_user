@@ -59,7 +59,7 @@ dev_dependencies:
 
 flutter_native_splash:
   color: "#000000" # dark background color
-  image: lib/images/medkaro.png # optional logo (add this image in assets folder)
+  image: lib/images/medkarolog.png # optional logo (add this image in assets folder)
   android: true
   ios: true
   

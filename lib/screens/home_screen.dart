@@ -39,6 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Map<String, dynamic>? SelectedAddress;
   List<Map<String, dynamic>> cartItems = [];
   double totalAmount = 0.00;
+  String finaltotalAmount="";
   bool isLoading = true;
   bool isTapped = false;
   bool? isInRadius;
@@ -180,6 +181,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
         if (responseData['status'] == 200 && responseData['data'] != null) {
           List<dynamic> cartData = responseData['data'];
+          finaltotalAmount=responseData["finalTotal"];
           List<Map<String, dynamic>> tempCart = [];
 
           for (var cartItem in cartData) {
@@ -1187,7 +1189,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           decoration: InputDecoration(
                             enabled: false,
                             hintText: "Search",
-                            hintStyle: TextStyle(fontFamily: "Urbanist"),
+                            hintStyle: TextStyle(fontFamily: "Urbanist",color: greyColor),
                             border: InputBorder.none,
                           ),
                         ),
@@ -1368,7 +1370,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         FontWeight.normal),
                                               ),
                                               Text(
-                                                "|  ₹ ${(totalAmount * 0.7).toStringAsFixed(2) ?? ''}",
+                                                "|  ₹ ${finaltotalAmount}",
                                                 style: TextStyle(
                                                     color: whiteColor,
                                                     fontFamily: "Urbanist",

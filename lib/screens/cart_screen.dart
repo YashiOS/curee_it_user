@@ -147,13 +147,10 @@ class _CartScreenState extends State<CartScreen> {
                 "productId": cartItem['productId'],
                 "quantity": cartItem['quantity'],
                 "name": productDetails['name'],
-                "sellingPrice": (productDetails['sellingPrice'] is int)
-                    ? productDetails['sellingPrice'].toDouble()
-                    : double.tryParse(
-                            productDetails['sellingPrice'].toString()) ??
-                        0.0,
+                "sellingPrice": cartItem["sellingPrice"]??'0',
                 "packagingDetail": productDetails['packagingDetail'],
-                "imageUrls": productDetails['imageUrls']
+                "imageUrls": productDetails['imageUrls'],
+                "productPrice":cartItem["productPrice"],
               });
             } else {
               print(
@@ -459,6 +456,7 @@ class _CartScreenState extends State<CartScreen> {
                                                   Column(
                                                     children: cartItems
                                                         .map((item) => CartCard(
+                                                          productPrice: item["productPrice"]??0.0,
                                                             reBuild: reBuild,
                                                             productName:
                                                                 item['name'],
