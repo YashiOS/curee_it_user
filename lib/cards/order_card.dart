@@ -158,10 +158,13 @@ class OrderCard extends StatelessWidget {
                   SizedBox(
                     width: screenWidth * 0.7,
                     child: Text(
+                      maxLines:3,
                       allItems,
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
                         fontSize: screenheight * 0.0145,
+                        
+
                         fontFamily: "Urbanist",
                         color: greyColor,
                       ),

@@ -103,8 +103,12 @@ class _HomeScreenState extends State<HomeScreen> {
         });
         Fluttertoast.showToast(msg: "Added To Cart");
       } else {
+        print(response.statusCode);
+        ScaffoldMessenger.of(context).clearSnackBars();
+        isAddingMap[index] = false;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to add item to cart')),
+          
         );
       }
     } catch (e) {
@@ -205,13 +209,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 "productId": cartItem['productId'],
                 "quantity": cartItem['quantity'],
                 "name": productDetails['name'],
-                "sellingPrice": (productDetails['sellingPrice'] is int)
-                    ? productDetails['sellingPrice'].toDouble()
-                    : double.tryParse(
-                            productDetails['sellingPrice'].toString()) ??
-                        0.0,
+               "sellingPrice": cartItem["sellingPrice"]??'0',
                 "packagingDetail": productDetails['packagingDetail'],
-                "imageUrls": productDetails['imageUrls']
+                "imageUrls": productDetails['imageUrls'],
+                "productPrice":cartItem["productPrice"]??0,
               });
             } else {
               print(
@@ -364,6 +365,7 @@ class _HomeScreenState extends State<HomeScreen> {
       crossAxisCount: 2,
       shrinkWrap: true,
       scrollDirection: Axis.vertical,
+      
       childAspectRatio: 0.8,
       crossAxisSpacing: 10,
       mainAxisSpacing: 10,
@@ -1255,6 +1257,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               SizedBox(height: 10),
                               Container(
                                   color: scaffoldBlackColor,
+                                  
                                   height: cartItems.isNotEmpty
                                       ? MediaQuery.of(context).size.height *
                                           0.47

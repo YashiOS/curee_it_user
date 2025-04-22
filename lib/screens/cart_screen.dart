@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:cureeit_user_app/cards/cart_card.dart';
 import 'package:cureeit_user_app/current_address/google_maps_screen.dart';
 import 'package:cureeit_user_app/screens/Order_SuccessScreen.dart';
@@ -9,6 +11,7 @@ import 'package:cureeit_user_app/widgets/LoadingIndicater.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
 
 import 'package:razorpay_flutter/razorpay_flutter.dart';
@@ -31,6 +34,12 @@ class _CartScreenState extends State<CartScreen> {
   double taxServices = 0.0;
   double deliveryServiceFees = 0;
   double totalWholeAmount = 0;
+  bool requiresPrescription = false;
+  final ImagePicker _picker = ImagePicker();
+  bool payNow = true;
+  bool imagePicked = false;
+  File? _imageFile;
+
   @override
   void initState() {
     super.initState();
@@ -142,15 +151,22 @@ class _CartScreenState extends State<CartScreen> {
                 await fetchProductDetails(cartItem['productId']);
 
             if (productDetails != null) {
+              print("${cartItem["prescription_required"]}");
+             
+              if (cartItem["prescription_required"]=="true") {
+                payNow = false;
+                requiresPrescription = true;
+                print("in if block");
+              }
               //print("🟢 Product Details Retrieved: $productDetails");
               tempCart.add({
                 "productId": cartItem['productId'],
                 "quantity": cartItem['quantity'],
                 "name": productDetails['name'],
-                "sellingPrice": cartItem["sellingPrice"]??'0',
+                "sellingPrice": cartItem["sellingPrice"] ?? '0',
                 "packagingDetail": productDetails['packagingDetail'],
                 "imageUrls": productDetails['imageUrls'],
-                "productPrice":cartItem["productPrice"],
+                "productPrice": cartItem["productPrice"],
               });
             } else {
               print(
@@ -305,6 +321,132 @@ class _CartScreenState extends State<CartScreen> {
     }
   }
 
+  void showUploadPrescriptionBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+        context: context,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        builder: (_) {
+          return Container(
+            decoration: BoxDecoration(
+                color: ligtBlackColor,
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20))),
+            height: 160,
+            width: MediaQuery.of(context).size.width,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: 20,
+                ),
+                Text(
+                  "Upload Prescription",
+                  style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                      fontFamily: "Urbanist",
+                      color: whiteColor),
+                ),
+                SizedBox(
+                  height: 20,
+                ),
+                Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      GestureDetector(
+                        onTap: () async {
+                          await pickFromCamera();
+                          Navigator.of(context).pop();
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 15, vertical: 11),
+                          decoration: BoxDecoration(
+                            color: scaffoldBlackColor,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.camera_alt_outlined,
+                                  size: 18, color: Colors.white),
+                              const SizedBox(width: 6),
+                              Text(
+                                "Camera",
+                                style: const TextStyle(
+                                  fontFamily: "Urbanist",
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () async {
+                          await pickFromGallery();
+                          Navigator.of(context).pop();
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 15, vertical: 11),
+                          decoration: BoxDecoration(
+                            color: scaffoldBlackColor,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.photo_library,
+                                  size: 18, color: Colors.white),
+                              const SizedBox(width: 6),
+                              Text(
+                                "Gallery",
+                                style: const TextStyle(
+                                  fontFamily: "Urbanist",
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
+          );
+        });
+  }
+
+  Future<void> pickFromCamera() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.camera);
+    if (pickedFile != null) {
+      _imageFile = File(pickedFile.path);
+      imagePicked = true;
+      payNow = true;
+      setState(() {});
+    }
+  }
+
+  Future<void> pickFromGallery() async {
+    final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      _imageFile = File(pickedFile.path);
+      imagePicked = true;
+      payNow = true;
+      setState(() {});
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -371,37 +513,49 @@ class _CartScreenState extends State<CartScreen> {
                                   color: whiteColor),
                             )
                           ]),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            height: 56,
-                            decoration: BoxDecoration(
-                              color: const Color(
-                                  0xFF1A1A1A), // or any color you want
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  'Upload your prescription',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 16,
-                                    fontFamily: "JosefinSans",
-                                    fontWeight: FontWeight.w500,
-                                  ),
+                          if (requiresPrescription)
+                            GestureDetector(
+                              onTap: () {
+                                showUploadPrescriptionBottomSheet(context);
+                              },
+                              child: Container(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 16),
+                                height: 56,
+                                decoration: BoxDecoration(
+                                  color: const Color(
+                                      0xFF1A1A1A), // or any color you want
+                                  borderRadius: BorderRadius.circular(8),
                                 ),
-                                Container(
-                                  width: 16,
-                                  height: 16,
-                                  decoration: BoxDecoration(
-                                    color: Colors.black,
-                                    shape: BoxShape.circle,
-                                  ),
-                                )
-                              ],
-                            ),
-                          ),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Upload your prescription',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 16,
+                                        fontFamily: "JosefinSans",
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    Container(
+                                      width: 16,
+                                      height: 16,
+                                      decoration: BoxDecoration(
+                                        color: imagePicked
+                                            ? greenColor
+                                            : Colors.black,
+                                        shape: BoxShape.circle,
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            )
+                          else
+                            Container(),
                           Container(
                             width: MediaQuery.of(context).size.width,
                             decoration: BoxDecoration(
@@ -456,21 +610,23 @@ class _CartScreenState extends State<CartScreen> {
                                                   Column(
                                                     children: cartItems
                                                         .map((item) => CartCard(
-                                                          productPrice: item["productPrice"]??0.0,
+                                                            productPrice:
+                                                                item["productPrice"] ??
+                                                                    0.0,
                                                             reBuild: reBuild,
                                                             productName:
                                                                 item['name'],
-                                                            packLabel: item[
-                                                                    'packagingDetail'] ??
-                                                                " ",
-                                                            quantity: item[
-                                                                    'quantity'] ??
-                                                                1,
+                                                            packLabel:
+                                                                item['packagingDetail'] ??
+                                                                    " ",
+                                                            quantity:
+                                                                item['quantity'] ??
+                                                                    1,
                                                             productId: item[
                                                                 'productId'],
-                                                            sellingPrice:
-                                                                item['sellingPrice'] ??
-                                                                    0.0,
+                                                            sellingPrice: item[
+                                                                    'sellingPrice'] ??
+                                                                0.0,
                                                             onUpdate:
                                                                 fetchCartDetails,
                                                             onRemove: () async {
@@ -594,7 +750,7 @@ class _CartScreenState extends State<CartScreen> {
                                                               0.05,
                                                           children: [
                                                             Text(
-                                                              "Tax and Charges",
+                                                              "GST and Platform Fees",
                                                               style: TextStyle(
                                                                 fontWeight:
                                                                     FontWeight
@@ -679,6 +835,17 @@ class _CartScreenState extends State<CartScreen> {
                                                                                 GoogleMapsScreen()));
                                                                 return;
                                                               }
+                                                              if (payNow ==
+                                                                  false) {
+                                                                ScaffoldMessenger.of(
+                                                                        context)
+                                                                    .showSnackBar(
+                                                                  SnackBar(
+                                                                      content: Text(
+                                                                          'Upload Prescription')),
+                                                                );
+                                                                return;
+                                                              }
                                                               RazorpayPayment
                                                                   razorpayPayment =
                                                                   RazorpayPayment(
@@ -690,7 +857,7 @@ class _CartScreenState extends State<CartScreen> {
                                                                         .toStringAsFixed(
                                                                             2),
                                                                     deliveryServiceFees,
-                                                                    "${Address.CurrentAddress!["address"]}, ${Address.CurrentAddress!['landmark']}, ${Address.CurrentAddress!['floor']}, ${Address.CurrentAddress!['userLat']}, ${Address.CurrentAddress!['userLong']}",
+                                                                    "${Address.CurrentAddress!["address"]}",
                                                                     response
                                                                         .paymentId
                                                                         .toString(),
@@ -742,8 +909,9 @@ class _CartScreenState extends State<CartScreen> {
                                                                       "Pay Now",
                                                                       style:
                                                                           TextStyle(
-                                                                        color:
-                                                                            greenColor,
+                                                                        color: payNow
+                                                                            ? greenColor
+                                                                            : greyColor,
                                                                         fontSize:
                                                                             screenWidth *
                                                                                 0.045,
