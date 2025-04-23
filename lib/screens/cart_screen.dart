@@ -610,9 +610,7 @@ class _CartScreenState extends State<CartScreen> {
                                                   Column(
                                                     children: cartItems
                                                         .map((item) => CartCard(
-                                                            productPrice:
-                                                                item["productPrice"] ??
-                                                                    0.0,
+                                            productPrice:  (item["productPrice"] ?? 0).toDouble(),
                                                             reBuild: reBuild,
                                                             productName:
                                                                 item['name'],
@@ -624,9 +622,9 @@ class _CartScreenState extends State<CartScreen> {
                                                                     1,
                                                             productId: item[
                                                                 'productId'],
-                                                            sellingPrice: item[
+                                                            sellingPrice: (item[
                                                                     'sellingPrice'] ??
-                                                                0.0,
+                                                                0).toDouble(),
                                                             onUpdate:
                                                                 fetchCartDetails,
                                                             onRemove: () async {

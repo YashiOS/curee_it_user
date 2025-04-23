@@ -189,8 +189,6 @@ class _HomeScreenState extends State<HomeScreen> {
           List<Map<String, dynamic>> tempCart = [];
 
           for (var cartItem in cartData) {
-            print(
-                "🔵 Fetching product details for Product ID: ${cartItem['productId']}");
 
             Map<String, dynamic>? productDetails =
                 await fetchProductDetails(cartItem['productId']);
