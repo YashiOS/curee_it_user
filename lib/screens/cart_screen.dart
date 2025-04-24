@@ -153,7 +153,7 @@ class _CartScreenState extends State<CartScreen> {
             if (productDetails != null) {
               print("${cartItem["prescription_required"]}");
              
-              if (cartItem["prescription_required"]=="true") {
+              if (cartItem["prescription_required"]=="Yes") {
                 payNow = false;
                 requiresPrescription = true;
                 print("in if block");
@@ -269,8 +269,7 @@ class _CartScreenState extends State<CartScreen> {
         })
         ..body = jsonEncode({
           "userId": "68fa72cbdc5f0a68",
-          "purchaseDate": "2025-03-19T10:30:00Z",
-          "currentStatus": "Pending",
+          
           "totalAmount": Total,
           "shippingAddress": shippingAddress,
           "shippingCost": shippingCost,

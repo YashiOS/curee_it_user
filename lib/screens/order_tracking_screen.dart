@@ -17,6 +17,7 @@ class OrderTrackingScreen extends StatefulWidget {
 
 class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
   Map<String, dynamic> orderTrackingDetails = {};
+
   bool HittingApi = false;
 
   String formatDate(String isoDate) {
@@ -94,6 +95,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
   }
 
   void showOrderSummaryBottomSheet() {
+    final List<dynamic> items = orderTrackingDetails['orderItems'] ?? [];
     final size = MediaQuery.of(context).size;
     final width = size.width;
     final height = size.height;
@@ -129,7 +131,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Order ${orderTrackingDetails["orderId"]}",
+                    "Order ${orderTrackingDetails["orderId"]??""}",
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: width * 0.045,
@@ -146,19 +148,10 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
               Row(
                 children: [
                   Text(
-                    formatDate(orderTrackingDetails['createdAt']),
+                    formatDate(orderTrackingDetails['createdAt']??""),
                     style: TextStyle(fontSize: width * 0.035),
                   ),
-                  Text(" • "),
-                  Text(
-                    "${orderTrackingDetails["orderItems"][0]["quantity"].toString()} item",
-                    style: TextStyle(fontSize: width * 0.035),
-                  ),
-                  Text(" • "),
-                  Text(
-                    "₹${orderTrackingDetails["orderItems"][0]["productPrice"].toString()}",
-                    style: TextStyle(fontSize: width * 0.035),
-                  ),
+                  
                 ],
               ),
               Divider(
@@ -166,18 +159,26 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                 thickness: 1,
                 height: height * 0.035,
               ),
-
-              // Item Card
-              MedicineCard(
-                Imgurl: "lib/images/capsule_image.png",
-                MedicineName:
-                    "${orderTrackingDetails["orderItems"][0]["productName"]}",
-                price:
-                    "${orderTrackingDetails["orderItems"][0]["productPrice"]}",
-                quantities:
-                    "${orderTrackingDetails["orderItems"][0]["quantity"]}",
+              ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight:  height * 0.33,
+                  minHeight: 0,
+                ),
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: items.length,
+                  itemBuilder: (context, index) {
+                    final item = items[index];
+                    return MedicineCard(
+                      Imgurl:
+                          item['productImageURL']??"", // or item['image']
+                      MedicineName: item['productName'].toString(),
+                      price: item['productPrice'].toString(),
+                      quantities: item['quantity'].toString(),
+                    );
+                  },
+                ),
               ),
-
               SizedBox(height: height * 0.015),
               Align(
                 alignment: Alignment.centerLeft,
@@ -196,7 +197,6 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                 height: height * 0.035,
               ),
               SizedBox(height: height * 0.01),
-
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
@@ -218,7 +218,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                       ),
                     ),
                     Text(
-                      "₹ ${orderTrackingDetails["orderItems"][0]["productPrice"]}",
+                      "₹ ${orderTrackingDetails["itemTotal"]}",
                       style: TextStyle(
                         fontSize: width * 0.04,
                         fontWeight: FontWeight.bold,
@@ -238,7 +238,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                         children: [
                           Icon(Icons.shopping_bag_outlined),
                           Text(
-                            " Handling charges ",
+                            " GST and Platform Fees ",
                             style: TextStyle(
                               fontSize: width * 0.04,
                               fontWeight: FontWeight.normal,
@@ -249,7 +249,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                       ),
                     ),
                     Text(
-                      "₹8",
+                      "₹${orderTrackingDetails["gstServiceCharge"]}",
                       style: TextStyle(
                         fontSize: width * 0.04,
                         fontFamily: "Urbanist",
@@ -434,6 +434,8 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     final height = size.height;
     int quantity = int.parse(quantities);
     double Price = double.parse(price);
+    var total = quantity * Price;  
+    final hasUrl = Imgurl != null && Imgurl.trim().isNotEmpty;
     return Container(
       margin: EdgeInsets.symmetric(vertical: height * 0.01),
       padding: EdgeInsets.all(width * 0.03),
@@ -445,12 +447,12 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(width * 0.02),
-            child: Image.asset(
+            child:hasUrl? Image.network(
               Imgurl,
               width: width * 0.15,
               height: width * 0.15,
               fit: BoxFit.cover,
-            ),
+            ):Image.asset("lib/images/capsule_image.png",width: width*0.15,height: width*0.15,),
           ),
           SizedBox(width: width * 0.04),
           Expanded(
@@ -477,7 +479,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
             ),
           ),
           Text(
-            "₹ ${quantity * Price}",
+            "₹ ${total.toStringAsFixed(2)}",
             style: TextStyle(
               fontSize: width * 0.04,
               fontWeight: FontWeight.bold,

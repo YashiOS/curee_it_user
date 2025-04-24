@@ -38,7 +38,7 @@ class OrderCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String orderStatus = orderData['currentStatus'];
-    String purchaseDate = orderData['createdAt'];
+    String purchaseDate = orderData['purchaseDate'];
     double shippingCost = double.parse(orderData['totalAmount']);
     List orderItems = orderData['orderItems'];
     String orderId = orderData['orderId'];
@@ -156,9 +156,9 @@ class OrderCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   SizedBox(
-                    width: screenWidth * 0.7,
+                    width: screenWidth * 0.5,
                     child: Text(
-                      maxLines:3,
+                      maxLines:1,
                       allItems,
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
@@ -170,6 +170,16 @@ class OrderCard extends StatelessWidget {
                       ),
                     ),
                   ),
+                  orderItems.length>2? Text(
+                      maxLines:1,
+                      " + more items",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: screenheight * 0.0145,
+                        fontFamily: "Urbanist",
+                        color: greyColor,
+                      ),
+                    ):Text(""),
                   Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(20),

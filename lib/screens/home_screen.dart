@@ -265,6 +265,8 @@ class _HomeScreenState extends State<HomeScreen> {
         final responseData = jsonDecode(responseBody);
 
         if (responseData['status'] == 200 && responseData['data'] != null) {
+          print("***PRODUCT DETAILS***");
+          print(responseData["data"]);
           return responseData['data']; // Return the data part of the response
         } else {
           print("❌ Product API did not return valid data.");
@@ -363,7 +365,7 @@ class _HomeScreenState extends State<HomeScreen> {
       crossAxisCount: 2,
       shrinkWrap: true,
       scrollDirection: Axis.vertical,
-      
+      physics: cartItems.isEmpty ? NeverScrollableScrollPhysics() : ClampingScrollPhysics(),
       childAspectRatio: 0.8,
       crossAxisSpacing: 10,
       mainAxisSpacing: 10,
@@ -1232,6 +1234,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   children: [
                     ListView(
                       shrinkWrap: true,
+                       physics: ClampingScrollPhysics(),
                       children: [
                         Padding(
                           padding: const EdgeInsets.symmetric(

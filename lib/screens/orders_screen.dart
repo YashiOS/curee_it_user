@@ -35,8 +35,8 @@ class _OrdersScreenState extends State<OrdersScreen> {
       setState(() {
         orders = data['data'];
         orders.sort((item1, item2) {
-  final dateA = DateTime.parse(item1['createdAt']);
-  final dateB = DateTime.parse(item2['createdAt']);
+  final dateA = DateTime.parse(item1['purchaseDate']);
+  final dateB = DateTime.parse(item2['purchaseDate']);
   return dateB.compareTo(dateA); // descending = most recent first
 });
 
