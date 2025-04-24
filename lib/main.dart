@@ -1,6 +1,8 @@
 import 'package:cureeit_user_app/cubit/service_avilable_cubit.dart';
 import 'package:cureeit_user_app/screens/base_screen.dart';
+import 'package:cureeit_user_app/screens/login_screen.dart';
 import 'package:cureeit_user_app/screens/order_tracking_screen.dart';
+import 'package:cureeit_user_app/screens/otp_screen.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -29,7 +31,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor:greenColor),
         useMaterial3: true,
       ),
-      home: BaseScreen(),
+      home: LoginScreen()
     );
   }
 }

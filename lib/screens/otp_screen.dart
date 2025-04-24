@@ -1,7 +1,9 @@
+import 'package:cureeit_user_app/screens/base_screen.dart';
 import 'package:cureeit_user_app/screens/home_screen.dart';
 import 'package:cureeit_user_app/utils/otp_form.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class OtpScreen extends StatefulWidget {
   final String phoneNumber;
@@ -41,135 +43,92 @@ class _OtpScreenState extends State<OtpScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
-      appBar: AppBar(
-        leading: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: Image.asset(
-                'lib/images/back_arrow.png',
-                fit: BoxFit.contain, // or BoxFit.contain, BoxFit.fill, etc.
-              )),
-        ),
-      ),
-      body: SizedBox(
-        width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.height,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10.0, horizontal: 22),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Column(
+      body: Stack(
+        children: [
+          Container(
+            width: screenWidth,
+            height: screenHeight,
+            color: scaffoldBlackColor,
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.08),
+              child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
-                spacing: 8,
                 children: [
+                  SizedBox(height: screenHeight * 0.15),
+                  Image.asset(
+                    "lib/images/medkaroLogo.png",
+                    height: screenHeight * 0.06,
+                    width: screenWidth * 0.55,
+                  ),
+                  SizedBox(height: screenHeight * 0.01),
                   Text(
-                    "Enter OTP",
-                    style: TextStyle(
-                      color: primaryColor,
-                      fontSize: 24,
-                      fontFamily: "JosefinSans",
-                      fontWeight: FontWeight.w600,
+                    "10-minute medicine delivery",
+                    style: GoogleFonts.mulish(
+                      color: whiteColor,
+                      fontSize: screenHeight * 0.022, // ~17.2
+                      fontWeight: FontWeight.w400,
                     ),
                   ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  SizedBox(height: screenHeight * 0.03),
+                  OtpForm(
+                    onOtpEntered: handleOtpEntered,
+                    onOtpChanged: handleOtpChanged,
+                  ),
+                 SizedBox(height: 20,),
+                  Column(
                     children: [
-                      Text(
-                        "Please check your message box.",
-                        style: TextStyle(
-                          color: Color(0xFF689AC0),
-                          fontSize: 14,
-                          fontFamily: "Urbanist",
-                          fontWeight: FontWeight.w400,
+                      GestureDetector(
+                        onTap: () {
+                          submitOtp();
+                          print(otp);
+                          Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>BaseScreen()));
+                        },
+                        child: Container(
+                          width: screenWidth * 0.22,
+                          height: screenHeight * 0.055,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: greenColor,
+                              width: 1,
+                            ),
+                            color: scaffoldBlackColor,
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            "Next",
+                            style: GoogleFonts.mulish(
+                              color: greenColor,
+                              fontSize: screenHeight * 0.02,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
                         ),
                       ),
-                      Text(
-                        "01:59",
-                        style: TextStyle(
-                          color: primaryColor,
-                          fontSize: 14,
-                          fontFamily: "Urbanist",
-                          fontWeight: FontWeight.w400,
-                        ),
-                      ),
+                      SizedBox(height: screenHeight * 0.04),
                     ],
                   ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 18.0),
-                    child: OtpForm(
-                      onOtpEntered:
-                          handleOtpEntered, // Pass callback for OTP entry status
-                      onOtpChanged:
-                          handleOtpChanged, // Pass callback for OTP value
-                    ),
-                  )
                 ],
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 36.0),
-                child: Column(
-                  spacing: 36,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      spacing: 8,
-                      children: [
-                        Text(
-                          "If you don't receive a code !",
-                          style: TextStyle(
-                            color: Color(0xFF689AC0).withOpacity(0.5),
-                            fontSize: 14,
-                            fontFamily: "Urbanist",
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                        Text(
-                          "Resend",
-                          style: TextStyle(
-                            color: primaryColor,
-                            fontSize: 14,
-                            fontFamily: "Urbanist",
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
-                      ],
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        submitOtp();
-                        print(otp);
-                      },
-                      child: Container(
-                        width: 275,
-                        height: 60,
-                        decoration: BoxDecoration(
-                            color: secondaryColor
-                                .withOpacity(otpEntered ? 1 : 0.3),
-                            borderRadius: BorderRadius.circular(10)),
-                        alignment: Alignment.center,
-                        child: Text(
-                          "Confirm OTP",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              )
-            ],
+            ),
           ),
-        ),
+
+          /// 🛻 Medkaro Gadi at bottom
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Image.asset(
+              "lib/images/medkaroGadi.png",
+              fit: BoxFit.cover,
+            ),
+          ),
+        ],
       ),
     );
   }

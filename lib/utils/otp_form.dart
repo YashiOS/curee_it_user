@@ -1,6 +1,7 @@
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class OtpForm extends StatefulWidget {
   final Function(bool) onOtpEntered; // Callback for otpEntered
@@ -15,7 +16,7 @@ class OtpForm extends StatefulWidget {
 
 class _OtpFormState extends State<OtpForm> {
   List<TextEditingController> controllers =
-      List.generate(6, (index) => TextEditingController());
+      List.generate(4, (index) => TextEditingController());
 
   void checkOtp() {
     bool allFilled =
@@ -33,20 +34,14 @@ class _OtpFormState extends State<OtpForm> {
   Widget build(BuildContext context) {
     return Form(
         child: Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: List.generate(6, (index) {
+      mainAxisAlignment: MainAxisAlignment.start,
+      children: List.generate(4, (index) {
         return Container(
+          margin: EdgeInsets.only(right: 20),
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            boxShadow: [
-              BoxShadow(
-                color: Color.fromARGB(255, 196, 220, 238),
-                blurRadius: 1,
-                spreadRadius: 1,
-              ),
-            ],
             borderRadius: BorderRadius.circular(12),
-            color: Colors.white,
+            color: ligtBlackColor,
           ),
           height: 50,
           width: 42,
@@ -62,10 +57,10 @@ class _OtpFormState extends State<OtpForm> {
                 FocusScope.of(context).previousFocus();
               }
             },
-            style: TextStyle(
+            style: GoogleFonts.mulish(
               fontSize: 20,
               fontWeight: FontWeight.w600,
-              color: secondaryColor,
+              color: whiteColor,
             ),
             decoration: InputDecoration(
               border: InputBorder.none,
