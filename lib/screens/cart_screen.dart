@@ -255,10 +255,16 @@ class _CartScreenState extends State<CartScreen> {
     }
   }
 
+
   Future<void> createCheckout(String total, double shippingCost,
-      String shippingAddress, String transactionId) async {
-    print("***SHIPPING ADDRESS****");
-    print(shippingAddress);
+      String shippingAddress, String transactionId) async {;
+        String base64Image="";
+        if(_imageFile!=null){
+          List<int>imageBytes=await _imageFile!.readAsBytes();
+          base64Image=base64Encode(imageBytes);
+
+        }
+    
     int Total = double.parse(total).toInt();
     try {
       var url = Uri.parse(
@@ -270,7 +276,7 @@ class _CartScreenState extends State<CartScreen> {
         ..body = jsonEncode({
           "userId": "68fa72cbdc5f0a68",
           
-          "totalAmount": Total,
+          "totalAmount":Total,
           "shippingAddress": shippingAddress,
           "shippingCost": shippingCost,
           "userLat": Address.CurrentAddress?["userLat"] ?? 0.0,

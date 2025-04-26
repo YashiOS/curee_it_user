@@ -1,4 +1,6 @@
+import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AddressCard extends StatelessWidget {
   final bool isSelected;
@@ -19,11 +21,11 @@ class AddressCard extends StatelessWidget {
         child: Container(
           padding: EdgeInsets.symmetric(vertical: 18, horizontal: 10),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: ligtBlackColor,
             borderRadius: BorderRadius.circular(14),
             border: isSelected
                 ? Border.all(
-                    color: Colors.blue, width: 2) // Highlight selection
+                    color: greenColor, width: 2) // Highlight selection
                 : Border.all(color: Colors.transparent),
           ),
           child: Row(
@@ -46,10 +48,10 @@ class AddressCard extends StatelessWidget {
                     children: [
                       Text(
                         address['type'],
-                        style: TextStyle(
-                          color: Color(0xFF1F1970),
+                        style: GoogleFonts.mulish(
+                          color: whiteColor,
                           fontSize: 20,
-                          fontFamily: "JosefinSans",
+                         
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -57,10 +59,10 @@ class AddressCard extends StatelessWidget {
                         width: MediaQuery.of(context).size.width * 0.7,
                         child: Text(
                           address['address'],
-                          style: TextStyle(
-                            color: Color(0xFF689AC0),
+                          style: GoogleFonts.mulish(
+                            color:whiteColor,
                             fontSize: 14,
-                            fontFamily: "Urbanist",
+                            
                             fontWeight: FontWeight.w600,
                           ),
                         ),

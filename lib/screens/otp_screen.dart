@@ -54,18 +54,22 @@ class _OtpScreenState extends State<OtpScreen> {
             height: screenHeight,
             color: scaffoldBlackColor,
             child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.08),
+               padding: EdgeInsets.only(
+                top: screenHeight * 0.17,
+                left: screenWidth * 0.1,
+                right: screenWidth*0.1,
+              ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(height: screenHeight * 0.15),
+                  
                   Image.asset(
                     "lib/images/medkaroLogo.png",
                     height: screenHeight * 0.06,
                     width: screenWidth * 0.55,
                   ),
-                  SizedBox(height: screenHeight * 0.01),
+                  
                   Text(
                     "10-minute medicine delivery",
                     style: GoogleFonts.mulish(
@@ -74,50 +78,51 @@ class _OtpScreenState extends State<OtpScreen> {
                       fontWeight: FontWeight.w400,
                     ),
                   ),
-                  SizedBox(height: screenHeight * 0.03),
+                  SizedBox(
+  height: MediaQuery.of(context).size.height * 0.12, // ~88px on most phones
+),
                   OtpForm(
                     onOtpEntered: handleOtpEntered,
                     onOtpChanged: handleOtpChanged,
                   ),
-                 SizedBox(height: 20,),
-                  Column(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          submitOtp();
-                          print(otp);
-                          Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>BaseScreen()));
-                        },
-                        child: Container(
-                          width: screenWidth * 0.22,
-                          height: screenHeight * 0.055,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(
-                              color: greenColor,
-                              width: 1,
-                            ),
-                            color: scaffoldBlackColor,
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            "Next",
-                            style: GoogleFonts.mulish(
-                              color: greenColor,
-                              fontSize: screenHeight * 0.02,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: screenHeight * 0.04),
-                    ],
-                  ),
+                
+                  
                 ],
               ),
             ),
           ),
-
+           Positioned(
+            top:430 ,
+            left: 41,
+             child: GestureDetector(
+                      onTap: () {
+                        submitOtp();
+                        print(otp);
+                        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>BaseScreen()));
+                      },
+                      child: Container(
+                        width: screenWidth * 0.23,
+                        height: screenHeight * 0.055,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          border: Border.all(
+                            color: greenColor,
+                            width: 1,
+                          ),
+                          color: scaffoldBlackColor,
+                        ),
+                        alignment: Alignment.center,
+                        child: Text(
+                          "Next",
+                          style: GoogleFonts.mulish(
+                            color: greenColor,
+                            fontSize: screenHeight * 0.018,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
+           ),
           /// 🛻 Medkaro Gadi at bottom
           Positioned(
             bottom: 0,

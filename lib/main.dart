@@ -1,8 +1,12 @@
 import 'package:cureeit_user_app/cubit/service_avilable_cubit.dart';
 import 'package:cureeit_user_app/screens/base_screen.dart';
+import 'package:cureeit_user_app/screens/home_screen.dart';
+import 'package:cureeit_user_app/screens/item_detail_screen.dart';
 import 'package:cureeit_user_app/screens/login_screen.dart';
 import 'package:cureeit_user_app/screens/order_tracking_screen.dart';
 import 'package:cureeit_user_app/screens/otp_screen.dart';
+import 'package:cureeit_user_app/screens/profile_screen.dart';
+import 'package:cureeit_user_app/screens/splashScreen.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -28,10 +32,11 @@ class MyApp extends StatelessWidget {
       },
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        scaffoldBackgroundColor: scaffoldBlackColor,
         colorScheme: ColorScheme.fromSeed(seedColor:greenColor),
         useMaterial3: true,
       ),
-      home: LoginScreen()
+      home: Splashscreen()
     );
   }
 }

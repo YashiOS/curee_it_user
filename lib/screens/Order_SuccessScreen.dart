@@ -15,9 +15,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
   @override
   void initState() {
     super.initState();
-    print(
-      "****Order-Id******${widget.orderId}",
-    );
+    
     Future.delayed(Duration(seconds: 4), () {
       Navigator.of(context).pushReplacement(MaterialPageRoute(
           builder: (context) => OrderTrackingScreen(
@@ -30,7 +28,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: scaffoldBlackColor,
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -46,7 +44,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
               style: TextStyle(
                 fontSize: 45,
                 fontWeight: FontWeight.w800,
-                color: primaryColor,
+                color: greyColor,
               ),
               textAlign: TextAlign.center,
             ),

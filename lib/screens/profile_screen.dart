@@ -1,5 +1,6 @@
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -16,7 +17,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.grey.shade100.withOpacity(0.5),
+        backgroundColor: scaffoldBlackColor,
         leadingWidth: 100,
         leading: Padding(
           padding: const EdgeInsets.only(left: 12.0),
@@ -29,14 +30,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Row(
                 spacing: 4,
                 children: [
-                  Icon(Icons.arrow_back, color: primaryColor),
+                  Icon(Icons.arrow_back, color: whiteColor),
                   Text(
                     "Back",
-                    style: TextStyle(
+                    style: GoogleFonts.mulish(
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
-                        fontFamily: "Urbanist",
-                        color: primaryColor),
+                        
+                        color: whiteColor),
                   )
                 ],
               ),
@@ -45,7 +46,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
       ),
       body: Container(
-        color: Colors.grey.shade100.withOpacity(0.5),
+        color: scaffoldBlackColor,
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
         child: Padding(
@@ -56,11 +57,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 children: [
                   Text(
                     "My Profile",
-                    style: TextStyle(
+                    style: GoogleFonts.mulish(
                         fontWeight: FontWeight.w600,
                         fontSize: 24,
-                        fontFamily: "JosefinSans",
-                        color: primaryColor),
+                        
+                        color: whiteColor),
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 18.0),
@@ -75,30 +76,31 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             padding: const EdgeInsets.only(left: 6.0),
                             child: Text(
                               "Name",
-                              style: TextStyle(
+                              style: GoogleFonts.mulish(
                                   fontWeight: FontWeight.w900,
                                   fontSize: 10,
-                                  fontFamily: "Urbanist",
-                                  color: Colors.black.withOpacity(0.6)),
+                                  
+                                  color: greenColor),
                             ),
                           ),
                         ),
                         Container(
                           padding: EdgeInsets.symmetric(horizontal: 14),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: ligtBlackColor,
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: TextField(
+                            style: TextStyle(color: whiteColor),
                             controller: _fullName,
                             decoration: InputDecoration(
                               //labelText: "Full Name",
                               hintText: "Gagan Pareek",
-                              hintStyle: TextStyle(
-                                  color: Color(0xFF689AC0),
+                              hintStyle: GoogleFonts.mulish(
+                                  color:greyColor,
                                   fontSize: 18,
                                   fontWeight: FontWeight.w400,
-                                  fontFamily: "Urbanist"),
+                                  ),
                               labelStyle: TextStyle(
                                   color: Color(0xFF689AC0),
                                   fontSize: 18,
@@ -115,32 +117,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             padding: const EdgeInsets.only(left: 6.0),
                             child: Text(
                               "Mobile Number",
-                              style: TextStyle(
+                              style: GoogleFonts.mulish(
                                   fontWeight: FontWeight.w900,
                                   fontSize: 10,
-                                  fontFamily: "Urbanist",
-                                  color: Colors.black.withOpacity(0.6)),
+                                  
+                                  color: greenColor),
                             ),
                           ),
                         ),
                         Container(
                           padding: EdgeInsets.symmetric(horizontal: 14),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color:ligtBlackColor,
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: TextField(
+                            style: TextStyle(color: whiteColor),
                             controller: _mobileNumber,
                             decoration: InputDecoration(
                               hintText: "+91-87284767998",
-                              hintStyle: TextStyle(
-                                  color: Color(0xFF689AC0),
+                              hintStyle: GoogleFonts.mulish(
+                                  color: greyColor,
                                   fontSize: 18,
                                   fontWeight: FontWeight.w400,
-                                  fontFamily: "Urbanist"),
+                                  ),
                               //labelText: "Full Name",
                               labelStyle: TextStyle(
-                                  color: Color(0xFF689AC0),
+                                  color: greyColor,
                                   fontSize: 18,
                                   fontWeight: FontWeight.w400,
                                   fontFamily: "Urbanist"),
@@ -155,32 +158,34 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             padding: const EdgeInsets.only(left: 6.0),
                             child: Text(
                               "Email",
-                              style: TextStyle(
+                              style: GoogleFonts.mulish(
                                   fontWeight: FontWeight.w900,
                                   fontSize: 10,
-                                  fontFamily: "Urbanist",
-                                  color: Colors.black.withOpacity(0.6)),
+                                  
+                                  color: greenColor),
                             ),
                           ),
                         ),
                         Container(
                           padding: EdgeInsets.symmetric(horizontal: 14),
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: ligtBlackColor,
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: TextField(
+                            style: TextStyle(color: whiteColor),
                             controller: _emailAddress,
                             decoration: InputDecoration(
                               //labelText: "Full Name",
                               hintText: "gaganpareek@gmail.com",
+                              
                               hintStyle: TextStyle(
-                                  color: Color(0xFF689AC0),
+                                  color: greyColor,
                                   fontSize: 18,
                                   fontWeight: FontWeight.w400,
                                   fontFamily: "Urbanist"),
                               labelStyle: TextStyle(
-                                  color: Color(0xFF689AC0),
+                                  color:whiteColor,
                                   fontSize: 18,
                                   fontWeight: FontWeight.w400,
                                   fontFamily: "Urbanist"),

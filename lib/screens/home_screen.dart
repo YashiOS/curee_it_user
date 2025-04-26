@@ -39,7 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Map<String, dynamic>? SelectedAddress;
   List<Map<String, dynamic>> cartItems = [];
   double totalAmount = 0.00;
-  String finaltotalAmount="";
+  String finaltotalAmount = "";
   bool isLoading = true;
   bool isTapped = false;
   bool? isInRadius;
@@ -108,7 +108,6 @@ class _HomeScreenState extends State<HomeScreen> {
         isAddingMap[index] = false;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to add item to cart')),
-          
         );
       }
     } catch (e) {
@@ -185,11 +184,10 @@ class _HomeScreenState extends State<HomeScreen> {
 
         if (responseData['status'] == 200 && responseData['data'] != null) {
           List<dynamic> cartData = responseData['data'];
-          finaltotalAmount=responseData["finalTotal"];
+          finaltotalAmount = responseData["finalTotal"];
           List<Map<String, dynamic>> tempCart = [];
 
           for (var cartItem in cartData) {
-
             Map<String, dynamic>? productDetails =
                 await fetchProductDetails(cartItem['productId']);
 
@@ -207,10 +205,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 "productId": cartItem['productId'],
                 "quantity": cartItem['quantity'],
                 "name": productDetails['name'],
-               "sellingPrice": cartItem["sellingPrice"]??'0',
+                "sellingPrice": cartItem["sellingPrice"] ?? '0',
                 "packagingDetail": productDetails['packagingDetail'],
                 "imageUrls": productDetails['imageUrls'],
-                "productPrice":cartItem["productPrice"]??0,
+                "productPrice": cartItem["productPrice"] ?? 0,
               });
             } else {
               print(
@@ -345,31 +343,54 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget buildProductGrid() {
+  Widget buildProductList() {
     if (products.isEmpty) {
       return Center(
-          child: CircularProgressIndicator(
-        color: secondaryColor,
-      ));
+        child: CircularProgressIndicator(color: secondaryColor),
+      );
     }
 
-    List<Widget> productWidgets = [];
+    // Calculate number of rows needed (2 items per row)
+    int itemCount = (products.length / 2).ceil();
+    if (products.length > 6) itemCount = 3; // Limit to 6 items (3 rows)
 
-    int itemsToShow = products.length > 6 ? 6 : products.length;
-
-    for (int i = 0; i < itemsToShow; i++) {
-      productWidgets.add(buildProductItem(i));
-    }
-
-    return GridView.count(
-      crossAxisCount: 2,
+    return ListView.builder(
       shrinkWrap: true,
-      scrollDirection: Axis.vertical,
-      physics: cartItems.isEmpty ? NeverScrollableScrollPhysics() : ClampingScrollPhysics(),
-      childAspectRatio: 0.8,
-      crossAxisSpacing: 10,
-      mainAxisSpacing: 10,
-      children: productWidgets,
+      physics: cartItems.isEmpty
+          ? NeverScrollableScrollPhysics()
+          : ClampingScrollPhysics(),
+      itemCount: itemCount,
+      itemBuilder: (context, rowIndex) {
+        int firstIndex = rowIndex * 2;
+        int secondIndex = firstIndex + 1;
+
+        return Container(
+          margin: EdgeInsets.only(bottom: 16),
+          child: Row(
+            children: [
+              // First product
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.only(right: 0),
+                  child: buildProductItem(firstIndex),
+                ),
+              ),
+              SizedBox(
+                width: 16,
+              ),
+              // Second product (or empty container if odd count)
+              secondIndex < products.length
+                  ? Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 0),
+                        child: buildProductItem(secondIndex),
+                      ),
+                    )
+                  : Expanded(child: Container()),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -384,12 +405,11 @@ class _HomeScreenState extends State<HomeScreen> {
     final containerWidth = width * 0.3;
 
     return Container(
-      width: containerWidth,
-      height: containerHeight,
-      padding: EdgeInsets.all(8),
+      width: 147,
+      height: 202,
       decoration: BoxDecoration(
         color: ligtBlackColor,
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
             color: ligtBlackColor,
@@ -403,8 +423,8 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           // 🔵 Product Image (30%)
           SizedBox(
-            width: width,
-            height: containerHeight * 0.3,
+            width: 147.5,
+            height: 109,
             child: GestureDetector(
               onTap: () {
                 Navigator.push(
@@ -417,8 +437,10 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               },
               child: Container(
+                width: 147.5,
+                height: 109,
                 decoration: BoxDecoration(
-                  color: ligtBlackColor,
+                  color: whiteColor,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: product['imageMediaUrls'][0] != null &&
@@ -441,113 +463,117 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ),
 
-          SizedBox(height: containerHeight * 0.01),
-
           // 🔵 Product Name (15%)
-          SizedBox(
-            height: containerHeight * 0.12,
+          Container(
+            width: 147,
+            height: 24,
+            margin: EdgeInsets.only(top: 16, left: 16),
             child: Text(
               product['name'] ?? 'Product',
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                  fontFamily: "Roboto",
-                  fontSize: containerHeight * 0.04,
-                  color: whiteColor),
+              style: GoogleFonts.mulish(
+                  fontSize: containerHeight * 0.04, color: whiteColor),
             ),
           ),
 
           // 🔵 Price (7%)
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "₹${product['price']}",
-                style: GoogleFonts.inter(
-                  fontSize: containerHeight * 0.04,
-                  color: greyColor,
-                ),
-              ),
-              SizedBox(width: containerWidth * 0.01),
-              Container(
-                width: width * 0.25,
-                height: containerHeight * 0.09,
-                decoration: BoxDecoration(
-                  color: ligtBlackColor,
-                  border: Border.all(
-                    color: greenColor,
-                    width: 1,
+          Container(
+            margin: EdgeInsets.only(left: 16),
+            width: 114,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  width: 46,
+                  height: 21,
+                  child: Text(
+                    "₹${product['price']}",
+                    style: GoogleFonts.mulish(
+                      color: greyColor,
+                    ),
                   ),
-                  borderRadius: BorderRadius.circular(8),
                 ),
-                child: isInCart
-                    ? FittedBox(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            IconButton(
-                              padding: EdgeInsets.zero,
-                              constraints: BoxConstraints(),
-                              icon: Icon(
-                                Icons.remove,
-                                size: containerHeight * 0.06,
-                                color: whiteColor,
-                              ),
-                              onPressed: () => DidUpdateQuantity(index, -1),
-                            ),
-                            Text(
-                              '${quantities[index]}',
-                              style: TextStyle(
-                                color: whiteColor,
-                                fontWeight: FontWeight.bold,
-                                fontSize: containerHeight * 0.05,
-                              ),
-                            ),
-                            IconButton(
-                              padding: EdgeInsets.zero,
-                              constraints: BoxConstraints(),
-                              icon: Icon(
-                                Icons.add,
-                                size: containerHeight * 0.06,
-                                color: whiteColor,
-                              ),
-                              onPressed: () => DidUpdateQuantity(index, 1),
-                            ),
-                          ],
-                        ),
-                      )
-                    : TextButton(
-                        style: TextButton.styleFrom(
-                          padding: EdgeInsets.zero,
-                          minimumSize: Size.zero,
-                        ),
-                        onPressed: () {
-                          didAddToCart(index);
-                          setState(() => isLoading = true);
-                          fetchCartDetails();
-                        },
-                        child: Center(
-                          child: isAddingMap[index] == true
-                              ? SizedBox(
-                                  width: 18,
-                                  height: 18,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2,
-                                  ),
-                                )
-                              : Text(
-                                  "Add to Cart",
-                                  style: GoogleFonts.lato(
-                                    fontSize: containerHeight * 0.03,
-                                    fontWeight: FontWeight.w600,
-                                    color: greenColor,
-                                  ),
+                Container(
+                  width: 49,
+                  height: 29,
+                  decoration: BoxDecoration(
+                    color: ligtBlackColor,
+                    border: Border.all(
+                      color: greenColor,
+                      width: 1,
+                    ),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: isInCart
+                      ? FittedBox(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              IconButton(
+                                padding: EdgeInsets.zero,
+                                constraints: BoxConstraints(),
+                                icon: Icon(
+                                  Icons.remove,
+                                  size: containerHeight * 0.06,
+                                  color: whiteColor,
                                 ),
+                                onPressed: () => DidUpdateQuantity(index, -1),
+                              ),
+                              Text(
+                                '${quantities[index]}',
+                                style: GoogleFonts.mulish(
+                                  color: whiteColor,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: containerHeight * 0.05,
+                                ),
+                              ),
+                              IconButton(
+                                padding: EdgeInsets.zero,
+                                constraints: BoxConstraints(),
+                                icon: Icon(
+                                  Icons.add,
+                                  size: containerHeight * 0.06,
+                                  color: whiteColor,
+                                ),
+                                onPressed: () => DidUpdateQuantity(index, 1),
+                              ),
+                            ],
+                          ),
+                        )
+                      : TextButton(
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            minimumSize: Size.zero,
+                          ),
+                          onPressed: () {
+                            didAddToCart(index);
+                            setState(() => isLoading = true);
+                            fetchCartDetails();
+                          },
+                          child: Center(
+                            child: isAddingMap[index] == true
+                                ? SizedBox(
+                                    width: 18,
+                                    height: 18,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
+                                  )
+                                : Text(
+                                    "Add",
+                                    style: GoogleFonts.mulish(
+                                      fontSize: containerHeight * 0.03,
+                                      fontWeight: FontWeight.w600,
+                                      color: greenColor,
+                                    ),
+                                  ),
+                          ),
                         ),
-                      ),
-              ),
-            ],
+                ),
+              ],
+            ),
           ), // 🔵 Add to Cart or Quantity Buttons (30%)
         ],
       ),
@@ -652,7 +678,7 @@ class _HomeScreenState extends State<HomeScreen> {
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
     showModalBottomSheet(
-      backgroundColor: const Color.fromARGB(255, 228, 233, 233),
+      backgroundColor: scaffoldBlackColor,
       context: context,
       isScrollControlled:
           true, // Allows the sheet to expand to full height if needed
@@ -686,7 +712,10 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.close),
+                    icon: const Icon(
+                      Icons.close,
+                      color: whiteColor,
+                    ),
                     onPressed: () {
                       Navigator.pop(context);
                       setState(() {});
@@ -697,15 +726,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 10),
 
               // Title
-              const Center(
-                child: Text(
-                  "Select delivery location",
-                  style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: "Urbanist"),
-                ),
-              ),
+
               const SizedBox(height: 10),
 
               // Search field
@@ -723,11 +744,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     enabled: false,
                     decoration: InputDecoration(
                       hintText: 'Search for area or apartment',
-                      prefixIcon: const Icon(Icons.search),
+                      hintStyle: GoogleFonts.mulish(color: whiteColor),
+                      prefixIcon: const Icon(
+                        Icons.search,
+                        color: whiteColor,
+                      ),
                       filled: true,
-                      fillColor: Colors.grey.shade100,
-                      contentPadding: const EdgeInsets.symmetric(
-                          vertical: 0, horizontal: 16),
+                      fillColor: ligtBlackColor,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                         borderSide: BorderSide.none,
@@ -749,7 +772,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: ligtBlackColor,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Row(
@@ -758,20 +781,19 @@ class _HomeScreenState extends State<HomeScreen> {
                         width: 40,
                         height: 40,
                         decoration: BoxDecoration(
-                          color: Colors.green.shade100,
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
                           Icons.my_location,
-                          color: Colors.green,
+                          color: whiteColor,
                         ),
                       ),
                       const SizedBox(width: 12),
-                      const Text(
+                      Text(
                         "Use my current location",
-                        style: TextStyle(
-                          fontFamily: "Urbanist",
+                        style: GoogleFonts.mulish(
                           fontSize: 16,
+                          color: whiteColor,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -785,7 +807,7 @@ class _HomeScreenState extends State<HomeScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: ligtBlackColor,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: GestureDetector(
@@ -801,12 +823,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         width: 40,
                         height: 40,
                         decoration: BoxDecoration(
-                          color: Colors.blue.shade100,
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
                           Icons.add,
-                          color: Colors.blue,
+                          color: whiteColor,
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -815,6 +836,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         style: TextStyle(
                           fontFamily: "Urbanist",
                           fontSize: 16,
+                          color: whiteColor,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -852,15 +874,13 @@ class _HomeScreenState extends State<HomeScreen> {
                         0.3, // Adjust as needed
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: scaffoldBlackColor,
                   ),
                   child: addresses.isEmpty
-                      ? const Center(
+                      ? Center(
                           child: Text(
                           "No saved addresses",
-                          style: TextStyle(
-                            fontFamily: "Urbanist",
-                          ),
+                          style: GoogleFonts.mulish(color: whiteColor),
                         ))
                       : ListView.builder(
                           shrinkWrap: true,
@@ -883,59 +903,55 @@ class _HomeScreenState extends State<HomeScreen> {
                               child: Column(
                                 children: [
                                   Container(
-                                    color: isSelected
-                                        ? const Color.fromARGB(
-                                            255, 194, 226, 205)
-                                        : Colors.white,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12),
+                                      color: ligtBlackColor,
+                                    ),
+                                    margin: EdgeInsets.only(bottom: 10),
                                     child: ListTile(
                                       contentPadding: EdgeInsets.symmetric(
                                           horizontal: 16, vertical: 3),
                                       leading: Container(
                                         padding: EdgeInsets.all(8),
                                         decoration: BoxDecoration(
-                                          color: Color.fromARGB(255, 204, 235,
-                                              231), // Soft blue background
+                                          color:
+                                              scaffoldBlackColor, // Soft blue background
                                           borderRadius:
                                               BorderRadius.circular(12),
                                           border: Border.all(
                                             color: isSelected
-                                                ? Colors.white
-                                                : Color.fromARGB(255, 171, 234,
-                                                    225), // Light blue border
+                                                ? greenColor
+                                                : whiteColor, // Light blue border
                                             width: 1.5,
                                           ),
                                         ),
                                         child: Icon(
                                           Icons
                                               .home_rounded, // More modern home icon
-                                          color:
-                                              primaryColor, // Matching blue icon
+                                          color: isSelected
+                                              ? greenColor
+                                              : whiteColor, // Matching blue icon
                                           size: 22,
                                         ),
                                       ),
                                       title: Text(
                                         address['address'] ?? '',
-                                        style: TextStyle(
-                                          fontFamily: "Urbanist",
+                                        style: GoogleFonts.mulish(
                                           fontSize: 15,
                                           fontWeight: FontWeight.w600,
-                                          color: Colors.grey
-                                              .shade800, // Darker text for better readability
+                                          color:
+                                              whiteColor, // Darker text for better readability
                                         ),
                                       ),
                                       subtitle: Text(
                                         address['landmark'] ?? '',
-                                        style: TextStyle(
-                                          fontFamily: "Urbanist",
+                                        style: GoogleFonts.mulish(
                                           fontSize: 13,
-                                          color: Colors.grey
-                                              .shade600, // Slightly lighter than title
+                                          color:
+                                              greyColor, // Slightly lighter than title
                                         ),
                                       ),
                                     ),
-                                  ),
-                                  Image.asset(
-                                    "lib/images/dotted_divider.png",
                                   ),
                                 ],
                               ),
@@ -988,7 +1004,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget LoadingIndicatorBallClip() {
-    return LoadingIndicator(indicatorType: Indicator.ballClipRotateMultiple);
+    return LoadingIndicator(indicatorType: Indicator.ballGridBeat);
   }
 
   @override
@@ -996,448 +1012,344 @@ class _HomeScreenState extends State<HomeScreen> {
     bool ISserviceAvilable =
         context.watch<ServiceAvilableCubit>().ServiceAvilable;
     return Scaffold(
-      backgroundColor: scaffoldBlackColor,
-      key: _scaffoldKey,
-      appBar: AppBar(
         backgroundColor: scaffoldBlackColor,
-        toolbarHeight: 90,
-        leadingWidth: 90,
-        leading: Container(
-          height: 60,
-          width: 60,
-          padding: const EdgeInsets.all(0.0),
-          child: Transform.translate(
-            offset: Offset(0, -12),
-            child: GestureDetector(
-                onTap: () {
-                  if (ISserviceAvilable) {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ProfileScreen()));
-                  }
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(20.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                        border: Border.all(
-                            color: Colors.blueGrey.withOpacity(0.2),
-                            width: 1.6),
-                        borderRadius: BorderRadius.circular(10)),
-                    child: ISserviceAvilable
-                        ? Icon(
-                            Icons.person,
-                            color: greenColor,
-                          )
-                        : Icon(
-                            Icons.person_off,
-                            color: Colors.grey,
-                          ),
-                  ),
-                )),
-          ),
-        ),
-        centerTitle: true,
-        actions: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20.0),
-            child: Container(
-              alignment: Alignment.topCenter,
-              height: 26,
-              width: 26,
-              padding: const EdgeInsets.all(0.0),
-              child: GestureDetector(
-                onTap: () {
-                  if (ISserviceAvilable) {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) => Search()));
-                  }
-                },
-                child: Transform.translate(
-                  offset: Offset(0, -10),
-                  child: ISserviceAvilable
-                      ? Icon(
-                          Icons.search, // You can use any suitable icon
-                          size: 32, // Adjust size as needed
-                          color: whiteColor, // Optional color
-                        )
-                      : Icon(
-                          Icons
-                              .search_off, // A suitable icon to indicate "unavailable"
-                          size: 32,
-                          color: Colors.red,
-                        ),
+        key: _scaffoldKey,
+        body: Stack(children: [
+          Container(
+            color: scaffoldBlackColor,
+            padding: EdgeInsets.only(left: 41, right: 41),
+            margin: EdgeInsets.only(bottom: cartItems.isEmpty ? 45 : 0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: 69,
                 ),
-              ),
-            ),
-          ),
-        ],
-        title: Transform.translate(
-            offset: Offset(0, -10),
-            child: Image.asset("lib/images/medkarolog.png")),
-      ),
-      body: Container(
-        color: scaffoldBlackColor,
-        margin: EdgeInsets.only(bottom: cartItems.isEmpty ? 45 : 0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            GestureDetector(
-                onTap: () {
-                  _locationBottomSheet();
-                  // Handle tap to show city selection
-                  print('Location selector tapped');
-                },
-                child: Container(
-                  padding: EdgeInsets.only(left: 10),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // Location Icon
-                      Icon(
-                        Icons.location_on,
-                        color: greenColor,
-                        size: 24, // Slightly larger icon
-                      ),
-                      SizedBox(width: 8),
-
-                      // Address Text Column
-                      Flexible(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // "HOME" Label
-                            Text(
-                              (Address.CurrentAddress != null &&
-                                      Address.CurrentAddress!["type"] != null &&
-                                      Address.CurrentAddress!["type"] != "")
-                                  ? Address.CurrentAddress!["type"]
-                                      .toString()
-                                      .toUpperCase()
-                                  : "HOME",
-                              style: TextStyle(
-                                fontFamily: "Urbanist",
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
-                                color: greenColor,
-                                letterSpacing: 0.5,
+                Container(
+                    width: 311,
+                    height: 90,
+                    decoration: BoxDecoration(
+                        color: ligtBlackColor,
+                        borderRadius: BorderRadius.circular(8)),
+                    child: Row(
+                      children: [
+                        SizedBox(
+                          width: 16,
+                        ),
+                        GestureDetector(
+                          onTap: (){
+                           
+                      if (ISserviceAvilable) {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => ProfileScreen()));
+                      }
+                          },
+                          child: Container(
+                            height: 36,
+                            width: 36,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              image: DecorationImage(
+                                image: AssetImage('lib/images/user.png'),
+                                fit: BoxFit.cover,
                               ),
                             ),
-                            SizedBox(height: 2), // Small gap between lines
-
-                            // Actual Address
-                            localAddress == null || localAddress.isEmpty
-                                ? Shimmer.fromColors(
-                                    baseColor: ligtBlackColor!,
-                                    highlightColor: greenColor!,
-                                    child: Container(
-                                      width: MediaQuery.of(context).size.width *
-                                          0.2,
-                                      height: 16, // Matches your text height
-                                      decoration: BoxDecoration(
-                                        color: whiteColor,
-                                        borderRadius: BorderRadius.circular(4),
-                                      ),
-                                    ),
-                                  )
-                                : Text(
-                                    localAddress,
-                                    style: TextStyle(
-                                      fontFamily: "Urbanist",
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500,
-                                      color: whiteColor,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(width: 4),
-
-                      // Dropdown Icon
-                      Icon(
-                        Icons.arrow_drop_down,
-                        color: whiteColor,
-                        size: 20,
-                      ),
-                    ],
-                  ),
-                )),
-            GestureDetector(
-              onTap: () {
-                if (ISserviceAvilable) {
-                  Navigator.push(context,
-                      MaterialPageRoute(builder: (context) => Search()));
-                }
-              },
-              child: Container(
-                margin: EdgeInsets.all(10),
-                height: 58,
-                decoration: BoxDecoration(
-                  color: ligtBlackColor,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 12),
-                        child: TextField(
-                          style: TextStyle(fontFamily: "Urbanist"),
-                          decoration: InputDecoration(
-                            enabled: false,
-                            hintText: "Search",
-                            hintStyle: TextStyle(fontFamily: "Urbanist",color: greyColor),
-                            border: InputBorder.none,
                           ),
                         ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
-                      child: GestureDetector(
-                        onTap: () {
-                          if (ISserviceAvilable) {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => Search()));
-                          }
-                        },
-                        child: Container(
-                          padding: EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color:
-                                ISserviceAvilable ? greenColor : Colors.white,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: ISserviceAvilable
-                              ? Icon(Icons.search, color: Colors.white)
-                              : Icon(Icons.search_off, color: Colors.grey),
+                        SizedBox(
+                          width: 7.18,
                         ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            Expanded(
-              child: Container(
-                color: scaffoldBlackColor,
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height,
-                child: Stack(
-                  children: [
-                    ListView(
-                      shrinkWrap: true,
-                       physics: ClampingScrollPhysics(),
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 10.0, vertical: 5.0),
+                        Container(
+                          width: 180,
+                          height: 42,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                isInRadius == null
-                                    ? ""
-                                    : isInRadius!
-                                        ? "Featured Products"
-                                        : "",
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w700,
-                                  fontFamily: "Urbanist",
-                                  color: greenColor,
-                                ),
+                                "Alexa",
+                                style: GoogleFonts.mulish(
+                                    color: whiteColor, fontSize: 17.2),
                               ),
-                              SizedBox(height: 10),
-                              Container(
-                                  color: scaffoldBlackColor,
-                                  
-                                  height: cartItems.isNotEmpty
-                                      ? MediaQuery.of(context).size.height *
-                                          0.47
-                                      : null,
-                                  child: isInRadius == null
+                              GestureDetector(
+                                  onTap: () {
+                                    _locationBottomSheet();
+                                  },
+                                  child: localAddress == null ||
+                                          localAddress.isEmpty
                                       ? Shimmer.fromColors(
-                                          baseColor: Colors.grey[300]!,
-                                          highlightColor: Colors.grey[100]!,
-                                          child: LoadingIndicatorBallClip(),
+                                          baseColor: ligtBlackColor!,
+                                          highlightColor: greenColor!,
+                                          child: Container(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.2,
+                                            height: 2,
+                                            // Matches your text height
+                                            decoration: BoxDecoration(
+                                              color: whiteColor,
+                                              borderRadius:
+                                                  BorderRadius.circular(4),
+                                            ),
+                                          ),
                                         )
-                                      : isInRadius!
-                                          ? buildProductGrid()
-                                          : buildOutOfRadius()),
+                                      : Text(
+                                          "$localAddress",
+                                          style: GoogleFonts.mulish(
+                                              color: whiteColor,
+                                              fontSize: 12),
+                                        ))
                             ],
                           ),
+                        ),
+                        GestureDetector(
+                          onTap: (){
+                            Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => CartScreen(
+                                                isNavigated: true,
+                                              )));
+                          },
+                          child: Icon(
+                            Icons.shopping_cart_outlined,
+                            size: 18,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ],
+                    )),
+                SizedBox(
+                  height: 24,
+                ),
+                GestureDetector(
+                  onTap: () {
+                    if (ISserviceAvilable) {
+                      Navigator.push(context,
+                          MaterialPageRoute(builder: (context) => Search()));
+                    }
+                  },
+                  child: Container(
+                    width: 311,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      color: ligtBlackColor,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                            padding:
+                                EdgeInsets.only(top: 10, bottom: 10, left: 16),
+                            child: Icon(
+                              Icons.search,
+                              color: Colors.white,
+                              size: 16,
+                            )),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(
+                                top: 8, bottom: 8, left: 28),
+                            child: TextField(
+                              style: GoogleFonts.mulish(),
+                              decoration: InputDecoration(
+                                enabled: false,
+                                hintText: "Search for your medicine",
+                                hintStyle:
+                                    GoogleFonts.mulish(color: whiteColor),
+                                border: InputBorder.none,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Container(
+                    color: scaffoldBlackColor,
+                    child: ListView(
+                      shrinkWrap: true,
+                      physics: ClampingScrollPhysics(),
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              isInRadius == null
+                                  ? ""
+                                  : isInRadius!
+                                      ? "Featured Products"
+                                      : "",
+                              style: GoogleFonts.mulish(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700,
+                                
+                                color: whiteColor,
+                              ),
+                            ),
+                            SizedBox(height: 10),
+                            Container(
+                                color: scaffoldBlackColor,
+                                height: cartItems.isNotEmpty
+                                    ? MediaQuery.of(context).size.height * 0.47
+                                    : null,
+                                child: isInRadius == null
+                                    ? Shimmer.fromColors(
+                                        baseColor: Colors.grey[300]!,
+                                        highlightColor: Colors.grey[100]!,
+                                        child: LoadingIndicatorBallClip(),
+                                      )
+                                    : isInRadius!
+                                        ? buildProductList()
+                                        : buildOutOfRadius()),
+                          ],
                         )
                       ],
                     ),
-                    if ((!isLoading &&
-                            cartItems.isNotEmpty &&
-                            ISserviceAvilable &&
-                            totalAmount != 0) ||
-                        (isTapped) &&
-                            ISserviceAvilable &&
-                            totalAmount != 0) ...[
-                      Positioned(
-                          bottom: 76,
-                          child: Container(
-                            color: ligtBlackColor,
-                            width: MediaQuery.of(context).size.width,
-                            height: MediaQuery.of(context).size.height *
-                                0.12, // 12% of screen height
-
-                            child: Padding(
-                              padding: EdgeInsets.symmetric(
-                                  horizontal:
-                                      MediaQuery.of(context).size.width * 0.045,
-                                  vertical: MediaQuery.of(context).size.height *
-                                      0.012),
-                              child: Column(
-                                spacing: 8,
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    'Delivering in 20 minutes !',
-                                    style: TextStyle(
-                                        color: greenColor,
-                                        fontFamily: "Urbanist",
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600),
-                                  ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Row(
-                                        spacing: 12,
-                                        children: [
-                                          isLoading
-                                              ? Text("")
-                                              : Container(
-                                                  height: 48,
-                                                  width: 48,
-                                                  decoration: BoxDecoration(
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            10),
-                                                    border: Border.all(
-                                                        width: 2,
-                                                        color: greyColor),
-                                                  ),
-                                                  child: cartItems[0]
-                                                              ['imageUrls']
-                                                          .isNotEmpty
-                                                      ? Image.network(
-                                                          cartItems[0]
-                                                              ['imageUrls'][0],
-                                                          fit: BoxFit.contain,
-                                                          loadingBuilder: (context,
-                                                              child,
-                                                              loadingProgress) {
-                                                            if (loadingProgress ==
-                                                                null) {
-                                                              return child;
-                                                            }
-                                                            return const Center(
-                                                                child:
-                                                                    CircularProgressIndicator(
-                                                              color: whiteColor,
-                                                            ));
-                                                          },
-                                                          errorBuilder:
-                                                              (context, error,
-                                                                  stackTrace) {
-                                                            return const Center(
-                                                                child: Icon(
-                                                              Icons.error,
-                                                              color: whiteColor,
-                                                            ));
-                                                          },
-                                                        )
-                                                      : Icon(Icons.image)),
-                                          Row(
-                                            children: [
-                                              Text(
-                                                '${cartItems.length} Item(s)  ',
-                                                style: TextStyle(
-                                                    color: greyColor,
-                                                    fontFamily: "Urbanist",
-                                                    fontSize: 14,
-                                                    fontWeight:
-                                                        FontWeight.normal),
-                                              ),
-                                              Text(
-                                                "|  ₹ ${finaltotalAmount}",
-                                                style: TextStyle(
-                                                    color: whiteColor,
-                                                    fontFamily: "Urbanist",
-                                                    fontSize: 14,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                            ],
-                                          )
-                                        ],
-                                      ),
-                                      GestureDetector(
-                                          onTap: () {
-                                            Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        CartScreen(
-                                                          isNavigated: true,
-                                                        )));
-                                          },
-                                          child: Container(
-                                            padding: EdgeInsets.symmetric(
-                                                vertical: MediaQuery.of(context)
-                                                        .size
-                                                        .height *
-                                                    0.0175,
-                                                horizontal:
-                                                    MediaQuery.of(context)
-                                                            .size
-                                                            .width *
-                                                        0.055),
-                                            decoration: BoxDecoration(
-                                                color: greenColor,
-                                                borderRadius:
-                                                    BorderRadius.circular(10)),
-                                            child: Text(
-                                              'Checkout',
-                                              style: TextStyle(
-                                                  color: whiteColor,
-                                                  fontFamily: "Urbanist",
-                                                  fontSize:
-                                                      MediaQuery.of(context)
-                                                              .size
-                                                              .height *
-                                                          0.0175,
-                                                  fontWeight: FontWeight.bold),
-                                            ),
-                                          ))
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ))
-                    ]
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
-          ],
-        ),
-      ),
-    );
+          ),
+          if ((!isLoading &&
+                  cartItems.isNotEmpty &&
+                  ISserviceAvilable &&
+                  totalAmount != 0) ||
+              (isTapped) && ISserviceAvilable && totalAmount != 0) ...[
+            Positioned(
+                right: 0,
+                bottom: 76,
+                child: Container(
+                  color: ligtBlackColor,
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height *
+                      0.12, // 12% of screen height
+
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: MediaQuery.of(context).size.width * 0.045,
+                        vertical: MediaQuery.of(context).size.height * 0.012),
+                    child: Column(
+                      spacing: 8,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Delivering in 20 minutes !',
+                          style: GoogleFonts.mulish(
+                              color: whiteColor,
+                              
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600),
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Row(
+                              spacing: 12,
+                              children: [
+                                isLoading
+                                    ? Text("")
+                                    : Container(
+                                        height: 48,
+                                        width: 48,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          border: Border.all(
+                                              width: 2, color: greyColor),
+                                        ),
+                                        child: cartItems[0]['imageUrls']
+                                                .isNotEmpty
+                                            ? Image.network(
+                                                cartItems[0]['imageUrls'][0],
+                                                fit: BoxFit.contain,
+                                                loadingBuilder: (context, child,
+                                                    loadingProgress) {
+                                                  if (loadingProgress == null) {
+                                                    return child;
+                                                  }
+                                                  return const Center(
+                                                      child:
+                                                          CircularProgressIndicator(
+                                                    color: whiteColor,
+                                                  ));
+                                                },
+                                                errorBuilder: (context, error,
+                                                    stackTrace) {
+                                                  return const Center(
+                                                      child: Icon(
+                                                    Icons.error,
+                                                    color: whiteColor,
+                                                  ));
+                                                },
+                                              )
+                                            : Icon(Icons.image)),
+                                Row(
+                                  children: [
+                                    Text(
+                                      '${cartItems.length} Item(s)  ',
+                                      style: TextStyle(
+                                          color: greyColor,
+                                          fontFamily: "Urbanist",
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.normal),
+                                    ),
+                                    Text(
+                                      "|  ₹ ${finaltotalAmount}",
+                                      style: TextStyle(
+                                          color: whiteColor,
+                                          fontFamily: "Urbanist",
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ),
+                            GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => CartScreen(
+                                                isNavigated: true,
+                                              )));
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                      vertical:
+                                          MediaQuery.of(context).size.height *
+                                              0.0175,
+                                      horizontal:
+                                          MediaQuery.of(context).size.width *
+                                              0.055),
+                                  decoration: BoxDecoration(
+                                      color: greenColor,
+                                      borderRadius: BorderRadius.circular(10)),
+                                  child: Text(
+                                    'Checkout',
+                                    style: TextStyle(
+                                        color: whiteColor,
+                                        fontFamily: "Urbanist",
+                                        fontSize:
+                                            MediaQuery.of(context).size.height *
+                                                0.0175,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                ))
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ))
+          ]
+        ]));
   }
 }

@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:async';
 import 'package:cureeit_user_app/screens/base_screen.dart';
+import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
@@ -103,7 +105,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: Colors.white,
+      backgroundColor: whiteColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(width * 0.06)),
       ),
@@ -342,13 +344,13 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
         Container(
           padding: EdgeInsets.all(width * 0.025),
           decoration: BoxDecoration(
-            color: Colors.grey.shade100,
+            color: ligtBlackColor,
             shape: BoxShape.circle,
           ),
           child: Icon(
             icon,
             size: width * 0.06,
-            color: Colors.grey.shade600,
+            color: greyColor,
           ),
         ),
         SizedBox(width: width * 0.04),
@@ -358,21 +360,21 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
             children: [
               Text(
                 title,
-                style: TextStyle(
+                style: GoogleFonts.mulish(
                   fontSize: width * 0.045,
                   fontWeight: FontWeight.bold,
-                  color: Colors.black87,
-                  fontFamily: "Urbanist",
+                  color: whiteColor,
+                  
                 ),
               ),
               Text(
                 subtitle,
                 maxLines: 1,
-                style: TextStyle(
+                style: GoogleFonts.mulish(
                   fontSize: width * 0.035,
                   fontWeight: FontWeight.w500,
-                  color: Colors.black,
-                  fontFamily: "Urbanist",
+                  color: whiteColor,
+                  
                 ),
               ),
             ],
@@ -497,6 +499,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     final height = size.height;
 
     return Scaffold(
+      backgroundColor: scaffoldBlackColor,
       body: Column(
         children: [
           SizedBox(height: height * 0.02),
@@ -523,7 +526,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                     },
                     child: Icon(
                       Icons.close,
-                      color: Colors.black,
+                      color: whiteColor,
                       size: width * 0.06,
                     ),
                   ),
@@ -544,7 +547,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
             child: Container(
               padding: EdgeInsets.all(width * 0.04),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: ligtBlackColor,
                 borderRadius:
                     BorderRadius.vertical(top: Radius.circular(width * 0.06)),
                 boxShadow: [
@@ -560,11 +563,11 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                 children: [
                   Text(
                     "Order is being packed",
-                    style: TextStyle(
+                    style: GoogleFonts.mulish(
                       fontSize: width * 0.045,
                       fontWeight: FontWeight.bold,
-                      color: Colors.grey.shade800,
-                      fontFamily: "Urbanist",
+                      color: whiteColor,
+                      
                     ),
                   ),
                   SizedBox(height: height * 0.02),
@@ -574,7 +577,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                       DeliveryStatus(
                         icon: Icons.check_circle,
                         label: "Order placed",
-                        color: Colors.green,
+                        color: greenColor,
                         size: width,
                         isInactive: orderTrackingDetails["currentStatus"] ==
                                     "Order Placed" ||
@@ -596,7 +599,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                       DeliveryStatus(
                         icon: Icons.inventory_2,
                         label: "Packing",
-                        color: Colors.orange,
+                        color: greenColor,
                         size: width,
                         isInactive: orderTrackingDetails["currentStatus"] ==
                                     "Packing" ||
@@ -616,7 +619,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                       DeliveryStatus(
                         icon: Icons.local_shipping,
                         label: "On the Way",
-                        color: Colors.blue,
+                        color: greenColor,
                         size: width,
                         isInactive: orderTrackingDetails["currentStatus"] ==
                                     "On the way" ||
@@ -634,7 +637,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                       DeliveryStatus(
                         icon: Icons.check_circle,
                         label: "Delivered",
-                        color: Colors.green,
+                        color: greenColor,
                         size: width,
                         isInactive:
                             orderTrackingDetails["currentStatus"] == "Delivered"

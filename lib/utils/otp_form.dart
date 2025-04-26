@@ -37,14 +37,14 @@ class _OtpFormState extends State<OtpForm> {
       mainAxisAlignment: MainAxisAlignment.start,
       children: List.generate(4, (index) {
         return Container(
-          margin: EdgeInsets.only(right: 20),
+          margin: EdgeInsets.only(right: 4),
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(8),
             color: ligtBlackColor,
           ),
-          height: 50,
-          width: 42,
+          height: 40,
+          width: 41,
           child: TextFormField(
             controller: controllers[index],
             onChanged: (value) {

@@ -2,8 +2,11 @@ import 'package:cureeit_user_app/screens/search.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+
+import 'package:loading_indicator/loading_indicator.dart';
 
 class ItemDetailScreen extends StatefulWidget {
   final String productId;
@@ -19,6 +22,8 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
   late Future<Map<String, dynamic>> productDetails;
   int quantity = 1; // Initialize quantity
   bool isFav = false;
+  bool addingToCart=false;
+  bool addingToFav=false;
   bool readMore = false;
 
   @override
@@ -73,6 +78,10 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
   }
 
   Future<void> addToFavourites() async {
+    setState(() {
+      addingToFav=true;
+    });
+    
     final String apiUrl =
         "http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/product/favourites";
 
@@ -90,14 +99,27 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
         final responseData = jsonDecode(response.body);
         if (responseData['status'] == 200) {
           checkIfFav();
+          setState(() {
+            addingToFav=false;
+          });
+          
           Fluttertoast.showToast(msg: "Item added to Favourites");
-        } else {}
+        } else {
+          setState(() {
+             addingToFav=false;
+          });
+         
+        }
       } else {}
     } catch (error) {}
     checkIfFav();
   }
 
   Future<void> addToCart() async {
+    setState(() {
+      addingToCart=true;
+    });
+    
     try {
       var url = Uri.parse(
           'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/cart/addToCart');
@@ -116,7 +138,10 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
       if (response.statusCode == 200) {
         var responseBody = await response.stream.bytesToString();
         Map<String, dynamic> responseData = jsonDecode(responseBody);
-
+        setState(() {
+          addingToCart=false;
+        });
+        
         if (responseData['message'] == 'Added To Cart') {
           Fluttertoast.showToast(
             msg: "Added to Cart",
@@ -128,9 +153,17 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
           );
         }
       } else {
+        
+        setState(() {
+          addingToCart=false;
+        });
         throw Exception('Failed to add to cart');
       }
     } catch (error) {
+      
+      setState(() {
+        addingToCart=false;
+      });
       print('Error adding to cart: $error');
     }
   }
@@ -202,7 +235,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: ligtBlackColor,
         leadingWidth: 100,
         leading: Padding(
           padding: const EdgeInsets.only(left: 12.0),
@@ -215,37 +248,21 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
               child: Row(
                 spacing: 4,
                 children: [
-                  Icon(Icons.arrow_back, color: primaryColor),
+                  Icon(Icons.arrow_back, color:whiteColor),
                   Text(
                     "Back",
-                    style: TextStyle(
+                    style: GoogleFonts.mulish(
                         fontWeight: FontWeight.w600,
                         fontSize: MediaQuery.of(context).size.height * 0.018,
-                        fontFamily: "Urbanist",
-                        color: primaryColor),
+                       
+                        color: whiteColor),
                   )
                 ],
               ),
             ),
           ),
         ),
-        actions: [
-          GestureDetector(
-            onTap: () {
-              Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => Search()));
-            },
-            child: Padding(
-              padding: const EdgeInsets.only(right: 22.0),
-              child: Image.asset(
-                'lib/images/search_button.png',
-                height: 24,
-                width: 24,
-                fit: BoxFit.contain,
-              ),
-            ),
-          )
-        ],
+       
       ),
       body: FutureBuilder<Map<String, dynamic>>(
           future: productDetails,
@@ -253,7 +270,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(
                   child: CircularProgressIndicator(
-                color: secondaryColor,
+                color: whiteColor,
               ));
             } else if (snapshot.hasError) {
               return Center(child: Text('Error: ${snapshot.error}'));
@@ -261,7 +278,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
               final product = snapshot.data!;
 
               return Container(
-                color: Colors.grey.shade200,
+                color: scaffoldBlackColor,
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.height,
                 child: ListView(
@@ -273,11 +290,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                       children: [
                         Stack(
                           children: [
-                            Image.asset(
-                              'lib/images/item_image_bg.png',
-                              width: MediaQuery.of(context).size.width,
-                              fit: BoxFit.contain,
-                            ),
+                           
                             Padding(
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 22.0, vertical: 18),
@@ -287,20 +300,20 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                 children: [
                                   Text(
                                     product['name'] ?? 'Unknown Product',
-                                    style: TextStyle(
+                                    style: GoogleFonts.mulish(
                                         fontWeight: FontWeight.w500,
                                         fontSize: MediaQuery.of(context).size.height * 0.026,
-                                        fontFamily: "JosefinSans",
-                                        color: Colors.black),
+                                        
+                                        color: whiteColor),
                                   ),
                                   Text(
                                     product['marketer'] ??
                                         'Manufacturer not available',
-                                    style: TextStyle(
+                                    style: GoogleFonts.mulish(
                                         fontWeight: FontWeight.w400,
                                         fontSize: MediaQuery.of(context).size.height * 0.015,
-                                        fontFamily: "Urbanist",
-                                        color: Color(0xFF585858)),
+                                        
+                                        color: whiteColor),
                                   ),
                                   SizedBox(
                                     width: MediaQuery.of(context).size.width,
@@ -311,74 +324,77 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                       itemBuilder: (context, index) {
                                         return Padding(
                                           padding: const EdgeInsets.all(8.0),
-                                          child: ClipRRect(
-                                              borderRadius:
-                                                  BorderRadius.circular(20),
-                                              child: SizedBox(
-                                                width: MediaQuery.of(context)
-                                                    .size
-                                                    .width,
-                                                height: MediaQuery.of(context).size.height * 0.263,
-                                                child: Padding(
-                                                    padding: EdgeInsets.only(
-                                                        top: 28),
-                                                    child: product[
-                                                                'imageUrls'] !=
-                                                            []
-                                                        ? SizedBox(
-                                                            height: MediaQuery.of(context).size.height * 0.263,
-                                                            width: 176,
-                                                            child:
-                                                                Image.network(
-                                                              product['imageUrls']
-                                                                  [index],
-                                                              fit: BoxFit
-                                                                  .contain,
-                                                              loadingBuilder:
-                                                                  (context,
-                                                                      child,
-                                                                      loadingProgress) {
-                                                                if (loadingProgress ==
-                                                                    null) {
-                                                                  return child;
-                                                                }
-                                                                return const Center(
-                                                                    child:
-                                                                        CircularProgressIndicator(
-                                                                  color:
-                                                                      secondaryColor,
-                                                                ));
-                                                              },
-                                                              errorBuilder:
-                                                                  (context,
-                                                                      error,
-                                                                      stackTrace) {
-                                                                return const Center(
-                                                                    child: Icon(
-                                                                  Icons.error,
-                                                                  color: Color
-                                                                      .fromRGBO(
-                                                                          7,
-                                                                          9,
-                                                                          84,
-                                                                          1),
-                                                                ));
-                                                              },
-                                                            ),
-                                                          )
-                                                        : Text(
-                                                            "No Image",
-                                                            style: TextStyle(
-                                                                fontSize: MediaQuery.of(context).size.height * 0.027,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                color: Colors
-                                                                    .grey
-                                                                    .withOpacity(
-                                                                        0.4)),
-                                                          )),
-                                              )),
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              color:ligtBlackColor,
+                                              borderRadius:  BorderRadius.circular(10),
+                                            ),
+                                           padding: EdgeInsets.only(bottom: 40),
+                                            
+                                            child: ClipRRect(
+                                                borderRadius:
+                                                    BorderRadius.circular(20),
+                                                child: SizedBox(
+                                                  width: MediaQuery.of(context)
+                                                      .size
+                                                      .width,
+                                                  height: MediaQuery.of(context).size.height * 0.350,
+                                                  child: Padding(
+                                                      padding: EdgeInsets.only(
+                                                          top: 28),
+                                                      child: product[
+                                                                  'imageUrls'] !=
+                                                              []
+                                                          ? SizedBox(
+                                                              height: MediaQuery.of(context).size.height * 0.350,
+                                                              width: 176,
+                                                              child:
+                                                                  Image.network(
+                                                                product['imageUrls']
+                                                                    [index],
+                                                                fit: BoxFit
+                                                                    .contain,
+                                                                loadingBuilder:
+                                                                    (context,
+                                                                        child,
+                                                                        loadingProgress) {
+                                                                  if (loadingProgress ==
+                                                                      null) {
+                                                                    return child;
+                                                                  }
+                                                                  return const Center(
+                                                                      child:
+                                                                          CircularProgressIndicator(
+                                                                    color:
+                                                                        whiteColor,
+                                                                  ));
+                                                                },
+                                                                errorBuilder:
+                                                                    (context,
+                                                                        error,
+                                                                        stackTrace) {
+                                                                  return const Center(
+                                                                      child: Icon(
+                                                                    Icons.error,
+                                                                    color:whiteColor
+                                                                  ));
+                                                                },
+                                                              ),
+                                                            )
+                                                          : Text(
+                                                              "No Image",
+                                                              style: TextStyle(
+                                                                  fontSize: MediaQuery.of(context).size.height * 0.027,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  color: Colors
+                                                                      .grey
+                                                                      .withOpacity(
+                                                                          0.4)),
+                                                            )),
+                                                )),
+                                          ),
                                         );
                                       },
                                     ),
@@ -426,8 +442,8 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                                         BorderRadius.circular(
                                                             8),
                                                     color: _currentPage == index
-                                                        ? secondaryColor
-                                                        : Color(0xFF1F1970)),
+                                                        ? greenColor
+                                                        :whiteColor),
                                               );
                                             })),
                                       ],
@@ -438,7 +454,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                     vertical: 12.0, horizontal: 22),
                                 child: Container(
                                   decoration: BoxDecoration(
-                                      color: Colors.white,
+                                      color: ligtBlackColor,
                                       borderRadius: BorderRadius.circular(10)),
                                   child: Stack(
                                     children: [
@@ -478,9 +494,9 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                                           0.0075, // ~6 on 800px height
                                                     ),
                                                     decoration: BoxDecoration(
-                                                        color: Colors.white,
+                                                        color: ligtBlackColor,
                                                         border: Border.all(
-                                                            color: Colors.grey,
+                                                            color: greenColor,
                                                             width: 0.6),
                                                         borderRadius:
                                                             BorderRadius
@@ -488,12 +504,12 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                                     child: Text(
                                                       product['saltComposition'] ??
                                                           'N/A',
-                                                      style: TextStyle(
+                                                      style: GoogleFonts.mulish(
                                                         fontWeight:
                                                             FontWeight.w400,
                                                         fontSize: MediaQuery.of(context).size.height * 0.018,
-                                                        fontFamily: "Urbanist",
-                                                        color: Colors.black,
+                                                        
+                                                        color:whiteColor,
                                                       ),
                                                     ),
                                                   ),
@@ -503,11 +519,11 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                             Text(
                                               product['packagingDetail'] ??
                                                   'N/A',
-                                              style: TextStyle(
+                                              style: GoogleFonts.mulish(
                                                 fontWeight: FontWeight.w500,
                                                fontSize: MediaQuery.of(context).size.height * 0.020,
-                                                fontFamily: "Urbanist",
-                                                color: Colors.black,
+                                                
+                                                color: whiteColor,
                                               ),
                                             ),
                                             Column(
@@ -519,21 +535,21 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                               children: [
                                                 Text(
                                                   "USE : ",
-                                                  style: TextStyle(
+                                                  style: GoogleFonts.mulish(
                                                     fontWeight: FontWeight.w700,
                                                     fontSize: MediaQuery.of(context).size.height * 0.012,
-                                                    fontFamily: "Urbanist",
-                                                    color: Colors.black,
+                                                   
+                                                    color: greenColor,
                                                   ),
                                                 ),
                                                 Text(
                                                   product['mainUse'] ?? 'N/A',
                                                   maxLines: readMore ? 50 : 2,
-                                                  style: TextStyle(
+                                                  style: GoogleFonts.mulish(
                                                     fontWeight: FontWeight.w400,
                                                     fontSize: MediaQuery.of(context).size.height * 0.015,
-                                                    fontFamily: "Urbanist",
-                                                    color: Colors.black,
+                                                   
+                                                    color: whiteColor,
                                                   ),
                                                 ),
                                               ],
@@ -542,11 +558,11 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                               Text(
                                                 product['introduction'] ?? '',
                                                 maxLines: readMore ? 50 : 2,
-                                                style: TextStyle(
+                                                style: GoogleFonts.mulish(
                                                   fontWeight: FontWeight.w300,
                                                   fontSize: MediaQuery.of(context).size.height * 0.015,
-                                                  fontFamily: "Urbanist",
-                                                  color: Colors.black,
+                                                 
+                                                  color:whiteColor,
                                                 ),
                                               ),
                                             ],
@@ -559,22 +575,22 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                               children: [
                                                 Text(
                                                   "INSTRUCTIONS : ",
-                                                  style: TextStyle(
+                                                  style: GoogleFonts.mulish(
                                                     fontWeight: FontWeight.w700,
                                                     fontSize: MediaQuery.of(context).size.height * 0.012,
-                                                    fontFamily: "Urbanist",
-                                                    color: Colors.black,
+                                                    
+                                                    color: greenColor,
                                                   ),
                                                 ),
                                                 Text(
                                                   product['usageInstruction'] ??
                                                       '',
                                                   maxLines: readMore ? 50 : 2,
-                                                  style: TextStyle(
+                                                  style: GoogleFonts.mulish(
                                                     fontWeight: FontWeight.w300,
                                                     fontSize: MediaQuery.of(context).size.height * 0.013,
-                                                    fontFamily: "Urbanist",
-                                                    color: Colors.black,
+                                                  
+                                                    color: whiteColor,
                                                   ),
                                                 ),
                                               ],
@@ -604,12 +620,11 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                                     readMore
                                                         ? "Read Less"
                                                         : "Read More",
-                                                    style: TextStyle(
+                                                    style: GoogleFonts.mulish(
                                                       fontWeight:
                                                           FontWeight.w500,
                                                       fontSize: MediaQuery.of(context).size.height * 0.015,
-                                                      fontFamily: "Urbanist",
-                                                      color: secondaryColor,
+                                                      color: greenColor,
                                                     ),
                                                   ),
                                                 ),
@@ -660,7 +675,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                           fontWeight: FontWeight.w500,
                                           fontSize: MediaQuery.of(context).size.height * 0.013,
                                           fontFamily: "Urbanist",
-                                          color: secondaryColor,
+                                          color: greenColor,
                                         ),
                                       ),
                                     ),
@@ -675,12 +690,12 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                           spacing: 8,
                                           children: [
                                             Text(
-                                              "₹${(product['sellingPrice'] * 0.7).toInt() ?? 00}",
+                                              "₹${(product['sellingPrice']*0.7).toInt() ?? 00}",
                                               style: TextStyle(
                                                 fontWeight: FontWeight.w600,
                                                 fontSize: MediaQuery.of(context).size.height * 0.017,
                                                 fontFamily: "Urbanist",
-                                                color: Colors.black,
+                                                color: whiteColor,
                                               ),
                                             ),
                                             Row(
@@ -688,46 +703,44 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                               children: [
                                                 Text(
                                                   "MRP",
-                                                  style: TextStyle(
+                                                  style: GoogleFonts.mulish(
                                                     fontWeight: FontWeight.w400,
                                                     fontSize: MediaQuery.of(context).size.height * 0.017,
-                                                    fontFamily: "Urbanist",
-                                                    color: Colors.black
-                                                        .withOpacity(0.6),
+                                                    
+                                                    color: whiteColor,
                                                   ),
                                                 ),
                                                 Text(
                                                   "₹${product['sellingPrice'] ?? '00'}",
-                                                  style: TextStyle(
+                                                  style: GoogleFonts.mulish(
                                                     decoration: TextDecoration
                                                         .lineThrough,
                                                     fontWeight: FontWeight.w400,
                                                     fontSize: MediaQuery.of(context).size.height * 0.017,
-                                                    fontFamily: "Urbanist",
-                                                    color: Colors.black
-                                                        .withOpacity(0.6),
+                                                  
+                                                    color: whiteColor,
                                                   ),
                                                 ),
                                               ],
                                             ),
                                             Text(
                                               "30% off",
-                                              style: TextStyle(
+                                              style: GoogleFonts.mulish(
                                                 fontWeight: FontWeight.w600,
                                                 fontSize: MediaQuery.of(context).size.height * 0.014,
-                                                fontFamily: "Urbanist",
-                                                color: Colors.black,
+                                                
+                                                color: whiteColor,
                                               ),
                                             ),
                                           ],
                                         ),
                                         Text(
                                           "+ 1% Cashback",
-                                          style: TextStyle(
+                                          style: GoogleFonts.mulish(
                                             fontWeight: FontWeight.w500,
                                             fontSize: MediaQuery.of(context).size.height * 0.014,
-                                            fontFamily: "Urbanist",
-                                            color: Colors.black,
+                                            
+                                            color:whiteColor,
                                           ),
                                         ),
                                       ],
@@ -752,13 +765,21 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                                     .withOpacity(0.16),
                                                 borderRadius:
                                                     BorderRadius.circular(10)),
-                                            child: Text(
+                                            child:addingToCart?Text(
+                                              "Adding...",
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w500,
+                                                fontSize: MediaQuery.of(context).size.height * 0.015,
+                                                fontFamily: "Urbanist",
+                                                color: greenColor,
+                                              ),
+                                            ): Text(
                                               "Add to Cart",
                                               style: TextStyle(
                                                 fontWeight: FontWeight.w500,
                                                 fontSize: MediaQuery.of(context).size.height * 0.015,
                                                 fontFamily: "Urbanist",
-                                                color: secondaryColor,
+                                                color: greenColor,
                                               ),
                                             ),
                                           ),
@@ -769,7 +790,15 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                             onTap: () {
                                               addToFavourites();
                                             },
-                                            child: Container(
+                                            child:addingToFav?Container(
+                                              decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          40)),
+                                              height: MediaQuery.of(context).size.height * 0.06, // 40/667 ≈ 0.06
+  width: MediaQuery.of(context).size.height * 0.06,
+  child:LoadingIndicator(indicatorType: Indicator.orbit,colors: [whiteColor],),
+                                            ) : Container(
                                               decoration: BoxDecoration(
                                                   borderRadius:
                                                       BorderRadius.circular(
@@ -781,8 +810,8 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                                     ? Icons.favorite
                                                     : Icons.favorite_border,
                                                 color: isFav
-                                                    ? secondaryColor
-                                                    : Colors.black
+                                                    ? greenColor
+                                                    : whiteColor
                                                         .withOpacity(0.6),
                                                 size: 24,
                                               ),
@@ -802,7 +831,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                 child: Container(
                                   width: MediaQuery.of(context).size.width,
                                   decoration: BoxDecoration(
-                                      color: Colors.white,
+                                      color:ligtBlackColor,
                                       borderRadius: BorderRadius.circular(10)),
                                   child: Stack(
                                     children: [
@@ -818,11 +847,11 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                           children: [
                                             Text(
                                               "Return & Expiry",
-                                              style: TextStyle(
+                                              style: GoogleFonts.mulish(
                                                 fontWeight: FontWeight.w500,
                                                 fontSize:  MediaQuery.of(context).size.height * 0.015,
-                                                fontFamily: "Urbanist",
-                                                color: Colors.black,
+                                                
+                                                color: greenColor,
                                               ),
                                             ),
                                             Column(
@@ -834,20 +863,20 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                               children: [
                                                 Text(
                                                   "7 day free return",
-                                                  style: TextStyle(
+                                                  style: GoogleFonts.mulish(
                                                     fontWeight: FontWeight.w600,
                                                     fontSize: MediaQuery.of(context).size.height * 0.014,
-                                                    fontFamily: "Urbanist",
-                                                    color: Colors.black,
+                                                    
+                                                    color: whiteColor,
                                                   ),
                                                 ),
                                                 Text(
                                                   "Easily return the medicine if you have not used it.",
-                                                  style: TextStyle(
+                                                  style: GoogleFonts.mulish(
                                                     fontWeight: FontWeight.w300,
                                                     fontSize: MediaQuery.of(context).size.height * 0.014,
-                                                    fontFamily: "Urbanist",
-                                                    color: Colors.black,
+                                                    
+                                                    color: whiteColor,
                                                   ),
                                                 ),
                                               ],
@@ -861,20 +890,20 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                               children: [
                                                 Text(
                                                   "Expires after Jun 2025",
-                                                  style: TextStyle(
+                                                  style: GoogleFonts.mulish(
                                                     fontWeight: FontWeight.w600,
                                                     fontSize: MediaQuery.of(context).size.height * 0.014,
-                                                    fontFamily: "Urbanist",
-                                                    color: Colors.black,
+                                                    
+                                                    color: whiteColor,
                                                   ),
                                                 ),
                                                 Text(
                                                   "The product will have this expiry date on the packet",
-                                                  style: TextStyle(
+                                                  style: GoogleFonts.mulish(
                                                     fontWeight: FontWeight.w300,
                                                     fontSize:MediaQuery.of(context).size.height * 0.014,
-                                                    fontFamily: "Urbanist",
-                                                    color: Colors.black,
+                                                    
+                                                    color:whiteColor,
                                                   ),
                                                 ),
                                               ],

@@ -3,6 +3,7 @@ import 'package:cureeit_user_app/current_address/google_maps_screen.dart';
 import 'package:cureeit_user_app/selected_Address/currentAddress.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
@@ -63,8 +64,9 @@ class _AddressesScreenState extends State<AddressesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: scaffoldBlackColor,
       appBar: AppBar(
-        backgroundColor: Colors.grey.shade100.withOpacity(0.5),
+        backgroundColor: scaffoldBlackColor,
         leadingWidth: 100,
         leading: Padding(
           padding: const EdgeInsets.only(left: 12.0),
@@ -77,14 +79,13 @@ class _AddressesScreenState extends State<AddressesScreen> {
               child: Row(
                 spacing: 4,
                 children: [
-                  Icon(Icons.arrow_back, color: primaryColor),
+                  Icon(Icons.arrow_back, color: whiteColor),
                   Text(
                     "Back",
-                    style: TextStyle(
+                    style: GoogleFonts.mulish(
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
-                        fontFamily: "Urbanist",
-                        color: primaryColor),
+                        color: whiteColor),
                   )
                 ],
               ),
@@ -95,6 +96,7 @@ class _AddressesScreenState extends State<AddressesScreen> {
       body: Stack(
         children: [
           SizedBox(
+        
             width:
                 MediaQuery.of(context).size.width, // Set width to screen width
             height: MediaQuery.of(context).size.height,
@@ -105,11 +107,11 @@ class _AddressesScreenState extends State<AddressesScreen> {
                 children: [
                   Text(
                     "Addresses",
-                    style: TextStyle(
+                    style: GoogleFonts.mulish(
                         fontWeight: FontWeight.w600,
                         fontSize: 24,
-                        fontFamily: "JosefinSans",
-                        color: primaryColor),
+                      
+                        color: whiteColor),
                   ),
                   ListView.builder(
                     shrinkWrap: true,
@@ -147,16 +149,16 @@ class _AddressesScreenState extends State<AddressesScreen> {
                         padding:
                             EdgeInsets.symmetric(vertical: 10, horizontal: 16),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color:ligtBlackColor,
                           borderRadius: BorderRadius.circular(8),
                           border: Border.all(color: Colors.grey.shade300),
                         ),
                         child: Text(
                           "+ Add new address",
-                          style: TextStyle(
+                          style: GoogleFonts.mulish(
                             fontSize: 16,
                             fontWeight: FontWeight.w800,
-                            color: Color.fromARGB(255, 10, 21, 81),
+                            color: whiteColor,
                           ),
                         ),
                       ),

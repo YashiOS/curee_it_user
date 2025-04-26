@@ -9,6 +9,7 @@ import 'package:cureeit_user_app/selected_Address/currentAddress.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 
 class BaseScreen extends StatefulWidget {
@@ -63,7 +64,7 @@ class _BaseScreenState extends State<BaseScreen> {
                             labelColor: whiteColor,
                             indicatorColor: greenColor,
                             labelStyle:
-                                TextStyle(fontFamily: "Urbanist", fontSize: 12),
+                                GoogleFonts.mulish(fontSize: 12),
                             tabs: [
                               Tab(icon: Icon(Icons.house_outlined), text: "Home"),
                               Tab(
