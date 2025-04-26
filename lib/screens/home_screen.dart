@@ -1022,6 +1022,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                Image.asset("lib/images/medkaroLogo.png"),
                 SizedBox(
                   height: 69,
                 ),
