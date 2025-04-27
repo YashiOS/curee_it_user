@@ -29,13 +29,15 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+@override
+Widget build(BuildContext context) {
+  final screenWidth = MediaQuery.of(context).size.width;
+  final screenHeight = MediaQuery.of(context).size.height;
 
-    return Scaffold(
-      body: Container(
+  return Scaffold(
+    resizeToAvoidBottomInset: true, // This makes the scaffold adjust when keyboard appears
+    body: SingleChildScrollView(  // <-- Wrap with scroll view
+      child: Container(
         color: scaffoldBlackColor,
         width: screenWidth,
         height: screenHeight,
@@ -45,46 +47,37 @@ class _LoginScreenState extends State<LoginScreen> {
               padding: EdgeInsets.only(
                 top: screenHeight * 0.17,
                 left: screenWidth * 0.1,
-                right: screenWidth*0.1,
+                right: screenWidth * 0.1,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Image.asset(
                     "lib/images/medkaroLogo.png",
-                    height:
-                        screenHeight * 0.06, // approx 47 if screen height ~780
-                    width:
-                        screenWidth * 0.55, // approx 210 if screen width ~390
+                    height: screenHeight * 0.06,
+                    width: screenWidth * 0.55,
                   ),
-                
                   Text(
                     "10-minute medicine delivery",
                     style: GoogleFonts.mulish(
                       color: whiteColor,
-                      fontSize: screenHeight * 0.022, // ~17.2
-                      
+                      fontSize: screenHeight * 0.022,
                     ),
                   ),
-                  SizedBox(
-      height: MediaQuery.of(context).size.height * (60 / 812),
-    ),
-     // ~60
+                  SizedBox(height: screenHeight * (60 / 812)),
                   Container(
-                    width: screenWidth * 0.85, // ~311 if screen width ~366
+                    width: screenWidth * 0.85,
                     decoration: BoxDecoration(
                       color: const Color(0xFF1A1A1A),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    padding:
-                        EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+                    padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
                     child: TextField(
                       style: GoogleFonts.mulish(color: whiteColor),
                       decoration: InputDecoration(
                         hintText: "Name",
-                        hintStyle: TextStyle(color: Colors.white,fontWeight: FontWeight.w100),
+                        hintStyle: TextStyle(color: Colors.white, fontWeight: FontWeight.w100),
                         border: InputBorder.none,
-                        
                       ),
                     ),
                   ),
@@ -95,52 +88,46 @@ class _LoginScreenState extends State<LoginScreen> {
                       color: const Color(0xFF1A1A1A),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    padding:
-                        EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+                    padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
                     child: TextField(
+                      controller: _controller, // <-- Attach controller here
                       style: GoogleFonts.mulish(color: whiteColor),
+                      keyboardType: TextInputType.phone,
                       decoration: InputDecoration(
                         hintText: "Phone Number",
-                        hintStyle: TextStyle(color: Colors.white,fontWeight: FontWeight.w100),
+                        hintStyle: TextStyle(color: Colors.white, fontWeight: FontWeight.w100),
                         border: InputBorder.none,
                       ),
                     ),
                   ),
-                 
-                  
-                ],
-              ),
-            ),
-            Positioned(
-                    top: 430,
-                    left: 41,
-                    child: SizedBox(
-                      width: screenWidth * 0.23, // ~83 if screen width ~360
-                      height: screenHeight * 0.055, // ~40
-                      child: TextButton(
-                        onPressed:(){
-                             _validateAndProceed();
-                             Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>OtpScreen(phoneNumber: "1234567891")));
-                        } ,
-                        style: TextButton.styleFrom(
-                          backgroundColor: scaffoldBlackColor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(8),
-                            side: BorderSide(color: greenColor, width: 1),
-                          ),
+                  SizedBox(height: screenHeight * 0.05), // Added some spacing
+                  SizedBox(
+                    width: screenWidth * 0.23,
+                    height: screenHeight * 0.055,
+                    child: TextButton(
+                      onPressed: () {
+                        _validateAndProceed();
+                      },
+                      style: TextButton.styleFrom(
+                        backgroundColor: scaffoldBlackColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                          side: BorderSide(color: greenColor, width: 1),
                         ),
-                        child: Text(
-                          "Next",
-                          style: GoogleFonts.mulish(
-                            color: greenColor,
-                            fontSize: screenHeight * 0.018,
-                            fontWeight: FontWeight.w500,
-                          ),
+                      ),
+                      child: Text(
+                        "Next",
+                        style: GoogleFonts.mulish(
+                          color: greenColor,
+                          fontSize: screenHeight * 0.018,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
                   ),
+                ],
+              ),
+            ),
             /// 🚗 Positioned Gadi at bottom
             Positioned(
               bottom: 0,
@@ -159,7 +146,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ],
         ),
       ),
-    );
-    
-  }
+    ),
+  );
+}
 }

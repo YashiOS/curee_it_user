@@ -41,100 +41,96 @@ class _OtpScreenState extends State<OtpScreen> {
     }
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+ @override
+Widget build(BuildContext context) {
+  final screenWidth = MediaQuery.of(context).size.width;
+  final screenHeight = MediaQuery.of(context).size.height;
 
-    return Scaffold(
-      body: Stack(
-        children: [
-          Container(
-            width: screenWidth,
-            height: screenHeight,
-            color: scaffoldBlackColor,
-            child: Padding(
-               padding: EdgeInsets.only(
+  return Scaffold(
+    resizeToAvoidBottomInset: true, // Important!
+    body: SingleChildScrollView( // Wrap the whole body!
+      child: Container(
+        width: screenWidth,
+        height: screenHeight,
+        color: scaffoldBlackColor,
+        child: Stack(
+          children: [
+            Padding(
+              padding: EdgeInsets.only(
                 top: screenHeight * 0.17,
                 left: screenWidth * 0.1,
-                right: screenWidth*0.1,
+                right: screenWidth * 0.1,
               ),
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  
                   Image.asset(
                     "lib/images/medkaroLogo.png",
                     height: screenHeight * 0.06,
                     width: screenWidth * 0.55,
                   ),
-                  
                   Text(
                     "10-minute medicine delivery",
                     style: GoogleFonts.mulish(
                       color: whiteColor,
-                      fontSize: screenHeight * 0.022, // ~17.2
+                      fontSize: screenHeight * 0.022,
                       fontWeight: FontWeight.w400,
                     ),
                   ),
-                  SizedBox(
-  height: MediaQuery.of(context).size.height * 0.12, // ~88px on most phones
-),
+                  SizedBox(height: screenHeight * 0.12),
                   OtpForm(
                     onOtpEntered: handleOtpEntered,
                     onOtpChanged: handleOtpChanged,
                   ),
-                
-                  
-                ],
-              ),
-            ),
-          ),
-           Positioned(
-            top:430 ,
-            left: 41,
-             child: GestureDetector(
-                      onTap: () {
-                        submitOtp();
-                        print(otp);
-                        Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>BaseScreen()));
-                      },
-                      child: Container(
-                        width: screenWidth * 0.23,
-                        height: screenHeight * 0.055,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(
-                            color: greenColor,
-                            width: 1,
-                          ),
-                          color: scaffoldBlackColor,
+                  SizedBox(height: screenHeight * 0.05),
+                  GestureDetector(
+                    onTap: () {
+                      submitOtp();
+                      print(otp);
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(builder: (context) => BaseScreen()),
+                      );
+                    },
+                    child: Container(
+                      width: screenWidth * 0.23,
+                      height: screenHeight * 0.055,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(
+                          color: greenColor,
+                          width: 1,
                         ),
-                        alignment: Alignment.center,
-                        child: Text(
-                          "Next",
-                          style: GoogleFonts.mulish(
-                            color: greenColor,
-                            fontSize: screenHeight * 0.018,
-                            fontWeight: FontWeight.w500,
-                          ),
+                        color: scaffoldBlackColor,
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        "Next",
+                        style: GoogleFonts.mulish(
+                          color: greenColor,
+                          fontSize: screenHeight * 0.018,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
-           ),
-          /// 🛻 Medkaro Gadi at bottom
-          Positioned(
-            bottom: 0,
-            left: 0,
-            right: 0,
-            child: Image.asset(
-              "lib/images/medkaroGadi.png",
-              fit: BoxFit.cover,
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+            /// 🚚 Medkaro Gadi
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Image.asset(
+                "lib/images/medkaroGadi.png",
+                fit: BoxFit.cover,
+              ),
+            ),
+          ],
+        ),
       ),
-    );
-  }
+    ),
+  );
+}
+
 }
