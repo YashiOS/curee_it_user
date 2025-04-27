@@ -3,6 +3,7 @@ import 'package:cureeit_user_app/screens/login_screen.dart';
 import 'package:cureeit_user_app/screens/otp_screen.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class Splashscreen extends StatefulWidget {
   const Splashscreen({super.key});
@@ -52,13 +53,35 @@ class _SplashScreenState extends State<Splashscreen>
 
   @override
   Widget build(BuildContext context) {
+     final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       backgroundColor: scaffoldBlackColor,
-      body: Center(
+      body: Center( 
         child: ScaleTransition(
           scale: _scaleAnimation,
-          child: Image.asset("lib/images/medkaro.png",width: MediaQuery.of(context).size.width * 0.75,
-),
+          child: Column(
+            mainAxisSize: MainAxisSize.min, 
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Image.asset(
+                "lib/images/medkaroLogo.png",
+                height: screenHeight * 0.08,
+                width: screenWidth * 0.6,
+                fit: BoxFit.contain,
+              ),
+              Text(
+                "10-minute medicine delivery",
+                style: GoogleFonts.mulish(
+                  color: Colors.white,
+                  fontSize: screenHeight * 0.022,
+                  fontWeight: FontWeight.w500,
+                ),
+                textAlign: TextAlign.center, 
+              ),
+            ],
+          ),
         ),
       ),
     );

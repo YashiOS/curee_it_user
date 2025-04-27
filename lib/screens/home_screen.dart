@@ -467,7 +467,7 @@ class _HomeScreenState extends State<HomeScreen> {
           Container(
             width: 147,
             height: 24,
-            margin: EdgeInsets.only(top: 16, left: 16),
+            margin: EdgeInsets.only(top: 16, left: 10),
             child: Text(
               product['name'] ?? 'Product',
               maxLines: 2,
@@ -479,21 +479,33 @@ class _HomeScreenState extends State<HomeScreen> {
 
           // 🔵 Price (7%)
           Container(
-            margin: EdgeInsets.only(left: 16),
-            width: 114,
+            margin: EdgeInsets.only(left: 10),
+            width: 120,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
-                  width: 46,
-                  height: 21,
-                  child: Text(
-                    "₹${product['price']}",
-                    style: GoogleFonts.mulish(
-                      color: greyColor,
-                    ),
-                  ),
-                ),
+                Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "₹${product['discountedPrice']}",
+            style: GoogleFonts.mulish(
+              color: whiteColor.withOpacity(0.8),
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+            ),
+          ),
+          Text(
+            "₹${product['price']}",
+            style: GoogleFonts.mulish(
+              color: greyColor,
+              fontSize: 12,
+              decoration: TextDecoration.lineThrough,
+            ),
+          ),
+        ],
+      ),
+      
                 Container(
                   width: 49,
                   height: 29,
@@ -1017,7 +1029,7 @@ class _HomeScreenState extends State<HomeScreen> {
         body: Stack(children: [
           Container(
             color: scaffoldBlackColor,
-            padding: EdgeInsets.only(left: 41, right: 41),
+            padding: EdgeInsets.only(left: 20, right: 20),
             margin: EdgeInsets.only(bottom: cartItems.isEmpty ? 45 : 0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
