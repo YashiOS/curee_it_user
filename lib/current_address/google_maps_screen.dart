@@ -1,11 +1,14 @@
 import 'package:cureeit_user_app/current_address/api_services.dart';
 import 'package:cureeit_user_app/current_address/location_permission_helper.dart';
+import 'package:cureeit_user_app/current_address/map_style.dart';
 import 'package:cureeit_user_app/current_address/models/get_places.dart';
 import 'package:cureeit_user_app/current_address/models/place_from_coordinates.dart';
 import 'package:cureeit_user_app/screens/add_address_screen.dart';
 import 'package:cureeit_user_app/selected_Address/currentAddress.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class GoogleMapsScreen extends StatefulWidget {
@@ -25,6 +28,7 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
   double defaultLng = 75.7873;
   PlaceFromCoordinates placeFromCoordinates = PlaceFromCoordinates();
   bool isLoading = true;
+  late String mapDarkStyle;
 
   void _changeCameraPosition(double lat, double lng) {
     CameraPosition newPosition = CameraPosition(
@@ -62,6 +66,7 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
       print(value.longitude);
     });
     getAddress();
+    
   }
 
   @override
@@ -70,19 +75,36 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
      
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: scaffoldBlackColor,
         title: Text(
           "Current Location",
-          style: TextStyle(
-              color: primaryColor,
-              fontFamily: "JosefinSans",
+          style: GoogleFonts.mulish(
+              color: whiteColor,
+              
               fontWeight: FontWeight.w400),
         ),
+         leading: Padding(
+            padding: const EdgeInsets.only(left: 24.0),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: Padding(
+                padding: const EdgeInsets.only(left: 4.0),
+                child: Row(
+                  spacing: 4,
+                  children: [
+                    Image.asset("lib/images/Vector 9.png")
+                  ],
+                ),
+              ),
+      ),
+         ),
       ),
       body: isLoading
           ? Center(
               child: CircularProgressIndicator(
-                color: secondaryColor,
+                color: whiteColor,
               ),
             )
           : Stack(
@@ -91,8 +113,11 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
                   width: double.infinity,
                   height: double.infinity,
                   child: GoogleMap(
+                    style: darkMapStyle,
                     onMapCreated: (GoogleMapController controller) {
+                      
                       _mapController = controller;
+                      
                     },
                     mapType: MapType.normal,
                     initialCameraPosition: CameraPosition(
@@ -125,7 +150,7 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
                   child: Icon(
                     Icons.location_on,
                     size: 36,
-                    color: primaryColor,
+                    color:whiteColor,
                   ),
                 ),
                 Container(
@@ -142,28 +167,28 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
                                 vertical: 8.0, horizontal: 18),
                             child: Container(
                               decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(10)),
+                                  color: ligtBlackColor,
+                                  borderRadius: BorderRadius.circular(8)),
                               padding: const EdgeInsets.symmetric(
                                   vertical: 4.0, horizontal: 18),
                               child: TextField(
                                 controller: searchPlaceController,
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontFamily: "Urbanist",
+                                style: GoogleFonts.mulish(
+                                    color: whiteColor,
+                                   
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600),
                                 decoration: InputDecoration(
                                     border: InputBorder.none,
-                                    helperStyle: TextStyle(
-                                        color: Colors.black,
-                                        fontFamily: "Urbanist",
+                                    helperStyle: GoogleFonts.mulish(
+                                        color: whiteColor,
+                                       
                                         fontSize: 16,
                                         fontWeight: FontWeight.w600),
                                     hintText: "Search ...",
-                                    hintStyle: TextStyle(
+                                    hintStyle: GoogleFonts.mulish(
                                         color: Colors.grey,
-                                        fontFamily: "Urbanist",
+                                        
                                         fontSize: 16,
                                         fontWeight: FontWeight.w600),
                                     fillColor: Colors.white,
@@ -190,8 +215,8 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
                                   vertical: 8.0, horizontal: 18),
                               child: Container(
                                 decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    borderRadius: BorderRadius.circular(10)),
+                                    color: ligtBlackColor,
+                                    borderRadius: BorderRadius.circular(8)),
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
                                   mainAxisAlignment:
@@ -240,12 +265,12 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
                                               },
                                               leading: Icon(
                                                 Icons.location_on_outlined,
-                                                color: secondaryColor,
+                                                color: whiteColor,
                                               ),
                                               title: Text(getPlaces
                                                   .predictions![index]
                                                   .description
-                                                  .toString()),
+                                                  .toString(),style: GoogleFonts.mulish(color: whiteColor),),
                                             );
                                           }),
                                     ),
@@ -284,8 +309,8 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
 
                                 width: MediaQuery.of(context).size.width / 2,
                                 decoration: BoxDecoration(
-                                    color: Colors.blueGrey,
-                                    borderRadius: BorderRadius.circular(50)),
+                                    color: greenColor,
+                                    borderRadius: BorderRadius.circular(8)),
                                 child: Row(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   spacing: 6,
@@ -296,9 +321,9 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
                                     ),
                                     Text(
                                       "Current Location",
-                                      style: TextStyle(
+                                      style: GoogleFonts.mulish(
                                           color: Colors.white,
-                                          fontFamily: "Urbanist",
+                                          
                                           fontSize:MediaQuery.of(context).size.height*0.016 ,
                                           fontWeight: FontWeight.bold),
                                     )
@@ -308,7 +333,7 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
                             ),
                             Container(
                               width: MediaQuery.of(context).size.width,
-                              color: Colors.white,
+                              color: ligtBlackColor,
                               padding: EdgeInsets.symmetric(vertical: 24),
                               child: Row(
                                 children: [
@@ -321,9 +346,9 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
                                       placeFromCoordinates
                                               .results?[0].formattedAddress ??
                                           "Loading...",
-                                      style: TextStyle(
-                                          color: secondaryColor,
-                                          fontFamily: "Urbanist",
+                                      style: GoogleFonts.mulish(
+                                          color: whiteColor,
+                                          
                                           fontSize: 12,
                                           fontWeight: FontWeight.w600),
                                     ),
@@ -355,17 +380,10 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
                                         },
                                       );
                                     },
-                                    child: Container(
-                                      padding: EdgeInsets.all(1),
-                                      decoration: BoxDecoration(
-                                        color: secondaryColor.withOpacity(0.3),
-                                        borderRadius: BorderRadius.circular(50),
-                                      ),
-                                      child: Icon(
-                                        Icons.check_circle,
-                                        color: primaryColor,
-                                        size: 48,
-                                      ),
+                                    child: Icon(
+                                      Icons.check_circle,
+                                      color: greenColor,
+                                      size: 48,
                                     ),
                                   ),
                                 ],

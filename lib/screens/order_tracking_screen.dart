@@ -105,9 +105,9 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: whiteColor,
+      backgroundColor: scaffoldBlackColor,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(width * 0.06)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
       ),
       builder: (context) {
         return Padding(
@@ -124,7 +124,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                 width: width * 0.15,
                 height: height * 0.006,
                 decoration: BoxDecoration(
-                  color: Colors.grey.shade400,
+                  color: whiteColor,
                   borderRadius: BorderRadius.circular(width * 0.02),
                 ),
               ),
@@ -134,14 +134,15 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                 children: [
                   Text(
                     "Order ${orderTrackingDetails["orderId"]??""}",
-                    style: TextStyle(
+                    style: GoogleFonts.mulish(
                       fontWeight: FontWeight.bold,
                       fontSize: width * 0.045,
-                      fontFamily: "Urbanist",
+                      color: whiteColor
+                      
                     ),
                   ),
                   IconButton(
-                    icon: Icon(Icons.close, size: width * 0.06),
+                    icon: Icon(Icons.close, size: width * 0.06,color: whiteColor,),
                     onPressed: () => Navigator.pop(context),
                   ),
                 ],
@@ -151,13 +152,13 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                 children: [
                   Text(
                     formatDate(orderTrackingDetails['createdAt']??""),
-                    style: TextStyle(fontSize: width * 0.035),
+                    style: GoogleFonts.mulish(fontSize: width * 0.035,color: whiteColor),
                   ),
                   
                 ],
               ),
               Divider(
-                color: Colors.grey.shade300,
+                color: greyColor,
                 thickness: 1,
                 height: height * 0.035,
               ),
@@ -186,15 +187,15 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                 alignment: Alignment.centerLeft,
                 child: Text(
                   "Bill Details",
-                  style: TextStyle(
+                  style: GoogleFonts.mulish(
                     fontWeight: FontWeight.bold,
                     fontSize: width * 0.045,
-                    fontFamily: "Urbanist",
+                    color: whiteColor
                   ),
                 ),
               ),
               Divider(
-                color: Colors.grey.shade300,
+                color: greyColor,
                 thickness: 1,
                 height: height * 0.035,
               ),
@@ -207,13 +208,14 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                     Expanded(
                       child: Row(
                         children: [
-                          Icon(Icons.currency_rupee),
+                          Icon(Icons.currency_rupee,color: greyColor,),
                           Text(
                             " Item total",
-                            style: TextStyle(
+                            style: GoogleFonts.mulish(
                               fontSize: width * 0.04,
                               fontWeight: FontWeight.normal,
-                              fontFamily: "Urbanist",
+                              color: greyColor
+                              
                             ),
                           ),
                         ],
@@ -221,10 +223,10 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                     ),
                     Text(
                       "₹ ${orderTrackingDetails["itemTotal"]}",
-                      style: TextStyle(
+                      style: GoogleFonts.mulish(
                         fontSize: width * 0.04,
                         fontWeight: FontWeight.bold,
-                        fontFamily: "Urbanist",
+                        color: greyColor
                       ),
                     ),
                   ],
@@ -238,13 +240,13 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                     Expanded(
                       child: Row(
                         children: [
-                          Icon(Icons.shopping_bag_outlined),
+                          Icon(Icons.shopping_bag_outlined,color: greyColor,),
                           Text(
                             " GST and Platform Fees ",
-                            style: TextStyle(
+                            style: GoogleFonts.mulish(
                               fontSize: width * 0.04,
                               fontWeight: FontWeight.normal,
-                              fontFamily: "Urbanist",
+                              color: greyColor
                             ),
                           ),
                         ],
@@ -252,9 +254,9 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                     ),
                     Text(
                       "₹${orderTrackingDetails["gstServiceCharge"]}",
-                      style: TextStyle(
+                      style: GoogleFonts.mulish(
                         fontSize: width * 0.04,
-                        fontFamily: "Urbanist",
+                      color: greyColor
                       ),
                     ),
                   ],
@@ -268,13 +270,13 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                     Expanded(
                       child: Row(
                         children: [
-                          Icon(Icons.shopping_cart_outlined),
+                          Icon(Icons.shopping_cart_outlined,color: greyColor,),
                           Text(
                             " Delivery charge (Inc taxes)",
-                            style: TextStyle(
+                            style: GoogleFonts.mulish(
                               fontSize: width * 0.04,
                               fontWeight: FontWeight.normal,
-                              fontFamily: "Urbanist",
+                              color: greyColor
                             ),
                           ),
                         ],
@@ -282,16 +284,17 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                     ),
                     Text(
                       "₹ ${orderTrackingDetails["shippingCost"]}",
-                      style: TextStyle(
+                      style: GoogleFonts.mulish(
+                        color: greyColor,
                         fontSize: width * 0.04,
-                        fontFamily: "Urbanist",
+                        
                       ),
                     ),
                   ],
                 ),
               ),
               Divider(
-                color: Colors.grey.shade300,
+                color: greyColor,
                 thickness: 1,
                 height: height * 0.035,
               ),
@@ -303,21 +306,21 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                   children: [
                     Text(
                       "Grand total",
-                      style: TextStyle(
+                      style: GoogleFonts.mulish(
                         fontWeight: FontWeight.bold,
                         fontSize: width * 0.050,
-                        fontFamily: "Urbanist",
+                        color: whiteColor,
                       ),
                     ),
                     Row(
                       children: [
-                        Icon(Icons.currency_rupee),
+                        Icon(Icons.currency_rupee,color: whiteColor,),
                         Text(
                           "${orderTrackingDetails["totalAmount"]}",
-                          style: TextStyle(
+                          style: GoogleFonts.mulish(
                             fontWeight: FontWeight.bold,
                             fontSize: width * 0.050,
-                            fontFamily: "Urbanist",
+                            color: whiteColor
                           ),
                         ),
                       ],
@@ -442,8 +445,8 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
       margin: EdgeInsets.symmetric(vertical: height * 0.01),
       padding: EdgeInsets.all(width * 0.03),
       decoration: BoxDecoration(
-        color: Colors.grey.shade100,
-        borderRadius: BorderRadius.circular(width * 0.04),
+        color: ligtBlackColor,
+        borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
         children: [
@@ -463,18 +466,18 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
               children: [
                 Text(
                   "$MedicineName",
-                  style: TextStyle(
+                  style: GoogleFonts.mulish(
                     fontSize: width * 0.04,
                     fontWeight: FontWeight.w600,
-                    fontFamily: "Urbanist",
+                    color: whiteColor
                   ),
                 ),
                 SizedBox(height: height * 0.005),
                 Text(
                   "$quantity x ₹$Price",
-                  style: TextStyle(
+                  style: GoogleFonts.mulish(
                     fontSize: width * 0.035,
-                    color: Colors.grey.shade600,
+                    color: greyColor,
                   ),
                 ),
               ],
@@ -482,7 +485,8 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
           ),
           Text(
             "₹ ${total.toStringAsFixed(2)}",
-            style: TextStyle(
+            style: GoogleFonts.mulish(
+              color: whiteColor,
               fontSize: width * 0.04,
               fontWeight: FontWeight.bold,
             ),
@@ -549,7 +553,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
               decoration: BoxDecoration(
                 color: ligtBlackColor,
                 borderRadius:
-                    BorderRadius.vertical(top: Radius.circular(width * 0.06)),
+                    BorderRadius.vertical(top: Radius.circular(8)),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black12,

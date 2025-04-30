@@ -1,6 +1,7 @@
 import 'package:cureeit_user_app/cards/favorites_card.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -53,7 +54,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: scaffoldBlackColor,
+        backgroundColor: ligtBlackColor,
         leadingWidth: 200,
         toolbarHeight: 60,
         leading: Padding(
@@ -64,10 +65,10 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
             children: [
               Text(
                 "Favorites",
-                style: TextStyle(
+                style: GoogleFonts.mulish(
                     fontWeight: FontWeight.w600,
                     fontSize: MediaQuery.of(context).size.width * 0.06,
-                    fontFamily: "JosefinSans",
+                    
                     color: whiteColor),
               ),
             ],
@@ -75,47 +76,41 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
         ),
       ),
       body: Container(
-        margin: EdgeInsets.only(bottom: MediaQuery.of(context).size.height*0.03),
-        padding: EdgeInsets.only(bottom: MediaQuery.of(context).size.height*0.05),
+        padding:EdgeInsets.only(top: 24,bottom: 40,left: 20,right: 20),
+        margin: EdgeInsets.only(bottom: 20),
         color: scaffoldBlackColor,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 0.0, horizontal: 18),
-          child: Padding(
-            padding: const EdgeInsets.only(top: 6.0),
-            child: FutureBuilder<List<String>>(
-              future: favoritesFuture, // use stored future
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return Container(
-                    color: scaffoldBlackColor,
-                    child: Center(
-                        child: CircularProgressIndicator(
-                      color: whiteColor,
-                    )),
+        child: FutureBuilder<List<String>>(
+          future: favoritesFuture, // use stored future
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Container(
+                color: scaffoldBlackColor,
+                child: Center(
+                    child: CircularProgressIndicator(
+                  color: whiteColor,
+                )),
+              );
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return Center(child: Text('No favorites found.'));
+            } else {
+              final favoritesList = snapshot.data!;
+              return ListView.builder(
+                itemCount: favoritesList.length,
+                itemBuilder: (context, index) {
+                  final productId = favoritesList[index];
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 6),
+                    child: FavoritesCard(
+                      productId: productId,
+                      onUpdate: refreshFavorites, // trigger setState
+                    ),
                   );
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Error: ${snapshot.error}'));
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return Center(child: Text('No favorites found.'));
-                } else {
-                  final favoritesList = snapshot.data!;
-                  return ListView.builder(
-                    itemCount: favoritesList.length,
-                    itemBuilder: (context, index) {
-                      final productId = favoritesList[index];
-                      return Padding(
-                        padding: const EdgeInsets.only(bottom: 6),
-                        child: FavoritesCard(
-                          productId: productId,
-                          onUpdate: refreshFavorites, // trigger setState
-                        ),
-                      );
-                    },
-                  );
-                }
-              },
-            ),
-          ),
+                },
+              );
+            }
+          },
         ),
       ),
     );

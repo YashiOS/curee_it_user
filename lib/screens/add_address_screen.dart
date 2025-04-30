@@ -1,13 +1,12 @@
 import 'package:cureeit_user_app/screens/base_screen.dart';
 import 'package:cureeit_user_app/screens/home_screen.dart';
 import 'package:cureeit_user_app/selected_Address/currentAddress.dart';
+import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
-
-
 
 class AddAddressScreen extends StatefulWidget {
   final String userId;
@@ -31,10 +30,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
   final _landmarkController = TextEditingController();
   final _floorController = TextEditingController();
   final _typeController = TextEditingController();
-  bool isButtonEnabled=false;
-
-
-  
+  bool isButtonEnabled = false;
 
   Future<void> addAddress() async {
     const String url =
@@ -80,21 +76,15 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
   }
 
   InputDecoration _inputDecoration(String hint) {
-  return InputDecoration(
-    hintText: hint,
-    hintStyle: const TextStyle(color: Colors.black54),
-    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(14),
-      borderSide: const BorderSide(color: Colors.grey),
-    ),
-    focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(14),
-      borderSide: const BorderSide(color: Color(0xFF0A9682), width: 2),
-    ),
-  );
-}
- @override
+    return InputDecoration(
+        hintText: hint,
+        hintStyle:  GoogleFonts.mulish(color: whiteColor),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        border: InputBorder.none);
+  }
+
+  @override
   void initState() {
     _line1Controller.addListener(_checkFields);
     _line2Controller.addListener(_checkFields);
@@ -104,117 +94,156 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
   }
 
   void _checkFields() {
-  setState(() {
-    isButtonEnabled = _line1Controller.text.trim().isNotEmpty &&
-                      _line2Controller.text.trim().isNotEmpty&&_typeController.text.trim().isNotEmpty;
-  });
-}
-
+    setState(() {
+      isButtonEnabled = _line1Controller.text.trim().isNotEmpty &&
+          _line2Controller.text.trim().isNotEmpty &&
+          _typeController.text.trim().isNotEmpty;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Container(
-        padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.085, vertical: MediaQuery.of(context).size.height * 0.03),
+        padding: EdgeInsets.symmetric(
+            horizontal: MediaQuery.of(context).size.width * 0.085,
+            vertical: MediaQuery.of(context).size.height * 0.03),
         decoration: const BoxDecoration(
-          color: Color(0xFFF9FCFB),
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          color: scaffoldBlackColor,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             // Close Button
             Align(
               alignment: Alignment.topRight,
               child: GestureDetector(
                 onTap: () => Navigator.pop(context),
-                child: const Icon(Icons.close, size: 30, color: Color.fromARGB(255, 121, 159, 138)),
-              ),
-            ),
-             Text(
-              "Add Your Address",
-              style: TextStyle(
-                fontSize: MediaQuery.of(context).size.width * 0.055,
-                fontFamily: "Urbanist",
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF0A9682),
+                child: const Icon(Icons.close, size: 30, color: whiteColor),
               ),
             ),
             Text(
-              "For a seamless delivery experience, help us locate you perfectly",
-              style: TextStyle(
-                fontSize: MediaQuery.of(context).size.width * 0.03,
-                fontFamily: "Urbanist",
+              "Add Your Address",
+              style: GoogleFonts.mulish(
+                fontSize: MediaQuery.of(context).size.width * 0.055,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF0A9682),
+                color: whiteColor,
+              ),
+            ),
+            SizedBox(height: 10,),
+            Text(
+              "For a seamless delivery experience, help us locate you perfectly",
+              style: GoogleFonts.mulish(
+                fontSize: MediaQuery.of(context).size.width * 0.03,
+               
+                fontWeight: FontWeight.bold,
+                color: greyColor,
               ),
             ),
 
             const SizedBox(height: 20),
-            TextField(
-              cursorColor:Color(0xFF0A9682) ,
-              controller: _line1Controller,
-              decoration: _inputDecoration("Flat/House No., Street, Area"),
+            Container(
+              margin: EdgeInsets.only(bottom: 10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: ligtBlackColor,
+              ),
+              child: TextField(
+                style: GoogleFonts.mulish(color: whiteColor ),
+                cursorColor: greenColor,
+                controller: _line1Controller,
+                decoration: _inputDecoration("Flat/House No., Street, Area"),
+              ),
             ),
             const SizedBox(height: 12),
-            TextField(
-              cursorColor:Color(0xFF0A9682) ,
-              controller: _line2Controller,
-              decoration: _inputDecoration("City, State, Pincode"),
+            Container(
+              
+              margin: EdgeInsets.only(bottom: 10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: ligtBlackColor,
+              ),
+              child: TextField(
+                style: GoogleFonts.mulish(color: whiteColor ),
+                cursorColor: greenColor,
+                controller: _line2Controller,
+                decoration: _inputDecoration("City, State, Pincode"),
+              ),
             ),
             const SizedBox(height: 12),
-            TextField(
-              cursorColor:Color(0xFF0A9682) ,
-              controller: _landmarkController,
-              decoration: _inputDecoration("Landmark (Optional)"),
+            Container(
+              margin: EdgeInsets.only(bottom: 10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: ligtBlackColor,
+              ),
+              child: TextField(
+                style: GoogleFonts.mulish(color: whiteColor ),
+                cursorColor: greenColor,
+                controller: _landmarkController,
+                decoration: _inputDecoration("Landmark (Optional)"),
+              ),
             ),
             const SizedBox(height: 12),
-            TextField(
-              cursorColor:Color(0xFF0A9682) ,
-              controller: _floorController,
-              decoration: _inputDecoration("Floor (Optional)"),
+            Container(
+              margin: EdgeInsets.only(bottom: 10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: ligtBlackColor,
+              ),
+              child: TextField(
+                style: GoogleFonts.mulish(color: whiteColor ),
+                cursorColor: greenColor,
+                controller: _floorController,
+                decoration: _inputDecoration("Floor (Optional)"),
+              ),
             ),
             const SizedBox(height: 12),
-            TextField(
-              cursorColor:Color(0xFF0A9682) ,
-              controller: _typeController,
-              decoration: _inputDecoration("Type (e.g., Home, Office)"),
+            Container(
+               margin: EdgeInsets.only(bottom: 10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                 color: ligtBlackColor,
+              ),
+              child: TextField(
+                style: GoogleFonts.mulish(color: whiteColor ),
+                cursorColor: greenColor,
+                controller: _typeController,
+                decoration: _inputDecoration("Type (e.g., Home, Office)"),
+              ),
             ),
-
+            const SizedBox(height: 12),
             GestureDetector(
-              onTap:(){
-                if(isButtonEnabled){
-                    addAddress();
+              onTap: () {
+                if (isButtonEnabled) {
+                  addAddress();
                 }
-                
-              } ,
+              },
               child: Container(
-                  alignment: Alignment.bottomCenter,
-                  child: Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      isButtonEnabled? Image.asset(
-                        "lib/images/saveButton.png",
-                        height: 100,
-                        width: 350,
-                        fit: BoxFit.contain,
-                      ):Image.asset(
-                        "lib/images/unablesaveButton.png",
-                        height: 100,
-                        width: 350,
-                        fit: BoxFit.contain,
-                      ),
-                      Text(
-                        "Save",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: MediaQuery.of(context).size.width*0.04,
-                          fontFamily: "Urbanist",
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),),
+                width: 75,
+                height: 35,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: greenColor,
+                    width: 1
+                  ),
+                  color: isButtonEnabled?greenColor:scaffoldBlackColor
+                ),
+                alignment: Alignment.bottomCenter,
+                child: Center(
+                  child: Text(
+                    "Save",
+                    style: GoogleFonts.mulish(
+                      color:isButtonEnabled? Colors.white:greenColor,
+                      fontSize: MediaQuery.of(context).size.width * 0.04,
+                     
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ),
+              ),
             ),
           ],
         ),

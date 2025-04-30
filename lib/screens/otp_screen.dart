@@ -1,6 +1,7 @@
 import 'package:cureeit_user_app/screens/base_screen.dart';
 import 'package:cureeit_user_app/screens/home_screen.dart';
-import 'package:cureeit_user_app/utils/otp_form.dart';
+import 'package:cureeit_user_app/selected_Address/otp_form.dart';
+
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -18,6 +19,7 @@ class _OtpScreenState extends State<OtpScreen> {
   String otp = ""; // Store the combined OTP
 
   void handleOtpEntered(bool entered) {
+    print(entered);
     setState(() {
       otpEntered = entered;
     });
@@ -100,15 +102,15 @@ Widget build(BuildContext context) {
                           color: greenColor,
                           width: 1,
                         ),
-                        color: scaffoldBlackColor,
+                        color:otpEntered?greenColor: scaffoldBlackColor,
                       ),
                       alignment: Alignment.center,
                       child: Text(
                         "Next",
                         style: GoogleFonts.mulish(
-                          color: greenColor,
+                          color:otpEntered?whiteColor: greenColor,
                           fontSize: screenHeight * 0.018,
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),

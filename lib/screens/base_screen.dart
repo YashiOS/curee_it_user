@@ -71,7 +71,7 @@ class _BaseScreenState extends State<BaseScreen> {
                                   icon: Icon(Icons.favorite_border_outlined),
                                   text: "Favorites"),
                               Tab(icon: Icon(Icons.lock_clock), text: "Orders"),
-                              Tab(icon: Icon(Icons.trolley), text: "Cart"),
+                              Tab(icon: Icon(Icons.shopping_cart_outlined), text: "Cart"),
                             ],
                           ),
                         ),

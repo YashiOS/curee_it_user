@@ -2,12 +2,15 @@ import 'package:cureeit_user_app/screens/order_tracking_screen.dart';
 import 'package:cureeit_user_app/screens/orderdetail_screen_new.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 class OrderCard extends StatelessWidget {
-  
   final dynamic orderData;
-  const OrderCard({super.key, required this.orderData,});
+  const OrderCard({
+    super.key,
+    required this.orderData,
+  });
 
   String formatDate(String isoDate) {
     // Parse the ISO 8601 string into a DateTime object
@@ -42,165 +45,155 @@ class OrderCard extends StatelessWidget {
     double shippingCost = double.parse(orderData['totalAmount']);
     List orderItems = orderData['orderItems'];
     String orderId = orderData['orderId'];
-    
+
     print(orderData);
 
     String allItems = formatOrderItems(orderItems);
 
     return Padding(
-  padding: EdgeInsets.only(
-    top: MediaQuery.of(context).size.height * 0.02,
-  ),
-  child: GestureDetector(
-    onTap: () {
-      if (orderStatus == "Order Placed" || orderStatus == "Packing" || orderStatus == "On the way") {
-           Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => OrderTrackingScreen(NavigatingFrom: "Order History", orderId: orderId,),
+      padding: EdgeInsets.only(
+        top: MediaQuery.of(context).size.height * 0.02,
       ),
-    );
-   } else {
-     Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => OrderdetailScreenNew(orderData: orderData),
-        ),
-      );
-    }
-    },
-    child: LayoutBuilder(
-      builder: (context, constraints) {
-        final screenWidth = MediaQuery.of(context).size.width;
-        final screenheight=MediaQuery.of(context).size.height;
+      child: GestureDetector(
+        onTap: () {
+          if (orderStatus == "Order Placed" ||
+              orderStatus == "Packing" ||
+              orderStatus == "On the way") {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => OrderTrackingScreen(
+                  NavigatingFrom: "Order History",
+                  orderId: orderId,
+                ),
+              ),
+            );
+          } else {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    OrderdetailScreenNew(orderData: orderData),
+              ),
+            );
+          }
+        },
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final screenWidth = MediaQuery.of(context).size.width;
+            final screenheight = MediaQuery.of(context).size.height;
 
-        return Container(
-          padding: EdgeInsets.symmetric(
-            vertical: screenheight * 0.015,
-            horizontal: screenWidth * 0.035,
-          ),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            color: ligtBlackColor,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.end,
+            return Container(
+              padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                color: ligtBlackColor,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      
-                      Text(
-                        "Order ID: ${orderData['orderId'] ?? '?'}",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: screenheight * 0.016,
-                          fontFamily: "Urbanist",
-                          color:greenColor,
-                        ),
-                      ),
-                      Text(
-                        "Date: ${formatDate(purchaseDate) ?? "N/A"}",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w600,
-                          fontSize: screenheight * 0.013,
-                          fontFamily: "Urbanist",
-                          color: greyColor,
-                        ),
-                      ),
-                      SizedBox(
-                        width: screenWidth * 0.6,
-                        child: Text(
-                          orderData['shippingAddress'],
-                          style: TextStyle(
-                            fontWeight: FontWeight.w600,
-                            fontSize: screenheight * 0.0128,
-                            fontFamily: "Urbanist",
-                            color:greyColor,
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: 165,
+                            child: Text(
+                              maxLines: 1,
+                              allItems,
+                              style: GoogleFonts.mulish(
+                                fontSize: 17.02,
+                                fontWeight: FontWeight.w500,
+                                color: whiteColor,
+                              ),
+                            ),
                           ),
-                        ),
+                          Text(
+                            "${formatDate(purchaseDate) ?? "N/A"}",
+                            style: GoogleFonts.mulish(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 12,
+                              color: greyColor,
+                            ),
+                          ),
+                        ],
                       ),
                       Text(
                         "₹ ${shippingCost.toStringAsFixed(2)}",
-                        style: TextStyle(
+                        style: GoogleFonts.mulish(
                           fontWeight: FontWeight.w500,
-                          fontSize: screenheight * 0.018,
-                          fontFamily: "JosefinSans",
+                          fontSize: 17,
                           color: whiteColor,
                         ),
                       ),
                     ],
                   ),
-                  Text(
-                    orderStatus.toUpperCase(),
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: screenheight * 0.014,
-                      fontFamily: "Urbanist",
-                      color: whiteColor,
-                    ),
-                  ),
-                ],
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  vertical: screenWidth * 0.02,
-                ),
-                child: Image.asset("lib/images/dotted_divider.png"),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
                   SizedBox(
-                    width: screenWidth * 0.5,
-                    child: Text(
-                      maxLines:1,
-                      allItems,
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: screenheight * 0.0145,
-                        
-
-                        fontFamily: "Urbanist",
-                        color: greyColor,
-                      ),
-                    ),
+                    height: 24,
                   ),
-                  orderItems.length>2? Text(
-                      maxLines:1,
-                      " + more items",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w500,
-                        fontSize: screenheight * 0.0145,
-                        fontFamily: "Urbanist",
-                        color: greyColor,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Address",
+                            style: GoogleFonts.mulish(
+                              fontWeight: FontWeight.w600,
+                              fontSize: 17.02,
+                              color: whiteColor,
+                            ),
+                          ),
+                          SizedBox(
+                            width: screenWidth * 0.4,
+                            child: Text(
+                              orderData['shippingAddress'],
+                              style: GoogleFonts.mulish(
+                                fontWeight: FontWeight.w300,
+                                fontSize: 12,
+                                color: whiteColor,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ):Text(""),
-                  Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
-                      color:greenColor,
-                    ),
-                    child: Icon(
-                      Icons.chevron_right,
-                      color:whiteColor,
-                      size: screenWidth * 0.07,
-                    ),
-                  )
+                      Container(
+                        padding: EdgeInsets.symmetric(vertical: 8,horizontal: 16),
+                        decoration: BoxDecoration(
+                            color: greenColor,
+                            borderRadius: BorderRadius.circular(8)
+                        ),
+                        
+                        child:orderStatus=="Delivered"||orderStatus==""?Text(
+                          "Reorder",
+                          style: GoogleFonts.mulish(
+                            fontWeight: FontWeight.bold,
+                            fontSize: screenheight * 0.014,
+                           
+                            color: whiteColor,
+                          ),
+                        ): Text(
+                          orderStatus,
+                          style: GoogleFonts.mulish(
+                            fontWeight: FontWeight.bold,
+                            fontSize: screenheight * 0.014,
+                           
+                            color: whiteColor,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
-            ],
-          ),
-        );
-      },
-    ),
-  ),
-);
-
+            );
+          },
+        ),
+      ),
+    );
   }
 
   // Helper function to format the orderItems list into a string

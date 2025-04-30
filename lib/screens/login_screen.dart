@@ -12,6 +12,7 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _controller = TextEditingController();
+  bool isButtonEnabled=false;
 
   void _validateAndProceed() {
     String phoneNumber = _controller.text.trim();
@@ -27,6 +28,18 @@ class _LoginScreenState extends State<LoginScreen> {
             builder: (context) => OtpScreen(phoneNumber: phoneNumber)),
       );
     }
+  }
+
+  @override
+  void initState() {
+    _controller.addListener(_checkButton);
+    super.initState();
+  }
+
+  void _checkButton(){
+       setState(() {
+         isButtonEnabled=_controller.text.trim().length==10;
+       });
   }
 
 @override
@@ -109,7 +122,7 @@ Widget build(BuildContext context) {
                         _validateAndProceed();
                       },
                       style: TextButton.styleFrom(
-                        backgroundColor: scaffoldBlackColor,
+                        backgroundColor:isButtonEnabled?greenColor: scaffoldBlackColor,
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
                           side: BorderSide(color: greenColor, width: 1),
@@ -118,9 +131,9 @@ Widget build(BuildContext context) {
                       child: Text(
                         "Next",
                         style: GoogleFonts.mulish(
-                          color: greenColor,
+                          color:isButtonEnabled?whiteColor: greenColor,
                           fontSize: screenHeight * 0.018,
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),

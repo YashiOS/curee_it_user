@@ -5,7 +5,6 @@ import 'package:cureeit_user_app/current_address/location_permission_helper.dart
 import 'package:cureeit_user_app/current_address/models/place_from_coordinates.dart';
 import 'package:cureeit_user_app/selected_Address/currentAddress.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
-import 'package:cureeit_user_app/widgets/LoadingIndicater.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -365,7 +364,7 @@ class _HomeScreenState extends State<HomeScreen> {
         int secondIndex = firstIndex + 1;
 
         return Container(
-          margin: EdgeInsets.only(bottom: 16),
+          margin:cartItems.isNotEmpty?EdgeInsets.only(bottom: 36): EdgeInsets.only(bottom: 16),
           child: Row(
             children: [
               // First product
@@ -423,7 +422,7 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           // 🔵 Product Image (30%)
           SizedBox(
-            width: 147.5,
+          width: double.infinity,
             height: 109,
             child: GestureDetector(
               onTap: () {
@@ -437,7 +436,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               },
               child: Container(
-                width: 147.5,
+              width: double.infinity,
                 height: 109,
                 decoration: BoxDecoration(
                   color: whiteColor,
@@ -859,18 +858,7 @@ class _HomeScreenState extends State<HomeScreen> {
               const SizedBox(height: 16),
 
               // Saved Addresses Header
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 8.0),
-                child: Text(
-                  "Your saved addresses",
-                  style: TextStyle(
-                    fontFamily: "Urbanist",
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey,
-                  ),
-                ),
-              ),
+              
               const SizedBox(height: 8),
 
               // Saved Addresses List Container
@@ -1034,7 +1022,7 @@ class _HomeScreenState extends State<HomeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Image.asset("lib/images/medkaroLogo.png"),
+                
                 SizedBox(
                   height: 69,
                 ),
@@ -1052,12 +1040,12 @@ class _HomeScreenState extends State<HomeScreen> {
                         GestureDetector(
                           onTap: (){
                            
-                      if (ISserviceAvilable) {
+                    
                         Navigator.push(
                             context,
                             MaterialPageRoute(
                                 builder: (context) => ProfileScreen()));
-                      }
+                      
                           },
                           child: Container(
                             height: 36,
@@ -1146,7 +1134,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   },
                   child: Container(
                     width: 311,
-                    height: 36,
+                    height: 43,
+                    margin: EdgeInsets.only(bottom: 12),
                     decoration: BoxDecoration(
                       color: ligtBlackColor,
                       borderRadius: BorderRadius.circular(8),
@@ -1208,9 +1197,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             SizedBox(height: 10),
                             Container(
                                 color: scaffoldBlackColor,
-                                height: cartItems.isNotEmpty
-                                    ? MediaQuery.of(context).size.height * 0.47
-                                    : null,
+                                padding:cartItems.isNotEmpty? EdgeInsets.only(bottom: 140):EdgeInsets.only(bottom: 20),
                                 child: isInRadius == null
                                     ? Shimmer.fromColors(
                                         baseColor: Colors.grey[300]!,

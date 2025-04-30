@@ -1,9 +1,14 @@
 import 'package:cureeit_user_app/cubit/service_avilable_cubit.dart';
+import 'package:cureeit_user_app/current_address/google_maps_screen.dart';
 import 'package:cureeit_user_app/screens/base_screen.dart';
+import 'package:cureeit_user_app/screens/cart_screen.dart';
+import 'package:cureeit_user_app/screens/favorites_screen.dart';
 import 'package:cureeit_user_app/screens/home_screen.dart';
 import 'package:cureeit_user_app/screens/item_detail_screen.dart';
+import 'package:cureeit_user_app/screens/location.dart';
 import 'package:cureeit_user_app/screens/login_screen.dart';
 import 'package:cureeit_user_app/screens/order_tracking_screen.dart';
+import 'package:cureeit_user_app/screens/orders_screen.dart';
 import 'package:cureeit_user_app/screens/otp_screen.dart';
 import 'package:cureeit_user_app/screens/profile_screen.dart';
 import 'package:cureeit_user_app/screens/splashScreen.dart';
@@ -32,12 +37,15 @@ class MyApp extends StatelessWidget {
       },
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
+        appBarTheme: AppBarTheme(
+          color: ligtBlackColor
+        ),
         scaffoldBackgroundColor: scaffoldBlackColor,
         colorScheme: ColorScheme.fromSeed(seedColor:greenColor),
         useMaterial3: true,
       ),
-      home: Splashscreen()
-    );
+      home: Splashscreen()  
+      );
   }
 }
 

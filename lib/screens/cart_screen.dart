@@ -7,9 +7,11 @@ import 'package:cureeit_user_app/screens/addresses_screen.dart';
 import 'package:cureeit_user_app/selected_Address/currentAddress.dart';
 import 'package:cureeit_user_app/utils/razor_pay.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
-import 'package:cureeit_user_app/widgets/LoadingIndicater.dart';
+import 'package:cureeit_user_app/utils/widgets/LoadingIndicater.dart';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
@@ -474,13 +476,13 @@ class _CartScreenState extends State<CartScreen> {
                   child: Row(
                     spacing: 4,
                     children: [
-                      Icon(Icons.arrow_back, color: greenColor),
+                      Icon(Icons.arrow_back, color: whiteColor),
                       Text(
                         "Back",
-                        style: TextStyle(
+                        style: GoogleFonts.mulish(
                             fontWeight: FontWeight.w600,
                             fontSize: 14,
-                            fontFamily: "Urbanist",
+                          
                             color: whiteColor),
                       )
                     ],
@@ -510,11 +512,11 @@ class _CartScreenState extends State<CartScreen> {
                           Row(children: [
                             Text(
                               "Cart",
-                              style: TextStyle(
+                              style: GoogleFonts.mulish(
                                   fontWeight: FontWeight.w600,
                                   fontSize:
                                       MediaQuery.of(context).size.width * 0.06,
-                                  fontFamily: "JosefinSans",
+                                  
                                   color: whiteColor),
                             )
                           ]),
@@ -538,10 +540,10 @@ class _CartScreenState extends State<CartScreen> {
                                   children: [
                                     Text(
                                       'Upload your prescription',
-                                      style: TextStyle(
+                                      style: GoogleFonts.mulish(
                                         color: Colors.white,
                                         fontSize: 16,
-                                        fontFamily: "JosefinSans",
+                                       
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
@@ -565,7 +567,7 @@ class _CartScreenState extends State<CartScreen> {
                             width: MediaQuery.of(context).size.width,
                             decoration: BoxDecoration(
                                 color: ligtBlackColor,
-                                borderRadius: BorderRadius.circular(10)),
+                                borderRadius: BorderRadius.circular(8)),
                             child: Stack(
                               children: [
                                 isLoading
@@ -593,7 +595,7 @@ class _CartScreenState extends State<CartScreen> {
                                                       vertical: 16.0),
                                                   child: Text(
                                                     "No Items in Cart",
-                                                    style: TextStyle(
+                                                    style: GoogleFonts.mulish(
                                                         fontSize: MediaQuery.of(
                                                                     context)
                                                                 .size
@@ -669,27 +671,25 @@ class _CartScreenState extends State<CartScreen> {
                                                       children: [
                                                         Text(
                                                           "Item Total",
-                                                          style: TextStyle(
+                                                          style: GoogleFonts.mulish(
                                                             fontWeight:
                                                                 FontWeight.w400,
                                                             fontSize:
                                                                 screenWidth *
                                                                     0.03,
-                                                            fontFamily:
-                                                                "Urbanist",
+                                                            
                                                             color: greyColor,
                                                           ),
                                                         ),
                                                         Text(
                                                           "₹${(totalAmount)}",
-                                                          style: TextStyle(
+                                                          style: GoogleFonts.mulish(
                                                             fontWeight:
                                                                 FontWeight.w400,
                                                             fontSize:
                                                                 screenWidth *
                                                                     0.03,
-                                                            fontFamily:
-                                                                "Urbanist",
+                                                            
                                                             color: greyColor,
                                                           ),
                                                         ),
@@ -706,38 +706,29 @@ class _CartScreenState extends State<CartScreen> {
                                                           children: [
                                                             Text(
                                                               "Delivery Fee",
-                                                              style: TextStyle(
+                                                              style: GoogleFonts.mulish(
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .w400,
                                                                 fontSize:
                                                                     screenWidth *
                                                                         0.03,
-                                                                fontFamily:
-                                                                    "Urbanist",
+                                                                
                                                                 color:
                                                                     greyColor,
                                                               ),
                                                             ),
-                                                            Image.asset(
-                                                              "lib/images/cart_i_button.png",
-                                                              height: 10,
-                                                              width: 10,
-                                                              fit: BoxFit
-                                                                  .contain,
-                                                            )
+                                                            
                                                           ],
                                                         ),
                                                         Text(
                                                           "₹${deliveryServiceFees}",
-                                                          style: TextStyle(
+                                                          style: GoogleFonts.mulish(
                                                             fontWeight:
                                                                 FontWeight.w400,
-                                                            fontSize:
-                                                                screenWidth *
-                                                                    0.03,
-                                                            fontFamily:
-                                                                "Urbanist",
+                                                            fontSize:12,
+                                                                
+                                                            
                                                             color: greyColor,
                                                           ),
                                                         ),
@@ -754,57 +745,41 @@ class _CartScreenState extends State<CartScreen> {
                                                           children: [
                                                             Text(
                                                               "GST and Platform Fees",
-                                                              style: TextStyle(
+                                                              style: GoogleFonts.mulish(
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .w400,
-                                                                fontSize:
-                                                                    screenWidth *
-                                                                        0.03,
-                                                                fontFamily:
-                                                                    "Urbanist",
+                                                                fontSize:12,
+                                                                    
+                                                                
                                                                 color:
                                                                     greyColor,
                                                               ),
                                                             ),
-                                                            Image.asset(
-                                                              "lib/images/cart_i_button.png",
-                                                              height: 10,
-                                                              width: 10,
-                                                              fit: BoxFit
-                                                                  .contain,
-                                                            )
+                                                            
                                                           ],
                                                         ),
                                                         Text(
                                                           "₹${taxServices}",
-                                                          style: TextStyle(
+                                                          style: GoogleFonts.mulish(
                                                             fontWeight:
                                                                 FontWeight.w400,
-                                                            fontSize:
-                                                                screenWidth *
-                                                                    0.03,
-                                                            fontFamily:
-                                                                "Urbanist",
+                                                            fontSize:12,
+                                                                
+                                                           
                                                             color: greyColor,
                                                           ),
                                                         ),
                                                       ],
                                                     ),
-                                                    Padding(
-                                                      padding: EdgeInsets.only(
-                                                          top: screenHeight *
-                                                              0.05),
-                                                      child: Image.asset(
-                                                        "lib/images/dotted_divider.png",
-                                                      ),
-                                                    ),
+                                                    SizedBox(height: 15,),
                                                     Row(
                                                       mainAxisAlignment:
                                                           MainAxisAlignment
                                                               .spaceBetween,
                                                       children: [
                                                         Container(
+                                                         
                                                           height: screenHeight *
                                                               0.06,
                                                           width:
@@ -813,16 +788,16 @@ class _CartScreenState extends State<CartScreen> {
                                                               Alignment.center,
                                                           decoration:
                                                               BoxDecoration(
+                                                               color: payNow?greenColor:ligtBlackColor,
                                                             border: Border.all(
                                                               color: greenColor,
                                                               width: 1,
                                                             ),
-                                                            color:
-                                                                ligtBlackColor, // Setting the background color to primary color
+                                                           // Setting the background color to primary color
                                                             borderRadius:
                                                                 BorderRadius
                                                                     .circular(
-                                                                        10), // Setting the border radius to 10
+                                                                        8), // Setting the border radius to 10
                                                           ),
                                                           child:
                                                               GestureDetector(
@@ -845,7 +820,7 @@ class _CartScreenState extends State<CartScreen> {
                                                                     .showSnackBar(
                                                                   SnackBar(
                                                                       content: Text(
-                                                                          'Upload Prescription')),
+                                                                          'Upload Prescription',style: GoogleFonts.mulish(color: whiteColor),)),
                                                                 );
                                                                 return;
                                                               }
@@ -898,11 +873,10 @@ class _CartScreenState extends State<CartScreen> {
                                                                   ? Text(
                                                                       "Add your address first",
                                                                       style:
-                                                                          TextStyle(
+                                                                          GoogleFonts.mulish(
                                                                         color:
                                                                             greenColor,
-                                                                        fontFamily:
-                                                                            "Urbanist",
+                                                                        
                                                                         fontSize:
                                                                             screenWidth *
                                                                                 0.025,
@@ -911,17 +885,16 @@ class _CartScreenState extends State<CartScreen> {
                                                                   : Text(
                                                                       "Pay Now",
                                                                       style:
-                                                                          TextStyle(
+                                                                          GoogleFonts.mulish(
                                                                         color: payNow
-                                                                            ? greenColor
-                                                                            : greyColor,
+                                                                            ? whiteColor
+                                                                            : greenColor,
                                                                         fontSize:
                                                                             screenWidth *
                                                                                 0.045,
-                                                                        fontFamily:
-                                                                            "Urbanist",
+                                                                        
                                                                         fontWeight:
-                                                                            FontWeight.w600,
+                                                                            FontWeight.bold,
                                                                       ),
                                                                     ),
                                                             ),
@@ -930,29 +903,27 @@ class _CartScreenState extends State<CartScreen> {
                                                         Column(children: [
                                                           Text(
                                                             "To Pay",
-                                                            style: TextStyle(
+                                                            style: GoogleFonts.mulish(
                                                                 fontWeight:
                                                                     FontWeight
-                                                                        .w600,
+                                                                        .bold,
                                                                 fontSize:
                                                                     screenWidth *
                                                                         0.04,
-                                                                fontFamily:
-                                                                    "Urbanist",
+                                                                
                                                                 color:
                                                                     greyColor),
                                                           ),
                                                           Text(
                                                             "₹${totalWholeAmount.toStringAsFixed(2)}",
-                                                            style: TextStyle(
+                                                            style: GoogleFonts.mulish(
                                                               fontWeight:
                                                                   FontWeight
                                                                       .w700,
                                                               fontSize:
                                                                   screenWidth *
                                                                       0.05,
-                                                              fontFamily:
-                                                                  "Urbanist",
+                                                             
                                                               color: whiteColor,
                                                             ),
                                                           ),
@@ -995,10 +966,10 @@ class _CartScreenState extends State<CartScreen> {
                                     children: [
                                       Text(
                                         "Delivery Address",
-                                        style: TextStyle(
+                                        style: GoogleFonts.mulish(
                                           fontWeight: FontWeight.w700,
                                           fontSize: screenWidth * 0.035,
-                                          fontFamily: "JosefinSans",
+                                          
                                           color: whiteColor,
                                         ),
                                       ),
@@ -1018,7 +989,7 @@ class _CartScreenState extends State<CartScreen> {
                                           decoration: BoxDecoration(
                                               color: greenColor,
                                               borderRadius:
-                                                  BorderRadius.circular(30)),
+                                                  BorderRadius.circular(8)),
                                           child: Row(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceBetween,
@@ -1028,10 +999,10 @@ class _CartScreenState extends State<CartScreen> {
                                                     ? selectedAddress!['type']
                                                     : "",
                                                 // addresses.isNotEmpty ? addresses[0]['type'] ?? 'N/A' : 'Others',
-                                                style: TextStyle(
+                                                style: GoogleFonts.mulish(
                                                   fontWeight: FontWeight.w400,
                                                   fontSize: 12,
-                                                  fontFamily: "Urbanist",
+                                                 
                                                   color: whiteColor,
                                                 ),
                                               ),
@@ -1050,12 +1021,12 @@ class _CartScreenState extends State<CartScreen> {
                                     Address.CurrentAddress != null
                                         ? "${Address.CurrentAddress!['address']} ${Address.CurrentAddress!['landmark'] != "" ? "\n landmark : ${Address.CurrentAddress!['landmark']}" : ""} ${Address.CurrentAddress!["floor"] != "" ? "\n floor : ${Address.CurrentAddress!["floor"]}" : ""}"
                                         : "N/A",
-                                    style: TextStyle(
+                                    style: GoogleFonts.mulish(
                                       fontWeight: FontWeight.w400,
                                       fontSize:
                                           MediaQuery.of(context).size.width *
                                               0.03,
-                                      fontFamily: "Urbanist",
+                                     
                                       color: whiteColor,
                                     ),
                                   ),

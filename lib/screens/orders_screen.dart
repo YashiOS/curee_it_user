@@ -1,6 +1,7 @@
 import 'package:cureeit_user_app/cards/order_card.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -45,10 +46,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
     } else {
       throw Exception('Failed to load order history');
     }
-    print("********THIS IS ORDER LIST LENGHT");
-    print(orders.length);
-    print("******THIS IS ORDER LIST DATA");
-    print(orders);
+   
   }
 
   @override
@@ -62,7 +60,8 @@ class _OrdersScreenState extends State<OrdersScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor:scaffoldBlackColor,
+        backgroundColor:ligtBlackColor,
+        elevation: 0,
         leadingWidth: 200,
         toolbarHeight: 60,
         leading: Padding(
@@ -74,10 +73,10 @@ class _OrdersScreenState extends State<OrdersScreen> {
             children: [
               Text(
                 "Orders",
-                style: TextStyle(
+                style: GoogleFonts.mulish(
                     fontWeight: FontWeight.w600,
                     fontSize: MediaQuery.of(context).size.width * 0.06,
-                    fontFamily: "JosefinSans",
+                    
                     color: whiteColor),
               ),
             ],

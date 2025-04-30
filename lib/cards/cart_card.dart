@@ -1,6 +1,7 @@
 import 'package:cureeit_user_app/screens/item_detail_screen.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
@@ -170,6 +171,7 @@ class _CartCardState extends State<CartCard> {
             Expanded(
               child: Row(
                 children: [
+                  SizedBox(width: 10,),
                   // Product Image
                   SizedBox(
                     height: MediaQuery.of(context).size.width * 0.1,
@@ -195,7 +197,8 @@ class _CartCardState extends State<CartCard> {
                   const SizedBox(width: 10),
 
                   /// Product Info
-                  Expanded(
+                  Container(
+                    width: 130,
                     child: GestureDetector(
                       onTap: () {
                         Navigator.push(
@@ -213,11 +216,11 @@ class _CartCardState extends State<CartCard> {
                             widget.productName,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
+                            style: GoogleFonts.mulish(
                               fontWeight: FontWeight.w700,
                               fontSize:
                                   MediaQuery.of(context).size.height * 0.0175,
-                              fontFamily: "JosefinSans",
+                              
                               color: whiteColor,
                             ),
                           ),
@@ -225,11 +228,11 @@ class _CartCardState extends State<CartCard> {
                             widget.packLabel,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
+                            style: GoogleFonts.mulish(
                               fontWeight: FontWeight.w400,
                               fontSize:
                                   MediaQuery.of(context).size.height * 0.015,
-                              fontFamily: "JosefinSans",
+                              
                               color: whiteColor,
                             ),
                           ),
@@ -243,15 +246,17 @@ class _CartCardState extends State<CartCard> {
 
             /// RIGHT SECTION - Quantity control + price
             Row(
+            
+          
               mainAxisSize: MainAxisSize.min,
               children: [
                 // Quantity Control
                 Container(
-                  width: MediaQuery.of(context).size.width * 0.25,
+                  width: MediaQuery.of(context).size.width * 0.20,
                   height: MediaQuery.of(context).size.height * 0.04,
                   decoration: BoxDecoration(
                     color: greenColor,
-                    borderRadius: BorderRadius.circular(30),
+                    borderRadius: BorderRadius.circular(8),
                   ),
                   padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: Row(
@@ -268,7 +273,8 @@ class _CartCardState extends State<CartCard> {
                             }
                           },
                           child: Icon(
-                            Icons.remove, // Flutter's built-in minus icon
+                            Icons.remove, 
+                            weight: 900,// Flutter's built-in minus icon
                             color: Colors.white, // Makes icon white
                             size: screenHeight *
                                 0.03, // Matches your original image height
@@ -284,10 +290,10 @@ class _CartCardState extends State<CartCard> {
                             )
                           : Text(
                               "$_localQuantity",
-                              style: const TextStyle(
-                                fontWeight: FontWeight.w700,
+                              style:  GoogleFonts.mulish(
+                                fontWeight: FontWeight.bold,
                                 fontSize: 12,
-                                fontFamily: "Urbanist",
+                                
                                 color: whiteColor,
                               ),
                             ),
@@ -298,7 +304,8 @@ class _CartCardState extends State<CartCard> {
                           }
                         },
                         child: Icon(
-                            Icons.add, // Flutter's built-in minus icon
+                            Icons.add,
+                            weight: 800, // Flutter's built-in minus icon
                             color: Colors.white, // Makes icon white
                             size: screenHeight *
                                 0.03, // Matches your original image height
@@ -310,31 +317,36 @@ class _CartCardState extends State<CartCard> {
                 const SizedBox(width: 8),
 
                 // Price Column
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      "₹ ${((widget.sellingPrice ) * _localQuantity).toStringAsFixed(2)}",
-                      style: TextStyle(
-                        fontWeight: FontWeight.w800,
-                        fontSize: screenWidth * 0.03,
-                        fontFamily: "Urbanist",
-                        color:whiteColor,
+                Container(
+                  width: 60,
+                  height: 60,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                   
+                    children: [
+                      Text(
+                        "₹ ${((widget.sellingPrice ) * _localQuantity).toStringAsFixed(2)}",
+                        style: GoogleFonts.mulish(
+                          fontWeight: FontWeight.w800,
+                          fontSize: screenWidth * 0.03,
+                          
+                          color:whiteColor,
+                        ),
                       ),
-                    ),
-                    Text(
-                      "₹ ${(widget.productPrice * _localQuantity).toString()}",
-                      style: TextStyle(
-                        decoration: TextDecoration.lineThrough,
-                        fontWeight: FontWeight.w500,
-                        fontSize: screenWidth * 0.025,
-                        fontFamily: "Urbanist",
-                        color: greyColor,
+                      Text(
+                        "₹ ${(widget.productPrice * _localQuantity).toStringAsFixed(1)}",
+                        style: GoogleFonts.mulish(
+                          decoration: TextDecoration.lineThrough,
+                          fontWeight: FontWeight.w500,
+                           decorationColor:whiteColor,
+                          fontSize: screenWidth * 0.025,
+                          
+                          color: greyColor,
+                        ),
                       ),
-                    ),
-                    Text("${widget.productPrice*_localQuantity}")
-                  ],
+                      Text("${widget.productPrice*_localQuantity}")
+                    ],
+                  ),
                 ),
               ],
             ),
