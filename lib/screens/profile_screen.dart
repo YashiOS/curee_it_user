@@ -1,3 +1,4 @@
+import 'package:cureeit_user_app/screens/location.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -10,9 +11,7 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  final _fullName = TextEditingController();
-  final _mobileNumber = TextEditingController();
-  final _emailAddress = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -104,53 +103,58 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 height: 24,
               ),
               
-              Container(
-                padding: const EdgeInsets.only(top: 16, bottom: 16, left: 16),
-                decoration: BoxDecoration(
-                  color: ligtBlackColor, // dark background
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  children: [
-                    // Circle Avatar Placeholder
-                    Container(
-                      width: 46,
-                      height: 46,
+              GestureDetector(
+                onTap: (){
+                  Navigator.of(context).push(MaterialPageRoute(builder: (context)=>LocationScreen()));
+                },
+                child: Container(
+                  padding: const EdgeInsets.only(top: 16, bottom: 16, left: 16),
+                  decoration: BoxDecoration(
+                    color: ligtBlackColor, // dark background
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
                       
-                      child: const Center(
-                        child: Icon(
-                          Icons.location_on, // Location icon
-                          color: whiteColor,
-                          size: 28,
+                      Container(
+                        width: 46,
+                        height: 46,
+                        
+                        child: const Center(
+                          child: Icon(
+                            Icons.location_on, // Location icon
+                            color: whiteColor,
+                            size: 28,
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 16),
-
-                    // Name & Phone
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Address",
-                          style: GoogleFonts.mulish(
-                            color: whiteColor,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w400,
+                      const SizedBox(width: 16),
+                
+                      // Name & Phone
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Address",
+                            style: GoogleFonts.mulish(
+                              color: whiteColor,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w400,
+                            ),
                           ),
-                        ),
-                        SizedBox(height: 2),
-                        Text(
-                          "Edit and add new addresses",
-                          style: GoogleFonts.mulish(
-                            color: whiteColor,
-                            fontWeight: FontWeight.w300,
-                            fontSize: 12,
+                          SizedBox(height: 2),
+                          Text(
+                            "Edit and add new addresses",
+                            style: GoogleFonts.mulish(
+                              color: whiteColor,
+                              fontWeight: FontWeight.w300,
+                              fontSize: 12,
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
-                  ],
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
               ),
                 SizedBox(

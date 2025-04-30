@@ -39,7 +39,7 @@ class _BaseScreenState extends State<BaseScreen> {
                 children: [
                   TabBarView(children: [
                     Center(child: HomeScreen()),
-                    Center(child: FavoritesScreen()),
+                    
                     Center(child: OrdersScreen()),
                     Center(
                         child: CartScreen(
@@ -67,9 +67,7 @@ class _BaseScreenState extends State<BaseScreen> {
                                 GoogleFonts.mulish(fontSize: 12),
                             tabs: [
                               Tab(icon: Icon(Icons.house_outlined), text: "Home"),
-                              Tab(
-                                  icon: Icon(Icons.favorite_border_outlined),
-                                  text: "Favorites"),
+                              
                               Tab(icon: Icon(Icons.lock_clock), text: "Orders"),
                               Tab(icon: Icon(Icons.shopping_cart_outlined), text: "Cart"),
                             ],

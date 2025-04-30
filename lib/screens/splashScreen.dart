@@ -66,17 +66,17 @@ class _SplashScreenState extends State<Splashscreen>
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Image.asset(
-                "lib/images/medkaroLogo.png",
-                height: screenHeight * 0.08,
-                width: screenWidth * 0.6,
+                "lib/images/Medkaro (1) 2.png",
+                height: screenHeight * 0.09,
+                width: screenWidth * 0.8,
                 fit: BoxFit.contain,
               ),
               Text(
-                "10-minute medicine delivery",
+                "medicine delivered in minutes!",
                 style: GoogleFonts.mulish(
                   color: Colors.white,
                   fontSize: screenHeight * 0.022,
-                  fontWeight: FontWeight.w500,
+                  fontWeight: FontWeight.w700,
                 ),
                 textAlign: TextAlign.center, 
               ),

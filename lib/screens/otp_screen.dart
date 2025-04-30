@@ -67,7 +67,7 @@ Widget build(BuildContext context) {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Image.asset(
-                    "lib/images/medkaroLogo.png",
+                    "lib/images/Medkaro (1) 2.png",
                     height: screenHeight * 0.06,
                     width: screenWidth * 0.55,
                   ),

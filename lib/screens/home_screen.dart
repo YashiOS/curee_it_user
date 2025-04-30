@@ -685,290 +685,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  void _locationBottomSheet() {
-    var width = MediaQuery.of(context).size.width;
-    var height = MediaQuery.of(context).size.height;
-    showModalBottomSheet(
-      backgroundColor: scaffoldBlackColor,
-      context: context,
-      isScrollControlled:
-          true, // Allows the sheet to expand to full height if needed
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-      ),
-
-      builder: (_) {
-        return Padding(
-          padding: EdgeInsets.all(width * 0.05),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Draggable handle and close button
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const SizedBox(width: 30),
-                  Expanded(
-                    child: Align(
-                      alignment: Alignment.center,
-                      child: Container(
-                        width: 60,
-                        height: 4,
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade400,
-                          borderRadius: BorderRadius.circular(2),
-                        ),
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(
-                      Icons.close,
-                      color: whiteColor,
-                    ),
-                    onPressed: () {
-                      Navigator.pop(context);
-                      setState(() {});
-                    },
-                  ),
-                ],
-              ),
-              const SizedBox(height: 10),
-
-              // Title
-
-              const SizedBox(height: 10),
-
-              // Search field
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                child: GestureDetector(
-                  onTap: () async {
-                    await Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => GoogleMapsScreen()));
-                    Navigator.pop(context);
-                    UpdateAddress1();
-                  },
-                  child: TextField(
-                    enabled: false,
-                    decoration: InputDecoration(
-                      hintText: 'Search for area or apartment',
-                      hintStyle: GoogleFonts.mulish(color: whiteColor),
-                      prefixIcon: const Icon(
-                        Icons.search,
-                        color: whiteColor,
-                      ),
-                      filled: true,
-                      fillColor: ligtBlackColor,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Current Location Container
-              GestureDetector(
-                onTap: () async {
-                  await Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => GoogleMapsScreen()));
-                  Navigator.pop(context);
-                  UpdateAddress1();
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: ligtBlackColor,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.my_location,
-                          color: whiteColor,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        "Use my current location",
-                        style: GoogleFonts.mulish(
-                          fontSize: 16,
-                          color: whiteColor,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-
-              // Add New Address Container
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: ligtBlackColor,
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: GestureDetector(
-                  onTap: () async {
-                    await Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => GoogleMapsScreen()));
-                    Navigator.pop(context);
-                    UpdateAddress1();
-                  },
-                  child: Row(
-                    children: [
-                      Container(
-                        width: 40,
-                        height: 40,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.add,
-                          color: whiteColor,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      const Text(
-                        "Add new address",
-                        style: TextStyle(
-                          fontFamily: "Urbanist",
-                          fontSize: 16,
-                          color: whiteColor,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
-
-              // Saved Addresses Header
-              
-              const SizedBox(height: 8),
-
-              // Saved Addresses List Container
-              ClipRRect(
-                borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(10),
-                    topRight: Radius.circular(10),
-                    bottomLeft: Radius.circular(10),
-                    bottomRight: Radius.circular(10)),
-                child: Container(
-                  constraints: BoxConstraints(
-                    maxHeight: MediaQuery.of(context).size.height *
-                        0.3, // Adjust as needed
-                  ),
-                  decoration: BoxDecoration(
-                    color: scaffoldBlackColor,
-                  ),
-                  child: addresses.isEmpty
-                      ? Center(
-                          child: Text(
-                          "No saved addresses",
-                          style: GoogleFonts.mulish(color: whiteColor),
-                        ))
-                      : ListView.builder(
-                          shrinkWrap: true,
-                          physics: const ClampingScrollPhysics(),
-                          itemCount: addresses.length,
-                          itemBuilder: (context, index) {
-                            var address = addresses[index];
-                            bool isSelected = Address.selectedIndex == index;
-                            return GestureDetector(
-                              onTap: () {
-                                print(address);
-                                UpdateAddress(address);
-
-                                setState(() {
-                                  Address.selectedIndex = index;
-                                });
-                                checkLocation();
-                                Navigator.of(context).pop();
-                              },
-                              child: Column(
-                                children: [
-                                  Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(12),
-                                      color: ligtBlackColor,
-                                    ),
-                                    margin: EdgeInsets.only(bottom: 10),
-                                    child: ListTile(
-                                      contentPadding: EdgeInsets.symmetric(
-                                          horizontal: 16, vertical: 3),
-                                      leading: Container(
-                                        padding: EdgeInsets.all(8),
-                                        decoration: BoxDecoration(
-                                          color:
-                                              scaffoldBlackColor, // Soft blue background
-                                          borderRadius:
-                                              BorderRadius.circular(12),
-                                          border: Border.all(
-                                            color: isSelected
-                                                ? greenColor
-                                                : whiteColor, // Light blue border
-                                            width: 1.5,
-                                          ),
-                                        ),
-                                        child: Icon(
-                                          Icons
-                                              .home_rounded, // More modern home icon
-                                          color: isSelected
-                                              ? greenColor
-                                              : whiteColor, // Matching blue icon
-                                          size: 22,
-                                        ),
-                                      ),
-                                      title: Text(
-                                        address['address'] ?? '',
-                                        style: GoogleFonts.mulish(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w600,
-                                          color:
-                                              whiteColor, // Darker text for better readability
-                                        ),
-                                      ),
-                                      subtitle: Text(
-                                        address['landmark'] ?? '',
-                                        style: GoogleFonts.mulish(
-                                          fontSize: 13,
-                                          color:
-                                              greyColor, // Slightly lighter than title
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
-                ),
-              ),
-
-              const SizedBox(height: 16), // Extra space at bottom
-            ],
-          ),
-        );
-      },
-    );
-  }
-
   Future<String> fetchLocationAndAddress() async {
     try {
       // Get current position
@@ -1038,14 +754,16 @@ class _HomeScreenState extends State<HomeScreen> {
                           width: 16,
                         ),
                         GestureDetector(
-                          onTap: (){
+                          onTap: ()async{
                            
                     
-                        Navigator.push(
+                       await Navigator.push(
                             context,
                             MaterialPageRoute(
                                 builder: (context) => ProfileScreen()));
-                      
+                       checkLocation();
+                       localAddress=Address.CurrentAddress!["address"];
+                       
                           },
                           child: Container(
                             height: 36,
@@ -1073,35 +791,31 @@ class _HomeScreenState extends State<HomeScreen> {
                                 style: GoogleFonts.mulish(
                                     color: whiteColor, fontSize: 17.2),
                               ),
-                              GestureDetector(
-                                  onTap: () {
-                                    _locationBottomSheet();
-                                  },
-                                  child: localAddress == null ||
-                                          localAddress.isEmpty
-                                      ? Shimmer.fromColors(
-                                          baseColor: ligtBlackColor!,
-                                          highlightColor: greenColor!,
-                                          child: Container(
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.2,
-                                            height: 2,
-                                            // Matches your text height
-                                            decoration: BoxDecoration(
-                                              color: whiteColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(4),
-                                            ),
-                                          ),
-                                        )
-                                      : Text(
-                                          "$localAddress",
-                                          style: GoogleFonts.mulish(
-                                              color: whiteColor,
-                                              fontSize: 12),
-                                        ))
+                              localAddress == null ||
+                                      localAddress.isEmpty
+                                  ? Shimmer.fromColors(
+                                      baseColor: ligtBlackColor!,
+                                      highlightColor: greenColor!,
+                                      child: Container(
+                                        width: MediaQuery.of(context)
+                                                .size
+                                                .width *
+                                            0.2,
+                                        height: 2,
+                                        // Matches your text height
+                                        decoration: BoxDecoration(
+                                          color: whiteColor,
+                                          borderRadius:
+                                              BorderRadius.circular(4),
+                                        ),
+                                      ),
+                                    )
+                                  : Text(
+                                      "$localAddress",
+                                      style: GoogleFonts.mulish(
+                                          color: whiteColor,
+                                          fontSize: 12),
+                                    )
                             ],
                           ),
                         ),
@@ -1133,9 +847,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     }
                   },
                   child: Container(
-                    width: 311,
+                   
                     height: 43,
-                    margin: EdgeInsets.only(bottom: 12),
+                    margin: EdgeInsets.only(bottom: 0),
                     decoration: BoxDecoration(
                       color: ligtBlackColor,
                       borderRadius: BorderRadius.circular(8),
@@ -1179,6 +893,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       physics: ClampingScrollPhysics(),
                       children: [
                         Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
@@ -1225,11 +940,37 @@ class _HomeScreenState extends State<HomeScreen> {
                 right: 0,
                 bottom: 76,
                 child: Container(
-                  color: ligtBlackColor,
+                  
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.height *
                       0.12, // 12% of screen height
-
+                  decoration: BoxDecoration(
+                     color: ligtBlackColor,
+                     boxShadow: [
+      // Top shadow
+      BoxShadow(
+        color: Colors.white.withOpacity(0.1),
+        offset: Offset(0, -2),
+        blurRadius: 6,
+        spreadRadius: 1,
+      ),
+      // Left shadow
+      BoxShadow(
+        color: Colors.white.withOpacity(0.1),
+        offset: Offset(-2, 0),
+        blurRadius: 6,
+        spreadRadius: 1,
+      ),
+      // Right shadow
+      BoxShadow(
+        color: Colors.white.withOpacity(0.1),
+        offset: Offset(2, 0),
+        blurRadius: 6,
+        spreadRadius: 1,
+      ),
+    ],
+                     borderRadius: BorderRadius.only(topLeft: Radius.circular(30),topRight: Radius.circular(30))
+                  ),
                   child: Padding(
                     padding: EdgeInsets.symmetric(
                         horizontal: MediaQuery.of(context).size.width * 0.045,
@@ -1331,12 +1072,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                               0.055),
                                   decoration: BoxDecoration(
                                       color: greenColor,
-                                      borderRadius: BorderRadius.circular(10)),
+                                      borderRadius: BorderRadius.circular(8)),
                                   child: Text(
                                     'Checkout',
-                                    style: TextStyle(
+                                    style: GoogleFonts.mulish(
                                         color: whiteColor,
-                                        fontFamily: "Urbanist",
+                                       
                                         fontSize:
                                             MediaQuery.of(context).size.height *
                                                 0.0175,

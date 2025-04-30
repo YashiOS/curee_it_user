@@ -16,7 +16,7 @@ class LocationScreen extends StatefulWidget {
 
 class _LocationScreenState extends State<LocationScreen> {
   List<dynamic> addresses = [];
-
+ 
   @override
   void initState() {
     fetchAddresses();
@@ -25,10 +25,7 @@ class _LocationScreenState extends State<LocationScreen> {
   }
 
   Future<void> fetchAddresses() async {
-    if (Address.CurrentAddress != null) {
-      String fullAddress = Address.CurrentAddress!["address"];
-      print("in 2nd if condition");
-    }
+   
     var url = Uri.parse(
       'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/address/savedAddress',
     );
@@ -267,9 +264,9 @@ class _LocationScreenState extends State<LocationScreen> {
                                         width: 16,
                                         height: 16,
                                         
-                                        decoration: const BoxDecoration(
+                                        decoration:  BoxDecoration(
                                           
-                                          color: Colors.black,
+                                          color:isSelected ?greenColor :Colors.black,
                                           shape: BoxShape.circle,
                                         ),
                                       ),
