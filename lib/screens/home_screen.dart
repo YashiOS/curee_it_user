@@ -318,10 +318,10 @@ class _HomeScreenState extends State<HomeScreen> {
             Text(
               "Sorry! Our services are not available in your area yet.",
               textAlign: TextAlign.center, // Center the text inside the widget
-              style: TextStyle(
+              style: GoogleFonts.mulish(
                 fontWeight: FontWeight.w700,
                 fontSize: 24,
-                fontFamily: "Urbanist",
+             
                 color: whiteColor,
               ),
             ),
@@ -329,11 +329,11 @@ class _HomeScreenState extends State<HomeScreen> {
             Text(
               "We will notify you as soon as the services are available",
               textAlign: TextAlign.center, // Center this text too
-              style: TextStyle(
+              style: GoogleFonts.mulish(
                 fontWeight: FontWeight.w500,
                 fontSize: 14,
-                fontFamily: "Urbanist",
-                color: greenColor,
+               
+                color:greyColor,
               ),
             ),
           ],
@@ -675,7 +675,7 @@ class _HomeScreenState extends State<HomeScreen> {
             context.read<ServiceAvilableCubit>().UpdateServiceAvilable(false);
           }
 
-          print("IsInRadius value is ${isInRadius}");
+        
         });
       } else {
         print("Failed to check_location: ${response.body}");
@@ -733,37 +733,75 @@ class _HomeScreenState extends State<HomeScreen> {
         body: Stack(children: [
           Container(
             color: scaffoldBlackColor,
-            padding: EdgeInsets.only(left: 20, right: 20),
+            padding: EdgeInsets.only(left: 20, right: 20,top: 20),
             margin: EdgeInsets.only(bottom: cartItems.isEmpty ? 45 : 0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 
-                SizedBox(
-                  height: 69,
-                ),
+               
                 Container(
-                    width: 311,
-                    height: 90,
+                    height: 100,
                     decoration: BoxDecoration(
-                        color: ligtBlackColor,
+                        color: scaffoldBlackColor,
                         borderRadius: BorderRadius.circular(8)),
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
-                        SizedBox(
-                          width: 16,
+                       
+                        
+                       
+                        Container(
+                          width: 180,
+                          height: 80,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Container(
+                                width: 70,
+                                child: Image.asset("lib/images/Medkaro (1) 2.png")),
+                                Text(
+                                  "10 minutes",
+                                  style: GoogleFonts.mulish(color: whiteColor,fontSize:24,fontWeight: FontWeight.bold  ),
+                                ),
+                              localAddress == null ||
+                                      localAddress.isEmpty
+                                  ? Shimmer.fromColors(
+                                      baseColor: ligtBlackColor!,
+                                      highlightColor: whiteColor!,
+                                      child: Container(
+                                        width: MediaQuery.of(context)
+                                                .size
+                                                .width *
+                                            0.4,
+                                        height: 4,
+                                        // Matches your text height
+                                        decoration: BoxDecoration(
+                                          color: whiteColor,
+                                          borderRadius:
+                                              BorderRadius.circular(4),
+                                        ),
+                                      ),
+                                    )
+                                  : Text(
+                                      "$localAddress",
+                                      style: GoogleFonts.mulish(
+                                          color: whiteColor,
+                                          fontWeight:FontWeight.w300,
+                                          fontSize: 15),
+                                    )
+                            ],
+                          ),
                         ),
-                        GestureDetector(
+                       GestureDetector(
                           onTap: ()async{
-                           
-                    
                        await Navigator.push(
                             context,
                             MaterialPageRoute(
                                 builder: (context) => ProfileScreen()));
                        checkLocation();
                        localAddress=Address.CurrentAddress!["address"];
-                       
                           },
                           child: Container(
                             height: 36,
@@ -777,68 +815,9 @@ class _HomeScreenState extends State<HomeScreen> {
                             ),
                           ),
                         ),
-                        SizedBox(
-                          width: 7.18,
-                        ),
-                        Container(
-                          width: 180,
-                          height: 42,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                "Alexa",
-                                style: GoogleFonts.mulish(
-                                    color: whiteColor, fontSize: 17.2),
-                              ),
-                              localAddress == null ||
-                                      localAddress.isEmpty
-                                  ? Shimmer.fromColors(
-                                      baseColor: ligtBlackColor!,
-                                      highlightColor: greenColor!,
-                                      child: Container(
-                                        width: MediaQuery.of(context)
-                                                .size
-                                                .width *
-                                            0.2,
-                                        height: 2,
-                                        // Matches your text height
-                                        decoration: BoxDecoration(
-                                          color: whiteColor,
-                                          borderRadius:
-                                              BorderRadius.circular(4),
-                                        ),
-                                      ),
-                                    )
-                                  : Text(
-                                      "$localAddress",
-                                      style: GoogleFonts.mulish(
-                                          color: whiteColor,
-                                          fontSize: 12),
-                                    )
-                            ],
-                          ),
-                        ),
-                        GestureDetector(
-                          onTap: (){
-                            Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => CartScreen(
-                                                isNavigated: true,
-                                              )));
-                          },
-                          child: Icon(
-                            Icons.shopping_cart_outlined,
-                            size: 18,
-                            color: Colors.white,
-                          ),
-                        ),
                       ],
                     )),
-                SizedBox(
-                  height: 24,
-                ),
+              
                 GestureDetector(
                   onTap: () {
                     if (ISserviceAvilable) {

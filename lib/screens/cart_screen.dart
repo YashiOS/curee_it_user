@@ -9,7 +9,11 @@ import 'package:cureeit_user_app/utils/razor_pay.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:cureeit_user_app/utils/widgets/LoadingIndicater.dart';
 
+import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:path/path.dart' as path;
 import 'package:flutter/material.dart';
+import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
@@ -277,7 +281,7 @@ class _CartScreenState extends State<CartScreen> {
         })
         ..body = jsonEncode({
           "userId": "68fa72cbdc5f0a68",
-          
+          "prescriptionPhoto":base64Image,
           "totalAmount":Total,
           "shippingAddress": shippingAddress,
           "shippingCost": shippingCost,
@@ -305,7 +309,7 @@ class _CartScreenState extends State<CartScreen> {
           //   builder: (context) => OrderSuccessScreen(),
           // ),
           // );
-          print("*****ORDER-ID-CART-SCREEN********${responseData["data"]}");
+          
           final shouldRefresh = await Navigator.push(
             context,
             MaterialPageRoute(
@@ -434,10 +438,30 @@ class _CartScreenState extends State<CartScreen> {
         });
   }
 
+
+Future<File?> compressImage(File imageFile) async {
+  try {
+    final dir = await getTemporaryDirectory();
+    final targetPath = path.join(dir.path, "compressed_${DateTime.now().millisecondsSinceEpoch}.jpg");
+
+    final compressedFile = await FlutterImageCompress.compressAndGetFile(
+      imageFile.absolute.path,
+      targetPath,
+      quality: 50, // You can tune this
+    );
+
+    return File(compressedFile!.path);
+  } catch (e) {
+    print("Image compression error: $e");
+    return null;
+  }
+}
+
   Future<void> pickFromCamera() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.camera);
     if (pickedFile != null) {
-      _imageFile = File(pickedFile.path);
+      _imageFile = await compressImage(File(pickedFile.path)) ;
+
       imagePicked = true;
       payNow = true;
       setState(() {});
@@ -447,7 +471,8 @@ class _CartScreenState extends State<CartScreen> {
   Future<void> pickFromGallery() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      _imageFile = File(pickedFile.path);
+      _imageFile = await compressImage(File(pickedFile.path)) ;
+;
       imagePicked = true;
       payNow = true;
       setState(() {});

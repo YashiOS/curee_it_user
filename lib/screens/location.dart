@@ -69,12 +69,12 @@ class _LocationScreenState extends State<LocationScreen> {
             style: GoogleFonts.mulish(
                 fontWeight: FontWeight.w300, fontSize: 24, color: whiteColor),
           ),
-          leading: Padding(
-            padding: const EdgeInsets.only(left: 24.0),
-            child: GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-              },
+          leading: GestureDetector(
+            onTap: (){
+              Navigator.pop(context);
+            },
+            child: Padding(
+              padding: const EdgeInsets.only(left: 24.0),
               child: Padding(
                 padding: const EdgeInsets.only(left: 4.0),
                 child: Row(

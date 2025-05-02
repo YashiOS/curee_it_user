@@ -67,7 +67,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
               addingToFav = false;
             }
             
-            print(isFav);
+            
           });
         } else {
           
@@ -412,60 +412,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                     color: whiteColor),
                               ),
                             ),
-                            GestureDetector(
-                                    onTap: () {
-                                      addToFavourites();
-                                    },
-                                    child: addingToFav
-                                        ? Container(
-                                            decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius
-                                                        .circular(40)),
-                                            height: MediaQuery.of(
-                                                        context)
-                                                    .size
-                                                    .height *
-                                                0.06, // 40/667 ≈ 0.06
-                                            width:
-                                                MediaQuery.of(context)
-                                                        .size
-                                                        .height *
-                                                    0.06,
-                                            child: LoadingIndicator(
-                                              indicatorType:
-                                                  Indicator.orbit,
-                                              colors: [whiteColor],
-                                            ),
-                                          )
-                                        : Container(
-                                            decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius
-                                                        .circular(40)),
-                                            height: MediaQuery.of(
-                                                        context)
-                                                    .size
-                                                    .height *
-                                                0.06, // 40/667 ≈ 0.06
-                                            width:
-                                                MediaQuery.of(context)
-                                                        .size
-                                                        .height *
-                                                    0.06,
-                                            child: Icon(
-                                              isFav
-                                                  ? Icons.favorite
-                                                  : Icons
-                                                      .favorite_border,
-                                              color: isFav
-                                                  ? greenColor
-                                                  : greyColor
-                                                      .withOpacity(0.6),
-                                              size: 24,
-                                            ),
-                                          ),
-                                  ),
+                            
                           ],
                         ),
                       ),
@@ -487,17 +434,62 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                           margin: EdgeInsets.only(left: 24),
                           height: 15,
                           child: Text(
-                            "Manufacturer",
+                            "${product['marketer'] ??
+                                                    'Manufacturer not available'}",
+                            style: GoogleFonts.mulish(
+                                color: whiteColor),
+                          )),
+                          SizedBox(height: 20,),
+                          Container(
+                          margin: EdgeInsets.only(left: 24),
+                          height: 15,
+                          child: Text(
+                            "Slat composition",
+                            style: GoogleFonts.mulish(
+                                color: greyColor),
+                          )),
+                          SizedBox(height: 5,),
+                          Container(
+                          margin: EdgeInsets.only(left: 24),
+                          height: 15,
+                          child: Text(
+                            "${product['saltComposition'] ??
+                                      'N/A'}",
+                            style: GoogleFonts.mulish(
+                                color: whiteColor),
+                          )),
+                          SizedBox(height: 10,),
+                          Container(
+                          margin: EdgeInsets.only(left: 24),
+                          height: 15,
+                          child: Text(
+                            "Use",
+                            style: GoogleFonts.mulish(
+                                color: greyColor),
+                          )),
+                          SizedBox(height: 5,),
+                          Container(
+                          margin: EdgeInsets.only(left: 24),
+                          height: 15,
+                          child: Text(
+                            "${product['mainUse'] ?? ''}",
+                            style: GoogleFonts.mulish(
+                                color: whiteColor),
+                          )),
+                          SizedBox(height: 10,),
+                          Container(
+                          margin: EdgeInsets.only(left: 24),
+                          height: 15,
+                          child: Text(
+                            "Introduction",
                             style: GoogleFonts.mulish(
                                 color: greyColor),
                           )),
                       Container(
                         margin: EdgeInsets.only(
-                            left: 24, top: 24,right: 24),
+                            left: 24, top:5,right: 24),
                         child: Text(
-                          "${product['marketer'] ??
-                                                    'Manufacturer not available'} , ${product['saltComposition'] ??
-                                      'N/A'} , ${product['mainUse'] ?? ''} , ${product['introduction'] ?? ''} , ${product['usageInstruction'] ??
+                          "${product['introduction'] ?? ''} , ${product['usageInstruction'] ??
                                   ''}",
                           style: GoogleFonts.mulish(
                               color: whiteColor),

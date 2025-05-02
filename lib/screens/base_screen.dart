@@ -62,7 +62,7 @@ class _BaseScreenState extends State<BaseScreen> {
                           child: TabBar(
                             unselectedLabelColor: greyColor,
                             labelColor: whiteColor,
-                            indicatorColor: greenColor,
+                            indicatorColor: whiteColor,
                             labelStyle:
                                 GoogleFonts.mulish(fontSize: 12),
                             tabs: [

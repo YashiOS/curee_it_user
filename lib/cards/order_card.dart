@@ -37,6 +37,13 @@ class OrderCard extends StatelessWidget {
         return '${day}th';
     }
   }
+  
+void getOrderId(){
+  List<dynamic> orderItems = orderData["orderItems"];
+  List productIds=orderItems.map((item)=>item['productId'].toString()).toList();
+  
+  
+}
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +53,7 @@ class OrderCard extends StatelessWidget {
     List orderItems = orderData['orderItems'];
     String orderId = orderData['orderId'];
 
-    print(orderData);
+   
 
     String allItems = formatOrderItems(orderItems);
 
@@ -160,28 +167,36 @@ class OrderCard extends StatelessWidget {
                           ),
                         ],
                       ),
-                      Container(
-                        padding: EdgeInsets.symmetric(vertical: 8,horizontal: 16),
-                        decoration: BoxDecoration(
-                            color: greenColor,
-                            borderRadius: BorderRadius.circular(8)
-                        ),
-                        
-                        child:orderStatus=="Delivered"||orderStatus==""?Text(
-                          "Reorder",
-                          style: GoogleFonts.mulish(
-                            fontWeight: FontWeight.bold,
-                            fontSize: screenheight * 0.014,
-                           
-                            color: whiteColor,
+                      GestureDetector(
+                        onTap: (){
+                           getOrderId();
+                          if(orderStatus=="Delivered"||orderStatus==""){
+                                
+                          }
+                        },
+                        child: Container(
+                          padding: EdgeInsets.symmetric(vertical: 8,horizontal: 16),
+                          decoration: BoxDecoration(
+                              color: greenColor,
+                              borderRadius: BorderRadius.circular(8)
                           ),
-                        ): Text(
-                          orderStatus,
-                          style: GoogleFonts.mulish(
-                            fontWeight: FontWeight.bold,
-                            fontSize: screenheight * 0.014,
-                           
-                            color: whiteColor,
+                          
+                          child:orderStatus=="Delivered"||orderStatus==""?Text(
+                            "Reorder",
+                            style: GoogleFonts.mulish(
+                              fontWeight: FontWeight.bold,
+                              fontSize: screenheight * 0.014,
+                             
+                              color: whiteColor,
+                            ),
+                          ): Text(
+                            orderStatus,
+                            style: GoogleFonts.mulish(
+                              fontWeight: FontWeight.bold,
+                              fontSize: screenheight * 0.014,
+                             
+                              color: whiteColor,
+                            ),
                           ),
                         ),
                       ),

@@ -1,5 +1,6 @@
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
 class OrderdetailScreenNew extends StatelessWidget {
@@ -32,12 +33,19 @@ class OrderdetailScreenNew extends StatelessWidget {
     }
   }
 
+  void getOrderId(){
+  List<dynamic> orderItems = orderData["orderItems"];
+  List productIds=orderItems.map((item)=>item['productId'].toString()).toList();
+  
+  
+}
+
   @override
   Widget build(BuildContext context) {
     String orderStatus = orderData['currentStatus'];
     return Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.grey.shade100.withOpacity(0.5),
+          backgroundColor:ligtBlackColor,
           leadingWidth: 100,
           leading: Padding(
             padding: const EdgeInsets.only(left: 12.0),
@@ -45,32 +53,29 @@ class OrderdetailScreenNew extends StatelessWidget {
               onTap: () {
                 Navigator.pop(context);
               },
+              child:  Padding(
+              padding: const EdgeInsets.only(left: 24.0),
               child: Padding(
                 padding: const EdgeInsets.only(left: 4.0),
                 child: Row(
                   spacing: 4,
-                  children: [
-                    Image.asset(
-                      'lib/images/back_arrow.png',
-                      width: 20,
-                      height: 16,
-                    ),
-                  ],
+                  children: [Image.asset("lib/images/Vector 9.png")],
                 ),
               ),
+            ),
             ),
           ),
           title: Text(
             "Order Details",
-            style: TextStyle(
-                color: Colors.black.withOpacity(0.7),
-                fontFamily: "JosefinSans",
+            style: GoogleFonts.mulish(
+                color: whiteColor,
+               
                 fontSize: 18,
                 fontWeight: FontWeight.w700),
           ),
         ),
         body: Container(
-            color: Colors.grey.shade100.withOpacity(0.5),
+            color: scaffoldBlackColor,
             width: MediaQuery.of(context).size.width,
             height: MediaQuery.of(context).size.height,
             child: Padding(
@@ -86,7 +91,7 @@ class OrderdetailScreenNew extends StatelessWidget {
                         Container(
                           padding: EdgeInsets.symmetric(vertical: 14),
                           width: MediaQuery.of(context).size.width,
-                          color: secondaryColor.withOpacity(0.2),
+                          color: ligtBlackColor,
                           child: Column(
                             spacing: 12,
                             children: [
@@ -95,22 +100,22 @@ class OrderdetailScreenNew extends StatelessWidget {
                                     ? Icons.check_circle
                                     : Icons.delivery_dining,
                                 size: 40,
-                                color: primaryColor,
+                                color: greenColor,
                               ),
                               Column(
                                 children: [
                                   Text(
                                     "Order " + orderData['currentStatus'],
-                                    style: TextStyle(
-                                        color: Colors.black.withOpacity(0.6),
-                                        fontFamily: "Urbanist",
+                                    style: GoogleFonts.mulish(
+                                        color: whiteColor,
+                                       
                                         fontSize: 13,
                                         fontWeight: FontWeight.bold),
                                   ),
                                   Text(
                                     "You can count on us",
                                     style: TextStyle(
-                                        color: Colors.black.withOpacity(0.6),
+                                        color:greyColor,
                                         fontFamily: "Urbanist",
                                         fontSize: 11,
                                         fontWeight: FontWeight.w400),
@@ -122,7 +127,7 @@ class OrderdetailScreenNew extends StatelessWidget {
                         ),
                         Container(
                           padding: EdgeInsets.all(6),
-                          color: Colors.white,
+                          color: ligtBlackColor,
                           child: Column(
                             spacing: 12,
                             children: [
@@ -136,14 +141,14 @@ class OrderdetailScreenNew extends StatelessWidget {
                                       padding: EdgeInsets.symmetric(
                                           horizontal: 10, vertical: 4),
                                       decoration: BoxDecoration(
-                                          color: secondaryColor,
+                                          color: greenColor,
                                           borderRadius:
-                                              BorderRadius.circular(20)),
+                                              BorderRadius.circular(8)),
                                       child: Text(
                                         orderData['currentStatus'],
-                                        style: TextStyle(
+                                        style: GoogleFonts.mulish(
                                             color: Colors.white,
-                                            fontFamily: "Urbanist",
+                                            
                                             fontSize: 13,
                                             fontWeight: FontWeight.bold),
                                       ),
@@ -153,17 +158,17 @@ class OrderdetailScreenNew extends StatelessWidget {
                                     orderData['currentStatus'] == "Pending"
                                         ? "Delivering in"
                                         : "Delivered in",
-                                    style: TextStyle(
-                                        color: Colors.black.withOpacity(0.6),
-                                        fontFamily: "Urbanist",
+                                    style: GoogleFonts.mulish(
+                                        color: whiteColor,
+                                       
                                         fontSize: 13,
                                         fontWeight: FontWeight.normal),
                                   ),
                                   Text(
                                     "16 mins",
-                                    style: TextStyle(
-                                        color: secondaryColor,
-                                        fontFamily: "Urbanist",
+                                    style: GoogleFonts.mulish(
+                                        color: whiteColor,
+                                       
                                         fontSize: 13,
                                         fontWeight: FontWeight.bold),
                                   ),
@@ -179,27 +184,27 @@ class OrderdetailScreenNew extends StatelessWidget {
                                     Icon(
                                       Icons.check_circle,
                                       size: 24,
-                                      color: primaryColor,
+                                      color: greenColor,
                                     ),
                                     Container(
                                       width: 70,
                                       height: 2,
-                                      color: primaryColor,
+                                      color: whiteColor,
                                     ),
                                     Icon(
                                       Icons.check_circle,
                                       size: 24,
-                                      color: primaryColor,
+                                      color: greenColor,
                                     ),
                                     Container(
                                       width: 70,
                                       height: 2,
-                                      color: primaryColor,
+                                      color: whiteColor,
                                     ),
                                     Icon(
                                       Icons.check_circle,
                                       size: 24,
-                                      color: primaryColor,
+                                      color: greenColor,
                                     ),
                                     Container(
                                       width: 70,
@@ -207,7 +212,7 @@ class OrderdetailScreenNew extends StatelessWidget {
                                       color: orderData['currentStatus'] ==
                                               "Pending"
                                           ? Colors.grey
-                                          : primaryColor,
+                                          : greenColor,
                                     ),
                                     Icon(
                                       Icons.check_circle,
@@ -215,7 +220,7 @@ class OrderdetailScreenNew extends StatelessWidget {
                                       color: orderData['currentStatus'] ==
                                               "Pending"
                                           ? Colors.grey
-                                          : primaryColor,
+                                          : greenColor,
                                     ),
                                   ],
                                 ),
@@ -227,33 +232,33 @@ class OrderdetailScreenNew extends StatelessWidget {
                                 children: [
                                   Text(
                                     "Placed",
-                                    style: TextStyle(
-                                        color: Colors.black.withOpacity(0.6),
-                                        fontFamily: "Urbanist",
+                                    style: GoogleFonts.mulish(
+                                        color: whiteColor,
+                                        
                                         fontSize: 13,
                                         fontWeight: FontWeight.normal),
                                   ),
                                   Text(
                                     "Validated",
-                                    style: TextStyle(
-                                        color: Colors.black.withOpacity(0.6),
-                                        fontFamily: "Urbanist",
+                                    style: GoogleFonts.mulish(
+                                        color: whiteColor,
+                                       
                                         fontSize: 13,
                                         fontWeight: FontWeight.normal),
                                   ),
                                   Text(
                                     "Shipped",
-                                    style: TextStyle(
-                                        color: Colors.black.withOpacity(0.6),
-                                        fontFamily: "Urbanist",
+                                    style: GoogleFonts.mulish(
+                                        color: whiteColor,
+                                       
                                         fontSize: 13,
                                         fontWeight: FontWeight.normal),
                                   ),
                                   Text(
                                     "Delivered",
-                                    style: TextStyle(
-                                        color: Colors.black.withOpacity(0.6),
-                                        fontFamily: "Urbanist",
+                                    style:GoogleFonts.mulish(
+                                        color: whiteColor,
+                                        
                                         fontSize: 13,
                                         fontWeight: FontWeight.normal),
                                   ),
@@ -269,7 +274,7 @@ class OrderdetailScreenNew extends StatelessWidget {
                                       "Reorder",
                                       style: TextStyle(
                                           decoration: TextDecoration.underline,
-                                          color: primaryColor,
+                                          color: greenColor,
                                           fontFamily: "Urbanist",
                                           fontSize: 13,
                                           fontWeight: FontWeight.bold),
@@ -278,7 +283,7 @@ class OrderdetailScreenNew extends StatelessWidget {
                                       "View Invoice",
                                       style: TextStyle(
                                           decoration: TextDecoration.underline,
-                                          color: primaryColor,
+                                          color: greenColor,
                                           fontFamily: "Urbanist",
                                           fontSize: 13,
                                           fontWeight: FontWeight.bold),
@@ -299,7 +304,7 @@ class OrderdetailScreenNew extends StatelessWidget {
                               Text(
                                 "Items Ordered",
                                 style: TextStyle(
-                                    color: Colors.black,
+                                    color: whiteColor,
                                     fontFamily: "Urbanist",
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600),
@@ -307,7 +312,7 @@ class OrderdetailScreenNew extends StatelessWidget {
                               Container(
                                 padding: EdgeInsets.symmetric(
                                     horizontal: 12, vertical: 8),
-                                color: Colors.white,
+                                color: ligtBlackColor,
                                 child: Column(
                                     spacing: 12,
                                     mainAxisAlignment: MainAxisAlignment.start,
@@ -325,9 +330,9 @@ class OrderdetailScreenNew extends StatelessWidget {
                                           children: [
                                             Text(
                                               product['productName'] ?? "",
-                                              style: TextStyle(
-                                                  color: Colors.black,
-                                                  fontFamily: "Urbanist",
+                                              style: GoogleFonts.mulish(
+                                                  color: whiteColor,
+                                                 
                                                   fontSize: 16,
                                                   fontWeight:
                                                       FontWeight.normal),
@@ -340,18 +345,18 @@ class OrderdetailScreenNew extends StatelessWidget {
                                                 Text(
                                                   "Qty : ${product['quantity']}" ??
                                                       "1",
-                                                  style: TextStyle(
-                                                      color: primaryColor,
-                                                      fontFamily: "Urbanist",
+                                                  style: GoogleFonts.mulish(
+                                                      color: greyColor,
+                                                     
                                                       fontSize: 13,
                                                       fontWeight:
                                                           FontWeight.bold),
                                                 ),
                                                 Text(
                                                   "₹ ${double.tryParse(product['productPrice'].toString())?.toStringAsFixed(2) ?? "0.00"}",
-                                                  style: TextStyle(
-                                                      color: primaryColor,
-                                                      fontFamily: "Urbanist",
+                                                  style: GoogleFonts.mulish(
+                                                      color: whiteColor,
+                                                      
                                                       fontSize: 13,
                                                       fontWeight:
                                                           FontWeight.bold),
@@ -376,16 +381,16 @@ class OrderdetailScreenNew extends StatelessWidget {
                             children: [
                               Text(
                                 "Bill Summary",
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontFamily: "Urbanist",
+                                style: GoogleFonts.mulish(
+                                    color: whiteColor,
+                                   
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600),
                               ),
                               Container(
                                 padding: EdgeInsets.symmetric(
                                     horizontal: 12, vertical: 8),
-                                color: Colors.white,
+                                color: ligtBlackColor,
                                 child: Column(
                                   spacing: 12,
                                   mainAxisAlignment: MainAxisAlignment.start,
@@ -397,19 +402,19 @@ class OrderdetailScreenNew extends StatelessWidget {
                                       children: [
                                         Text(
                                           "Items total",
-                                          style: TextStyle(
+                                          style: GoogleFonts.mulish(
                                               color:
-                                                  Colors.black.withOpacity(0.6),
-                                              fontFamily: "Urbanist",
+                                                  greyColor,
+                                              
                                               fontSize: 13,
                                               fontWeight: FontWeight.normal),
                                         ),
                                         Text(
                                           "₹ 200",
-                                          style: TextStyle(
+                                          style: GoogleFonts.mulish(
                                               color:
-                                                  Colors.black.withOpacity(0.6),
-                                              fontFamily: "Urbanist",
+                                                  greyColor,
+                                              
                                               fontSize: 13,
                                               fontWeight: FontWeight.normal),
                                         ),
@@ -421,20 +426,20 @@ class OrderdetailScreenNew extends StatelessWidget {
                                       children: [
                                         Text(
                                           "Shipping",
-                                          style: TextStyle(
+                                          style: GoogleFonts.mulish(
                                               color:
-                                                  Colors.black.withOpacity(0.6),
-                                              fontFamily: "Urbanist",
+                                                  greyColor,
+                                              
                                               fontSize: 13,
                                               fontWeight: FontWeight.normal),
                                         ),
                                         Text(
                                           "₹ ${orderData['shippingCost']}" ??
                                               "0",
-                                          style: TextStyle(
+                                          style: GoogleFonts.mulish(
                                               color:
-                                                  Colors.black.withOpacity(0.6),
-                                              fontFamily: "Urbanist",
+                                                  greyColor,
+                                              
                                               fontSize: 13,
                                               fontWeight: FontWeight.normal),
                                         ),
@@ -446,19 +451,19 @@ class OrderdetailScreenNew extends StatelessWidget {
                                       children: [
                                         Text(
                                           "Tax and services",
-                                          style: TextStyle(
+                                          style: GoogleFonts.mulish(
                                               color:
-                                                  Colors.black.withOpacity(0.6),
-                                              fontFamily: "Urbanist",
+                                                  greyColor,
+                                              
                                               fontSize: 13,
                                               fontWeight: FontWeight.normal),
                                         ),
                                         Text(
                                           "₹ 10",
-                                          style: TextStyle(
+                                          style: GoogleFonts.mulish(
                                               color:
-                                                  Colors.black.withOpacity(0.6),
-                                              fontFamily: "Urbanist",
+                                                  greyColor,
+                                              
                                               fontSize: 13,
                                               fontWeight: FontWeight.normal),
                                         ),
@@ -470,19 +475,19 @@ class OrderdetailScreenNew extends StatelessWidget {
                                       children: [
                                         Text(
                                           "Total discount",
-                                          style: TextStyle(
+                                          style: GoogleFonts.mulish(
                                               color:
-                                                  Colors.black.withOpacity(0.6),
-                                              fontFamily: "Urbanist",
+                                                  greyColor,
+                                              
                                               fontSize: 13,
                                               fontWeight: FontWeight.normal),
                                         ),
                                         Text(
                                           "₹ 10",
-                                          style: TextStyle(
+                                          style: GoogleFonts.mulish(
                                               color:
-                                                  Colors.black.withOpacity(0.6),
-                                              fontFamily: "Urbanist",
+                                                  greyColor,
+                                             
                                               fontSize: 13,
                                               fontWeight: FontWeight.normal),
                                         ),
@@ -494,20 +499,20 @@ class OrderdetailScreenNew extends StatelessWidget {
                                       children: [
                                         Text(
                                           "Bill total",
-                                          style: TextStyle(
+                                          style: GoogleFonts.mulish(
                                               color:
-                                                  Colors.black.withOpacity(0.6),
-                                              fontFamily: "Urbanist",
+                                                  whiteColor,
+                                             
                                               fontSize: 16,
                                               fontWeight: FontWeight.bold),
                                         ),
                                         Text(
                                           "₹ " + orderData['totalAmount'] ??
                                               "0",
-                                          style: TextStyle(
+                                          style: GoogleFonts.mulish(
                                               color:
-                                                  Colors.black.withOpacity(0.6),
-                                              fontFamily: "Urbanist",
+                                                  whiteColor,
+                                             
                                               fontSize: 16,
                                               fontWeight: FontWeight.bold),
                                         ),
@@ -530,16 +535,16 @@ class OrderdetailScreenNew extends StatelessWidget {
                             children: [
                               Text(
                                 "Prescription Attached",
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontFamily: "Urbanist",
+                                style: GoogleFonts.mulish(
+                                    color: whiteColor,
+                                    
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600),
                               ),
                               Container(
                                 padding: EdgeInsets.symmetric(
                                     horizontal: 12, vertical: 8),
-                                color: Colors.white,
+                                color: ligtBlackColor,
                                 width: MediaQuery.of(context).size.width,
                                 child: Column(
                                   spacing: 12,
@@ -566,16 +571,16 @@ class OrderdetailScreenNew extends StatelessWidget {
                             children: [
                               Text(
                                 "Order Info",
-                                style: TextStyle(
-                                    color: Colors.black,
-                                    fontFamily: "Urbanist",
+                                style: GoogleFonts.mulish(
+                                    color: whiteColor,
+                                    
                                     fontSize: 12,
                                     fontWeight: FontWeight.w600),
                               ),
                               Container(
                                 padding: EdgeInsets.symmetric(
                                     horizontal: 12, vertical: 8),
-                                color: Colors.white,
+                                color: ligtBlackColor,
                                 width: MediaQuery.of(context).size.width,
                                 child: Column(
                                   spacing: 12,
@@ -590,17 +595,17 @@ class OrderdetailScreenNew extends StatelessWidget {
                                       children: [
                                         Text(
                                           "Order ID",
-                                          style: TextStyle(
-                                              color: Colors.black,
-                                              fontFamily: "Urbanist",
+                                          style: GoogleFonts.mulish(
+                                              color: greyColor,
+                                              
                                               fontSize: 13,
                                               fontWeight: FontWeight.normal),
                                         ),
                                         Text(
                                           orderData['orderId'] ?? "N/A",
-                                          style: TextStyle(
-                                              color: Colors.black,
-                                              fontFamily: "Urbanist",
+                                          style: GoogleFonts.mulish(
+                                              color: whiteColor,
+                                              
                                               fontSize: 12,
                                               fontWeight: FontWeight.w700),
                                         ),
@@ -614,9 +619,9 @@ class OrderdetailScreenNew extends StatelessWidget {
                                       children: [
                                         Text(
                                           "Address",
-                                          style: TextStyle(
-                                              color: Colors.black,
-                                              fontFamily: "Urbanist",
+                                          style: GoogleFonts.mulish(
+                                              color: greyColor,
+                                              
                                               fontSize: 13,
                                               fontWeight: FontWeight.normal),
                                         ),
@@ -628,9 +633,9 @@ class OrderdetailScreenNew extends StatelessWidget {
                                           child: Text(
                                             orderData['shippingAddress'] ??
                                                 "N/A",
-                                            style: TextStyle(
-                                                color: Colors.black,
-                                                fontFamily: "Urbanist",
+                                            style: GoogleFonts.mulish(
+                                                color: whiteColor,
+                                              
                                                 fontSize: 12,
                                                 fontWeight: FontWeight.w700),
                                           ),
@@ -645,18 +650,18 @@ class OrderdetailScreenNew extends StatelessWidget {
                                       children: [
                                         Text(
                                           "Date and Time",
-                                          style: TextStyle(
-                                              color: Colors.black,
-                                              fontFamily: "Urbanist",
+                                          style: GoogleFonts.mulish(
+                                              color: greyColor,
+                                              
                                               fontSize: 13,
                                               fontWeight: FontWeight.normal),
                                         ),
                                         Text(
                                           formatDate(orderData['createdAt']) ??
                                               "N/A",
-                                          style: TextStyle(
-                                              color: Colors.black,
-                                              fontFamily: "Urbanist",
+                                          style: GoogleFonts.mulish(
+                                              color: whiteColor,
+                                              
                                               fontSize: 12,
                                               fontWeight: FontWeight.w700),
                                         ),
@@ -669,14 +674,14 @@ class OrderdetailScreenNew extends StatelessWidget {
                                           EdgeInsets.symmetric(vertical: 6),
                                       decoration: BoxDecoration(
                                           border:
-                                              Border.all(color: secondaryColor),
+                                              Border.all(color: greenColor),
                                           borderRadius:
-                                              BorderRadius.circular(10)),
+                                              BorderRadius.circular(8)),
                                       child: Text(
                                         "Return Items",
-                                        style: TextStyle(
-                                            color: primaryColor,
-                                            fontFamily: "Urbanist",
+                                        style: GoogleFonts.mulish(
+                                            color: whiteColor,
+                                          
                                             fontSize: 12,
                                             fontWeight: FontWeight.normal),
                                       ),
