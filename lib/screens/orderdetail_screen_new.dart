@@ -5,7 +5,8 @@ import 'package:intl/intl.dart';
 
 class OrderdetailScreenNew extends StatelessWidget {
   final dynamic orderData;
-  const OrderdetailScreenNew({super.key, required this.orderData});
+  String prescriptionURL;
+   OrderdetailScreenNew({super.key, required this.orderData,this.prescriptionURL="",});
 
   String formatDate(String isoDate) {
     // Parse the ISO 8601 string into a DateTime object
@@ -43,17 +44,18 @@ class OrderdetailScreenNew extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String orderStatus = orderData['currentStatus'];
+   
     return Scaffold(
         appBar: AppBar(
           backgroundColor:ligtBlackColor,
           leadingWidth: 100,
-          leading: Padding(
-            padding: const EdgeInsets.only(left: 12.0),
-            child: GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child:  Padding(
+          leading: GestureDetector(
+            onTap: (){
+              Navigator.of(context).pop();
+            },
+            child: Padding(
+              padding: const EdgeInsets.only(left: 12.0),
+              child: Padding(
               padding: const EdgeInsets.only(left: 24.0),
               child: Padding(
                 padding: const EdgeInsets.only(left: 4.0),
@@ -62,7 +64,7 @@ class OrderdetailScreenNew extends StatelessWidget {
                   children: [Image.asset("lib/images/Vector 9.png")],
                 ),
               ),
-            ),
+                          ),
             ),
           ),
           title: Text(
@@ -91,7 +93,11 @@ class OrderdetailScreenNew extends StatelessWidget {
                         Container(
                           padding: EdgeInsets.symmetric(vertical: 14),
                           width: MediaQuery.of(context).size.width,
-                          color: ligtBlackColor,
+                         
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                             color: ligtBlackColor,
+                          ),
                           child: Column(
                             spacing: 12,
                             children: [
@@ -127,7 +133,11 @@ class OrderdetailScreenNew extends StatelessWidget {
                         ),
                         Container(
                           padding: EdgeInsets.all(6),
-                          color: ligtBlackColor,
+                          
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                             color: ligtBlackColor,
+                          ),
                           child: Column(
                             spacing: 12,
                             children: [
@@ -312,7 +322,11 @@ class OrderdetailScreenNew extends StatelessWidget {
                               Container(
                                 padding: EdgeInsets.symmetric(
                                     horizontal: 12, vertical: 8),
-                                color: ligtBlackColor,
+                                
+                                decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                             color: ligtBlackColor,
+                          ),
                                 child: Column(
                                     spacing: 12,
                                     mainAxisAlignment: MainAxisAlignment.start,
@@ -410,7 +424,7 @@ class OrderdetailScreenNew extends StatelessWidget {
                                               fontWeight: FontWeight.normal),
                                         ),
                                         Text(
-                                          "₹ 200",
+                                          "₹ ${orderData["itemTotal"]}",
                                           style: GoogleFonts.mulish(
                                               color:
                                                   greyColor,
@@ -459,7 +473,7 @@ class OrderdetailScreenNew extends StatelessWidget {
                                               fontWeight: FontWeight.normal),
                                         ),
                                         Text(
-                                          "₹ 10",
+                                          "₹ ${orderData["gstServiceCharge"]}",
                                           style: GoogleFonts.mulish(
                                               color:
                                                   greyColor,
@@ -544,15 +558,19 @@ class OrderdetailScreenNew extends StatelessWidget {
                               Container(
                                 padding: EdgeInsets.symmetric(
                                     horizontal: 12, vertical: 8),
-                                color: ligtBlackColor,
+                                    decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                             color: ligtBlackColor,
+                          ),
+                                
                                 width: MediaQuery.of(context).size.width,
                                 child: Column(
                                   spacing: 12,
                                   mainAxisAlignment: MainAxisAlignment.start,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Image.asset(
-                                      "lib/images/prescription.png",
+                                   prescriptionURL==""?Text("No prescription uploaded") :Image.network(
+                                      prescriptionURL,
                                       height: 160,
                                     )
                                   ],
@@ -580,7 +598,11 @@ class OrderdetailScreenNew extends StatelessWidget {
                               Container(
                                 padding: EdgeInsets.symmetric(
                                     horizontal: 12, vertical: 8),
-                                color: ligtBlackColor,
+                                    decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                             color: ligtBlackColor,
+                          ),
+                                
                                 width: MediaQuery.of(context).size.width,
                                 child: Column(
                                   spacing: 12,
@@ -673,6 +695,7 @@ class OrderdetailScreenNew extends StatelessWidget {
                                       padding:
                                           EdgeInsets.symmetric(vertical: 6),
                                       decoration: BoxDecoration(
+                                        color: greenColor,
                                           border:
                                               Border.all(color: greenColor),
                                           borderRadius:
@@ -681,9 +704,9 @@ class OrderdetailScreenNew extends StatelessWidget {
                                         "Return Items",
                                         style: GoogleFonts.mulish(
                                             color: whiteColor,
-                                          
+                                            
                                             fontSize: 12,
-                                            fontWeight: FontWeight.normal),
+                                            fontWeight: FontWeight.bold),
                                       ),
                                     )
                                   ],

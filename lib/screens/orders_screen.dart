@@ -1,6 +1,7 @@
 import 'package:cureeit_user_app/cards/order_card.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -17,7 +18,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
   bool isLoading = true;
 
   Future<void> fetchOrderHistory() async {
-    print("fetching order history");
+  
     var url = Uri.parse(
         'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/order/orderHistory');
     var request =  http.Request('GET', url)
@@ -27,14 +28,15 @@ class _OrdersScreenState extends State<OrdersScreen> {
       ..body = jsonEncode({'userId': "68fa72cbdc5f0a68"});
 
     var response = await http.Client().send(request);
-   print("got responese");
+ 
     if (response.statusCode == 200) {
       var responseBody = await response.stream.bytesToString();
       Map<String, dynamic> data = jsonDecode(responseBody);
-      print("*******THIS IS ORDER SCREEN DATA******");
-      print(data);
+      
       setState(() {
+      
         orders = data['data'];
+          print(orders[0]["prescription"]["photoURL"]);
         orders.sort((item1, item2) {
   final dateA = DateTime.parse(item1['purchaseDate']);
   final dateB = DateTime.parse(item2['purchaseDate']);
@@ -59,7 +61,9 @@ class _OrdersScreenState extends State<OrdersScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: scaffoldBlackColor,
       appBar: AppBar(
+       
         backgroundColor:ligtBlackColor,
         elevation: 0,
         leadingWidth: 200,
@@ -76,7 +80,6 @@ class _OrdersScreenState extends State<OrdersScreen> {
                 style: GoogleFonts.mulish(
                     fontWeight: FontWeight.w600,
                     fontSize: MediaQuery.of(context).size.width * 0.06,
-                    
                     color: whiteColor),
               ),
             ],
@@ -104,6 +107,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                       orders.length, // Use the length of the orders array
                   itemBuilder: (context, index) {
                     return OrderCard(
+                      prescriptionURL:orders[0]["prescription"]["photoURL"] ,
                         orderData:
                             orders[index]); // Pass the order data to the card
                   },

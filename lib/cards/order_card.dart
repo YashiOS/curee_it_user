@@ -7,9 +7,11 @@ import 'package:intl/intl.dart';
 
 class OrderCard extends StatelessWidget {
   final dynamic orderData;
-  const OrderCard({
+  String prescriptionURL;
+   OrderCard( {
     super.key,
     required this.orderData,
+    this.prescriptionURL="",
   });
 
   String formatDate(String isoDate) {
@@ -39,7 +41,9 @@ class OrderCard extends StatelessWidget {
   }
   
 void getOrderId(){
+ 
   List<dynamic> orderItems = orderData["orderItems"];
+   print(orderItems);
   List productIds=orderItems.map((item)=>item['productId'].toString()).toList();
   
   
@@ -80,7 +84,7 @@ void getOrderId(){
               context,
               MaterialPageRoute(
                 builder: (context) =>
-                    OrderdetailScreenNew(orderData: orderData),
+                    OrderdetailScreenNew(orderData: orderData,prescriptionURL: prescriptionURL,),
               ),
             );
           }

@@ -43,7 +43,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor:greenColor),
         useMaterial3: true,
       ),
-      home:  Splashscreen()
+      home:  HomeScreen()
       );
   }
 }

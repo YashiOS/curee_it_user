@@ -124,7 +124,7 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   Future<void> fetchCartDetails() async {
-    print("****fetching cart******");
+   
     var cartApiUrl = Uri.parse(
         "http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/cart/cartDetails");
     final String userId = "68fa72cbdc5f0a68"; // Replace with the actual userId
@@ -157,12 +157,12 @@ class _CartScreenState extends State<CartScreen> {
                 await fetchProductDetails(cartItem['productId']);
 
             if (productDetails != null) {
-              print("${cartItem["prescription_required"]}");
+             
              
               if (cartItem["prescription_required"]=="Yes") {
                 payNow = false;
                 requiresPrescription = true;
-                print("in if block");
+                
               }
               //print("🟢 Product Details Retrieved: $productDetails");
               tempCart.add({

@@ -3,6 +3,7 @@ import 'package:cureeit_user_app/cubit/service_avilable_cubit.dart';
 import 'package:cureeit_user_app/current_address/api_services.dart';
 import 'package:cureeit_user_app/current_address/location_permission_helper.dart';
 import 'package:cureeit_user_app/current_address/models/place_from_coordinates.dart';
+import 'package:cureeit_user_app/screens/location.dart';
 import 'package:cureeit_user_app/selected_Address/currentAddress.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
@@ -733,90 +734,113 @@ class _HomeScreenState extends State<HomeScreen> {
         body: Stack(children: [
           Container(
             color: scaffoldBlackColor,
-            padding: EdgeInsets.only(left: 20, right: 20,top: 20),
+            padding: EdgeInsets.only(left: 20, right: 20,top: 40),
             margin: EdgeInsets.only(bottom: cartItems.isEmpty ? 45 : 0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 
                
-                Container(
-                    height: 100,
-                    decoration: BoxDecoration(
-                        color: scaffoldBlackColor,
-                        borderRadius: BorderRadius.circular(8)),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                       
-                        
-                       
-                        Container(
-                          width: 180,
-                          height: 80,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Container(
-                                width: 70,
-                                child: Image.asset("lib/images/Medkaro (1) 2.png")),
-                                Text(
-                                  "10 minutes",
-                                  style: GoogleFonts.mulish(color: whiteColor,fontSize:24,fontWeight: FontWeight.bold  ),
-                                ),
-                              localAddress == null ||
-                                      localAddress.isEmpty
-                                  ? Shimmer.fromColors(
-                                      baseColor: ligtBlackColor!,
-                                      highlightColor: whiteColor!,
-                                      child: Container(
-                                        width: MediaQuery.of(context)
-                                                .size
-                                                .width *
-                                            0.4,
-                                        height: 4,
-                                        // Matches your text height
-                                        decoration: BoxDecoration(
-                                          color: whiteColor,
-                                          borderRadius:
-                                              BorderRadius.circular(4),
+                GestureDetector(
+                  onTap: (){
+                    Navigator.of(context).push(MaterialPageRoute(builder: (context)=>LocationScreen()));
+                  },
+                  child: Container(
+                      height: 100,
+                      decoration: BoxDecoration(
+                          color: scaffoldBlackColor,
+                          borderRadius: BorderRadius.circular(8)),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                         
+                          
+                         
+                          Container(
+                          
+                            height: 80,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  width: 70,
+                                  child: Image.asset("lib/images/Medkaro (1) 2.png")),
+                                  Text(
+                                    "10 minutes",
+                                    style: GoogleFonts.mulish(color: whiteColor,fontSize:24,fontWeight: FontWeight.bold  ),
+                                  ),
+                                localAddress == null ||
+                                        localAddress.isEmpty
+                                    ? Shimmer.fromColors(
+                                        baseColor: ligtBlackColor!,
+                                        highlightColor: whiteColor!,
+                                        child: Container(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.4,
+                                          height: 4,
+                                          // Matches your text height
+                                          decoration: BoxDecoration(
+                                            color: whiteColor,
+                                            borderRadius:
+                                                BorderRadius.circular(4),
+                                          ),
                                         ),
+                                      )
+                                    : Container(
+                                      width: 280,
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Container(
+                                            constraints: BoxConstraints(
+                                              minWidth: 100,
+                                              maxWidth: 250,
+                                            ),
+                                            child: Text(
+                                                "$localAddress",
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: GoogleFonts.mulish(
+                                                    color: whiteColor,
+                                                    fontWeight:FontWeight.w300,
+                                                    
+                                                    fontSize: 15),
+                                              ),
+                                          ),
+                                            Icon(Icons.arrow_drop_down,color: whiteColor,)
+                                        ],
                                       ),
                                     )
-                                  : Text(
-                                      "$localAddress",
-                                      style: GoogleFonts.mulish(
-                                          color: whiteColor,
-                                          fontWeight:FontWeight.w300,
-                                          fontSize: 15),
-                                    )
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                       GestureDetector(
-                          onTap: ()async{
-                       await Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => ProfileScreen()));
-                       checkLocation();
-                       localAddress=Address.CurrentAddress!["address"];
-                          },
-                          child: Container(
-                            height: 36,
-                            width: 36,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              image: DecorationImage(
-                                image: AssetImage('lib/images/user.png'),
-                                fit: BoxFit.cover,
+                         GestureDetector(
+                            onTap: ()async{
+                         await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => ProfileScreen()));
+                         checkLocation();
+                         localAddress=Address.CurrentAddress!["address"];
+                            },
+                            child: Container(
+                              height: 36,
+                              width: 36,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                image: DecorationImage(
+                                  image: AssetImage('lib/images/user.png'),
+                                  fit: BoxFit.cover,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ],
-                    )),
+                        ],
+                      )),
+                ),
               
                 GestureDetector(
                   onTap: () {
