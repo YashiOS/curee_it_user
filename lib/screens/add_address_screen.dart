@@ -66,7 +66,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
           "_id": widget.userId,
         };
         Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => BaseScreen()));
+            MaterialPageRoute(builder: (context) => BaseScreen(Navigatedfrom: "add_address_screen",)));
       } else {
         Fluttertoast.showToast(msg: "Failed to add address");
       }

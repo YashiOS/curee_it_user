@@ -1,4 +1,5 @@
 import 'package:cureeit_user_app/screens/item_detail_screen.dart';
+import 'package:cureeit_user_app/user/user.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -80,7 +81,7 @@ class _CartCardState extends State<CartCard> {
   }
 
   Future<void> _updateQuantity(int quantity) async {
-    final String userId = "68fa72cbdc5f0a68";
+    final String userId = User.userId!;
     final String productId = widget.productId;
     if (_lastSentQuantity == quantity) return;
     _lastSentQuantity = quantity;
@@ -118,7 +119,7 @@ class _CartCardState extends State<CartCard> {
 
   Future<void> _removeFromCart() async {
     widget.isDeleting(true);
-    final String userId = "68fa72cbdc5f0a68";
+    final String userId = User.userId!;
     final String productId = widget.productId;
 
     final Map<String, dynamic> requestData = {
@@ -153,16 +154,15 @@ class _CartCardState extends State<CartCard> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-   print(widget.productPrice);
-   print(widget.sellingPrice);
+    print(widget.productPrice);
+    print(widget.sellingPrice);
     return Padding(
       padding: EdgeInsets.only(
-        top: MediaQuery.of(context).size.height * 0.035,
-        bottom: MediaQuery.of(context).size.height * 0.018,
+        top: 5,
       ),
       child: Container(
         padding:
-            EdgeInsets.only(right: MediaQuery.of(context).size.width * 0.03),
+            EdgeInsets.only(right: MediaQuery.of(context).size.width * 0.03, left: MediaQuery.of(context).size.width * 0.03),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -171,34 +171,14 @@ class _CartCardState extends State<CartCard> {
             Expanded(
               child: Row(
                 children: [
-                  SizedBox(width: 10,),
-                  // Product Image
                   SizedBox(
-                    height: MediaQuery.of(context).size.width * 0.1,
-                    width: MediaQuery.of(context).size.width * 0.1,
-                    child: widget.productImages.isNotEmpty
-                        ? Image.network(
-                            widget.productImages[0],
-                            fit: BoxFit.contain,
-                            loadingBuilder: (context, child, loadingProgress) {
-                              if (loadingProgress == null) return child;
-                              return const Center(
-                                child: CircularProgressIndicator(
-                                  color: greenColor,
-                                ),
-                              );
-                            },
-                            errorBuilder: (context, error, stackTrace) {
-                              return const Icon(Icons.error, color: Colors.red);
-                            },
-                          )
-                        : const Icon(Icons.image),
+                    width: 10,
                   ),
-                  const SizedBox(width: 10),
+                  // Product Image
 
                   /// Product Info
                   Container(
-                    width: 130,
+                    width: 180,
                     child: GestureDetector(
                       onTap: () {
                         Navigator.push(
@@ -218,9 +198,7 @@ class _CartCardState extends State<CartCard> {
                             overflow: TextOverflow.ellipsis,
                             style: GoogleFonts.mulish(
                               fontWeight: FontWeight.w700,
-                              fontSize:
-                                  MediaQuery.of(context).size.height * 0.0175,
-                              
+                              fontSize: 13,
                               color: whiteColor,
                             ),
                           ),
@@ -232,8 +210,7 @@ class _CartCardState extends State<CartCard> {
                               fontWeight: FontWeight.w400,
                               fontSize:
                                   MediaQuery.of(context).size.height * 0.015,
-                              
-                              color: whiteColor,
+                              color: greyColor,
                             ),
                           ),
                         ],
@@ -246,54 +223,55 @@ class _CartCardState extends State<CartCard> {
 
             /// RIGHT SECTION - Quantity control + price
             Row(
-            
-          
-              mainAxisSize: MainAxisSize.min,
+              mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 // Quantity Control
                 Container(
-                  width: MediaQuery.of(context).size.width * 0.20,
-                  height: MediaQuery.of(context).size.height * 0.04,
+                  width: 56,
+                  height: 28,
                   decoration: BoxDecoration(
                     color: greenColor,
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 4),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                     // Changed to spaceBetween
+                    crossAxisAlignment: CrossAxisAlignment
+                        .center, // Added for vertical centering
                     children: [
                       GestureDetector(
-                          onTap: () {
-                            if (widget.quantity == 1 || _localQuantity == 1) {
-                              _removeFromCart();
-                            }
-
-                            if (_localQuantity > 1 && isUpdating == false) {
-                              _onQuantityChanged(_localQuantity - 1);
-                            }
-                          },
+                        onTap: () {
+                          if (widget.quantity == 1 || _localQuantity == 1) {
+                            _removeFromCart();
+                          }
+                          if (_localQuantity > 1 && isUpdating == false) {
+                            _onQuantityChanged(_localQuantity - 1);
+                          }
+                        },
+                        child: Container(
+                          height: 28, // Match parent height
+                          width: 24, // Keep your original width
+                          alignment: Alignment.center, // Center the icon
                           child: Icon(
-                            Icons.remove, 
-                            weight: 900,// Flutter's built-in minus icon
-                            color: Colors.white, // Makes icon white
-                            size: screenHeight *
-                                0.03, // Matches your original image height
-                          )),
+                            Icons.remove,
+                            size: 18, // Explicit size
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
                       isUpdating
                           ? SizedBox(
-                              height: 14,
-                              width: 14,
+                              height: 8,
+                              width: 8,
                               child: CircularProgressIndicator(
                                 strokeWidth: 2,
-                                color: whiteColor, // matching the text color
+                                color: whiteColor,
                               ),
                             )
                           : Text(
                               "$_localQuantity",
-                              style:  GoogleFonts.mulish(
+                              style: GoogleFonts.mulish(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 12,
-                                
                                 color: whiteColor,
                               ),
                             ),
@@ -303,48 +281,48 @@ class _CartCardState extends State<CartCard> {
                             _onQuantityChanged(_localQuantity + 1);
                           }
                         },
-                        child: Icon(
+                        child: Container(
+                          height: 28, // Match parent height
+                          width: 24, // Keep your original width
+                          alignment: Alignment.center, // Center the icon
+                          child: Icon(
                             Icons.add,
-                            weight: 800, // Flutter's built-in minus icon
-                            color: Colors.white, // Makes icon white
-                            size: screenHeight *
-                                0.03, // Matches your original image height
+                            size: 18, // Explicit size
+                            color: Colors.white,
                           ),
+                        ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(width: 8),
-
+                
                 // Price Column
                 Container(
-                  width: 60,
+                  width: 80,
                   height: 60,
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.end,
-                   
                     children: [
-                      Text(
-                        "₹ ${((widget.sellingPrice ) * _localQuantity).toStringAsFixed(2)}",
-                        style: GoogleFonts.mulish(
-                          fontWeight: FontWeight.w800,
-                          fontSize: screenWidth * 0.03,
-                          
-                          color:whiteColor,
-                        ),
-                      ),
                       Text(
                         "₹ ${(widget.productPrice * _localQuantity).toStringAsFixed(1)}",
                         style: GoogleFonts.mulish(
                           decoration: TextDecoration.lineThrough,
                           fontWeight: FontWeight.w500,
-                           decorationColor:whiteColor,
-                          fontSize: screenWidth * 0.025,
-                          
+                          decorationColor: greyColor,
+                          fontSize: 10,
                           color: greyColor,
                         ),
+                     ), 
+                      Text(
+                        "₹ ${((widget.sellingPrice) * _localQuantity).toStringAsFixed(2)}",
+                        style: GoogleFonts.mulish(
+                          fontWeight: FontWeight.w300,
+                          fontSize: 13.78,
+                          color: whiteColor,
+                        ),
                       ),
-                      Text("${widget.productPrice*_localQuantity}")
+                      
+                      Text("${widget.productPrice * _localQuantity}")
                     ],
                   ),
                 ),

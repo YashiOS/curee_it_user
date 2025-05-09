@@ -1,4 +1,5 @@
 import 'package:cureeit_user_app/cards/favorites_card.dart';
+import 'package:cureeit_user_app/user/user.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -29,7 +30,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       ..headers.addAll({
         'Content-Type': 'application/json',
       })
-      ..body = jsonEncode({'userId': "68fa72cbdc5f0a68"});
+      ..body = jsonEncode({'userId': User.userId});
 
     var response = await http.Client().send(request);
 

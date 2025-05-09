@@ -1,3 +1,4 @@
+import 'package:cureeit_user_app/LocalStorageCubit/store_user_cubit.dart';
 import 'package:cureeit_user_app/cubit/service_avilable_cubit.dart';
 import 'package:cureeit_user_app/current_address/google_maps_screen.dart';
 import 'package:cureeit_user_app/screens/base_screen.dart';
@@ -11,17 +12,33 @@ import 'package:cureeit_user_app/screens/order_tracking_screen.dart';
 import 'package:cureeit_user_app/screens/orders_screen.dart';
 import 'package:cureeit_user_app/screens/otp_screen.dart';
 import 'package:cureeit_user_app/screens/profile_screen.dart';
+import 'package:cureeit_user_app/screens/register_screen.dart';
+import 'package:cureeit_user_app/screens/search.dart';
+import 'package:cureeit_user_app/screens/search_screen.dart';
 import 'package:cureeit_user_app/screens/splashScreen.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:io' show Platform;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/adapters.dart';
+late Box myBox;
 
+void main() async{
 
-void main() {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(BlocProvider(create: (context)=>ServiceAvilableCubit(),child: const MyApp()));
+  await Hive.initFlutter();
+   myBox=await Hive.openBox("Mybox");
+ runApp(
+  MultiBlocProvider(
+    providers: [
+      BlocProvider(create: (context) => ServiceAvilableCubit()),
+      BlocProvider(create: (context) => StoreUserCubit(myBox)), // Add this too
+    ],
+    child: const MyApp(),
+  ),
+);
 }
 
 class MyApp extends StatelessWidget {
@@ -43,7 +60,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor:greenColor),
         useMaterial3: true,
       ),
-      home:  HomeScreen()
+      home:  Splashscreen()
       );
   }
 }

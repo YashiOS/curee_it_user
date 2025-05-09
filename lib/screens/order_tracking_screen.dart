@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:async';
 import 'package:cureeit_user_app/screens/base_screen.dart';
+import 'package:cureeit_user_app/user/user.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -10,7 +11,7 @@ import 'package:intl/intl.dart';
 class OrderTrackingScreen extends StatefulWidget {
   OrderTrackingScreen(
       {super.key, required this.NavigatingFrom, required this.orderId});
-  final String userId = "68fa72cbdc5f0a68";
+  final String? userId = User.userId;
   late String orderId;
   final String NavigatingFrom;
   @override
@@ -53,7 +54,6 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
         if (data["data"].isNotEmpty) {
           orderTrackingDetails = Map<String, dynamic>.from(data["data"][0]);
         }
-        print("*****ORDER DETAILS*********** ${orderTrackingDetails}");
       });
     } else {
       print('Failed to load tracking details');
@@ -133,16 +133,18 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    "Order ${orderTrackingDetails["orderId"]??""}",
+                    "Order ${orderTrackingDetails["orderId"] ?? ""}",
                     style: GoogleFonts.mulish(
-                      fontWeight: FontWeight.bold,
-                      fontSize: width * 0.045,
-                      color: whiteColor
-                      
-                    ),
+                        fontWeight: FontWeight.bold,
+                        fontSize: width * 0.045,
+                        color: whiteColor),
                   ),
                   IconButton(
-                    icon: Icon(Icons.close, size: width * 0.06,color: whiteColor,),
+                    icon: Icon(
+                      Icons.close,
+                      size: width * 0.06,
+                      color: whiteColor,
+                    ),
                     onPressed: () => Navigator.pop(context),
                   ),
                 ],
@@ -151,10 +153,10 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
               Row(
                 children: [
                   Text(
-                    formatDate(orderTrackingDetails['createdAt']??""),
-                    style: GoogleFonts.mulish(fontSize: width * 0.035,color: whiteColor),
+                    formatDate(orderTrackingDetails['createdAt'] ?? ""),
+                    style: GoogleFonts.mulish(
+                        fontSize: width * 0.035, color: whiteColor),
                   ),
-                  
                 ],
               ),
               Divider(
@@ -164,7 +166,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
               ),
               ConstrainedBox(
                 constraints: BoxConstraints(
-                  maxHeight:  height * 0.33,
+                  maxHeight: height * 0.33,
                   minHeight: 0,
                 ),
                 child: ListView.builder(
@@ -173,8 +175,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                   itemBuilder: (context, index) {
                     final item = items[index];
                     return MedicineCard(
-                      Imgurl:
-                          item['productImageURL']??"", // or item['image']
+                      Imgurl: item['productImageURL'] ?? "", // or item['image']
                       MedicineName: item['productName'].toString(),
                       price: item['productPrice'].toString(),
                       quantities: item['quantity'].toString(),
@@ -188,10 +189,9 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                 child: Text(
                   "Bill Details",
                   style: GoogleFonts.mulish(
-                    fontWeight: FontWeight.bold,
-                    fontSize: width * 0.045,
-                    color: whiteColor
-                  ),
+                      fontWeight: FontWeight.bold,
+                      fontSize: width * 0.045,
+                      color: whiteColor),
                 ),
               ),
               Divider(
@@ -208,15 +208,16 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                     Expanded(
                       child: Row(
                         children: [
-                          Icon(Icons.currency_rupee,color: greyColor,),
+                          Icon(
+                            Icons.currency_rupee,
+                            color: greyColor,
+                          ),
                           Text(
                             " Item total",
                             style: GoogleFonts.mulish(
-                              fontSize: width * 0.04,
-                              fontWeight: FontWeight.normal,
-                              color: greyColor
-                              
-                            ),
+                                fontSize: width * 0.04,
+                                fontWeight: FontWeight.normal,
+                                color: greyColor),
                           ),
                         ],
                       ),
@@ -224,10 +225,9 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                     Text(
                       "₹ ${orderTrackingDetails["itemTotal"]}",
                       style: GoogleFonts.mulish(
-                        fontSize: width * 0.04,
-                        fontWeight: FontWeight.bold,
-                        color: greyColor
-                      ),
+                          fontSize: width * 0.04,
+                          fontWeight: FontWeight.bold,
+                          color: greyColor),
                     ),
                   ],
                 ),
@@ -240,14 +240,16 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                     Expanded(
                       child: Row(
                         children: [
-                          Icon(Icons.shopping_bag_outlined,color: greyColor,),
+                          Icon(
+                            Icons.shopping_bag_outlined,
+                            color: greyColor,
+                          ),
                           Text(
                             " GST and Platform Fees ",
                             style: GoogleFonts.mulish(
-                              fontSize: width * 0.04,
-                              fontWeight: FontWeight.normal,
-                              color: greyColor
-                            ),
+                                fontSize: width * 0.04,
+                                fontWeight: FontWeight.normal,
+                                color: greyColor),
                           ),
                         ],
                       ),
@@ -255,9 +257,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                     Text(
                       "₹${orderTrackingDetails["gstServiceCharge"]}",
                       style: GoogleFonts.mulish(
-                        fontSize: width * 0.04,
-                      color: greyColor
-                      ),
+                          fontSize: width * 0.04, color: greyColor),
                     ),
                   ],
                 ),
@@ -270,14 +270,16 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                     Expanded(
                       child: Row(
                         children: [
-                          Icon(Icons.shopping_cart_outlined,color: greyColor,),
+                          Icon(
+                            Icons.shopping_cart_outlined,
+                            color: greyColor,
+                          ),
                           Text(
                             " Delivery charge (Inc taxes)",
                             style: GoogleFonts.mulish(
-                              fontSize: width * 0.04,
-                              fontWeight: FontWeight.normal,
-                              color: greyColor
-                            ),
+                                fontSize: width * 0.04,
+                                fontWeight: FontWeight.normal,
+                                color: greyColor),
                           ),
                         ],
                       ),
@@ -287,7 +289,6 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                       style: GoogleFonts.mulish(
                         color: greyColor,
                         fontSize: width * 0.04,
-                        
                       ),
                     ),
                   ],
@@ -314,14 +315,16 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                     ),
                     Row(
                       children: [
-                        Icon(Icons.currency_rupee,color: whiteColor,),
+                        Icon(
+                          Icons.currency_rupee,
+                          color: whiteColor,
+                        ),
                         Text(
                           "${orderTrackingDetails["totalAmount"]}",
                           style: GoogleFonts.mulish(
-                            fontWeight: FontWeight.bold,
-                            fontSize: width * 0.050,
-                            color: whiteColor
-                          ),
+                              fontWeight: FontWeight.bold,
+                              fontSize: width * 0.050,
+                              color: whiteColor),
                         ),
                       ],
                     ),
@@ -353,7 +356,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
           child: Icon(
             icon,
             size: width * 0.06,
-            color: greyColor,
+            color: whiteColor,
           ),
         ),
         SizedBox(width: width * 0.04),
@@ -364,10 +367,9 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
               Text(
                 title,
                 style: GoogleFonts.mulish(
-                  fontSize: width * 0.045,
-                  fontWeight: FontWeight.bold,
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
                   color: whiteColor,
-                  
                 ),
               ),
               Text(
@@ -376,8 +378,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                 style: GoogleFonts.mulish(
                   fontSize: width * 0.035,
                   fontWeight: FontWeight.w500,
-                  color: whiteColor,
-                  
+                  color: greyColor,
                 ),
               ),
             ],
@@ -395,16 +396,15 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     bool isInactive = false,
   }) {
     final iconColor = isInactive
-        ? Colors.grey.shade500
+        ? greyColor
         : (color is MaterialColor ? color.shade800 : color);
     final bgColor = isInactive
-        ? Colors.grey.shade200
+        ? ligtBlackColor
         : (color is MaterialColor ? color.shade100 : color.withOpacity(0.2));
 
     return Column(
       children: [
         Container(
-          padding: EdgeInsets.all(size * 0.03),
           decoration: BoxDecoration(
             color: bgColor,
             shape: BoxShape.circle,
@@ -418,10 +418,10 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
         SizedBox(height: size * 0.015),
         Text(
           label,
-          style: TextStyle(
+          style: GoogleFonts.mulish(
             fontWeight: FontWeight.w600,
             color: iconColor,
-            fontFamily: "Urbanist",
+           
             fontSize: size * 0.03,
           ),
         ),
@@ -439,7 +439,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     final height = size.height;
     int quantity = int.parse(quantities);
     double Price = double.parse(price);
-    var total = quantity * Price;  
+    var total = quantity * Price;
     final hasUrl = Imgurl != null && Imgurl.trim().isNotEmpty;
     return Container(
       margin: EdgeInsets.symmetric(vertical: height * 0.01),
@@ -452,12 +452,18 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
         children: [
           ClipRRect(
             borderRadius: BorderRadius.circular(width * 0.02),
-            child:hasUrl? Image.network(
-              Imgurl,
-              width: width * 0.15,
-              height: width * 0.15,
-              fit: BoxFit.cover,
-            ):Image.asset("lib/images/capsule_image.png",width: width*0.15,height: width*0.15,),
+            child: hasUrl
+                ? Image.network(
+                    Imgurl,
+                    width: width * 0.15,
+                    height: width * 0.15,
+                    fit: BoxFit.cover,
+                  )
+                : Image.asset(
+                    "lib/images/capsule_image.png",
+                    width: width * 0.15,
+                    height: width * 0.15,
+                  ),
           ),
           SizedBox(width: width * 0.04),
           Expanded(
@@ -467,10 +473,9 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                 Text(
                   "$MedicineName",
                   style: GoogleFonts.mulish(
-                    fontSize: width * 0.04,
-                    fontWeight: FontWeight.w600,
-                    color: whiteColor
-                  ),
+                      fontSize: width * 0.04,
+                      fontWeight: FontWeight.w600,
+                      color: whiteColor),
                 ),
                 SizedBox(height: height * 0.005),
                 Text(
@@ -494,6 +499,23 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
         ],
       ),
     );
+  }
+
+  String getTrackingImage(String status) {
+    switch (status) {
+      case "Order Placed":
+        return 'lib/images/ordered.png';
+      case "Packing":
+        return 'lib/images/packing.png';
+      case "On the way":
+        return 'lib/images/onTheWay.png';
+      case "Delivered":
+        return 'lib/images/delivered.png';
+      case null:
+        return 'lib/images/ordered.png';
+      default:
+        return 'lib/images/ordered.png'; // default image
+    }
   }
 
   @override
@@ -523,7 +545,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                       }
                       if (widget.NavigatingFrom == "Order_SuccessScreen") {
                         Navigator.of(context).pushReplacement(MaterialPageRoute(
-                            builder: (context) => BaseScreen()));
+                            builder: (context) => BaseScreen(Navigatedfrom: "orderTrackingScreen",)));
                       }
 
                       //Navigator.pop(context);
@@ -536,12 +558,35 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                   ),
                 ),
                 SizedBox(height: height * 0.01),
-                ClipRRect(
-                  child: Image.asset(
-                    'lib/images/OrderTracking.png',
-                    fit: BoxFit.cover,
-                    width: double.infinity,
-                    height: height * 0.35,
+                Container(
+                  height: height * 0.35,
+                  child: ClipRRect(
+                    child: Image.asset(
+                      orderTrackingDetails["currentStatus"] == "Order Placed"
+                          ? 'lib/images/ordered.png'
+                          : orderTrackingDetails["currentStatus"] == "Packing"
+                              ? 'lib/images/packing.png'
+                              : orderTrackingDetails["currentStatus"] ==
+                                      "On the way"
+                                  ? 'lib/images/onTheWay.png'
+                                  : orderTrackingDetails["currentStatus"] ==
+                                          "Delivered"
+                                      ? 'lib/images/DELIVERED.png'
+                                      : 'lib/images/ordered.png', // Default image
+
+                      width: orderTrackingDetails["currentStatus"] ==
+                              "Order Placed"
+                          ? width*0.5
+                          : orderTrackingDetails["currentStatus"] == "Packing"
+                              ?  width*0.5
+                              : orderTrackingDetails["currentStatus"] ==
+                                      "On the way"
+                                  ?  width*0.5
+                                  : orderTrackingDetails["currentStatus"] ==
+                                          "Delivered"
+                                      ?  width*0.5
+                                      :  width*0.5,
+                    ),
                   ),
                 ),
               ],
@@ -552,8 +597,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
               padding: EdgeInsets.all(width * 0.04),
               decoration: BoxDecoration(
                 color: ligtBlackColor,
-                borderRadius:
-                    BorderRadius.vertical(top: Radius.circular(8)),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black12,
@@ -571,16 +615,16 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                       fontSize: width * 0.045,
                       fontWeight: FontWeight.bold,
                       color: whiteColor,
-                      
                     ),
                   ),
                   SizedBox(height: height * 0.02),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       DeliveryStatus(
                         icon: Icons.check_circle,
-                        label: "Order placed",
+                        label: "Ordered",
                         color: greenColor,
                         size: width,
                         isInactive: orderTrackingDetails["currentStatus"] ==
@@ -595,9 +639,12 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                             : true,
                       ),
                       Expanded(
-                        child: Divider(
-                          thickness: 2,
-                          color: Colors.grey.shade300,
+                        child: Container(
+                          margin: EdgeInsets.only(top: 7),
+                          child: Divider(
+                            thickness: 2,
+                            color: Colors.grey.shade300,
+                          ),
                         ),
                       ),
                       DeliveryStatus(
@@ -615,14 +662,17 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                             : true,
                       ),
                       Expanded(
-                        child: Divider(
-                          thickness: 2,
-                          color: Colors.grey.shade300,
+                        child: Container(
+                          margin: EdgeInsets.only(top: 7),
+                          child: Divider(
+                            thickness: 2,
+                            color: Colors.grey.shade300,
+                          ),
                         ),
                       ),
                       DeliveryStatus(
                         icon: Icons.local_shipping,
-                        label: "On the Way",
+                        label: "Enroute",
                         color: greenColor,
                         size: width,
                         isInactive: orderTrackingDetails["currentStatus"] ==
@@ -633,9 +683,12 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                             : true,
                       ),
                       Expanded(
-                        child: Divider(
-                          thickness: 2,
-                          color: Colors.grey.shade300,
+                        child: Container(
+                          margin: EdgeInsets.only(top: 7),
+                          child: Divider(
+                            thickness: 2,
+                            color: Colors.grey.shade300,
+                          ),
                         ),
                       ),
                       DeliveryStatus(

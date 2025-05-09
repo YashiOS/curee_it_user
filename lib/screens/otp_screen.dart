@@ -1,14 +1,22 @@
+import 'dart:convert';
+
+import 'package:cureeit_user_app/LocalStorageCubit/store_user_cubit.dart';
 import 'package:cureeit_user_app/screens/base_screen.dart';
 import 'package:cureeit_user_app/screens/home_screen.dart';
 import 'package:cureeit_user_app/selected_Address/otp_form.dart';
+import 'package:cureeit_user_app/user/user.dart';
 
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
 
 class OtpScreen extends StatefulWidget {
   final String phoneNumber;
-  const OtpScreen({super.key, required this.phoneNumber});
+  final String purpose;
+  final String name;
+  const OtpScreen({super.key, required this.phoneNumber,required this.purpose,required this.name});
 
   @override
   State<OtpScreen> createState() => _OtpScreenState();
@@ -31,13 +39,64 @@ class _OtpScreenState extends State<OtpScreen> {
     });
   }
 
-  void submitOtp() {
+  Future<void> submitOtp() async {
     if (otpEntered) {
       print('OTP entered: $otp');
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => HomeScreen()),
+
+
+       try {
+      final response = await http.post(
+        Uri.parse(
+            'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/auth/user/verifyOTP'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({
+          "mobileNumber":widget.phoneNumber,
+          "code":otp,
+          "purpose":widget.purpose,
+          "name":widget.name
+        }),
       );
+
+      if (response.statusCode == 200) {
+   
+      final data = json.decode(response.body);
+      if(data!=null){
+         final id=data["user"]["_id"];
+      final name=data["user"]["name"];
+      final userid=data["user"]["userId"];
+      final mobileNumber=data["user"]["mobileNumber"];
+
+      User.id=id;
+      User.name=name;
+      User.phoneNumber=mobileNumber;
+      User.userId=userid;
+      context.read<StoreUserCubit>().saveUserData(id: id, userId: userid, name: name, phoneNumber: mobileNumber);
+
+       Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) =>BaseScreen(Navigatedfrom: "otpScreen",)),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Logged in "),
+            backgroundColor: greenColor,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            duration: Duration(seconds: 2),
+          ),
+        );
+      }
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('failed to logged in error: $e')),
+      );
+    }
+      
     } else {
       print('OTP not fully entered');
     }
@@ -89,9 +148,7 @@ Widget build(BuildContext context) {
                     onTap: () {
                       submitOtp();
                       print(otp);
-                      Navigator.of(context).pushReplacement(
-                        MaterialPageRoute(builder: (context) => BaseScreen()),
-                      );
+                      
                     },
                     child: Container(
                       width: screenWidth * 0.23,

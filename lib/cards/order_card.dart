@@ -1,8 +1,13 @@
+import 'dart:convert';
+
+import 'package:cureeit_user_app/screens/cart_screen.dart';
 import 'package:cureeit_user_app/screens/order_tracking_screen.dart';
 import 'package:cureeit_user_app/screens/orderdetail_screen_new.dart';
+import 'package:cureeit_user_app/user/user.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
 class OrderCard extends StatelessWidget {
@@ -40,12 +45,32 @@ class OrderCard extends StatelessWidget {
     }
   }
   
-void getOrderId(){
+void addMultipleTocart(context)async{
  
   List<dynamic> orderItems = orderData["orderItems"];
    print(orderItems);
   List productIds=orderItems.map((item)=>item['productId'].toString()).toList();
-  
+   try{
+    final response = await http.post(
+        Uri.parse(
+            'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/cart/addMultipleToCart'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({
+          'userId': User.userId,
+          'productIds': productIds,
+          'quantity': 1,
+        }),
+      );
+     
+        if(response.statusCode==200){
+          Navigator.of(context).push(MaterialPageRoute(builder: (context)=>CartScreen(isNavigated: true)));
+        }
+
+   }catch(e){
+
+   }
   
 }
 
@@ -173,9 +198,9 @@ void getOrderId(){
                       ),
                       GestureDetector(
                         onTap: (){
-                           getOrderId();
+                           
                           if(orderStatus=="Delivered"||orderStatus==""){
-                                
+                                addMultipleTocart(context);
                           }
                         },
                         child: Container(
@@ -189,8 +214,7 @@ void getOrderId(){
                             "Reorder",
                             style: GoogleFonts.mulish(
                               fontWeight: FontWeight.bold,
-                              fontSize: screenheight * 0.014,
-                             
+                              fontSize: screenheight * 0.014,                           
                               color: whiteColor,
                             ),
                           ): Text(

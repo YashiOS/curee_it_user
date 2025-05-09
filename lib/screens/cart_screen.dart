@@ -5,6 +5,7 @@ import 'package:cureeit_user_app/current_address/google_maps_screen.dart';
 import 'package:cureeit_user_app/screens/Order_SuccessScreen.dart';
 import 'package:cureeit_user_app/screens/addresses_screen.dart';
 import 'package:cureeit_user_app/selected_Address/currentAddress.dart';
+import 'package:cureeit_user_app/user/user.dart';
 import 'package:cureeit_user_app/utils/razor_pay.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:cureeit_user_app/utils/widgets/LoadingIndicater.dart';
@@ -31,7 +32,10 @@ class CartScreen extends StatefulWidget {
 }
 
 class _CartScreenState extends State<CartScreen> {
+  double totalProductPrice = 0.0;  // Total of original prices
+  double totalSellingPrice = 0.0;  // Total of discounted prices
   bool isDeleting = false;
+  bool continueWithoutPre = false;
   List<Map<String, dynamic>> cartItems = [];
   List<dynamic> addresses = [];
   Map<String, dynamic>? selectedAddress;
@@ -85,7 +89,7 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   Future<void> _removeAllFromCart() async {
-    final String userId = "68fa72cbdc5f0a68"; // Example userId
+    final String? userId = User.userId; // Example userId
 
     final Map<String, dynamic> requestData = {
       "userId": userId,
@@ -112,7 +116,7 @@ class _CartScreenState extends State<CartScreen> {
     final address = await Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => AddressesScreen(userId: "68fa72cbdc5f0a68"),
+        builder: (context) => AddressesScreen(userId: User.userId!),
       ),
     );
     setState(() {});
@@ -124,10 +128,9 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   Future<void> fetchCartDetails() async {
-   
     var cartApiUrl = Uri.parse(
         "http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/cart/cartDetails");
-    final String userId = "68fa72cbdc5f0a68"; // Replace with the actual userId
+    final String? userId = User.userId; // Replace with the actual userId
 
     try {
       var request = http.Request('GET', cartApiUrl)
@@ -144,6 +147,8 @@ class _CartScreenState extends State<CartScreen> {
         if (responseData['status'] == 200 && responseData['data'] != null) {
           List<dynamic> cartData = responseData['data'];
           List<Map<String, dynamic>> tempCart = [];
+          double productTotal = 0.0;
+        double sellingTotal = 0.0;
           double totalFromApi =
               double.tryParse(responseData['totalAmount'].toString()) ?? 0.0;
           double taxFees =
@@ -157,13 +162,15 @@ class _CartScreenState extends State<CartScreen> {
                 await fetchProductDetails(cartItem['productId']);
 
             if (productDetails != null) {
-             
-             
-              if (cartItem["prescription_required"]=="Yes") {
+              if (cartItem["prescription_required"] == "Yes") {
                 payNow = false;
                 requiresPrescription = true;
-                
               }
+              double itemProductPrice = (cartItem['productPrice'] ?? 0).toDouble();
+            double itemSellingPrice = (cartItem['sellingPrice'] ?? 0).toDouble();
+            int quantity = cartItem['quantity'] ?? 1;
+             productTotal += itemProductPrice * quantity;
+            sellingTotal += itemSellingPrice * quantity;
               //print("🟢 Product Details Retrieved: $productDetails");
               tempCart.add({
                 "productId": cartItem['productId'],
@@ -187,6 +194,8 @@ class _CartScreenState extends State<CartScreen> {
             taxServices = taxFees;
             deliveryServiceFees = deliveryFees;
             totalWholeAmount = taxServices + totalAmount + deliveryServiceFees;
+            totalProductPrice = productTotal;
+          totalSellingPrice = sellingTotal;
           });
         } else {
           print("❌ Response did not contain valid cart data");
@@ -247,7 +256,7 @@ class _CartScreenState extends State<CartScreen> {
       ..headers.addAll({
         'Content-Type': 'application/json',
       })
-      ..body = jsonEncode({'userId': "68fa72cbdc5f0a68"});
+      ..body = jsonEncode({'userId': User.userId});
 
     var response = await http.Client().send(request);
 
@@ -261,16 +270,15 @@ class _CartScreenState extends State<CartScreen> {
     }
   }
 
-
   Future<void> createCheckout(String total, double shippingCost,
-      String shippingAddress, String transactionId) async {;
-        String base64Image="";
-        if(_imageFile!=null){
-          List<int>imageBytes=await _imageFile!.readAsBytes();
-          base64Image=base64Encode(imageBytes);
+      String shippingAddress, String transactionId) async {
+    ;
+    String base64Image = "";
+    if (_imageFile != null) {
+      List<int> imageBytes = await _imageFile!.readAsBytes();
+      base64Image = base64Encode(imageBytes);
+    }
 
-        }
-    
     int Total = double.parse(total).toInt();
     try {
       var url = Uri.parse(
@@ -280,9 +288,9 @@ class _CartScreenState extends State<CartScreen> {
           'Content-Type': 'application/json',
         })
         ..body = jsonEncode({
-          "userId": "68fa72cbdc5f0a68",
-          "prescriptionPhoto":base64Image,
-          "totalAmount":Total,
+          "userId": User.userId,
+          "prescriptionPhoto": base64Image,
+          "totalAmount": Total,
           "shippingAddress": shippingAddress,
           "shippingCost": shippingCost,
           "userLat": Address.CurrentAddress?["userLat"] ?? 0.0,
@@ -309,7 +317,7 @@ class _CartScreenState extends State<CartScreen> {
           //   builder: (context) => OrderSuccessScreen(),
           // ),
           // );
-          
+
           final shouldRefresh = await Navigator.push(
             context,
             MaterialPageRoute(
@@ -355,10 +363,10 @@ class _CartScreenState extends State<CartScreen> {
                 ),
                 Text(
                   "Upload Prescription",
-                  style: TextStyle(
+                  style: GoogleFonts.mulish(
                       fontWeight: FontWeight.w600,
                       fontSize: 14,
-                      fontFamily: "Urbanist",
+                      
                       color: whiteColor),
                 ),
                 SizedBox(
@@ -388,8 +396,8 @@ class _CartScreenState extends State<CartScreen> {
                               const SizedBox(width: 6),
                               Text(
                                 "Camera",
-                                style: const TextStyle(
-                                  fontFamily: "Urbanist",
+                                style: GoogleFonts.mulish(
+                                 
                                   fontSize: 14,
                                   fontWeight: FontWeight.w500,
                                   color: Colors.white,
@@ -418,8 +426,8 @@ class _CartScreenState extends State<CartScreen> {
                               const SizedBox(width: 6),
                               Text(
                                 "Gallery",
-                                style: const TextStyle(
-                                  fontFamily: "Urbanist",
+                                style:GoogleFonts.mulish(
+                                  
                                   fontSize: 14,
                                   fontWeight: FontWeight.w500,
                                   color: Colors.white,
@@ -438,32 +446,33 @@ class _CartScreenState extends State<CartScreen> {
         });
   }
 
+  Future<File?> compressImage(File imageFile) async {
+    try {
+      final dir = await getTemporaryDirectory();
+      final targetPath = path.join(
+          dir.path, "compressed_${DateTime.now().millisecondsSinceEpoch}.jpg");
 
-Future<File?> compressImage(File imageFile) async {
-  try {
-    final dir = await getTemporaryDirectory();
-    final targetPath = path.join(dir.path, "compressed_${DateTime.now().millisecondsSinceEpoch}.jpg");
+      final compressedFile = await FlutterImageCompress.compressAndGetFile(
+        imageFile.absolute.path,
+        targetPath,
+        quality: 5, // You can tune this
+      );
 
-    final compressedFile = await FlutterImageCompress.compressAndGetFile(
-      imageFile.absolute.path,
-      targetPath,
-      quality: 50, // You can tune this
-    );
-
-    return File(compressedFile!.path);
-  } catch (e) {
-    print("Image compression error: $e");
-    return null;
+      return File(compressedFile!.path);
+    } catch (e) {
+      print("Image compression error: $e");
+      return null;
+    }
   }
-}
 
   Future<void> pickFromCamera() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.camera);
     if (pickedFile != null) {
-      _imageFile = await compressImage(File(pickedFile.path)) ;
+      _imageFile = await compressImage(File(pickedFile.path));
 
       imagePicked = true;
       payNow = true;
+      continueWithoutPre = false;
       setState(() {});
     }
   }
@@ -471,10 +480,11 @@ Future<File?> compressImage(File imageFile) async {
   Future<void> pickFromGallery() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
     if (pickedFile != null) {
-      _imageFile = await compressImage(File(pickedFile.path)) ;
-;
+      _imageFile = await compressImage(File(pickedFile.path));
+      ;
       imagePicked = true;
       payNow = true;
+      continueWithoutPre = false;
       setState(() {});
     }
   }
@@ -487,34 +497,39 @@ Future<File?> compressImage(File imageFile) async {
       children: [
         Scaffold(
           appBar: AppBar(
-            toolbarHeight: widget.isNavigated ? 48 : 0,
-            backgroundColor: scaffoldBlackColor,
-            leadingWidth: 100,
-            leading: Padding(
-              padding: const EdgeInsets.only(left: 12.0),
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.pop(context);
-                },
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 4.0),
-                  child: Row(
-                    spacing: 4,
-                    children: [
-                      Icon(Icons.arrow_back, color: whiteColor),
-                      Text(
-                        "Back",
-                        style: GoogleFonts.mulish(
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14,
-                          
-                            color: whiteColor),
-                      )
-                    ],
-                  ),
-                ),
+            centerTitle: true,
+            backgroundColor: ligtBlackColor,
+            shape: ContinuousRectangleBorder(
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(10),
+                bottomRight: Radius.circular(10),
               ),
             ),
+            title: Text(
+              "Cart",
+              style: GoogleFonts.mulish(
+                fontWeight: FontWeight.w400,
+                fontSize: 22.69,
+                color: whiteColor,
+              ),
+            ),
+            leading: widget.isNavigated
+                ? GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 24.0),
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 4.0),
+                        child: Row(
+                          spacing: 4,
+                          children: [Image.asset("lib/images/Vector 9.png")],
+                        ),
+                      ),
+                    ),
+                  )
+                : Container(),
           ),
           body: Container(
             padding: EdgeInsets.only(
@@ -532,19 +547,9 @@ Future<File?> compressImage(File imageFile) async {
                       Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        spacing: 16,
+                        spacing: 20,
                         children: [
-                          Row(children: [
-                            Text(
-                              "Cart",
-                              style: GoogleFonts.mulish(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize:
-                                      MediaQuery.of(context).size.width * 0.06,
-                                  
-                                  color: whiteColor),
-                            )
-                          ]),
+                          SizedBox(height: 35,),
                           if (requiresPrescription)
                             GestureDetector(
                               onTap: () {
@@ -555,8 +560,8 @@ Future<File?> compressImage(File imageFile) async {
                                     const EdgeInsets.symmetric(horizontal: 16),
                                 height: 56,
                                 decoration: BoxDecoration(
-                                  color: const Color(
-                                      0xFF1A1A1A), // or any color you want
+                                  color: 
+                                      ligtBlackColor, // or any color you want
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Row(
@@ -564,11 +569,10 @@ Future<File?> compressImage(File imageFile) async {
                                       MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
-                                      'Upload your prescription',
+                                      'Upload prescription',
                                       style: GoogleFonts.mulish(
                                         color: Colors.white,
                                         fontSize: 16,
-                                       
                                         fontWeight: FontWeight.w500,
                                       ),
                                     ),
@@ -577,6 +581,71 @@ Future<File?> compressImage(File imageFile) async {
                                       height: 16,
                                       decoration: BoxDecoration(
                                         color: imagePicked
+                                            ? greenColor
+                                            : Colors.black,
+                                        shape: BoxShape.circle,
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            )
+                          else
+                            Container(),
+                           
+                          if (requiresPrescription)
+                            GestureDetector(
+                              onTap: () {
+                                if (imagePicked) {
+                                  return;
+                                }
+
+                                continueWithoutPre = true;
+                                setState(() {});
+                              },
+                              child: Container(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 16),
+                                height: 75,
+                                decoration: BoxDecoration(
+                                  color:
+                                      ligtBlackColor, // or any color you want
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Continue without Prescription',
+                                          style: GoogleFonts.mulish(
+                                            color: Colors.white,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                        Text(
+                                          'We will call you to confirm your order',
+                                          style: GoogleFonts.mulish(
+                                            color: Colors.white,
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w300,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Container(
+                                      width: 16,
+                                      height: 16,
+                                      decoration: BoxDecoration(
+                                        color: continueWithoutPre
                                             ? greenColor
                                             : Colors.black,
                                         shape: BoxShape.circle,
@@ -642,21 +711,26 @@ Future<File?> compressImage(File imageFile) async {
                                                   Column(
                                                     children: cartItems
                                                         .map((item) => CartCard(
-                                            productPrice:  (item["productPrice"] ?? 0).toDouble(),
+                                                            productPrice:
+                                                                (item["productPrice"] ??
+                                                                        0)
+                                                                    .toDouble(),
                                                             reBuild: reBuild,
                                                             productName:
                                                                 item['name'],
-                                                            packLabel:
-                                                                item['packagingDetail'] ??
-                                                                    " ",
-                                                            quantity:
-                                                                item['quantity'] ??
-                                                                    1,
-                                                            productId: item[
-                                                                'productId'],
-                                                            sellingPrice: (item[
-                                                                    'sellingPrice'] ??
-                                                                0).toDouble(),
+                                                            packLabel: item[
+                                                                    'packagingDetail'] ??
+                                                                " ",
+                                                            quantity: item[
+                                                                    'quantity'] ??
+                                                                1,
+                                                            productId:
+                                                                item[
+                                                                    'productId'],
+                                                            sellingPrice:
+                                                                (item['sellingPrice'] ??
+                                                                        0)
+                                                                    .toDouble(),
                                                             onUpdate:
                                                                 fetchCartDetails,
                                                             onRemove: () async {
@@ -687,8 +761,9 @@ Future<File?> compressImage(File imageFile) async {
                                                       0.0175, // ≈14
                                                 ),
                                                 child: Column(
-                                                  spacing: screenWidth * 0.045,
+                                                  spacing: 10,
                                                   children: [
+                                                    
                                                     Row(
                                                       mainAxisAlignment:
                                                           MainAxisAlignment
@@ -696,26 +771,53 @@ Future<File?> compressImage(File imageFile) async {
                                                       children: [
                                                         Text(
                                                           "Item Total",
-                                                          style: GoogleFonts.mulish(
+                                                          style: GoogleFonts
+                                                              .mulish(
                                                             fontWeight:
-                                                                FontWeight.w400,
+                                                                FontWeight.w300,
                                                             fontSize:
-                                                                screenWidth *
-                                                                    0.03,
-                                                            
-                                                            color: greyColor,
+                                                                14,
+                                                            color: whiteColor,
                                                           ),
                                                         ),
                                                         Text(
-                                                          "₹${(totalAmount)}",
-                                                          style: GoogleFonts.mulish(
+                                                          "₹${totalProductPrice}",
+                                                          style: GoogleFonts
+                                                              .mulish(
                                                             fontWeight:
-                                                                FontWeight.w400,
+                                                                FontWeight.w300,
+                                                            fontSize:14,
+                                                                
+                                                            color: whiteColor,
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .spaceBetween,
+                                                      children: [
+                                                        Text(
+                                                          "Item Discount",
+                                                          style: GoogleFonts
+                                                              .mulish(
+                                                            fontWeight:
+                                                                FontWeight.w300,
                                                             fontSize:
-                                                                screenWidth *
-                                                                    0.03,
-                                                            
-                                                            color: greyColor,
+                                                                14,
+                                                            color: whiteColor,
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          "- ₹${(totalProductPrice - totalSellingPrice).toStringAsFixed(2)}",
+                                                          style: GoogleFonts
+                                                              .mulish(
+                                                            fontWeight:
+                                                                FontWeight.w300,
+                                                            fontSize:14,
+                                                                
+                                                            color:greenColor,
                                                           ),
                                                         ),
                                                       ],
@@ -731,29 +833,26 @@ Future<File?> compressImage(File imageFile) async {
                                                           children: [
                                                             Text(
                                                               "Delivery Fee",
-                                                              style: GoogleFonts.mulish(
+                                                              style: GoogleFonts
+                                                                  .mulish(
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .w400,
-                                                                fontSize:
-                                                                    screenWidth *
-                                                                        0.03,
-                                                                
+                                                                fontSize:12,
+                                                                    
                                                                 color:
                                                                     greyColor,
                                                               ),
                                                             ),
-                                                            
                                                           ],
                                                         ),
                                                         Text(
                                                           "₹${deliveryServiceFees}",
-                                                          style: GoogleFonts.mulish(
+                                                          style: GoogleFonts
+                                                              .mulish(
                                                             fontWeight:
                                                                 FontWeight.w400,
-                                                            fontSize:12,
-                                                                
-                                                            
+                                                            fontSize: 12,
                                                             color: greyColor,
                                                           ),
                                                         ),
@@ -770,55 +869,83 @@ Future<File?> compressImage(File imageFile) async {
                                                           children: [
                                                             Text(
                                                               "GST and Platform Fees",
-                                                              style: GoogleFonts.mulish(
+                                                              style: GoogleFonts
+                                                                  .mulish(
                                                                 fontWeight:
                                                                     FontWeight
                                                                         .w400,
-                                                                fontSize:12,
-                                                                    
-                                                                
+                                                                fontSize: 12,
                                                                 color:
                                                                     greyColor,
                                                               ),
                                                             ),
-                                                            
                                                           ],
                                                         ),
                                                         Text(
                                                           "₹${taxServices}",
-                                                          style: GoogleFonts.mulish(
+                                                          style: GoogleFonts
+                                                              .mulish(
                                                             fontWeight:
                                                                 FontWeight.w400,
-                                                            fontSize:12,
-                                                                
-                                                           
+                                                            fontSize: 12,
                                                             color: greyColor,
                                                           ),
                                                         ),
                                                       ],
                                                     ),
-                                                    SizedBox(height: 15,),
-                                                    Row(
+                                                    SizedBox(
+                                                      height: 15,
+                                                    ),
+                                                    Column(
                                                       mainAxisAlignment:
                                                           MainAxisAlignment
                                                               .spaceBetween,
                                                       children: [
+                                                        Row(
+                                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                          children: [
+                                                          
+                                                          Text(
+                                                            "To Pay",
+                                                            style: GoogleFonts.mulish(
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                fontSize:16,
+                                                                    
+                                                                color:
+                                                                    greyColor),
+                                                          ),
+                                                          Text(
+                                                            "₹${totalWholeAmount.toStringAsFixed(2)}",
+                                                            style: GoogleFonts
+                                                                .mulish(
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w700,
+                                                              fontSize:15,
+                                                                  
+                                                              color: whiteColor,
+                                                            ),
+                                                          ),
+                                                        ]),
+                                                        SizedBox(height: 10,),
                                                         Container(
-                                                         
-                                                          height: screenHeight *
-                                                              0.06,
+                                                          height: 36,
                                                           width:
-                                                              screenWidth * 0.3,
+                                                              double.infinity,
                                                           alignment:
                                                               Alignment.center,
                                                           decoration:
                                                               BoxDecoration(
-                                                               color: payNow?greenColor:ligtBlackColor,
+                                                            color: payNow
+                                                                ? greenColor
+                                                                : ligtBlackColor,
                                                             border: Border.all(
                                                               color: greenColor,
                                                               width: 1,
                                                             ),
-                                                           // Setting the background color to primary color
+                                                            // Setting the background color to primary color
                                                             borderRadius:
                                                                 BorderRadius
                                                                     .circular(
@@ -830,12 +957,7 @@ Future<File?> compressImage(File imageFile) async {
                                                               if (addresses
                                                                       .length ==
                                                                   0) {
-                                                                Navigator.of(
-                                                                        context)
-                                                                    .pushReplacement(MaterialPageRoute(
-                                                                        builder:
-                                                                            (context) =>
-                                                                                GoogleMapsScreen()));
+                                                                
                                                                 return;
                                                               }
                                                               if (payNow ==
@@ -844,8 +966,14 @@ Future<File?> compressImage(File imageFile) async {
                                                                         context)
                                                                     .showSnackBar(
                                                                   SnackBar(
-                                                                      content: Text(
-                                                                          'Upload Prescription',style: GoogleFonts.mulish(color: whiteColor),)),
+                                                                      content:
+                                                                          Text(
+                                                                    'Upload Prescription',
+                                                                    style: GoogleFonts
+                                                                        .mulish(
+                                                                            color:
+                                                                                whiteColor),
+                                                                  )),
                                                                 );
                                                                 return;
                                                               }
@@ -892,67 +1020,23 @@ Future<File?> compressImage(File imageFile) async {
                                                               );
                                                             },
                                                             child: Center(
-                                                              child: addresses
-                                                                          .length ==
-                                                                      0
-                                                                  ? Text(
-                                                                      "Add your address first",
-                                                                      style:
-                                                                          GoogleFonts.mulish(
-                                                                        color:
-                                                                            greenColor,
-                                                                        
-                                                                        fontSize:
-                                                                            screenWidth *
-                                                                                0.025,
-                                                                      ),
-                                                                    )
-                                                                  : Text(
-                                                                      "Pay Now",
-                                                                      style:
-                                                                          GoogleFonts.mulish(
+                                                              child:  Text(
+                                                                      "Confirm and Pay",
+                                                                      style: GoogleFonts
+                                                                          .mulish(
                                                                         color: payNow
                                                                             ? whiteColor
                                                                             : greenColor,
-                                                                        fontSize:
-                                                                            screenWidth *
-                                                                                0.045,
-                                                                        
+                                                                        fontSize:12,
+                                                                            
                                                                         fontWeight:
-                                                                            FontWeight.bold,
+                                                                            FontWeight.w700,
                                                                       ),
                                                                     ),
                                                             ),
                                                           ),
                                                         ),
-                                                        Column(children: [
-                                                          Text(
-                                                            "To Pay",
-                                                            style: GoogleFonts.mulish(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                fontSize:
-                                                                    screenWidth *
-                                                                        0.04,
-                                                                
-                                                                color:
-                                                                    greyColor),
-                                                          ),
-                                                          Text(
-                                                            "₹${totalWholeAmount.toStringAsFixed(2)}",
-                                                            style: GoogleFonts.mulish(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w700,
-                                                              fontSize:
-                                                                  screenWidth *
-                                                                      0.05,
-                                                             
-                                                              color: whiteColor,
-                                                            ),
-                                                          ),
-                                                        ])
+                                                        
                                                       ],
                                                     ),
                                                   ],
@@ -994,7 +1078,6 @@ Future<File?> compressImage(File imageFile) async {
                                         style: GoogleFonts.mulish(
                                           fontWeight: FontWeight.w700,
                                           fontSize: screenWidth * 0.035,
-                                          
                                           color: whiteColor,
                                         ),
                                       ),
@@ -1027,7 +1110,6 @@ Future<File?> compressImage(File imageFile) async {
                                                 style: GoogleFonts.mulish(
                                                   fontWeight: FontWeight.w400,
                                                   fontSize: 12,
-                                                 
                                                   color: whiteColor,
                                                 ),
                                               ),
@@ -1051,7 +1133,6 @@ Future<File?> compressImage(File imageFile) async {
                                       fontSize:
                                           MediaQuery.of(context).size.width *
                                               0.03,
-                                     
                                       color: whiteColor,
                                     ),
                                   ),

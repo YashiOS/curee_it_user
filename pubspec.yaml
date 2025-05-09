@@ -53,12 +53,21 @@ dependencies:
   flutter_native_splash: ^2.4.4
   image_picker: ^1.1.2
   flutter_image_compress: ^2.4.0
+  dotted_border: ^2.1.0
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  
   
   
 dev_dependencies:
   flutter_test:
     sdk: flutter
-    
+  flutter_launcher_icons: ^0.14.3  
+
+flutter_icons:
+  android: true
+  image_path: "lib/images/app_icon.png"
+  adaptive_icon_background: "#00b852" 
 
 flutter_native_splash:
   color: "#000000" # dark background color

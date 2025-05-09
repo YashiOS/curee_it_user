@@ -1,43 +1,42 @@
 import 'dart:convert';
 
 import 'package:cureeit_user_app/screens/otp_screen.dart';
-import 'package:cureeit_user_app/screens/register_screen.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class RegisterScreen extends StatefulWidget {
+  const RegisterScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<RegisterScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends State<RegisterScreen> {
   final TextEditingController _controller = TextEditingController();
-  
+  final TextEditingController _nameController = TextEditingController();
   bool isButtonEnabled = false;
 
-  void userLogin() async {
+  void userRegister() async {
     try {
       final response = await http.post(
         Uri.parse(
-            'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/auth/user/login'),
+            'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/auth/user/register'),
         headers: {
           'Content-Type': 'application/json',
         },
         body: json.encode({
           "mobileNumber": _controller.text.trim(),
+          "name":_nameController.text.trim(),
         }),
       );
 
       if (response.statusCode == 200) {
-        
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text("OTP sent successfully"),
-            backgroundColor: greenColor,
+            backgroundColor: Colors.green,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
@@ -55,25 +54,42 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _validateAndProceed() async {
     String phoneNumber = _controller.text.trim();
-  
+    String name=_nameController.text.trim();
+
     if (phoneNumber.length != 10) {
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("Phone number must be 10 digit ",style: GoogleFonts.mulish(),),
+            content: Text(" Phone number must be 10 digit "),
             backgroundColor: greenColor,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
             duration: Duration(seconds: 2),
-          ),);
+          ),
+        );
       return;
-    } else {
-      userLogin();
+    } 
+    if(name==""&&name==null){
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Name can not be empty "),
+            backgroundColor: greenColor,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            duration: Duration(seconds: 2),
+          ),
+        );
+        return;
+    }
+    else {
+      userRegister();
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-            builder: (context) => OtpScreen(phoneNumber: phoneNumber,purpose: "login",name: "",)),
+            builder: (context) => OtpScreen(phoneNumber: phoneNumber,purpose: "register",name: name,)),
       );
     }
   }
@@ -81,12 +97,13 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   void initState() {
     _controller.addListener(_checkButton);
+    _nameController.addListener(_checkButton);
     super.initState();
   }
 
   void _checkButton() {
     setState(() {
-      isButtonEnabled = _controller.text.trim().length == 10;
+      isButtonEnabled = _controller.text.trim().length == 10&&_nameController.text.trim().length>1;
     });
   }
 
@@ -127,7 +144,27 @@ class _LoginScreenState extends State<LoginScreen> {
                         fontSize: screenHeight * 0.022,
                       ),
                     ),
-                     SizedBox(height: screenHeight * 0.123),
+                    SizedBox(height: screenHeight * (60 / 812)),
+                    Container(
+                      width: screenWidth * 0.85,
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF1A1A1A),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
+                      child: TextField(
+                        controller: _nameController,
+                        style: GoogleFonts.mulish(color: whiteColor),
+                        decoration: InputDecoration(
+                          hintText: "Name",
+                          hintStyle: TextStyle(
+                              color: Colors.white, fontWeight: FontWeight.w100),
+                          border: InputBorder.none,
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: screenHeight * 0.022),
                     Container(
                       width: screenWidth * 0.85,
                       decoration: BoxDecoration(
@@ -164,49 +201,31 @@ class _LoginScreenState extends State<LoginScreen> {
                         ],
                       ),
                     ),
-                    SizedBox(height: screenHeight * 0.05),// Added some spacing
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        SizedBox(
-                          width: screenWidth * 0.23,
-                          height: screenHeight * 0.055,
-                          child: TextButton(
-                            onPressed: () {
-                              _validateAndProceed();
-                            },
-                            style: TextButton.styleFrom(
-                              backgroundColor:
-                                  isButtonEnabled ? greenColor : scaffoldBlackColor,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                side: BorderSide(color: greenColor, width: 1),
-                              ),
-                            ),
-                            child: Text(
-                              "Next",
-                              style: GoogleFonts.mulish(
-                                color: isButtonEnabled ? whiteColor : greenColor,
-                                fontSize: screenHeight * 0.018,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
+                    SizedBox(height: screenHeight * 0.05), // Added some spacing
+                    SizedBox(
+                      width: screenWidth * 0.23,
+                      height: screenHeight * 0.055,
+                      child: TextButton(
+                        onPressed: () {
+                          _validateAndProceed();
+                        },
+                        style: TextButton.styleFrom(
+                          backgroundColor:
+                              isButtonEnabled ? greenColor : scaffoldBlackColor,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            side: BorderSide(color: greenColor, width: 1),
                           ),
                         ),
-                        GestureDetector(
-                          onTap: (){
-                            Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>RegisterScreen()));
-                          },
-                          child: Column(
-                            children: [
-                              Text("New to medkaro ?",style: GoogleFonts.mulish(color: greyColor,fontSize: 17,fontWeight: FontWeight.w600),),
-                              Text("Register Now",style: GoogleFonts.mulish(color: whiteColor,fontSize: 13,fontWeight: FontWeight.w800),)
-                            ],
+                        child: Text(
+                          "Next",
+                          style: GoogleFonts.mulish(
+                            color: isButtonEnabled ? whiteColor : greenColor,
+                            fontSize: screenHeight * 0.018,
+                            fontWeight: FontWeight.bold,
                           ),
-                        )
-
-                      ],
+                        ),
+                      ),
                     ),
                   ],
                 ),

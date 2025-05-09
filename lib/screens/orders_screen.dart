@@ -1,4 +1,5 @@
 import 'package:cureeit_user_app/cards/order_card.dart';
+import 'package:cureeit_user_app/user/user.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -18,14 +19,13 @@ class _OrdersScreenState extends State<OrdersScreen> {
   bool isLoading = true;
 
   Future<void> fetchOrderHistory() async {
-  
     var url = Uri.parse(
         'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/order/orderHistory');
     var request =  http.Request('GET', url)
       ..headers.addAll({
         'Content-Type': 'application/json',
       })
-      ..body = jsonEncode({'userId': "68fa72cbdc5f0a68"});
+      ..body = jsonEncode({'userId':User.userId});
 
     var response = await http.Client().send(request);
  

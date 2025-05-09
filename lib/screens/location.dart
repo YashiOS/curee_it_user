@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:cureeit_user_app/current_address/google_maps_screen.dart';
 import 'package:cureeit_user_app/selected_Address/currentAddress.dart';
+import 'package:cureeit_user_app/user/user.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -35,7 +36,7 @@ class _LocationScreenState extends State<LocationScreen> {
       ..headers.addAll({
         'Content-Type': 'application/json',
       })
-      ..body = jsonEncode({'userId': "68fa72cbdc5f0a68"});
+      ..body = jsonEncode({'userId': User.userId});
 
     var response = await http.Client().send(request);
 

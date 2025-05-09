@@ -5,6 +5,7 @@ import 'package:cureeit_user_app/current_address/models/get_places.dart';
 import 'package:cureeit_user_app/current_address/models/place_from_coordinates.dart';
 import 'package:cureeit_user_app/screens/add_address_screen.dart';
 import 'package:cureeit_user_app/selected_Address/currentAddress.dart';
+import 'package:cureeit_user_app/user/user.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -214,6 +215,7 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
                               padding: const EdgeInsets.symmetric(
                                   vertical: 8.0, horizontal: 18),
                               child: Container(
+                                height: 300,
                                 decoration: BoxDecoration(
                                     color: ligtBlackColor,
                                     borderRadius: BorderRadius.circular(8)),
@@ -372,7 +374,7 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
                                                   .bottom,
                                             ),
                                             child: AddAddressScreen(
-                                              userId: "68fa72cbdc5f0a68",
+                                              userId: User.userId!,
                                               userLat: defaultLat,
                                               userLong: defaultLng,
                                             ),

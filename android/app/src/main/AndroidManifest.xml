@@ -15,7 +15,7 @@
         android:authorities="${applicationId}.fileprovider"
         android:exported="false"
         android:grantUriPermissions="true"
-        android:label="curee_it_user_app"
+        android:label="Medkaro"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <meta-data

@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:cureeit_user_app/screens/item_detail_screen.dart';
+import 'package:cureeit_user_app/user/user.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -24,7 +25,7 @@ class _SearchCardState extends State<SearchCard> {
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
           "productId": widget.productId,
-          "userId": "68fa72cbdc5f0a68",
+          "userId": User.userId,
         }),
       );
 
@@ -53,7 +54,7 @@ class _SearchCardState extends State<SearchCard> {
         ..headers.addAll({
           'Content-Type': 'application/json',
         })
-        ..body = jsonEncode({'userId': "68fa72cbdc5f0a68"});
+        ..body = jsonEncode({'userId': User.userId});
 
       var response = await http.Client().send(request);
 

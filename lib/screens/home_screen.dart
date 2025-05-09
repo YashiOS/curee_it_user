@@ -1,10 +1,13 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:math';
 import 'package:cureeit_user_app/cubit/service_avilable_cubit.dart';
 import 'package:cureeit_user_app/current_address/api_services.dart';
 import 'package:cureeit_user_app/current_address/location_permission_helper.dart';
 import 'package:cureeit_user_app/current_address/models/place_from_coordinates.dart';
 import 'package:cureeit_user_app/screens/location.dart';
 import 'package:cureeit_user_app/selected_Address/currentAddress.dart';
+import 'package:cureeit_user_app/user/user.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -30,9 +33,36 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _bounceAnimation;
+  int _currentImageIndex = 0;
+  final List<String> _images = [
+    "lib/images/capsule.png",
+    "lib/images/capsule_image.png"
+  ];
+  final List<String> hints = [
+    "Search for your medicine",
+    "Try 'Paracetamol'",
+    "Looking for Cough Syrup?",
+    "Enter salt or brand name",
+    "Got a headache? Try 'Saridon'",
+    "Search by symptoms like 'cold'",
+    "Find Ayurvedic medicines too",
+    "Try 'Disprin' for quick relief",
+    "Type 'Crocin' for fever meds",
+    "Try 'ORS' for dehydration",
+    "Search homeopathic remedies",
+    "Search for baby care products",
+  ];
+  int currentIndex = 0;
+  String? currentHint;
+  late Timer timer;
+
+  Timer? _animationTimer;
   bool loaded = false;
   bool newUser = false;
+  bool GotproductDetail=false;
   Map<int, bool> isAddingMap = {};
   List<dynamic> addresses = [];
   List<dynamic> products = [];
@@ -51,13 +81,47 @@ class _HomeScreenState extends State<HomeScreen> {
   PlaceFromCoordinates placeFromCoordinates = PlaceFromCoordinates();
   // To store product quantities
 
+  void changeSearchText() async {
+    timer = Timer.periodic(Duration(seconds: 3), (_) async {
+      setState(() {
+        currentHint = "";
+      });
+
+      setState(() {
+        currentIndex = (currentIndex + 1) % hints.length;
+      });
+
+      setState(() {
+        currentHint = hints[currentIndex];
+      });
+    });
+  }
+
   @override
   void initState() {
-    print("in intit state");
     super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 800),
+      vsync: this, // Make sure your class mixes with TickerProviderStateMixin
+    )..repeat(reverse: true); // This makes the animation loop back and forth
+
+    _bounceAnimation = Tween<double>(begin: 0, end: -20).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.easeInOut,
+      ),
+    );
     fetchAddresses();
     fetchCartDetails();
     fetchProducts();
+    changeSearchText();
+  }
+
+  @override
+  void dispose() {
+    timer.cancel();
+    // TODO: implement dispose
+    super.dispose();
   }
 
   void UpdateAddress1() {
@@ -88,7 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
           'Content-Type': 'application/json',
         },
         body: json.encode({
-          'userId': "68fa72cbdc5f0a68",
+          'userId': User.userId,
           'productId': productId,
           'quantity': 1,
         }),
@@ -120,13 +184,13 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> DidUpdateQuantity(int index, int change) async {
     final product = products[index];
     final productId = product['productId'];
-    final String userId = "68fa72cbdc5f0a68"; // Example userId
+    final String? userId = User.userId; // Example userId
     final int currentQuantity = quantities[index] ?? 0;
     final int newQuantity = currentQuantity + change;
 
     // Update local state immediately for UI responsiveness
     setState(() {
-      if (newQuantity < 1) {
+      if (newQuantity <= 1) {
         quantities[index] = 0;
       } else {
         quantities[index] = newQuantity;
@@ -168,7 +232,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> fetchCartDetails() async {
     var cartApiUrl = Uri.parse(
         "http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/cart/cartDetails");
-    final String userId = "68fa72cbdc5f0a68"; // Replace with the actual userId
+    final String? userId = User.userId; // Replace with the actual userId
 
     try {
       var request = http.Request('GET', cartApiUrl)
@@ -259,11 +323,11 @@ class _HomeScreenState extends State<HomeScreen> {
       var response = await http.Client().send(request);
 
       if (response.statusCode == 200) {
+        GotproductDetail=true;
         final responseBody = await response.stream.bytesToString();
         final responseData = jsonDecode(responseBody);
 
         if (responseData['status'] == 200 && responseData['data'] != null) {
-          print("***PRODUCT DETAILS***");
           print(responseData["data"]);
           return responseData['data']; // Return the data part of the response
         } else {
@@ -309,36 +373,32 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget buildOutOfRadius() {
     return Container(
       color: scaffoldBlackColor,
-      child: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize
-              .min, // Ensures column takes only as much space as needed
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              "Sorry! Our services are not available in your area yet.",
-              textAlign: TextAlign.center, // Center the text inside the widget
-              style: GoogleFonts.mulish(
-                fontWeight: FontWeight.w700,
-                fontSize: 24,
-             
-                color: whiteColor,
-              ),
+      child: Column(
+        mainAxisSize: MainAxisSize
+            .min, // Ensures column takes only as much space as needed
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            "Sorry! Our services are not available in your area yet.",
+            textAlign: TextAlign.center, // Center the text inside the widget
+            style: GoogleFonts.mulish(
+              fontWeight: FontWeight.w700,
+              fontSize: 24,
+              color: whiteColor,
             ),
-            SizedBox(height: 12), // Add spacing between the two texts
-            Text(
-              "We will notify you as soon as the services are available",
-              textAlign: TextAlign.center, // Center this text too
-              style: GoogleFonts.mulish(
-                fontWeight: FontWeight.w500,
-                fontSize: 14,
-               
-                color:greyColor,
-              ),
+          ),
+          SizedBox(height: 12), // Add spacing between the two texts
+          Text(
+            "We will notify you as soon as the services are available",
+            textAlign: TextAlign.center, // Center this text too
+            style: GoogleFonts.mulish(
+              fontWeight: FontWeight.w500,
+              fontSize: 14,
+              color: greyColor,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -356,16 +416,16 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return ListView.builder(
       shrinkWrap: true,
-      physics: cartItems.isEmpty
-          ? NeverScrollableScrollPhysics()
-          : ClampingScrollPhysics(),
+      physics: ClampingScrollPhysics(),
       itemCount: itemCount,
       itemBuilder: (context, rowIndex) {
         int firstIndex = rowIndex * 2;
         int secondIndex = firstIndex + 1;
 
         return Container(
-          margin:cartItems.isNotEmpty?EdgeInsets.only(bottom: 36): EdgeInsets.only(bottom: 16),
+          margin: cartItems.isNotEmpty
+              ? EdgeInsets.only(bottom: 20)
+              : EdgeInsets.only(bottom: 20),
           child: Row(
             children: [
               // First product
@@ -423,7 +483,7 @@ class _HomeScreenState extends State<HomeScreen> {
         children: [
           // 🔵 Product Image (30%)
           SizedBox(
-          width: double.infinity,
+            width: double.infinity,
             height: 109,
             child: GestureDetector(
               onTap: () {
@@ -437,7 +497,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               },
               child: Container(
-              width: double.infinity,
+                width: double.infinity,
                 height: 109,
                 decoration: BoxDecoration(
                   color: whiteColor,
@@ -479,33 +539,32 @@ class _HomeScreenState extends State<HomeScreen> {
 
           // 🔵 Price (7%)
           Container(
-            margin: EdgeInsets.only(left: 10),
-            width: 120,
+            margin: EdgeInsets.only(left: 10, right: 10),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "₹${product['discountedPrice']}",
-            style: GoogleFonts.mulish(
-              color: whiteColor.withOpacity(0.8),
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
-            ),
-          ),
-          Text(
-            "₹${product['price']}",
-            style: GoogleFonts.mulish(
-              color: greyColor,
-              fontSize: 12,
-              decoration: TextDecoration.lineThrough,
-            ),
-          ),
-        ],
-      ),
-      
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      "₹${product['discountedPrice']}",
+                      style: GoogleFonts.mulish(
+                        color: whiteColor.withOpacity(0.8),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                    Text(
+                      "₹${product['price']}",
+                      style: GoogleFonts.mulish(
+                          color: greyColor,
+                          fontSize: 12,
+                          decoration: TextDecoration.lineThrough,
+                          decorationColor: greyColor),
+                    ),
+                  ],
+                ),
                 Container(
                   width: 49,
                   height: 29,
@@ -518,39 +577,47 @@ class _HomeScreenState extends State<HomeScreen> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: isInCart
-                      ? FittedBox(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              IconButton(
-                                padding: EdgeInsets.zero,
-                                constraints: BoxConstraints(),
-                                icon: Icon(
-                                  Icons.remove,
-                                  size: containerHeight * 0.06,
-                                  color: whiteColor,
+                      ? Container(
+                          width: 49,
+                          height: 29,
+                          decoration: BoxDecoration(
+                            color: greenColor,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: FittedBox(
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                IconButton(
+                                  padding: EdgeInsets.zero,
+                                  constraints: BoxConstraints(),
+                                  icon: Icon(
+                                    Icons.remove,
+                                    size: containerHeight * 0.06,
+                                    color: whiteColor,
+                                  ),
+                                  onPressed: () => DidUpdateQuantity(index, -1),
                                 ),
-                                onPressed: () => DidUpdateQuantity(index, -1),
-                              ),
-                              Text(
-                                '${quantities[index]}',
-                                style: GoogleFonts.mulish(
-                                  color: whiteColor,
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: containerHeight * 0.05,
+                                Text(
+                                  '${quantities[index]}',
+                                  style: GoogleFonts.mulish(
+                                    color: whiteColor,
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: containerHeight * 0.05,
+                                  ),
                                 ),
-                              ),
-                              IconButton(
-                                padding: EdgeInsets.zero,
-                                constraints: BoxConstraints(),
-                                icon: Icon(
-                                  Icons.add,
-                                  size: containerHeight * 0.06,
-                                  color: whiteColor,
+                                IconButton(
+                                  padding: EdgeInsets.zero,
+                                  constraints: BoxConstraints(),
+                                  icon: Icon(
+                                    Icons.add,
+                                    size: containerHeight * 0.06,
+                                    color: whiteColor,
+                                  ),
+                                  onPressed: () => DidUpdateQuantity(index, 1),
                                 ),
-                                onPressed: () => DidUpdateQuantity(index, 1),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         )
                       : TextButton(
@@ -611,23 +678,36 @@ class _HomeScreenState extends State<HomeScreen> {
       ..headers.addAll({
         'Content-Type': 'application/json',
       })
-      ..body = jsonEncode({'userId': "68fa72cbdc5f0a68"});
+      ..body = jsonEncode({'userId': User.userId});
 
     var response = await http.Client().send(request);
-
+    print(response.statusCode);
     if (response.statusCode == 200) {
+      String address = await fetchLocationAndAddress();
       final data = json.decode(await response.stream.bytesToString());
       final fetchAddress = data["data"]["address"];
       if (fetchAddress == null || fetchAddress.isEmpty) {
         setState(() {
+            Address.CurrentAddress = {
+              "address": address,
+              "landmark": "",
+              "floor": "",
+              "userLat": defaultLat,
+              "userLong": defaultLng,
+              "type": "",
+              "_id": ""
+            };
+            localAddress = address;
+            Address.selectedIndex = null;
+          });
+        setState(() {
           newUser = true;
+          checkLocation();
         });
       } else {
         SelectedAddress = data['data']['address'][0];
         addresses = data['data']['address'];
         if (Address.CurrentAddress == null && SelectedAddress != null) {
-          String address = await fetchLocationAndAddress();
-
           setState(() {
             Address.CurrentAddress = {
               "address": address,
@@ -641,7 +721,7 @@ class _HomeScreenState extends State<HomeScreen> {
             localAddress = address;
             Address.selectedIndex = null;
           });
-          checkLocation();
+            checkLocation();
 
           return;
         }
@@ -649,9 +729,11 @@ class _HomeScreenState extends State<HomeScreen> {
     } else {
       print('Failed to load addresses');
     }
+  
   }
 
   Future<void> checkLocation() async {
+    print("checking location...");
     final String apiUrl =
         "http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/home/check_location";
 
@@ -668,15 +750,16 @@ class _HomeScreenState extends State<HomeScreen> {
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         setState(() {
+          print("checking if its in radius...");
+         
           isInRadius = responseData['insideRadius'] == true;
+           print(isInRadius);
           if (isInRadius == true) {
             context.read<ServiceAvilableCubit>().UpdateServiceAvilable(true);
           } else {
             isInRadius = false;
             context.read<ServiceAvilableCubit>().UpdateServiceAvilable(false);
           }
-
-        
         });
       } else {
         print("Failed to check_location: ${response.body}");
@@ -721,7 +804,33 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget LoadingIndicatorBallClip() {
-    return LoadingIndicator(indicatorType: Indicator.ballGridBeat);
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        AnimatedBuilder(
+          animation: _bounceAnimation,
+          builder: (context, child) {
+            return Transform.translate(
+              offset: Offset(0, _bounceAnimation.value),
+              child: Image.asset(
+                "lib/images/capsule.png",
+                width: 40,
+                height: 60,
+              ),
+            );
+          },
+        ),
+        SizedBox(height: 8),
+        Text(
+          "Relief loading...",
+          style: GoogleFonts.mulish(
+            color: Colors.white,
+            fontSize: 14,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ],
+    );
   }
 
   @override
@@ -734,16 +843,17 @@ class _HomeScreenState extends State<HomeScreen> {
         body: Stack(children: [
           Container(
             color: scaffoldBlackColor,
-            padding: EdgeInsets.only(left: 20, right: 20,top: 40),
+            padding: EdgeInsets.only(left: 20, right: 20, top: 40),
             margin: EdgeInsets.only(bottom: cartItems.isEmpty ? 45 : 0),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                
-               
                 GestureDetector(
-                  onTap: (){
-                    Navigator.of(context).push(MaterialPageRoute(builder: (context)=>LocationScreen()));
+                  onTap: () async {
+                    await Navigator.of(context).push(MaterialPageRoute(
+                        builder: (context) => LocationScreen()));
+                    checkLocation();
+                    localAddress = Address.CurrentAddress!["address"];
                   },
                   child: Container(
                       height: 100,
@@ -754,94 +864,151 @@ class _HomeScreenState extends State<HomeScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                         
-                          
-                         
                           Container(
-                          
                             height: 80,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Container(
-                                  width: 70,
-                                  child: Image.asset("lib/images/Medkaro (1) 2.png")),
-                                  Text(
-                                    "10 minutes",
-                                    style: GoogleFonts.mulish(color: whiteColor,fontSize:24,fontWeight: FontWeight.bold  ),
-                                  ),
-                                localAddress == null ||
-                                        localAddress.isEmpty
-                                    ? Shimmer.fromColors(
-                                        baseColor: ligtBlackColor!,
-                                        highlightColor: whiteColor!,
-                                        child: Container(
-                                          width: MediaQuery.of(context)
-                                                  .size
-                                                  .width *
-                                              0.4,
-                                          height: 4,
-                                          // Matches your text height
-                                          decoration: BoxDecoration(
-                                            color: whiteColor,
-                                            borderRadius:
-                                                BorderRadius.circular(4),
+                                localAddress == null || localAddress.isEmpty
+                                    ? Container(
+                                        margin: EdgeInsets.only(bottom: 10),
+                                        child: Shimmer.fromColors(
+                                          baseColor: ligtBlackColor,
+                                          highlightColor: whiteColor,
+                                          child: Container(
+                                            width: 60,
+                                            height: 10,
+                                            // Matches your text height
+                                            decoration: BoxDecoration(
+                                              color: whiteColor,
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
                                           ),
                                         ),
                                       )
                                     : Container(
-                                      width: 280,
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Container(
-                                            constraints: BoxConstraints(
-                                              minWidth: 100,
-                                              maxWidth: 250,
+                                        width: 70,
+                                        child: Image.asset(
+                                            "lib/images/Medkaro (1) 2.png")),
+                                localAddress == null || localAddress.isEmpty
+                                    ? Container(
+                                        margin: EdgeInsets.only(bottom: 10),
+                                        child: Shimmer.fromColors(
+                                          baseColor: ligtBlackColor,
+                                          highlightColor: whiteColor,
+                                          child: Container(
+                                            width: 150,
+                                            height: 22,
+                                            // Matches your text height
+                                            decoration: BoxDecoration(
+                                              color: whiteColor,
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
                                             ),
-                                            child: Text(
+                                          ),
+                                        ),
+                                      )
+                                    : Text(
+                                        "in 10 minutes",
+                                        style: GoogleFonts.mulish(
+                                            color: whiteColor,
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                localAddress == null || localAddress.isEmpty
+                                    ? Container(
+                                        margin: EdgeInsets.only(top: 10),
+                                        child: Shimmer.fromColors(
+                                          baseColor: ligtBlackColor,
+                                          highlightColor: whiteColor,
+                                          child: Container(
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.4,
+                                            height: 8,
+                                            // Matches your text height
+                                            decoration: BoxDecoration(
+                                              color: whiteColor,
+                                              borderRadius:
+                                                  BorderRadius.circular(2),
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    : Container(
+                                        width: 280,
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Container(
+                                              constraints: BoxConstraints(
+                                                minWidth: 100,
+                                                maxWidth: 250,
+                                              ),
+                                              child: Text(
                                                 "$localAddress",
                                                 maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
                                                 style: GoogleFonts.mulish(
                                                     color: whiteColor,
-                                                    fontWeight:FontWeight.w300,
-                                                    
+                                                    fontWeight: FontWeight.w300,
                                                     fontSize: 15),
                                               ),
-                                          ),
-                                            Icon(Icons.arrow_drop_down,color: whiteColor,)
-                                        ],
-                                      ),
-                                    )
+                                            ),
+                                            Icon(
+                                              Icons.arrow_drop_down,
+                                              color: whiteColor,
+                                            )
+                                          ],
+                                        ),
+                                      )
                               ],
                             ),
                           ),
-                         GestureDetector(
-                            onTap: ()async{
-                         await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => ProfileScreen()));
-                         checkLocation();
-                         localAddress=Address.CurrentAddress!["address"];
+                          GestureDetector(
+                            onTap: () async {
+                              await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => ProfileScreen()));
+                              checkLocation();
+                              localAddress = Address.CurrentAddress!["address"];
                             },
-                            child: Container(
-                              height: 36,
-                              width: 36,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                image: DecorationImage(
-                                  image: AssetImage('lib/images/user.png'),
-                                  fit: BoxFit.cover,
-                                ),
-                              ),
-                            ),
+                            child: localAddress == null || localAddress.isEmpty
+                                ? Container(
+                                    child: Shimmer.fromColors(
+                                      baseColor: ligtBlackColor,
+                                      highlightColor: whiteColor,
+                                      child: Container(
+                                        width: 36,
+                                        height: 36,
+                                        // Matches your text height
+                                        decoration: BoxDecoration(
+                                          color: whiteColor,
+                                          borderRadius:
+                                              BorderRadius.circular(50),
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                : Container(
+                                    height: 36,
+                                    width: 36,
+                                    decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      image: DecorationImage(
+                                        image:
+                                            AssetImage('lib/images/user.png'),
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
+                                  ),
                           ),
                         ],
                       )),
                 ),
-              
                 GestureDetector(
                   onTap: () {
                     if (ISserviceAvilable) {
@@ -849,86 +1016,127 @@ class _HomeScreenState extends State<HomeScreen> {
                           MaterialPageRoute(builder: (context) => Search()));
                     }
                   },
-                  child: Container(
-                   
-                    height: 43,
-                    margin: EdgeInsets.only(bottom: 0),
-                    decoration: BoxDecoration(
-                      color: ligtBlackColor,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Container(
-                            padding:
-                                EdgeInsets.only(top: 10, bottom: 10, left: 16),
-                            child: Icon(
-                              Icons.search,
-                              color: Colors.white,
-                              size: 16,
-                            )),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                                top: 8, bottom: 8, left: 28),
-                            child: TextField(
-                              style: GoogleFonts.mulish(),
-                              decoration: InputDecoration(
-                                enabled: false,
-                                hintText: "Search for your medicine",
-                                hintStyle:
-                                    GoogleFonts.mulish(color: whiteColor),
-                                border: InputBorder.none,
+                  child: localAddress == null || localAddress.isEmpty
+                      ? Container(
+                          child: Shimmer.fromColors(
+                            baseColor: ligtBlackColor,
+                            highlightColor: whiteColor,
+                            child: Container(
+                              width: double.infinity,
+                              height: 43,
+                              // Matches your text height
+                              decoration: BoxDecoration(
+                                color: whiteColor,
+                                borderRadius: BorderRadius.circular(8),
                               ),
                             ),
                           ),
+                        )
+                      : Container(
+                          height: 43,
+                          decoration: BoxDecoration(
+                            color: ligtBlackColor,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          clipBehavior: Clip.hardEdge,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 16, right: 5),
+                                child: Icon(Icons.search,
+                                    color: Colors.white, size: 16),
+                              ),
+                              Container(
+                                width: 250,
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.only(left: 5, right: 26),
+                                  child: AnimatedSwitcher(
+                                    duration: Duration(milliseconds: 300),
+                                    transitionBuilder: (child, animation) {
+                                      final inAnimation = Tween<Offset>(
+                                        begin: Offset(0, 1), // from bottom
+                                        end: Offset.zero, // to center
+                                      ).animate(animation);
+
+                                      final outAnimation = Tween<Offset>(
+                                        begin: Offset(0, -1), // from center
+                                        end: Offset.zero, //, // to top
+                                      ).animate(animation);
+
+                                      return SlideTransition(
+                                        position: child.key ==
+                                                ValueKey(hints[currentIndex])
+                                            ? inAnimation // incoming child
+                                            : outAnimation, // outgoing child
+                                        child: child,
+                                      );
+                                    },
+                                    child: Align(
+                                      key:
+                                          ValueKey<String>(hints[currentIndex]),
+                                      alignment: Alignment.centerLeft,
+                                      child: Text(
+                                        currentHint ?? "",
+                                        style: GoogleFonts.mulish(
+                                          color: whiteColor,
+                                          fontSize: 15,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
-                      ],
-                    ),
-                  ),
                 ),
                 Expanded(
-                  child: Container(
-                    color: scaffoldBlackColor,
-                    child: ListView(
-                      shrinkWrap: true,
-                      physics: ClampingScrollPhysics(),
-                      children: [
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              isInRadius == null
-                                  ? ""
-                                  : isInRadius!
-                                      ? "Featured Products"
-                                      : "",
-                              style: GoogleFonts.mulish(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w700,
-                                
-                                color: whiteColor,
-                              ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: EdgeInsets.only(top: 10, bottom: 15),
+                        child: Text(
+                          isInRadius == null
+                              ? ""
+                              : isInRadius!
+                                  ? "Featured Products"
+                                  : "",
+                          style: GoogleFonts.mulish(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w700,
+                            color: whiteColor,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Container(
+                          
+                          color: scaffoldBlackColor,
+                          child: Center(
+                            child: MediaQuery.removePadding(
+                              context: context,
+                              removeTop: true,
+                              child: Container(
+                                  color: scaffoldBlackColor,
+                                  padding: cartItems.isNotEmpty
+                                      ? EdgeInsets.only(bottom: 180)
+                                      : EdgeInsets.only(bottom: 20),
+                                  child: isInRadius == null
+                                      ? LoadingIndicatorBallClip()
+                                      : isInRadius!
+                                          ? buildProductList()
+                                          : buildOutOfRadius()),
                             ),
-                            SizedBox(height: 10),
-                            Container(
-                                color: scaffoldBlackColor,
-                                padding:cartItems.isNotEmpty? EdgeInsets.only(bottom: 140):EdgeInsets.only(bottom: 20),
-                                child: isInRadius == null
-                                    ? Shimmer.fromColors(
-                                        baseColor: Colors.grey[300]!,
-                                        highlightColor: Colors.grey[100]!,
-                                        child: LoadingIndicatorBallClip(),
-                                      )
-                                    : isInRadius!
-                                        ? buildProductList()
-                                        : buildOutOfRadius()),
-                          ],
-                        )
-                      ],
-                    ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
@@ -943,37 +1151,37 @@ class _HomeScreenState extends State<HomeScreen> {
                 right: 0,
                 bottom: 76,
                 child: Container(
-                  
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.height *
                       0.12, // 12% of screen height
                   decoration: BoxDecoration(
-                     color: ligtBlackColor,
-                     boxShadow: [
-      // Top shadow
-      BoxShadow(
-        color: Colors.white.withOpacity(0.1),
-        offset: Offset(0, -2),
-        blurRadius: 6,
-        spreadRadius: 1,
-      ),
-      // Left shadow
-      BoxShadow(
-        color: Colors.white.withOpacity(0.1),
-        offset: Offset(-2, 0),
-        blurRadius: 6,
-        spreadRadius: 1,
-      ),
-      // Right shadow
-      BoxShadow(
-        color: Colors.white.withOpacity(0.1),
-        offset: Offset(2, 0),
-        blurRadius: 6,
-        spreadRadius: 1,
-      ),
-    ],
-                     borderRadius: BorderRadius.only(topLeft: Radius.circular(30),topRight: Radius.circular(30))
-                  ),
+                      color: ligtBlackColor,
+                      boxShadow: [
+                        // Top shadow
+                        BoxShadow(
+                          color: Colors.white.withOpacity(0.1),
+                          offset: Offset(0, -2),
+                          blurRadius: 6,
+                          spreadRadius: 1,
+                        ),
+                        // Left shadow
+                        BoxShadow(
+                          color: Colors.white.withOpacity(0.1),
+                          offset: Offset(-2, 0),
+                          blurRadius: 6,
+                          spreadRadius: 1,
+                        ),
+                        // Right shadow
+                        BoxShadow(
+                          color: Colors.white.withOpacity(0.1),
+                          offset: Offset(2, 0),
+                          blurRadius: 6,
+                          spreadRadius: 1,
+                        ),
+                      ],
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(30),
+                          topRight: Radius.circular(30))),
                   child: Padding(
                     padding: EdgeInsets.symmetric(
                         horizontal: MediaQuery.of(context).size.width * 0.045,
@@ -984,10 +1192,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Delivering in 20 minutes !',
+                          'Delivering in 10 minutes!',
                           style: GoogleFonts.mulish(
                               color: whiteColor,
-                              
                               fontSize: 12,
                               fontWeight: FontWeight.w600),
                         ),
@@ -1069,21 +1276,20 @@ class _HomeScreenState extends State<HomeScreen> {
                                   padding: EdgeInsets.symmetric(
                                       vertical:
                                           MediaQuery.of(context).size.height *
-                                              0.0175,
+                                              0.017,
                                       horizontal:
                                           MediaQuery.of(context).size.width *
-                                              0.055),
+                                              0.05),
                                   decoration: BoxDecoration(
                                       color: greenColor,
                                       borderRadius: BorderRadius.circular(8)),
                                   child: Text(
-                                    'Checkout',
+                                    'View cart',
                                     style: GoogleFonts.mulish(
                                         color: whiteColor,
-                                       
                                         fontSize:
                                             MediaQuery.of(context).size.height *
-                                                0.0175,
+                                                0.017,
                                         fontWeight: FontWeight.bold),
                                   ),
                                 ))

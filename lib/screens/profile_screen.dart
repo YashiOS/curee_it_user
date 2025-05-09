@@ -1,7 +1,14 @@
+import 'dart:convert';
+
+import 'package:cureeit_user_app/LocalStorageCubit/store_user_cubit.dart';
 import 'package:cureeit_user_app/screens/location.dart';
+import 'package:cureeit_user_app/screens/login_screen.dart';
+import 'package:cureeit_user_app/user/user.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -11,6 +18,46 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
+   String? name;
+   String? phoneNumber;
+
+  @override
+  void initState(){
+
+    super.initState();
+    fetchUserProfile();
+  }
+
+  Future<void> fetchUserProfile() async {
+    print("fetchUserProfile...");
+     try {
+      final response = await http.post(
+        Uri.parse(
+            'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/profile/user/profileDetails'),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({
+          "userId": User.userId
+        }),
+      );
+
+      if (response.statusCode == 200) {
+   
+      final data = json.decode(response.body);
+       print(data);
+       setState(() {
+         name=data["data"]["name"];
+       phoneNumber=data["data"]["mobileNumber"];
+       });
+    
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('failed to load user profile  error: $e')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +125,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Saksham",
+                          "${name??User.name}",
                           style: GoogleFonts.mulish(
                             color: whiteColor,
                             fontSize: 18,
@@ -87,7 +134,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         SizedBox(height: 2),
                         Text(
-                          "8910115375",
+                          "${phoneNumber??User.phoneNumber}",
                           style: GoogleFonts.mulish(
                             color: whiteColor,
                             fontWeight: FontWeight.w300,
@@ -161,39 +208,45 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 height: 24,
               ),
               
-              Container(
-                padding: const EdgeInsets.only(top: 16, bottom: 16, left: 16),
-                decoration: BoxDecoration(
-                  color: ligtBlackColor, // dark background
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  children: [
-                    // Circle Avatar Placeholder
-                    Container(
-                      width: 46,
-                      height: 46,
-                      
-                      child: const Center(
-                        child: Icon(
-                          Icons.logout, // Location icon
-                          color: whiteColor,
-                          size: 28,
+              GestureDetector(
+                onTap: (){
+                  context.read<StoreUserCubit>().clearUserData();
+                  Navigator.pushReplacement(context,MaterialPageRoute(builder: (context)=>LoginScreen()));
+                },
+                child: Container(
+                  padding: const EdgeInsets.only(top: 16, bottom: 16, left: 16),
+                  decoration: BoxDecoration(
+                    color: ligtBlackColor, // dark background
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      // Circle Avatar Placeholder
+                      Container(
+                        width: 46,
+                        height: 46,
+                        
+                        child: const Center(
+                          child: Icon(
+                            Icons.logout, // Location icon
+                            color: whiteColor,
+                            size: 28,
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 16),
-
-                    // Name & Phone
-                    Text(
-                      "Logout",
-                      style: GoogleFonts.mulish(
-                        color: Colors.redAccent,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w400,
+                      const SizedBox(width: 16),
+                
+                      // Name & Phone
+                      Text(
+                        "Logout",
+                        style: GoogleFonts.mulish(
+                          color: Colors.redAccent,
+                          fontSize: 18,
+                          fontWeight: FontWeight.w400,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               )
              
