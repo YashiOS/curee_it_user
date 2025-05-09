@@ -36,7 +36,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
       setState(() {
       
         orders = data['data'];
-          print(orders[0]["prescription"]["photoURL"]);
+         
         orders.sort((item1, item2) {
   final dateA = DateTime.parse(item1['purchaseDate']);
   final dateB = DateTime.parse(item2['purchaseDate']);
@@ -46,6 +46,10 @@ class _OrdersScreenState extends State<OrdersScreen> {
         isLoading = false;
       });
     } else {
+      
+      setState(() {
+        isLoading=false;
+      });
       throw Exception('Failed to load order history');
     }
    
@@ -62,30 +66,25 @@ class _OrdersScreenState extends State<OrdersScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: scaffoldBlackColor,
-      appBar: AppBar(
-       
-        backgroundColor:ligtBlackColor,
-        elevation: 0,
-        leadingWidth: 200,
-        toolbarHeight: 60,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 12.0, top: 16),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            spacing: 20,
-            children: [
-              Text(
-                "Orders",
-                style: GoogleFonts.mulish(
-                    fontWeight: FontWeight.w600,
-                    fontSize: MediaQuery.of(context).size.width * 0.06,
-                    color: whiteColor),
+      appBar:AppBar(
+            centerTitle: true,
+            backgroundColor: ligtBlackColor,
+            shape: ContinuousRectangleBorder(
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(10),
+                bottomRight: Radius.circular(10),
               ),
-            ],
+            ),
+            title: Text(
+              "History",
+              style: GoogleFonts.mulish(
+                fontWeight: FontWeight.w400,
+                fontSize: 22.69,
+                color: whiteColor,
+              ),
+            ),
+           
           ),
-        ),
-      ),
       body: isLoading
           ? Container(
             color:scaffoldBlackColor,
@@ -94,7 +93,9 @@ class _OrdersScreenState extends State<OrdersScreen> {
                 color: whiteColor,
               )),
           ) // Show loader while data is loading
-          : Container(
+          : orders.length==0?Center(
+            child: Text("No orders",style:GoogleFonts.mulish(color: whiteColor,fontWeight: FontWeight.w700,fontSize: 17) ,),
+          ) :Container(
             margin: EdgeInsets.only(bottom: MediaQuery.of(context).size.height*0.03),
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height,

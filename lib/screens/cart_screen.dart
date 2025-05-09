@@ -496,7 +496,9 @@ class _CartScreenState extends State<CartScreen> {
     return Stack(
       children: [
         Scaffold(
+           backgroundColor: scaffoldBlackColor,
           appBar: AppBar(
+          
             centerTitle: true,
             backgroundColor: ligtBlackColor,
             shape: ContinuousRectangleBorder(
@@ -531,7 +533,38 @@ class _CartScreenState extends State<CartScreen> {
                   )
                 : Container(),
           ),
-          body: Container(
+          body:isLoading?Center(
+            child: CircularProgressIndicator(
+              color: whiteColor,
+            ),
+          ):cartItems.isEmpty?Container(
+            height: double.infinity,
+            width:double.infinity ,
+            child: Column(
+              
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                SizedBox(height: 100,),
+                Center(
+                  child: Container(
+                    height: 204,
+                    width: 150,
+                    child: Image.asset("lib/images/empty cart.png")),
+                ),
+                SizedBox(height: 200,),
+                Container(
+                  height: 36,
+                  width: 311,
+                  decoration: BoxDecoration(
+                    color: greenColor,
+                    borderRadius: BorderRadius.circular(8)
+                  ),
+                  child: Center(child: Text("Order Now",style: GoogleFonts.mulish(color: whiteColor,fontSize: 12,fontWeight: FontWeight.w600),)),
+                )
+              ],
+            ),
+          ): Container(
             padding: EdgeInsets.only(
                 bottom: MediaQuery.of(context).size.height * 0.06),
             color: scaffoldBlackColor,
@@ -549,13 +582,14 @@ class _CartScreenState extends State<CartScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         spacing: 20,
                         children: [
-                          SizedBox(height: 35,),
+                        
                           if (requiresPrescription)
                             GestureDetector(
                               onTap: () {
                                 showUploadPrescriptionBottomSheet(context);
                               },
                               child: Container(
+                                margin: EdgeInsets.only(top: 20),
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 16),
                                 height: 56,

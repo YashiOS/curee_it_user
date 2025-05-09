@@ -238,11 +238,17 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: scaffoldBlackColor,
+      backgroundColor:scaffoldBlackColor,
       appBar: AppBar(
+        shape: ContinuousRectangleBorder(
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(10),
+                bottomRight: Radius.circular(10),
+              ),
+            ),
         title: Text(
           "Medicine Details",
-          style: GoogleFonts.mulish(color: whiteColor),
+          style: GoogleFonts.mulish(color: whiteColor,fontSize: 22.69,fontWeight: FontWeight.w400),
         ),
         backgroundColor: ligtBlackColor,
         leadingWidth: 100,

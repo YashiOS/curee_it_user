@@ -65,10 +65,16 @@ class _LocationScreenState extends State<LocationScreen> {
         appBar: AppBar(
           centerTitle: true,
           backgroundColor: ligtBlackColor,
+          shape: ContinuousRectangleBorder(
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(10),
+                bottomRight: Radius.circular(10),
+              ),
+            ),
           title: Text(
             "Select a Location",
             style: GoogleFonts.mulish(
-                fontWeight: FontWeight.w300, fontSize: 24, color: whiteColor),
+                fontWeight: FontWeight.w400, fontSize: 22.69, color: whiteColor),
           ),
           leading: GestureDetector(
             onTap: (){

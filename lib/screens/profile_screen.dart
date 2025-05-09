@@ -28,6 +28,73 @@ class _ProfileScreenState extends State<ProfileScreen> {
     fetchUserProfile();
   }
 
+
+  void showLogoutDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (context) => Dialog(
+      backgroundColor: ligtBlackColor, // Dark background
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              "Are you sure you want to\nlogout?",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 17.02,
+                fontFamily: 'Mulish',
+                color: Colors.white,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+            const SizedBox(height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context); // Close the dialog
+                  },
+                  child: const Text(
+                    "Cancel",
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 17.13,
+                      fontFamily: 'Mulish',
+                    ),
+                  ),
+                ),
+                TextButton(
+                  onPressed: () {
+                    context.read<StoreUserCubit>().clearUserData();
+                  Navigator.pushReplacement(context,MaterialPageRoute(builder: (context)=>LoginScreen()));
+                    // Perform logout logic here
+                   
+                  },
+                  child: const Text(
+                    "Logout",
+                    style: TextStyle(
+                      color: Color(0xFFBE404F), // reddish color
+                      fontSize: 17.13,
+                      fontFamily: 'Mulish',
+                      
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
   Future<void> fetchUserProfile() async {
     print("fetchUserProfile...");
      try {
@@ -64,12 +131,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
         appBar: AppBar(
           centerTitle: true,
+          shape: ContinuousRectangleBorder(
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(10),
+                bottomRight: Radius.circular(10),
+              ),
+            ),
           backgroundColor: ligtBlackColor,
           leadingWidth: 100,
           title: Text(
             "Profile",
             style: GoogleFonts.mulish(
-                fontWeight: FontWeight.w300, fontSize: 24, color: whiteColor),
+                fontWeight: FontWeight.w400, fontSize: 22.69, color: whiteColor),
           ),
           leading: Padding(
             padding: const EdgeInsets.only(left: 12.0),
@@ -210,8 +283,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
               
               GestureDetector(
                 onTap: (){
-                  context.read<StoreUserCubit>().clearUserData();
-                  Navigator.pushReplacement(context,MaterialPageRoute(builder: (context)=>LoginScreen()));
+                  showLogoutDialog(context);
+                 
                 },
                 child: Container(
                   padding: const EdgeInsets.only(top: 16, bottom: 16, left: 16),
@@ -240,7 +313,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Text(
                         "Logout",
                         style: GoogleFonts.mulish(
-                          color: Colors.redAccent,
+                          color: Color(0xFFBE404F),
                           fontSize: 18,
                           fontWeight: FontWeight.w400,
                         ),

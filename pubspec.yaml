@@ -66,7 +66,7 @@ dev_dependencies:
 
 flutter_icons:
   android: true
-  image_path: "lib/images/app_icon.png"
+  image_path: "lib/images/app_icon2.png"
   adaptive_icon_background: "#00b852" 
 
 flutter_native_splash:

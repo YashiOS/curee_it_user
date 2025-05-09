@@ -34,6 +34,8 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
+  List AllOrders=[];
+  List onGoingOrders=[];
   late AnimationController _controller;
   late Animation<double> _bounceAnimation;
   int _currentImageIndex = 0;
@@ -115,6 +117,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     fetchCartDetails();
     fetchProducts();
     changeSearchText();
+    fetchOrderHistory();
   }
 
   @override
@@ -122,6 +125,51 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     timer.cancel();
     // TODO: implement dispose
     super.dispose();
+  }
+
+  List<dynamic> getOngoingOrders(List<dynamic> allOrders) {
+  return allOrders.where((order) => 
+    order['status'] != 'Delivered' && 
+    order['status'] != 'delivered'
+  ).toList();
+}
+
+    Future<void> fetchOrderHistory() async {
+    var url = Uri.parse(
+        'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/order/orderHistory');
+    var request =  http.Request('GET', url)
+      ..headers.addAll({
+        'Content-Type': 'application/json',
+      })
+      ..body = jsonEncode({'userId':User.userId});
+
+    var response = await http.Client().send(request);
+ 
+    if (response.statusCode == 200) {
+      var responseBody = await response.stream.bytesToString();
+      Map<String, dynamic> data = jsonDecode(responseBody);
+      
+      setState(() {
+      
+        AllOrders = data['data'];
+         
+        AllOrders.sort((item1, item2) {
+  final dateA = DateTime.parse(item1['purchaseDate']);
+  final dateB = DateTime.parse(item2['purchaseDate']);
+  return dateB.compareTo(dateA); 
+  
+});
+
+   onGoingOrders=getOngoingOrders(AllOrders);
+
+
+
+      });
+    } else {
+      
+      throw Exception('Failed to load order history');
+    }
+   
   }
 
   void UpdateAddress1() {
@@ -1009,6 +1057,27 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         ],
                       )),
                 ),
+                onGoingOrders.isNotEmpty &&localAddress!=""?Container(
+                  margin: EdgeInsets.only(bottom: 20),
+                  height: 94,
+                  decoration: BoxDecoration(
+                    color: ligtBlackColor,
+                    borderRadius: BorderRadius.circular(8)
+                  ),
+                  child: ListView.builder(
+                itemCount:onGoingOrders.length ,
+                itemBuilder: (context, index){
+                  final order=onGoingOrders[index];
+                  return Container(
+                  height: 90,
+                  child: Row(
+                    children: [],
+                  ),
+                );
+
+                } 
+                  ),
+                ) :SizedBox(height: 0,),
                 GestureDetector(
                   onTap: () {
                     if (ISserviceAvilable) {
@@ -1264,13 +1333,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               ],
                             ),
                             GestureDetector(
-                                onTap: () {
-                                  Navigator.push(
+                                onTap: ()async {
+                                  await Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) => CartScreen(
                                                 isNavigated: true,
                                               )));
+                                  
+                                            
                                 },
                                 child: Container(
                                   padding: EdgeInsets.symmetric(

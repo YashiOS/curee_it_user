@@ -136,9 +136,15 @@ class _SearchState extends State<Search> {
       backgroundColor: scaffoldBlackColor,
       appBar: AppBar(
         centerTitle: true,
+        shape: ContinuousRectangleBorder(
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(10),
+                bottomRight: Radius.circular(10),
+              ),
+            ),
         title: Text(
           "Search",
-          style: GoogleFonts.mulish(color: whiteColor),
+          style: GoogleFonts.mulish(color: whiteColor,fontSize:22.69,fontWeight: FontWeight.w400),
         ),
         backgroundColor: ligtBlackColor,
         leading: Padding(
