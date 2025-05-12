@@ -57,7 +57,7 @@ class MyApp extends StatelessWidget {
           color: ligtBlackColor
         ),
         scaffoldBackgroundColor: scaffoldBlackColor,
-        colorScheme: ColorScheme.fromSeed(seedColor:greenColor),
+       
         useMaterial3: true,
       ),
       home: Splashscreen()

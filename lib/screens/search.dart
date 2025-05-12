@@ -20,7 +20,11 @@ class _SearchState extends State<Search> {
   Timer? _debounce;
   List<dynamic> _searchResults = [];
   bool _isLoading = false;
+  bool isIncart = false;
+  Map<String, bool> _inCartMap = {};
 
+  // Track quantities for each product
+  Map<String, int> _quantityMap = {};
   // Function to call search API
   Future<void> _fetchSearchResults(String query) async {
     if (query.length < 3) {
@@ -107,6 +111,10 @@ class _SearchState extends State<Search> {
     int quantity = 1,
   }) async {
     try {
+      setState(() {
+        _inCartMap[productId] = true;
+        _quantityMap[productId] = 1;
+      });
       final response = await http.post(
         Uri.parse(
             'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/cart/addToCart'),
@@ -121,8 +129,15 @@ class _SearchState extends State<Search> {
       );
 
       if (response.statusCode == 200) {
+        setState(() {
+          isIncart = true;
+        });
         Fluttertoast.showToast(msg: "Added To Cart");
       } else {
+        setState(() {
+          _inCartMap.remove(productId);
+          _quantityMap.remove(productId);
+        });
         print('❌ Failed to add item to cart. Status: ${response.statusCode}');
       }
     } catch (e) {
@@ -130,30 +145,96 @@ class _SearchState extends State<Search> {
     }
   }
 
+  Future<void> DidUpdateQuantity(
+      int index, int change, String productId) async {
+    final currentQuantity = _quantityMap[productId] ?? 1;
+    final newQuantity = currentQuantity + change;
+
+    if (newQuantity < 1) {
+      // Remove from cart if quantity goes to 0
+      setState(() {
+        _inCartMap.remove(productId);
+        _quantityMap.remove(productId);
+      });
+      return;
+    }
+
+    final String? userId = User.userId; // Example userId
+    setState(() {
+      _quantityMap[productId] = newQuantity;
+    });
+
+    // Update local state immediately for UI responsiveness
+
+    try {
+      final response = await http.put(
+        Uri.parse(
+            'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/cart/updateQuantity'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          "userId": userId,
+          "productId": productId,
+          "quantity": newQuantity
+        }),
+      );
+
+      if (response.statusCode != 200) {
+        // Handle error - revert local state in case of failure
+        setState(() {
+          _quantityMap[productId] = currentQuantity;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to update cart')),
+        );
+      }
+    } catch (e) {
+      // Handle network errors - revert local state
+      setState(() {
+        _quantityMap[productId] = currentQuantity;
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Network error: $e')),
+      );
+    }
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
+    final height = MediaQuery.of(context).size.height;
+    final width = MediaQuery.of(context).size.width;
+
+    final containerHeight = height * 0.45; // 🟢 Half screen height
+    final containerWidth = width * 0.3;
     return Scaffold(
       backgroundColor: scaffoldBlackColor,
       appBar: AppBar(
         centerTitle: true,
         shape: ContinuousRectangleBorder(
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(10),
-                bottomRight: Radius.circular(10),
-              ),
-            ),
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(10),
+            bottomRight: Radius.circular(10),
+          ),
+        ),
         title: Text(
           "Search",
-          style: GoogleFonts.mulish(color: whiteColor,fontSize:22.69,fontWeight: FontWeight.w400),
+          style: GoogleFonts.mulish(
+              color: whiteColor, fontSize: 22.69, fontWeight: FontWeight.w400),
         ),
         backgroundColor: ligtBlackColor,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 12.0),
-          child: GestureDetector(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: Icon(Icons.arrow_back, color: whiteColor),
+        leading: GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Padding(
+            padding: const EdgeInsets.only(left: 24.0),
+            child: Padding(
+              padding: const EdgeInsets.only(left: 4.0),
+              child: Row(
+                spacing: 4,
+                children: [Image.asset("lib/images/Vector 9.png")],
+              ),
+            ),
           ),
         ),
       ),
@@ -203,19 +284,23 @@ class _SearchState extends State<Search> {
                       : ListView.builder(
                           itemCount: _searchResults.length,
                           itemBuilder: (context, index) {
-                            var item = _searchResults[index];
+                            final item = _searchResults[index];
+                            final productId = item["productId"];
+                            final IsInCart = _inCartMap[productId] ?? false;
+                            final quantity = _quantityMap[productId] ?? 1;
+
                             return GestureDetector(
                               onTap: () {
-                                  print("clicked");
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => ItemDetailScreen(
-                                        productId: item["productId"],
-                                      ),
+                                print("clicked");
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ItemDetailScreen(
+                                      productId: item["productId"],
                                     ),
-                                  );
-                                },
+                                  ),
+                                );
+                              },
                               child: Card(
                                 color: ligtBlackColor,
                                 margin: EdgeInsets.symmetric(vertical: 8),
@@ -223,13 +308,13 @@ class _SearchState extends State<Search> {
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Container(
-                                  height: 144,
                                   width: 311,
                                   padding: EdgeInsets.all(16),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
+                                      // First row with name and price
                                       Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
@@ -245,7 +330,7 @@ class _SearchState extends State<Search> {
                                             ),
                                           ),
                                           Text(
-                                            "₹${item['price']}",
+                                            "₹${item['sellingPrice']}",
                                             style: GoogleFonts.mulish(
                                               fontSize: 17,
                                               fontWeight: FontWeight.w500,
@@ -254,44 +339,130 @@ class _SearchState extends State<Search> {
                                           ),
                                         ],
                                       ),
-                                      SizedBox(height: 4),
-                                      Text(
-                                        maxLines: 1,
-                                        item['primaryUse'] ??
-                                            'Medicine information',
-                                        style: GoogleFonts.mulish(
-                                          color: greyColor,
-                                          fontSize: 14,
-                                        ),
+                                      SizedBox(
+                                        height: 5,
                                       ),
-                                      Spacer(),
+                                      // Second row with packaging info and Add button
                                       Row(
                                         mainAxisAlignment:
-                                            MainAxisAlignment.end,
+                                            MainAxisAlignment.spaceBetween,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: [
-                                          ElevatedButton(
-                                            onPressed: () {
-                                              didAddToCart(
-                                                userId: User.userId!,
-                                                productId: item["productId"],
-                                              );
-                                            },
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor: greenColor,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                              ),
-                                              padding: EdgeInsets.symmetric(
-                                                  horizontal: 16, vertical: 8),
-                                            ),
+                                          Expanded(
                                             child: Text(
-                                              'Add to cart',
+                                              item['packagingDetail'] ??
+                                                  'Medicine information',
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
                                               style: GoogleFonts.mulish(
-                                                color: whiteColor,
-                                                fontWeight: FontWeight.bold,
+                                                color: greyColor,
+                                                fontSize: 14,
                                               ),
                                             ),
+                                          ),
+                                          GestureDetector(
+                                            onTap: () {
+                                              if (!IsInCart) {
+                                                didAddToCart(
+                                                  userId: User.userId!,
+                                                  productId: productId,
+                                                );
+                                              }
+                                            },
+                                            child: IsInCart
+                                                ? Container(
+                                                    width: 50,
+                                                    height: 29,
+                                                    decoration: BoxDecoration(
+                                                        color: greenColor,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(8),
+                                                        border: Border.all(
+                                                            color: greenColor,
+                                                            width: 1)),
+                                                    child: FittedBox(
+                                                      child: Row(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .spaceBetween,
+                                                        children: [
+                                                          IconButton(
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .zero,
+                                                              constraints:
+                                                                  BoxConstraints(),
+                                                              icon: Icon(
+                                                                Icons.remove,
+                                                                size:
+                                                                    containerHeight *
+                                                                        0.06,
+                                                                color:
+                                                                    whiteColor,
+                                                              ),
+                                                              onPressed: () {
+                                                                DidUpdateQuantity(index, -1, productId);
+                                                              }),
+                                                          Text(
+                                                            '$quantity',
+                                                            style: GoogleFonts
+                                                                .mulish(
+                                                              color: whiteColor,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .bold,
+                                                              fontSize:
+                                                                  containerHeight *
+                                                                      0.05,
+                                                            ),
+                                                          ),
+                                                          IconButton(
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .zero,
+                                                              constraints:
+                                                                  BoxConstraints(),
+                                                              icon: Icon(
+                                                                Icons.add,
+                                                                size:
+                                                                    containerHeight *
+                                                                        0.06,
+                                                                color:
+                                                                    whiteColor,
+                                                              ),
+                                                              onPressed: () {
+                                                               DidUpdateQuantity(index, 1, productId);
+                                                              }),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  )
+                                                : Container(
+                                                    width: 50,
+                                                    height: 29,
+                                                    decoration: BoxDecoration(
+                                                        color: ligtBlackColor,
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(8),
+                                                        border: Border.all(
+                                                            color: greenColor,
+                                                            width: 1)),
+                                                    child: Center(
+                                                      child: Text(
+                                                        'Add',
+                                                        style:
+                                                            GoogleFonts.mulish(
+                                                          fontSize: 10,
+                                                          color: greenColor,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ),
                                           ),
                                         ],
                                       ),

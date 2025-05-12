@@ -162,7 +162,7 @@ class _CartCardState extends State<CartCard> {
       ),
       child: Container(
         padding:
-            EdgeInsets.only(right: MediaQuery.of(context).size.width * 0.03, left: MediaQuery.of(context).size.width * 0.03),
+            EdgeInsets.only(right: MediaQuery.of(context).size.width * 0.02, left: MediaQuery.of(context).size.width * 0.03),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -227,72 +227,76 @@ class _CartCardState extends State<CartCard> {
               children: [
                 // Quantity Control
                 Container(
-                  width: 56,
+                  width: 64,
                   height: 28,
                   decoration: BoxDecoration(
                     color: greenColor,
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Row(
-                     // Changed to spaceBetween
-                    crossAxisAlignment: CrossAxisAlignment
-                        .center, // Added for vertical centering
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          if (widget.quantity == 1 || _localQuantity == 1) {
-                            _removeFromCart();
-                          }
-                          if (_localQuantity > 1 && isUpdating == false) {
-                            _onQuantityChanged(_localQuantity - 1);
-                          }
-                        },
-                        child: Container(
-                          height: 28, // Match parent height
-                          width: 24, // Keep your original width
-                          alignment: Alignment.center, // Center the icon
-                          child: Icon(
-                            Icons.remove,
-                            size: 18, // Explicit size
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                      isUpdating
-                          ? SizedBox(
-                              height: 8,
-                              width: 8,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: whiteColor,
-                              ),
-                            )
-                          : Text(
-                              "$_localQuantity",
-                              style: GoogleFonts.mulish(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 12,
-                                color: whiteColor,
-                              ),
+                  child: Center(
+                    child: Row(
+                       // Changed to spaceBetween
+                      crossAxisAlignment: CrossAxisAlignment
+                      
+                          .center,
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Added for vertical centering
+                      children: [
+                        GestureDetector(
+                          onTap: () {
+                            if (widget.quantity == 1 || _localQuantity == 1) {
+                              _removeFromCart();
+                            }
+                            if (_localQuantity > 1 && isUpdating == false) {
+                              _onQuantityChanged(_localQuantity - 1);
+                            }
+                          },
+                          child: Container(
+                            height: 28, // Match parent height
+                            width: 24, // Keep your original width
+                            alignment: Alignment.center, // Center the icon
+                            child: Icon(
+                              Icons.remove,
+                              size: 18, // Explicit size
+                              color: Colors.white,
                             ),
-                      GestureDetector(
-                        onTap: () {
-                          if (isUpdating == false) {
-                            _onQuantityChanged(_localQuantity + 1);
-                          }
-                        },
-                        child: Container(
-                          height: 28, // Match parent height
-                          width: 24, // Keep your original width
-                          alignment: Alignment.center, // Center the icon
-                          child: Icon(
-                            Icons.add,
-                            size: 18, // Explicit size
-                            color: Colors.white,
                           ),
                         ),
-                      ),
-                    ],
+                        isUpdating
+                            ? SizedBox(
+                                height: 8,
+                                width: 8,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: whiteColor,
+                                ),
+                              )
+                            : Text(
+                                "$_localQuantity",
+                                style: GoogleFonts.mulish(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 12,
+                                  color: whiteColor,
+                                ),
+                              ),
+                        GestureDetector(
+                          onTap: () {
+                            if (isUpdating == false) {
+                              _onQuantityChanged(_localQuantity + 1);
+                            }
+                          },
+                          child: Container(
+                            height: 28, // Match parent height
+                            width: 24, // Keep your original width
+                            alignment: Alignment.center, // Center the icon
+                            child: Icon(
+                              Icons.add,
+                              size: 18, // Explicit size
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 
@@ -303,16 +307,7 @@ class _CartCardState extends State<CartCard> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Text(
-                        "₹ ${(widget.productPrice * _localQuantity).toStringAsFixed(1)}",
-                        style: GoogleFonts.mulish(
-                          decoration: TextDecoration.lineThrough,
-                          fontWeight: FontWeight.w500,
-                          decorationColor: greyColor,
-                          fontSize: 10,
-                          color: greyColor,
-                        ),
-                     ), 
+                      
                       Text(
                         "₹ ${((widget.sellingPrice) * _localQuantity).toStringAsFixed(2)}",
                         style: GoogleFonts.mulish(

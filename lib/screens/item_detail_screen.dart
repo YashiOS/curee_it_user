@@ -23,12 +23,15 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
   late Future<Map<String, dynamic>> productDetails;
   int quantity = 1; // Initialize quantity
   bool isFav = false;
+  bool isInCart = false;
   bool addingToCart = false;
   bool addingToFav = false;
   bool readMore = false;
+  int ?currentQuantity;
 
   @override
   void initState() {
+    print('INIT STATE CALLED');
     super.initState();
     checkIfFav();
     productDetails = fetchProductDetails(widget.productId);
@@ -40,6 +43,64 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
       }
     });
   }
+
+  
+  Future<void> DidUpdateQuantity(
+       int change, String productId) async {
+       
+   
+    final newQuantity = currentQuantity! + change;
+    setState(() {
+       currentQuantity=newQuantity;
+    });
+   
+
+    if (newQuantity < 1) {
+      // Remove from cart if quantity goes to 0
+      setState(() {
+        currentQuantity=1;
+      });
+      return;
+    }
+
+    final String? userId = User.userId; // Example userId
+  
+
+    // Update local state immediately for UI responsiveness
+
+    try {
+      final response = await http.put(
+        Uri.parse(
+            'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/cart/updateQuantity'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          "userId": userId,
+          "productId": productId,
+          "quantity": newQuantity,
+        }),
+      );
+
+      if (response.statusCode != 200) {
+        // Handle error - revert local state in case of failure
+        setState(() {
+         currentQuantity=newQuantity;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to update cart')),
+        );
+      }
+    } catch (e) {
+      // Handle network errors - revert local state
+      setState(() {
+       
+      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Network error: $e')),
+      );
+    }
+    setState(() {});
+  }
+
 
   Future<void> checkIfFav() async {
     try {
@@ -64,14 +125,11 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
           setState(() {
             // Check if the productId is in the favourites list
             isFav = favouritesList.contains(widget.productId);
-            if(isFav){
+            if (isFav) {
               addingToFav = false;
             }
-            
-            
           });
         } else {
-          
           print(
               "Failed to fetch favourites: ${response.stream.bytesToString()}");
         }
@@ -141,22 +199,20 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
       var response = await http.Client().send(request);
 
       if (response.statusCode == 200) {
+       
+        Fluttertoast.showToast(msg: "Added To Cart");
+        setState(() {
+           currentQuantity=1;
+          isInCart = true;
+        });
+
         var responseBody = await response.stream.bytesToString();
         Map<String, dynamic> responseData = jsonDecode(responseBody);
         setState(() {
           addingToCart = false;
         });
 
-        if (responseData['message'] == 'Added To Cart') {
-          Fluttertoast.showToast(
-            msg: "Added to Cart",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.BOTTOM,
-            backgroundColor: primaryColor,
-            textColor: Colors.white,
-            fontSize: 14.0,
-          );
-        }
+        if (responseData['message'] == 'Added To Cart') {}
       } else {
         setState(() {
           addingToCart = false;
@@ -238,33 +294,32 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:scaffoldBlackColor,
+      backgroundColor: scaffoldBlackColor,
       appBar: AppBar(
+        centerTitle: true,
         shape: ContinuousRectangleBorder(
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(10),
-                bottomRight: Radius.circular(10),
-              ),
-            ),
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(10),
+            bottomRight: Radius.circular(10),
+          ),
+        ),
         title: Text(
           "Medicine Details",
-          style: GoogleFonts.mulish(color: whiteColor,fontSize: 22.69,fontWeight: FontWeight.w400),
+          style: GoogleFonts.mulish(
+              color: whiteColor, fontSize: 22.69, fontWeight: FontWeight.w400),
         ),
         backgroundColor: ligtBlackColor,
-        leadingWidth: 100,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 12.0),
-          child: GestureDetector(
-            onTap: () {
-              Navigator.pop(context);
-            },
+        leading: GestureDetector(
+          onTap: () {
+            Navigator.pop(context);
+          },
+          child: Padding(
+            padding: const EdgeInsets.only(left: 24.0),
             child: Padding(
               padding: const EdgeInsets.only(left: 4.0),
               child: Row(
                 spacing: 4,
-                children: [
-                  Icon(Icons.arrow_back, color: whiteColor),
-                ],
+                children: [Image.asset("lib/images/Vector 9.png")],
               ),
             ),
           ),
@@ -285,94 +340,75 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
 
               return SingleChildScrollView(
                 child: Container(
-                  margin: EdgeInsets.only(top: 69,right: 24,left: 24,bottom: 24),
+                  margin:
+                      EdgeInsets.only(top: 24, right: 24, left: 24, bottom: 24),
                   decoration: BoxDecoration(
                       color: ligtBlackColor,
                       borderRadius: BorderRadius.circular(8)),
                   child: Column(
-                    crossAxisAlignment:
-                        CrossAxisAlignment.start,
-                    mainAxisAlignment:
-                        MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       SizedBox(
-                        width:
-                            MediaQuery.of(context).size.width,
+                        width: MediaQuery.of(context).size.width,
                         height: 250,
                         child: PageView.builder(
                           controller: _controller,
-                          itemCount:
-                              product['imageUrls'].length,
+                          itemCount: product['imageUrls'].length,
                           itemBuilder: (context, index) {
                             return Container(
                               height: 203,
                               margin: EdgeInsets.all(24),
                               decoration: BoxDecoration(
                                 color: whiteColor,
-                                borderRadius:
-                                    BorderRadius.circular(10),
+                                borderRadius: BorderRadius.circular(10),
                               ),
-                              padding:
-                                  EdgeInsets.only(bottom: 40),
+                              padding: EdgeInsets.only(bottom: 40),
                               child: ClipRRect(
-                                  borderRadius:
-                                      BorderRadius.circular(
-                                          20),
+                                  borderRadius: BorderRadius.circular(20),
                                   child: SizedBox(
-                                    width:
-                                        MediaQuery.of(context)
-                                            .size
-                                            .width,
+                                    width: MediaQuery.of(context).size.width,
                                     height: 203,
                                     child: Padding(
-                                        padding:
-                                            EdgeInsets.only(
-                                                top: 28),
-                                        child:
-                                            product['imageUrls'] !=
-                                                    []
-                                                ? SizedBox(
-                                                    width:
-                                                        176,
-                                                    child: Image
-                                                        .network(
-                                                      product['imageUrls']
-                                                          [
-                                                          index],
-                                                      fit: BoxFit
-                                                          .contain,
-                                                      loadingBuilder: (context,
-                                                          child,
-                                                          loadingProgress) {
-                                                        if (loadingProgress ==
-                                                            null) {
-                                                          return child;
-                                                        }
-                                                        return const Center(
-                                                            child: CircularProgressIndicator(
-                                                          color:
-                                                              whiteColor,
-                                                        ));
-                                                      },
-                                                      errorBuilder: (context,
-                                                          error,
-                                                          stackTrace) {
-                                                        return const Center(
-                                                            child: Icon(Icons.error, color: whiteColor));
-                                                      },
-                                                    ),
-                                                  )
-                                                : Text(
-                                                    "No Image",
-                                                    style: TextStyle(
-                                                        fontSize: MediaQuery.of(context).size.height *
+                                        padding: EdgeInsets.only(top: 28),
+                                        child: product['imageUrls'] != []
+                                            ? SizedBox(
+                                                width: 176,
+                                                child: Image.network(
+                                                  product['imageUrls'][index],
+                                                  fit: BoxFit.contain,
+                                                  loadingBuilder: (context,
+                                                      child, loadingProgress) {
+                                                    if (loadingProgress ==
+                                                        null) {
+                                                      return child;
+                                                    }
+                                                    return const Center(
+                                                        child:
+                                                            CircularProgressIndicator(
+                                                      color: whiteColor,
+                                                    ));
+                                                  },
+                                                  errorBuilder: (context, error,
+                                                      stackTrace) {
+                                                    return const Center(
+                                                        child: Icon(Icons.error,
+                                                            color: whiteColor));
+                                                  },
+                                                ),
+                                              )
+                                            : Text(
+                                                "No Image",
+                                                style: TextStyle(
+                                                    fontSize:
+                                                        MediaQuery.of(context)
+                                                                .size
+                                                                .height *
                                                             0.027,
-                                                        fontWeight: FontWeight
-                                                            .bold,
-                                                        color: Colors
-                                                            .grey
-                                                            .withOpacity(0.4)),
-                                                  )),
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.grey
+                                                        .withOpacity(0.4)),
+                                              )),
                                   )),
                             );
                           },
@@ -380,46 +416,37 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                       ),
                       Row(
                           spacing: 4,
-                          mainAxisAlignment:
-                              MainAxisAlignment.center,
-                          crossAxisAlignment:
-                              CrossAxisAlignment.center,
-                          children: List.generate(
-                              product['imageUrls'].length,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: List.generate(product['imageUrls'].length,
                               (index) {
                             return Container(
                               height: 8,
                               width: 8,
                               decoration: BoxDecoration(
-                                  borderRadius:
-                                      BorderRadius.circular(
-                                          8),
+                                  borderRadius: BorderRadius.circular(8),
                                   color: _currentPage == index
                                       ? whiteColor
                                       : greyColor),
                             );
                           })),
                       Container(
-                        margin: EdgeInsets.only(
-                            left: 24, top: 24,right: 24),
+                        margin: EdgeInsets.only(left: 24, top: 24, right: 24),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Container(
                               width: 200,
                               child: Text(
-                                product['name'] ??
-                                    'Unknown Product',
+                                product['name'] ?? 'Unknown Product',
                                 style: GoogleFonts.mulish(
                                     fontWeight: FontWeight.w500,
-                                    fontSize: MediaQuery.of(context)
-                                            .size
-                                            .height *
-                                        0.026,
+                                    fontSize:
+                                        MediaQuery.of(context).size.height *
+                                            0.026,
                                     color: whiteColor),
                               ),
                             ),
-                            
                           ],
                         ),
                       ),
@@ -441,134 +468,174 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                           margin: EdgeInsets.only(left: 24),
                           height: 15,
                           child: Text(
-                            "${product['marketer'] ??
-                                                    'Manufacturer not available'}",
-                            style: GoogleFonts.mulish(
-                                color: whiteColor),
+                            "${product['marketer'] ?? 'Manufacturer not available'}",
+                            style: GoogleFonts.mulish(color: whiteColor),
                           )),
-                          SizedBox(height: 20,),
-                          Container(
+                      SizedBox(
+                        height: 20,
+                      ),
+                      Container(
                           margin: EdgeInsets.only(left: 24),
                           height: 15,
                           child: Text(
                             "Slat composition",
-                            style: GoogleFonts.mulish(
-                                color: greyColor),
+                            style: GoogleFonts.mulish(color: greyColor),
                           )),
-                          SizedBox(height: 5,),
-                          Container(
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Container(
                           margin: EdgeInsets.only(left: 24),
                           height: 15,
                           child: Text(
-                            "${product['saltComposition'] ??
-                                      'N/A'}",
-                            style: GoogleFonts.mulish(
-                                color: whiteColor),
+                            "${product['saltComposition'] ?? 'N/A'}",
+                            style: GoogleFonts.mulish(color: whiteColor),
                           )),
-                          SizedBox(height: 10,),
-                          Container(
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Container(
                           margin: EdgeInsets.only(left: 24),
                           height: 15,
                           child: Text(
                             "Use",
-                            style: GoogleFonts.mulish(
-                                color: greyColor),
+                            style: GoogleFonts.mulish(color: greyColor),
                           )),
-                          SizedBox(height: 5,),
-                          Container(
+                      SizedBox(
+                        height: 5,
+                      ),
+                      Container(
                           margin: EdgeInsets.only(left: 24),
                           height: 15,
                           child: Text(
                             "${product['mainUse'] ?? ''}",
-                            style: GoogleFonts.mulish(
-                                color: whiteColor),
+                            style: GoogleFonts.mulish(color: whiteColor),
                           )),
-                          SizedBox(height: 10,),
-                          Container(
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Container(
                           margin: EdgeInsets.only(left: 24),
                           height: 15,
                           child: Text(
                             "Introduction",
-                            style: GoogleFonts.mulish(
-                                color: greyColor),
+                            style: GoogleFonts.mulish(color: greyColor),
                           )),
                       Container(
-                        margin: EdgeInsets.only(
-                            left: 24, top:5,right: 24),
+                        margin: EdgeInsets.only(left: 24, top: 5, right: 24),
                         child: Text(
-                          "${product['introduction'] ?? ''} , ${product['usageInstruction'] ??
-                                  ''}",
-                          style: GoogleFonts.mulish(
-                              color: whiteColor),
+                          "${product['introduction'] ?? ''} , ${product['usageInstruction'] ?? ''}",
+                          style: GoogleFonts.mulish(color: whiteColor),
                         ),
                       ),
                       Container(
-                        margin: EdgeInsets.only(top: 24,left: 24,right: 24,bottom: 24),
+                        margin: EdgeInsets.only(
+                            top: 24, left: 24, right: 24, bottom: 24),
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                                      "₹${(product['sellingPrice']).toInt() ?? 00}",
-                                      style: GoogleFonts.mulish(
-                                        fontWeight: FontWeight.w400,
-                                        fontSize: MediaQuery.of(context)
-                                                .size
-                                                .height *
-                                            0.026,
-                                       
-                                        color: whiteColor,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "₹${(product["sellingPrice"])?? "00"}",
+                                style: GoogleFonts.mulish(
+                                  fontWeight: FontWeight.w400,
+                                  fontSize: MediaQuery.of(context).size.height *
+                                      0.026,
+                                  color: whiteColor,
+                                ),
+                              ),
+                              isInCart
+                                  ? Container(
+                                      width: 156,
+                                      height: 36,
+                                     
+                                      decoration: BoxDecoration(
+                                         color: greenColor,
+                                         borderRadius: BorderRadius.circular(8),
                                       ),
-                                    ),
-                             GestureDetector(
-                                  onTap: addToCart,
-                                  child: Container(
-                                    alignment: Alignment.center,
-                                    width: 156,
-                                    height: 36,
-                                    decoration: BoxDecoration(
-                                        color: greenColor,
-                                        borderRadius:
-                                            BorderRadius.circular(8)),
-                                    child: addingToCart
-                                        ? Container(
-                                            decoration: BoxDecoration(
-                                                borderRadius:
-                                                    BorderRadius
-                                                        .circular(40)),
-                                            height: MediaQuery.of(
-                                                        context)
-                                                    .size
-                                                    .height *
-                                                0.06, // 40/667 ≈ 0.06
-                                            width:
-                                                MediaQuery.of(context)
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          IconButton(
+                                              padding: EdgeInsets.zero,
+                                              constraints: BoxConstraints(),
+                                              icon: Icon(
+                                                Icons.remove,
+                                                size: 20,
+                                                color: whiteColor,
+                                              ),
+                                              onPressed: () {
+                                                DidUpdateQuantity(
+                                                     -1,widget.productId);
+                                              }),
+                                          Text(
+                                            '$currentQuantity',
+                                            style: GoogleFonts.mulish(
+                                              color: whiteColor,
+                                              fontWeight: FontWeight.bold,
+                                              fontSize:
+                                                  13,
+                                            ),
+                                          ),
+                                          IconButton(
+                                              padding: EdgeInsets.zero,
+                                              constraints: BoxConstraints(),
+                                              icon: Icon(
+                                                Icons.add,
+                                                size: 20,
+                                                color: whiteColor,
+                                              ),
+                                              onPressed: () {
+                                                DidUpdateQuantity(
+                                                     1,widget.productId);
+                                              }),
+                                        ],
+                                      ),
+                                    )
+                                  : GestureDetector(
+                                      onTap: addToCart,
+                                      child: Container(
+                                        alignment: Alignment.center,
+                                        width: 156,
+                                        height: 36,
+                                        decoration: BoxDecoration(
+                                            color: ligtBlackColor,
+                                            border: Border.all(
+                                              color: greenColor,
+                                              width: 1,
+                                            ),
+                                            borderRadius:
+                                                BorderRadius.circular(8)),
+                                        child: addingToCart
+                                            ? Container(
+                                                decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            40)),
+                                                height: MediaQuery.of(context)
+                                                        .size
+                                                        .height *
+                                                    0.06, // 40/667 ≈ 0.06
+                                                width: MediaQuery.of(context)
                                                         .size
                                                         .height *
                                                     0.06,
-                                            child: LoadingIndicator(
-                                              indicatorType:
-                                                  Indicator.orbit,
-                                              colors: [whiteColor],
-                                            ),
-                                          )
-                                        : Text(
-                                            "Add to Cart",
-                                            style: GoogleFonts.mulish(
-                                              fontWeight:
-                                                  FontWeight.bold,
-                                              fontSize:
-                                                  12,
-                                              
-                                              color: whiteColor,
-                                            ),
-                                          ),
-                                  ),
-                                ),
-                          ]
-                          
-                        ),
+                                                child:
+                                                    CircularProgressIndicator(
+                                                  color: whiteColor,
+                                                ))
+                                            : Text(
+                                                "Add to Cart",
+                                                style: GoogleFonts.mulish(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 12,
+                                                  color: greenColor,
+                                                ),
+                                              ),
+                                      ),
+                                    ),
+                            ]),
                       )
-                     
                     ],
                   ),
                 ),

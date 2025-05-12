@@ -75,13 +75,21 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
    
      
     return Scaffold(
+      backgroundColor: scaffoldBlackColor,
       appBar: AppBar(
         backgroundColor: scaffoldBlackColor,
+        centerTitle: true,
+        shape: ContinuousRectangleBorder(
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(10),
+                bottomRight: Radius.circular(10),
+              ),
+            ),
         title: Text(
           "Current Location",
           style: GoogleFonts.mulish(
               color: whiteColor,
-              
+              fontSize: 22.69,
               fontWeight: FontWeight.w400),
         ),
          leading: Padding(

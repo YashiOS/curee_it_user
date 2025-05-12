@@ -34,11 +34,12 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
-  List AllOrders=[];
-  List onGoingOrders=[];
+  List AllOrders = [];
+  List onGoingOrders = [];
   late AnimationController _controller;
   late Animation<double> _bounceAnimation;
   int _currentImageIndex = 0;
+  bool _isFetchingCart = false;
   final List<String> _images = [
     "lib/images/capsule.png",
     "lib/images/capsule_image.png"
@@ -64,7 +65,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Timer? _animationTimer;
   bool loaded = false;
   bool newUser = false;
-  bool GotproductDetail=false;
+  bool GotproductDetail = false;
   Map<int, bool> isAddingMap = {};
   List<dynamic> addresses = [];
   List<dynamic> products = [];
@@ -114,71 +115,72 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       ),
     );
     fetchAddresses();
-    fetchCartDetails();
     fetchProducts();
     changeSearchText();
     fetchOrderHistory();
+   
+
   }
 
   @override
   void dispose() {
     timer.cancel();
+      _animationTimer?.cancel();
+       _controller.dispose();
     // TODO: implement dispose
     super.dispose();
   }
 
   List<dynamic> getOngoingOrders(List<dynamic> allOrders) {
-  return allOrders.where((order) => 
-    order['status'] != 'Delivered' && 
-    order['status'] != 'delivered'
-  ).toList();
-}
+    print("GET ON GOING ORDER");
+    return allOrders
+        .where((order) =>
+            order['currentStatus'] != 'Delivered' &&
+            order['currentStatus'] != 'delivered')
+        .toList();
+  }
 
-    Future<void> fetchOrderHistory() async {
+  Future<void> fetchOrderHistory() async {
+    print("FETCH ORDER HISTORY");
     var url = Uri.parse(
         'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/order/orderHistory');
-    var request =  http.Request('GET', url)
+    var request = http.Request('GET', url)
       ..headers.addAll({
         'Content-Type': 'application/json',
       })
-      ..body = jsonEncode({'userId':User.userId});
+      ..body = jsonEncode({'userId': User.userId});
 
     var response = await http.Client().send(request);
- 
+
     if (response.statusCode == 200) {
       var responseBody = await response.stream.bytesToString();
       Map<String, dynamic> data = jsonDecode(responseBody);
-      
+
       setState(() {
-      
         AllOrders = data['data'];
-         
+
         AllOrders.sort((item1, item2) {
-  final dateA = DateTime.parse(item1['purchaseDate']);
-  final dateB = DateTime.parse(item2['purchaseDate']);
-  return dateB.compareTo(dateA); 
-  
-});
+          final dateA = DateTime.parse(item1['purchaseDate']);
+          final dateB = DateTime.parse(item2['purchaseDate']);
+          return dateB.compareTo(dateA);
+        });
 
-   onGoingOrders=getOngoingOrders(AllOrders);
-
-
-
+        onGoingOrders = getOngoingOrders(AllOrders);
       });
     } else {
-      
       throw Exception('Failed to load order history');
     }
-   
   }
 
   void UpdateAddress1() {
+    print("UPDATE ADDRESS1");
     localAddress = Address.CurrentAddress!["address"];
     checkLocation();
     setState(() {});
   }
 
   void UpdateAddress(Map<String, dynamic> address) {
+    print("UPDATE ADDRESS");
     Address.CurrentAddress = address;
     localAddress = Address.CurrentAddress!["address"];
 
@@ -186,6 +188,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Future<void> didAddToCart(int index) async {
+    print("DID ADD TO CART");
     setState(() {
       isAddingMap[index] = true;
     });
@@ -230,6 +233,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Future<void> DidUpdateQuantity(int index, int change) async {
+    print("DID UPDATE QUANTITY");
     final product = products[index];
     final productId = product['productId'];
     final String? userId = User.userId; // Example userId
@@ -256,7 +260,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           "quantity": newQuantity < 1 ? 0 : newQuantity
         }),
       );
-
+      if(response.statusCode==200){
+         fetchCartDetails();
+      }
       if (response.statusCode != 200) {
         // Handle error - revert local state in case of failure
         setState(() {
@@ -277,86 +283,103 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     }
   }
 
-  Future<void> fetchCartDetails() async {
-    var cartApiUrl = Uri.parse(
-        "http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/cart/cartDetails");
-    final String? userId = User.userId; // Replace with the actual userId
+ Future<void> fetchCartDetails() async {
+  if (_isFetchingCart || !mounted) return;
+  
+  print("FETCH CART DETAILS STARTED");
+  setState(() {
+    _isFetchingCart = true;
+    isLoading = true;
+  });
 
-    try {
-      var request = http.Request('GET', cartApiUrl)
-        ..headers.addAll({
-          'Content-Type': 'application/json',
-        })
-        ..body = jsonEncode({"userId": userId});
+  try {
+    final cartApiUrl = Uri.parse(
+      "http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/cart/cartDetails");
+    final request = http.Request('GET', cartApiUrl)
+      ..headers.addAll({'Content-Type': 'application/json'})
+      ..body = jsonEncode({"userId": User.userId});
 
-      var response = await http.Client().send(request);
+    final response = await http.Client().send(request);
+    final responseBody = await response.stream.bytesToString();
 
-      if (response.statusCode == 200) {
-        final responseData = jsonDecode(await response.stream.bytesToString());
+    if (response.statusCode == 200) {
+      final responseData = jsonDecode(responseBody);
 
-        if (responseData['status'] == 200 && responseData['data'] != null) {
-          List<dynamic> cartData = responseData['data'];
-          finaltotalAmount = responseData["finalTotal"];
-          List<Map<String, dynamic>> tempCart = [];
+      if (responseData['status'] == 200 && responseData['data'] != null) {
+        final cartData = responseData['data'];
+        finaltotalAmount = responseData["finalTotal"]?.toString() ?? "0";
+        final List<Map<String, dynamic>> tempCart = [];
+        double calculatedTotal = 0.0;
 
-          for (var cartItem in cartData) {
-            Map<String, dynamic>? productDetails =
-                await fetchProductDetails(cartItem['productId']);
-
+        // Process all cart items
+        for (var cartItem in cartData) {
+          try {
+            final productDetails = await fetchProductDetails(cartItem['productId']);
             if (productDetails != null) {
-              if (productDetails['sellingPrice'] is int) {
-                totalAmount = totalAmount +
-                    (cartItem['quantity'] *
-                        productDetails['sellingPrice'].toDouble());
-              } else {
-                totalAmount = totalAmount +
-                    (cartItem['quantity'] * productDetails['sellingPrice']);
-              }
+              // Safely parse numeric values
+              final quantity = int.tryParse(cartItem['quantity'].toString()) ?? 0;
+              final sellingPrice = double.tryParse(
+                (productDetails['sellingPrice'] ?? '0').toString()) ?? 0.0;
+              final productPrice = double.tryParse(
+                (cartItem["productPrice"] ?? '0').toString()) ?? 0.0;
+
+              calculatedTotal += quantity * sellingPrice;
 
               tempCart.add({
                 "productId": cartItem['productId'],
-                "quantity": cartItem['quantity'],
-                "name": productDetails['name'],
-                "sellingPrice": cartItem["sellingPrice"] ?? '0',
-                "packagingDetail": productDetails['packagingDetail'],
-                "imageUrls": productDetails['imageUrls'],
-                "productPrice": cartItem["productPrice"] ?? 0,
+                "quantity": quantity,
+                "name": productDetails['name'] ?? 'Unknown Product',
+                "sellingPrice": sellingPrice,
+                "packagingDetail": productDetails['packagingDetail'] ?? '',
+                "imageUrls": productDetails['imageUrls'] ?? [],
+                "productPrice": productPrice,
               });
-            } else {
-              print(
-                  "❌ Failed to fetch details for Product ID: ${cartItem['productId']}");
             }
+          } catch (e) {
+            print("❌ Error processing product ${cartItem['productId']}: $e");
           }
+        }
 
+        if (mounted) {
           setState(() {
             cartItems = tempCart;
-            if (cartItems.isNotEmpty) {
-              isLoading = false;
-            }
+            totalAmount = calculatedTotal;
+            isLoading = false;
+            _isFetchingCart = false;
           });
-
-          print("🟢 Updated cartItems: $cartItems");
-        } else {
-          print("❌ Response did not contain valid cart data");
         }
       } else {
-        final responseBody = await response.stream.bytesToString();
-        print("❌ Failed to fetch cart details. Response: $responseBody");
-        if (responseBody.contains("No products available")) {
+        print("❌ Response did not contain valid cart data");
+        if (mounted) {
           setState(() {
-            if (cartItems.isNotEmpty) {
-              isLoading = false;
-            } // Stop loading and show "No Items in Cart"
+            cartItems = [];
+            isLoading = false;
+            _isFetchingCart = false;
           });
-          return;
         }
       }
-    } catch (error) {
-      print("❌ Error fetching cart details: $error");
+    } else {
+      print("❌ Failed to fetch cart details. Status: ${response.statusCode}");
+      if (mounted) {
+        setState(() {
+          isLoading = false;
+          _isFetchingCart = false;
+        });
+      }
+    }
+  } catch (error) {
+    print("❌ Error fetching cart details: $error");
+    if (mounted) {
+      setState(() {
+        isLoading = false;
+        _isFetchingCart = false;
+      });
     }
   }
+}
 
   Future<Map<String, dynamic>?> fetchProductDetails(String productId) async {
+    print("FETCH PRODUCT DETAILS");
     var productApiUrl = Uri.parse(
         "http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/product/productDetail");
 
@@ -371,12 +394,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       var response = await http.Client().send(request);
 
       if (response.statusCode == 200) {
-        GotproductDetail=true;
+        GotproductDetail = true;
         final responseBody = await response.stream.bytesToString();
         final responseData = jsonDecode(responseBody);
 
         if (responseData['status'] == 200 && responseData['data'] != null) {
-          print(responseData["data"]);
+          
           return responseData['data']; // Return the data part of the response
         } else {
           print("❌ Product API did not return valid data.");
@@ -390,6 +413,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Future<void> fetchProducts() async {
+    print("FETCH PRODUCTS");
     final response = await http.get(Uri.parse(
         'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/home/homeProducts'));
     if (response.statusCode == 200) {
@@ -406,6 +430,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   void addToCart(int index) {
+    print("ADD TO CART");
     setState(() {
       quantities[index] = 1;
     });
@@ -503,7 +528,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Widget buildProductItem(int index) {
-    print(products[index]);
+    
     final product = products[index];
     final bool isInCart = quantities[index] != null && quantities[index]! > 0;
     final height = MediaQuery.of(context).size.height;
@@ -614,23 +639,21 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   ],
                 ),
                 Container(
-                  width: 49,
+                  width: 50,
                   height: 29,
                   decoration: BoxDecoration(
                     color: ligtBlackColor,
-                    border: Border.all(
-                      color: greenColor,
-                      width: 1,
-                    ),
+                    border:isInCart?Border.all() :Border.all(color: greenColor,width: 1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: isInCart
                       ? Container(
-                          width: 49,
+                          width: 50,
                           height: 29,
                           decoration: BoxDecoration(
                             color: greenColor,
                             borderRadius: BorderRadius.circular(8),
+                            border: Border.all(color: greenColor,width: 1)
                           ),
                           child: FittedBox(
                             child: Row(
@@ -708,9 +731,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Future<void> fetchAddresses() async {
+    print("FETCH ADDRESSES");
     if (Address.CurrentAddress != null) {
       String fullAddress = Address.CurrentAddress!["address"];
       print("in 2nd if condition");
+       
 
       setState(() {
         localAddress = fullAddress;
@@ -736,18 +761,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       final fetchAddress = data["data"]["address"];
       if (fetchAddress == null || fetchAddress.isEmpty) {
         setState(() {
-            Address.CurrentAddress = {
-              "address": address,
-              "landmark": "",
-              "floor": "",
-              "userLat": defaultLat,
-              "userLong": defaultLng,
-              "type": "",
-              "_id": ""
-            };
-            localAddress = address;
-            Address.selectedIndex = null;
-          });
+          Address.CurrentAddress = {
+            "address": address,
+            "landmark": "",
+            "floor": "",
+            "userLat": defaultLat,
+            "userLong": defaultLng,
+            "type": "",
+            "_id": ""
+          };
+          localAddress = address;
+          Address.selectedIndex = null;
+        });
         setState(() {
           newUser = true;
           checkLocation();
@@ -769,7 +794,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             localAddress = address;
             Address.selectedIndex = null;
           });
-            checkLocation();
+          checkLocation();
 
           return;
         }
@@ -777,7 +802,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     } else {
       print('Failed to load addresses');
     }
-  
   }
 
   Future<void> checkLocation() async {
@@ -799,11 +823,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         final responseData = jsonDecode(response.body);
         setState(() {
           print("checking if its in radius...");
-         
+
           isInRadius = responseData['insideRadius'] == true;
-           print(isInRadius);
+             
+          print(isInRadius);
           if (isInRadius == true) {
+            
             context.read<ServiceAvilableCubit>().UpdateServiceAvilable(true);
+              fetchCartDetails();
           } else {
             isInRadius = false;
             context.read<ServiceAvilableCubit>().UpdateServiceAvilable(false);
@@ -908,6 +935,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       decoration: BoxDecoration(
                           color: scaffoldBlackColor,
                           borderRadius: BorderRadius.circular(8)),
+                          
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -915,6 +943,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           Container(
                             height: 80,
                             child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 localAddress == null || localAddress.isEmpty
@@ -1046,38 +1075,80 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                     width: 36,
                                     decoration: BoxDecoration(
                                       shape: BoxShape.circle,
-                                      image: DecorationImage(
-                                        image:
-                                            AssetImage('lib/images/user.png'),
-                                        fit: BoxFit.cover,
-                                      ),
+                                      color: whiteColor
                                     ),
                                   ),
                           ),
                         ],
                       )),
                 ),
-                onGoingOrders.isNotEmpty &&localAddress!=""?Container(
-                  margin: EdgeInsets.only(bottom: 20),
-                  height: 94,
-                  decoration: BoxDecoration(
-                    color: ligtBlackColor,
-                    borderRadius: BorderRadius.circular(8)
-                  ),
-                  child: ListView.builder(
-                itemCount:onGoingOrders.length ,
-                itemBuilder: (context, index){
-                  final order=onGoingOrders[index];
-                  return Container(
-                  height: 90,
-                  child: Row(
-                    children: [],
-                  ),
-                );
+                onGoingOrders.isNotEmpty && localAddress != ""
+                    ? Container(
+                        margin: EdgeInsets.only(bottom: 15),
+                        height: 94,
+                        decoration: BoxDecoration(
+                            color: ligtBlackColor,
+                            borderRadius: BorderRadius.circular(8)),
+                        child: Center(
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                              itemCount: onGoingOrders.length,
+                              itemBuilder: (context, index) {
+                                String status = "";
+                                final order = onGoingOrders[index];
+                                if (order["currentStatus"] == "Order Placed") {
+                                  status = "Your order was placed!";
+                                }
+                                if (order["currentStatus"] == "Packing") {
+                                  status = "Packing your items";
+                                }
+                                if (order["currentStatus"] == "On the way") {
+                                  status = "Out for delivery";
+                                }
+                                return Container(
+                                 padding: EdgeInsets.all(16),
+                                  height: 80,
+                                  width: 350,
+                                 
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        "$status",
+                                        style: GoogleFonts.mulish(
+                                            color: whiteColor,
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                      Container(
+                                        height: 80,
+                                        decoration: BoxDecoration(
+                                          
+                                        ),
+                                        child: Image.asset(
+                      order["currentStatus"] == "Order Placed"
+                          ? 'lib/images/ordered.png'
+                          :order["currentStatus"] == "Packing"
+                              ? 'lib/images/packing.png'
+                              : order["currentStatus"] ==
+                                      "On the way"
+                                  ? 'lib/images/onTheWay.png'
+                                  :order["currentStatus"] ==
+                                          "Delivered"
+                                      ? 'lib/images/DELIVERED.png'
+                                      : 'lib/images/ordered.png', // Default image
 
-                } 
-                  ),
-                ) :SizedBox(height: 0,),
+                      height: 80,
+                    ),)
+                                    ],
+                                  ),
+                                );
+                              }),
+                        ),
+                      )
+                    : SizedBox(
+                        height: 0,
+                      ),
                 GestureDetector(
                   onTap: () {
                     if (ISserviceAvilable) {
@@ -1185,22 +1256,21 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       ),
                       Expanded(
                         child: Container(
-                          
                           color: scaffoldBlackColor,
                           child: Center(
                             child: MediaQuery.removePadding(
                               context: context,
                               removeTop: true,
-                              child: Container(
-                                  color: scaffoldBlackColor,
-                                  padding: cartItems.isNotEmpty
-                                      ? EdgeInsets.only(bottom: 180)
-                                      : EdgeInsets.only(bottom: 20),
-                                  child: isInRadius == null
-                                      ? LoadingIndicatorBallClip()
-                                      : isInRadius!
-                                          ? buildProductList()
-                                          : buildOutOfRadius()),
+                              child: isInRadius == null
+                                  ? LoadingIndicatorBallClip()
+                                  : isInRadius!
+                                      ? Container(
+                                        color: scaffoldBlackColor,
+                              padding: cartItems.isNotEmpty 
+                                  ? EdgeInsets.only(bottom: 180)
+                                  : EdgeInsets.only(bottom: 20),
+                                        child: buildProductList())
+                                      : buildOutOfRadius(),
                             ),
                           ),
                         ),
@@ -1222,7 +1292,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 child: Container(
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.height *
-                      0.12, // 12% of screen height
+                      0.10, // 12% of screen height
                   decoration: BoxDecoration(
                       color: ligtBlackColor,
                       boxShadow: [
@@ -1257,16 +1327,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                         vertical: MediaQuery.of(context).size.height * 0.012),
                     child: Column(
                       spacing: 8,
-                      mainAxisAlignment: MainAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Delivering in 10 minutes!',
-                          style: GoogleFonts.mulish(
-                              color: whiteColor,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600),
-                        ),
+                        
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -1333,35 +1397,29 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               ],
                             ),
                             GestureDetector(
-                                onTap: ()async {
+                                onTap: () async {
                                   await Navigator.push(
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) => CartScreen(
                                                 isNavigated: true,
                                               )));
-                                  
-                                            
                                 },
                                 child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                      vertical:
-                                          MediaQuery.of(context).size.height *
-                                              0.017,
-                                      horizontal:
-                                          MediaQuery.of(context).size.width *
-                                              0.05),
+                                  width: 90,
+                                  height: 40,
                                   decoration: BoxDecoration(
                                       color: greenColor,
                                       borderRadius: BorderRadius.circular(8)),
-                                  child: Text(
-                                    'View cart',
-                                    style: GoogleFonts.mulish(
-                                        color: whiteColor,
-                                        fontSize:
-                                            MediaQuery.of(context).size.height *
-                                                0.017,
-                                        fontWeight: FontWeight.bold),
+                                  child: Center(
+                                    child: Text(
+                                      'View cart',
+                                      style: GoogleFonts.mulish(
+                                          color: whiteColor,
+                                          fontSize:13,
+                                              
+                                          fontWeight: FontWeight.bold),
+                                    ),
                                   ),
                                 ))
                           ],

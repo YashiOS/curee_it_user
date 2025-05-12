@@ -177,7 +177,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                     return MedicineCard(
                       Imgurl: item['productImageURL'] ?? "", // or item['image']
                       MedicineName: item['productName'].toString(),
-                      price: item['productPrice'].toString(),
+                      price: item['sellingPrice'].toString(),
                       quantities: item['quantity'].toString(),
                     );
                   },
@@ -559,7 +559,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                 ),
                 SizedBox(height: height * 0.01),
                 Container(
-                  height: height * 0.35,
+                  height: height * 0.45,
                   child: ClipRRect(
                     child: Image.asset(
                       orderTrackingDetails["currentStatus"] == "Order Placed"
@@ -574,18 +574,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                                       ? 'lib/images/DELIVERED.png'
                                       : 'lib/images/ordered.png', // Default image
 
-                      width: orderTrackingDetails["currentStatus"] ==
-                              "Order Placed"
-                          ? width*0.5
-                          : orderTrackingDetails["currentStatus"] == "Packing"
-                              ?  width*0.5
-                              : orderTrackingDetails["currentStatus"] ==
-                                      "On the way"
-                                  ?  width*0.5
-                                  : orderTrackingDetails["currentStatus"] ==
-                                          "Delivered"
-                                      ?  width*0.5
-                                      :  width*0.5,
+                      height: 80,
                     ),
                   ),
                 ),
@@ -712,18 +701,12 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                         children: [
                           OrderDetail(
                             icon: Icons.home_outlined,
-                            title: "Delivery at:",
+                            title: "Delivery ",
                             subtitle: orderTrackingDetails['shippingAddress'] ??
                                 "Unknown",
                             width: width,
                           ),
-                          OrderDetail(
-                            icon: Icons.help_outline,
-                            title: "Need help ?",
-                            subtitle:
-                                "Chat with us about any issue with your order",
-                            width: width,
-                          ),
+                         
                           GestureDetector(
                             onTap: () {
                               showOrderSummaryBottomSheet();

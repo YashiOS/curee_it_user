@@ -17,7 +17,7 @@ class LocationScreen extends StatefulWidget {
 
 class _LocationScreenState extends State<LocationScreen> {
   List<dynamic> addresses = [];
- 
+
   @override
   void initState() {
     fetchAddresses();
@@ -26,7 +26,6 @@ class _LocationScreenState extends State<LocationScreen> {
   }
 
   Future<void> fetchAddresses() async {
-   
     var url = Uri.parse(
       'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/address/savedAddress',
     );
@@ -62,22 +61,25 @@ class _LocationScreenState extends State<LocationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: ligtBlackColor,
         appBar: AppBar(
           centerTitle: true,
           backgroundColor: ligtBlackColor,
           shape: ContinuousRectangleBorder(
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(10),
-                bottomRight: Radius.circular(10),
-              ),
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(10),
+              bottomRight: Radius.circular(10),
             ),
+          ),
           title: Text(
             "Select a Location",
             style: GoogleFonts.mulish(
-                fontWeight: FontWeight.w400, fontSize: 22.69, color: whiteColor),
+                fontWeight: FontWeight.w400,
+                fontSize: 22.69,
+                color: whiteColor),
           ),
           leading: GestureDetector(
-            onTap: (){
+            onTap: () {
               Navigator.pop(context);
             },
             child: Padding(
@@ -113,20 +115,19 @@ class _LocationScreenState extends State<LocationScreen> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       // Circle Avatar Placeholder\
                       const SizedBox(width: 16),
-                      Icon(
-                        Icons.search_rounded,
-                        color: whiteColor,
+                      Container(
+                        height: 16,
+                        width: 16,
+                        child: Image.asset("lib/images/Search_light.png"),
                       ),
                       //Image.asset("lib/images/Search_light.png",scale: 0.8,),
                       const SizedBox(width: 16),
 
-                      // Name & Phone
-                      SizedBox(height: 2),
                       Container(
-                        height: 30,
                         child: Text(
                           "Search for your location",
                           style: GoogleFonts.mulish(
@@ -155,20 +156,21 @@ class _LocationScreenState extends State<LocationScreen> {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       // Circle Avatar Placeholder\
                       const SizedBox(width: 16),
-                      Icon(
-                        Icons.add_circle_outline,
-                        color: whiteColor,
+                      Container(
+                        height: 16,
+                        width: 16,
+                        child: Image.asset("lib/images/Add_ring_light.png"),
                       ),
                       //Image.asset("lib/images/Search_light.png",scale: 0.8,),
                       const SizedBox(width: 16),
 
                       // Name & Phone
-                      SizedBox(height: 2),
+
                       Container(
-                        height: 30,
                         child: Text(
                           "Type your address",
                           style: GoogleFonts.mulish(
@@ -226,59 +228,90 @@ class _LocationScreenState extends State<LocationScreen> {
                               child: Column(
                                 children: [
                                   Container(
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(8),
-                                      color: ligtBlackColor,
-                                    ),
-                                    margin: EdgeInsets.only(bottom: 10),
-                                    child: ListTile(
-                                      contentPadding: EdgeInsets.symmetric(
-                                          horizontal: 16, vertical: 3),
-                                      leading: Container(
-                                        decoration: BoxDecoration(
-                                          color:
-                                              ligtBlackColor, // Soft blue background
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                        ),
-                                        child: Icon(
-                                          Icons
-                                              .location_on, // More modern home icon
-                                          color:
-                                              whiteColor, // Matching blue icon
-                                          size: 22,
-                                        ),
+                                      padding: EdgeInsets.only(
+                                        left: 25,
+                                        right: 16,
                                       ),
-                                      title: Text(
-                                        address['address'] ?? '',
-                                        style: GoogleFonts.mulish(
-                                          fontSize: 15,
-                                          fontWeight: FontWeight.w500,
-                                          color:
-                                              whiteColor, // Darker text for better readability
-                                        ),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(8),
+                                        color: ligtBlackColor,
                                       ),
-                                      subtitle: Text(
-                                        address['landmark'] ?? '',
-                                        style: GoogleFonts.mulish(
-                                          fontSize: 13,
-                                          fontWeight: FontWeight.w300,
-                                          color:
-                                              whiteColor, // Slightly lighter than title
+                                      margin: EdgeInsets.only(bottom: 10),
+                                      child: Container(
+                                        height: 75,
+                                        padding: EdgeInsets.symmetric(
+                                            vertical:
+                                                8), // Match ListTile's vertical padding
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            // Leading icon (16x16 with 8px right margin)
+                                            Container(
+                                              // Space between icon and text
+                                              decoration: BoxDecoration(
+                                                color: ligtBlackColor,
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                              child: Container(
+                                                height: 16,
+                                                width: 16,
+                                                child: Image.asset(
+                                                    "lib/images/hugeicons_location.png"),
+                                              ),
+                                            ),
+                                            SizedBox(width: 16,),
+                                      
+                                            Expanded(
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    address['address'] ?? '',
+                                                    style: GoogleFonts.mulish(
+                                                      fontSize: 15,
+                                                      fontWeight:
+                                                          FontWeight.w500,
+                                                      color: whiteColor,
+                                                    ),
+                                                  ),
+                                                  SizedBox(
+                                                      height:
+                                                          2), // Space between title and subtitle
+                                                  Text(
+                                                    address['landmark'] ?? '',
+                                                    style: GoogleFonts.mulish(
+                                                      fontSize: 13,
+                                                      fontWeight:
+                                                          FontWeight.w300,
+                                                      color: whiteColor,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+
+                                            // Trailing radio button
+                                            Container(
+                                              width: 16,
+                                              height: 16,
+                                              margin: EdgeInsets.only(
+                                                  left:
+                                                      8), // Space before trailing widget
+                                              decoration: BoxDecoration(
+                                                color: isSelected
+                                                    ? greenColor
+                                                    : scaffoldBlackColor,
+                                                shape: BoxShape.circle,
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      ),
-                                      trailing: Container(
-                                        width: 16,
-                                        height: 16,
-                                        
-                                        decoration:  BoxDecoration(
-                                          
-                                          color:isSelected ?greenColor :Colors.black,
-                                          shape: BoxShape.circle,
-                                        ),
-                                      ),
-                                    ),
-                                  ),
+                                      )),
                                 ],
                               ),
                             );

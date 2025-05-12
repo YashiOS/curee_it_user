@@ -129,6 +129,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: scaffoldBlackColor,
         appBar: AppBar(
           centerTitle: true,
           shape: ContinuousRectangleBorder(
@@ -144,23 +145,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
             style: GoogleFonts.mulish(
                 fontWeight: FontWeight.w400, fontSize: 22.69, color: whiteColor),
           ),
-          leading: Padding(
-            padding: const EdgeInsets.only(left: 12.0),
-            child: GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-              },
+           leading: GestureDetector(
+            onTap: (){
+              Navigator.pop(context);
+            },
+            child: Padding(
+              padding: const EdgeInsets.only(left: 24.0),
               child: Padding(
                 padding: const EdgeInsets.only(left: 4.0),
                 child: Row(
                   spacing: 4,
-                  children: [
-                    Icon(
-                      Icons.arrow_back,
-                      color: whiteColor,
-                      weight: 10,
-                    ),
-                  ],
+                  children: [Image.asset("lib/images/Vector 9.png")],
                 ),
               ),
             ),
