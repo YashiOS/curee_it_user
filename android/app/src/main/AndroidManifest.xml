@@ -8,6 +8,8 @@
     <!-- For Android 10+ (API 29+) if you need background location -->
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET"/>
+    
+
    
 
     <application

@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 import 'package:cureeit_user_app/cubit/service_avilable_cubit.dart';
 import 'package:cureeit_user_app/current_address/api_services.dart';
 import 'package:cureeit_user_app/current_address/location_permission_helper.dart';
+
 import 'package:cureeit_user_app/current_address/models/place_from_coordinates.dart';
 import 'package:cureeit_user_app/screens/location.dart';
 import 'package:cureeit_user_app/selected_Address/currentAddress.dart';
@@ -23,6 +25,12 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:loading_indicator/loading_indicator.dart';
+import 'package:location/location.dart' as loc;
+
+import 'package:permission_handler/permission_handler.dart' as perm;
+
+
+
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -84,7 +92,63 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   PlaceFromCoordinates placeFromCoordinates = PlaceFromCoordinates();
    late Animation<Offset> _slideTransition;
   // To store product quantities
+
+void _showLocationDeniedDialog() {
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) => AlertDialog(
+      title: Text("Location Required"),
+      content: Text("Please enable location to use this app."),
+      actions: [
+        TextButton(
+          onPressed: () {
+            exit(0); // Exit the app
+          },
+          child: Text("Exit"),
+        ),
+      ],
+    ),
+  );
+}
+
+
+  void _startAppInitialization() {
+  fetchAddresses();
+  fetchProducts();
+  changeSearchText();
+  fetchOrderHistory();
+}
+
   
+Future<void> _checkLocationStatus() async {
+  print("Checking location status...");
+  loc.Location location = loc.Location();
+
+  bool serviceEnabled = await location.serviceEnabled();
+  if (!serviceEnabled) {
+    serviceEnabled = await location.requestService();
+    if (!serviceEnabled) {
+      _showLocationDeniedDialog();
+      return;
+    }
+  }
+
+  loc.PermissionStatus permissionGranted = await location.hasPermission();
+  if (permissionGranted == loc.PermissionStatus.denied) {
+    permissionGranted = await location.requestPermission();
+    if (permissionGranted != loc.PermissionStatus.granted) {
+      _showLocationDeniedDialog();
+      return;
+    }
+  }
+
+  // ✅ Location is enabled and permission is granted — now proceed
+  _startAppInitialization();
+}
+
+
+
   void changeSearchText() async {
     timer = Timer.periodic(Duration(seconds: 3), (_) async {
       setState(() {
@@ -100,28 +164,27 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       });
     });
   }
+@override
+void initState() {
+  super.initState();
+  _controller = AnimationController(
+    duration: const Duration(milliseconds: 900),
+    vsync: this,
+  )..repeat(reverse: true);
+    _bounceAnimation = Tween<double>(
+    begin: 0.0,
+    end: -50.0, // or whatever vertical/horizontal movement you want
+  ).animate(
+    CurvedAnimation(
+      parent: _controller,
+      curve: Curves.bounceIn,
+    ),
+  );
+  WidgetsBinding.instance.addPostFrameCallback((_) {
+    _checkLocationStatus();
+  });
+}
 
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 800),
-      vsync: this, // Make sure your class mixes with TickerProviderStateMixin
-    )..repeat(reverse: true); // This makes the animation loop back and forth
- 
-    _bounceAnimation = Tween<double>(begin: 0, end: -20).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeInOut,
-      ),
-    );
-    fetchAddresses();
-    fetchProducts();
-    changeSearchText();
-    fetchOrderHistory();
-   
-
-  }
     @override
   void dispose() {
     timer.cancel();
@@ -909,7 +972,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           style: GoogleFonts.mulish(
             color: Colors.white,
             fontSize: 14,
-            fontWeight: FontWeight.w700,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ],
@@ -1250,7 +1313,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       Container(
                         padding: EdgeInsets.only(top: 10, bottom: 15),
                         child: Text(
-                          isInRadius == null
+                          isInRadius == null ||localAddress.isEmpty
                               ? ""
                               : isInRadius!
                                   ? "Featured Products"
@@ -1269,7 +1332,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             child: MediaQuery.removePadding(
                               context: context,
                               removeTop: true,
-                              child: isInRadius == null
+                              child: isInRadius == null || localAddress.isEmpty
                                   ? LoadingIndicatorBallClip()
                                   : isInRadius!
                                       ? Container(

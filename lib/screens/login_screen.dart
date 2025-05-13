@@ -1,4 +1,9 @@
 import 'dart:convert';
+import 'package:location/location.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'dart:io'; // For exiting the app
+import 'package:location/location.dart' as loc;
+import 'package:permission_handler/permission_handler.dart' as perm;
 
 import 'package:cureeit_user_app/screens/otp_screen.dart';
 import 'package:cureeit_user_app/screens/register_screen.dart';
@@ -75,9 +80,59 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+Future<void> _checkLocationStatus() async {
+  print("checking location ON OF");
+  loc.Location location = loc.Location();
+
+  bool serviceEnabled = await location.serviceEnabled();
+  if (!serviceEnabled) {
+    print("checking location  OF");
+    serviceEnabled = await location.requestService();
+    if (!serviceEnabled) {
+      _showLocationDeniedDialog();
+      return;
+    }
+  }
+
+  loc.PermissionStatus permissionGranted = await location.hasPermission();
+  if (permissionGranted == loc.PermissionStatus.denied) {
+    print("checking location ON ");
+    permissionGranted = await location.requestPermission();
+    if (permissionGranted != loc.PermissionStatus.granted) {
+      _showLocationDeniedDialog();
+    }
+  }
+}
+
+
+void _showLocationDeniedDialog() {
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (context) => AlertDialog(
+      title: Text("Location Required"),
+      content: Text("Please enable location to use this app."),
+      actions: [
+        TextButton(
+          onPressed: () {
+            exit(0); // Exit the app
+          },
+          child: Text("Exit"),
+        ),
+      ],
+    ),
+  );
+}
+
+
+
   @override
   void initState() {
     _controller.addListener(_checkButton);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+    _checkLocationStatus();
+  });
+     
     super.initState();
   }
 
