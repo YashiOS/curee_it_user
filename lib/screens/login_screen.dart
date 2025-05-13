@@ -23,7 +23,7 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       final response = await http.post(
         Uri.parse(
-            'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/auth/user/login'),
+            'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/auth/user/verify'),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -31,20 +31,21 @@ class _LoginScreenState extends State<LoginScreen> {
           "mobileNumber": _controller.text.trim(),
         }),
       );
-
+       print(response.body);
       if (response.statusCode == 200) {
-        
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("OTP sent successfully"),
-            backgroundColor: greenColor,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            duration: Duration(seconds: 2),
-          ),
-        );
+         Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (context) => OtpScreen(phoneNumber:_controller.text.trim(),purpose: "login",name: "",)),
+      );
+      if(response.statusCode==400){
+        Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (context) => RegisterScreen(phoneNumber:_controller.text.trim()),
+      ));
+      }
+       
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -70,11 +71,7 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     } else {
       userLogin();
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (context) => OtpScreen(phoneNumber: phoneNumber,purpose: "login",name: "",)),
-      );
+     
     }
   }
 
@@ -194,17 +191,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                         ),
-                        GestureDetector(
-                          onTap: (){
-                            Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>RegisterScreen()));
-                          },
-                          child: Column(
-                            children: [
-                              Text("New to medkaro ?",style: GoogleFonts.mulish(color: greyColor,fontSize: 17,fontWeight: FontWeight.w600),),
-                              Text("Register Now",style: GoogleFonts.mulish(color: whiteColor,fontSize: 13,fontWeight: FontWeight.w800),)
-                            ],
-                          ),
-                        )
+                       
 
                       ],
                     ),

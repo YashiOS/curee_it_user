@@ -25,6 +25,13 @@ class OtpScreen extends StatefulWidget {
 class _OtpScreenState extends State<OtpScreen> {
   bool otpEntered = false; // Track OTP completion
   String otp = ""; // Store the combined OTP
+  
+@override
+  void initState() {
+    show();
+    // TODO: implement initState
+    super.initState();
+  }
 
   void handleOtpEntered(bool entered) {
     print(entered);
@@ -37,6 +44,22 @@ class _OtpScreenState extends State<OtpScreen> {
     setState(() {
       otp = newOtp;
     });
+  }
+
+  void show(){
+    Future.delayed(Duration(seconds: 2),(){
+         ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("OTP sent successfully ",style: GoogleFonts.mulish(),),
+            backgroundColor: greenColor,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            duration: Duration(seconds: 2),
+          ),);
+    });
+   
   }
 
   Future<void> submitOtp() async {
@@ -78,17 +101,7 @@ class _OtpScreenState extends State<OtpScreen> {
         context,
         MaterialPageRoute(builder: (context) =>BaseScreen(Navigatedfrom: "otpScreen",)),
       );
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Logged in "),
-            backgroundColor: greenColor,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            duration: Duration(seconds: 2),
-          ),
-        );
+     
       }
       }
     } catch (e) {

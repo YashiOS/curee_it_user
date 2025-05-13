@@ -34,16 +34,15 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
+  // Add to your state class
+
   List AllOrders = [];
   List onGoingOrders = [];
   late AnimationController _controller;
   late Animation<double> _bounceAnimation;
-  int _currentImageIndex = 0;
-  bool _isFetchingCart = false;
-  final List<String> _images = [
-    "lib/images/capsule.png",
-    "lib/images/capsule_image.png"
-  ];
+ 
+  
+ 
   final List<String> hints = [
     "Search for your medicine",
     "Try 'Paracetamol'",
@@ -81,9 +80,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   String localAddress = "";
   double defaultLat = 26.9124;
   double defaultLng = 75.7873;
+  bool _isFetchingCart = false;
   PlaceFromCoordinates placeFromCoordinates = PlaceFromCoordinates();
+   late Animation<Offset> _slideTransition;
   // To store product quantities
-
+  
   void changeSearchText() async {
     timer = Timer.periodic(Duration(seconds: 3), (_) async {
       setState(() {
@@ -107,7 +108,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       duration: const Duration(milliseconds: 800),
       vsync: this, // Make sure your class mixes with TickerProviderStateMixin
     )..repeat(reverse: true); // This makes the animation loop back and forth
-
+ 
     _bounceAnimation = Tween<double>(begin: 0, end: -20).animate(
       CurvedAnimation(
         parent: _controller,
@@ -121,8 +122,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
    
 
   }
-
-  @override
+    @override
   void dispose() {
     timer.cancel();
       _animationTimer?.cancel();
@@ -130,6 +130,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     // TODO: implement dispose
     super.dispose();
   }
+  
+
+
 
   List<dynamic> getOngoingOrders(List<dynamic> allOrders) {
     print("GET ON GOING ORDER");
@@ -261,7 +264,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         }),
       );
       if(response.statusCode==200){
-         fetchCartDetails();
+          ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Updated cart')),
+        );
       }
       if (response.statusCode != 200) {
         // Handle error - revert local state in case of failure
@@ -284,11 +289,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
  Future<void> fetchCartDetails() async {
-  if (_isFetchingCart || !mounted) return;
+ 
   
   print("FETCH CART DETAILS STARTED");
   setState(() {
-    _isFetchingCart = true;
+   
     isLoading = true;
   });
 
@@ -307,7 +312,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
       if (responseData['status'] == 200 && responseData['data'] != null) {
         final cartData = responseData['data'];
-        finaltotalAmount = responseData["finalTotal"]?.toString() ?? "0";
+        
+        setState(() {
+          finaltotalAmount = responseData["finalTotal"]?.toString() ?? "0";
+        });
         final List<Map<String, dynamic>> tempCart = [];
         double calculatedTotal = 0.0;
 
@@ -345,7 +353,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             cartItems = tempCart;
             totalAmount = calculatedTotal;
             isLoading = false;
-            _isFetchingCart = false;
+           
           });
         }
       } else {
@@ -354,7 +362,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           setState(() {
             cartItems = [];
             isLoading = false;
-            _isFetchingCart = false;
+           
           });
         }
       }
@@ -363,7 +371,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       if (mounted) {
         setState(() {
           isLoading = false;
-          _isFetchingCart = false;
+          
         });
       }
     }
@@ -704,8 +712,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                           child: Center(
                             child: isAddingMap[index] == true
                                 ? SizedBox(
-                                    width: 18,
-                                    height: 18,
+                                    width: 10,
+                                    height: 10,
                                     child: CircularProgressIndicator(
                                       color: Colors.white,
                                       strokeWidth: 2,

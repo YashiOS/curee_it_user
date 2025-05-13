@@ -109,6 +109,16 @@ class _CartScreenState extends State<CartScreen> {
         fetchCartDetails(); // Re-fetch cart details to update the UI
       } else {}
     } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Failed to remove from cart , try again later",style: GoogleFonts.mulish(),),
+            backgroundColor: greenColor,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            duration: Duration(seconds: 2),
+          ),);
       print("item did not got removed $error");
     }
   }
@@ -799,6 +809,7 @@ class _CartScreenState extends State<CartScreen> {
                                                                             "on remove is called");
                                                                         removeItemFromCart(
                                                                             item['productId']);
+                                                                            fetchCartDetails();
                                                                       },
                                                                       isDeleting: ItemDeleting,
                                                                       productImages: item['imageUrls'] ?? ''))

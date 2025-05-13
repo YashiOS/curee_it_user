@@ -109,6 +109,19 @@ class _CartCardState extends State<CartCard> {
           isUpdating = false;
         });
       } else {
+         setState(() {
+          isUpdating = false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Failed to update quantity !",style: GoogleFonts.mulish(),),
+            backgroundColor: greenColor,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            duration: Duration(seconds: 2),
+          ),);
         print(
             'Failed to update quantity. Status code: ${response.statusCode} ');
       }
@@ -139,13 +152,34 @@ class _CartCardState extends State<CartCard> {
       if (response.statusCode == 200) {
         widget.isDeleting(false);
         widget.onRemove();
+        
       } else {
         print(response.statusCode);
         widget.isDeleting(false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Failed to remove from cart",style: GoogleFonts.mulish(),),
+            backgroundColor: greenColor,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            duration: Duration(seconds: 2),
+          ),);
         print('Failed to remove from cart');
       }
     } catch (error) {
       widget.isDeleting(false);
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Error removing from cart ",style: GoogleFonts.mulish(),),
+            backgroundColor: greenColor,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            duration: Duration(seconds: 2),
+          ),);
       print('Error removing from cart: $error');
     }
   }

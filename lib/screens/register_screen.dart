@@ -7,7 +7,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 
 class RegisterScreen extends StatefulWidget {
-  const RegisterScreen({super.key});
+   RegisterScreen({super.key,required this.phoneNumber});
+  final String phoneNumber;
 
   @override
   State<RegisterScreen> createState() => _LoginScreenState();
@@ -27,23 +28,17 @@ class _LoginScreenState extends State<RegisterScreen> {
           'Content-Type': 'application/json',
         },
         body: json.encode({
-          "mobileNumber": _controller.text.trim(),
+          "mobileNumber":widget.phoneNumber,
           "name":_nameController.text.trim(),
         }),
       );
 
       if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("OTP sent successfully"),
-            backgroundColor: Colors.green,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            duration: Duration(seconds: 2),
-          ),
-        );
+       Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+            builder: (context) => OtpScreen(phoneNumber:widget.phoneNumber,purpose: "login",name:_nameController.text.trim(),)),
+      );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -56,10 +51,10 @@ class _LoginScreenState extends State<RegisterScreen> {
     String phoneNumber = _controller.text.trim();
     String name=_nameController.text.trim();
 
-    if (phoneNumber.length != 10) {
+    if (phoneNumber.length <=1) {
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(" Phone number must be 10 digit "),
+            content: Text("name must be longer then 1 alphabet "),
             backgroundColor: greenColor,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
@@ -144,27 +139,7 @@ class _LoginScreenState extends State<RegisterScreen> {
                         fontSize: screenHeight * 0.022,
                       ),
                     ),
-                    SizedBox(height: screenHeight * (60 / 812)),
-                    Container(
-                      width: screenWidth * 0.85,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF1A1A1A),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      padding:
-                          EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
-                      child: TextField(
-                        controller: _nameController,
-                        style: GoogleFonts.mulish(color: whiteColor),
-                        decoration: InputDecoration(
-                          hintText: "Name",
-                          hintStyle: TextStyle(
-                              color: Colors.white, fontWeight: FontWeight.w100),
-                          border: InputBorder.none,
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: screenHeight * 0.022),
+                     SizedBox(height: screenHeight * 0.123),
                     Container(
                       width: screenWidth * 0.85,
                       decoration: BoxDecoration(
@@ -175,11 +150,7 @@ class _LoginScreenState extends State<RegisterScreen> {
                           EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
                       child: Row(
                         children: [
-                          Text(
-                            "+91 ",
-                            style: GoogleFonts.mulish(
-                                color: whiteColor, fontSize: 16),
-                          ),
+                          
                           Expanded(
                             child: TextField(
                               controller:
@@ -190,9 +161,9 @@ class _LoginScreenState extends State<RegisterScreen> {
 
                               decoration: InputDecoration(
                                 counterText: "",
-                                hintText: " Phone Number",
+                                hintText: "Name",
                                 hintStyle: TextStyle(
-                                    color: greyColor,
+                                    color: whiteColor,
                                     fontWeight: FontWeight.w100),
                                 border: InputBorder.none,
                               ),
@@ -201,31 +172,39 @@ class _LoginScreenState extends State<RegisterScreen> {
                         ],
                       ),
                     ),
-                    SizedBox(height: screenHeight * 0.05), // Added some spacing
-                    SizedBox(
-                      width: screenWidth * 0.23,
-                      height: screenHeight * 0.055,
-                      child: TextButton(
-                        onPressed: () {
-                          _validateAndProceed();
-                        },
-                        style: TextButton.styleFrom(
-                          backgroundColor:
-                              isButtonEnabled ? greenColor : scaffoldBlackColor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            side: BorderSide(color: greenColor, width: 1),
+                    SizedBox(height: screenHeight * 0.05),// Added some spacing
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        SizedBox(
+                          width: screenWidth * 0.23,
+                          height: screenHeight * 0.055,
+                          child: TextButton(
+                            onPressed: () {
+                              _validateAndProceed();
+                            },
+                            style: TextButton.styleFrom(
+                              backgroundColor:
+                                  isButtonEnabled ? greenColor : scaffoldBlackColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                side: BorderSide(color: greenColor, width: 1),
+                              ),
+                            ),
+                            child: Text(
+                              "Next",
+                              style: GoogleFonts.mulish(
+                                color: isButtonEnabled ? whiteColor : greenColor,
+                                fontSize: screenHeight * 0.018,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                           ),
                         ),
-                        child: Text(
-                          "Next",
-                          style: GoogleFonts.mulish(
-                            color: isButtonEnabled ? whiteColor : greenColor,
-                            fontSize: screenHeight * 0.018,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
+                       
+
+                      ],
                     ),
                   ],
                 ),

@@ -612,14 +612,8 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             40)),
-                                                height: MediaQuery.of(context)
-                                                        .size
-                                                        .height *
-                                                    0.06, // 40/667 ≈ 0.06
-                                                width: MediaQuery.of(context)
-                                                        .size
-                                                        .height *
-                                                    0.06,
+                                                height: 10,// 40/667 ≈ 0.06
+                                                width: 10,
                                                 child:
                                                     CircularProgressIndicator(
                                                   color: whiteColor,
