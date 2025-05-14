@@ -48,6 +48,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   List onGoingOrders = [];
   late AnimationController _controller;
   late Animation<double> _bounceAnimation;
+  
  
   
  
@@ -98,14 +99,25 @@ void _showLocationDeniedDialog() {
     context: context,
     barrierDismissible: false,
     builder: (context) => AlertDialog(
-      title: Text("Location Required"),
-      content: Text("Please enable location to use this app."),
+      backgroundColor: ligtBlackColor,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(8),
+      ),
+      title: Text("Location Required",style: GoogleFonts.mulish(color: whiteColor),),
+      content: Text("Please enable location to use this app.",style: GoogleFonts.mulish(color: whiteColor),),
       actions: [
         TextButton(
+          style: TextButton.styleFrom(
+            backgroundColor: Color(0xFFBE404F),
+            foregroundColor: whiteColor,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            )
+          ),
           onPressed: () {
             exit(0); // Exit the app
           },
-          child: Text("Exit"),
+          child: Text("Exit",style: GoogleFonts.mulish(color: whiteColor),),
         ),
       ],
     ),
@@ -996,6 +1008,9 @@ void initState() {
               children: [
                 GestureDetector(
                   onTap: () async {
+                    if(localAddress.isEmpty ){
+                      return;
+                    }
                     await Navigator.of(context).push(MaterialPageRoute(
                         builder: (context) => LocationScreen()));
                     checkLocation();
@@ -1338,7 +1353,7 @@ void initState() {
                                       ? Container(
                                         color: scaffoldBlackColor,
                               padding: cartItems.isNotEmpty 
-                                  ? EdgeInsets.only(bottom: 180)
+                                  ? EdgeInsets.only(bottom: 160)
                                   : EdgeInsets.only(bottom: 20),
                                         child: buildProductList())
                                       : buildOutOfRadius(),
