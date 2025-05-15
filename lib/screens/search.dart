@@ -351,7 +351,7 @@ class _SearchState extends State<Search> {
                                         children: [
                                           Expanded(
                                             child: Text(
-                                              item['packagingDetail'] ??
+                                              item['Description'] ??
                                                   'Medicine information',
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,

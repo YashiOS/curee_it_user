@@ -38,8 +38,7 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
     );
 
     // Animate the camera to the new position
-     _mapController?.animateCamera(CameraUpdate.newCameraPosition(newPosition));
-     
+    _mapController?.animateCamera(CameraUpdate.newCameraPosition(newPosition));
   }
 
   getAddress() {
@@ -49,66 +48,60 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
         defaultLng = value.results?[0].geometry?.location?.lng ?? 0.0;
         placeFromCoordinates = value;
         isLoading = false;
-        
       });
     });
-    
   }
-
-  
 
   @override
   void initState() {
     super.initState();
+
     determinePosition().then((value) {
-      defaultLat = value.latitude;
-      defaultLng = value.longitude;
-      print(value.latitude);
-      print(value.longitude);
+      setState(() {
+        defaultLat = value.latitude;
+        defaultLng = value.longitude;
+
+        getAddress();
+        _changeCameraPosition(defaultLat, defaultLng);
+      });
+    }).onError((error, stackTrace) {
+      print("Location Error $error");
     });
-    getAddress();
-    
   }
 
   @override
   Widget build(BuildContext context) {
-   
-     
     return Scaffold(
       backgroundColor: scaffoldBlackColor,
       appBar: AppBar(
         backgroundColor: scaffoldBlackColor,
         centerTitle: true,
         shape: ContinuousRectangleBorder(
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(10),
-                bottomRight: Radius.circular(10),
-              ),
-            ),
+          borderRadius: BorderRadius.only(
+            bottomLeft: Radius.circular(10),
+            bottomRight: Radius.circular(10),
+          ),
+        ),
         title: Text(
           "Current Location",
           style: GoogleFonts.mulish(
-              color: whiteColor,
-              fontSize: 22.69,
-              fontWeight: FontWeight.w400),
+              color: whiteColor, fontSize: 22.69, fontWeight: FontWeight.w400),
         ),
-         leading: Padding(
-            padding: const EdgeInsets.only(left: 24.0),
-            child: GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: Padding(
-                padding: const EdgeInsets.only(left: 4.0),
-                child: Row(
-                  spacing: 4,
-                  children: [
-                    Image.asset("lib/images/Vector 9.png")
-                  ],
-                ),
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 24.0),
+          child: GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: Padding(
+              padding: const EdgeInsets.only(left: 4.0),
+              child: Row(
+                spacing: 4,
+                children: [Image.asset("lib/images/Vector 9.png")],
               ),
-      ),
-         ),
+            ),
+          ),
+        ),
       ),
       body: isLoading
           ? Center(
@@ -124,9 +117,7 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
                   child: GoogleMap(
                     style: darkMapStyle,
                     onMapCreated: (GoogleMapController controller) {
-                      
                       _mapController = controller;
-                      
                     },
                     mapType: MapType.normal,
                     initialCameraPosition: CameraPosition(
@@ -159,7 +150,7 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
                   child: Icon(
                     Icons.location_on,
                     size: 36,
-                    color:whiteColor,
+                    color: whiteColor,
                   ),
                 ),
                 Container(
@@ -184,20 +175,17 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
                                 controller: searchPlaceController,
                                 style: GoogleFonts.mulish(
                                     color: whiteColor,
-                                   
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600),
                                 decoration: InputDecoration(
                                     border: InputBorder.none,
                                     helperStyle: GoogleFonts.mulish(
                                         color: whiteColor,
-                                       
                                         fontSize: 16,
                                         fontWeight: FontWeight.w600),
                                     hintText: "Search ...",
                                     hintStyle: GoogleFonts.mulish(
                                         color: Colors.grey,
-                                        
                                         fontSize: 16,
                                         fontWeight: FontWeight.w600),
                                     fillColor: Colors.white,
@@ -277,10 +265,13 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
                                                 Icons.location_on_outlined,
                                                 color: whiteColor,
                                               ),
-                                              title: Text(getPlaces
-                                                  .predictions![index]
-                                                  .description
-                                                  .toString(),style: GoogleFonts.mulish(color: whiteColor),),
+                                              title: Text(
+                                                getPlaces.predictions![index]
+                                                    .description
+                                                    .toString(),
+                                                style: GoogleFonts.mulish(
+                                                    color: whiteColor),
+                                              ),
                                             );
                                           }),
                                     ),
@@ -303,20 +294,18 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
                                   setState(() {
                                     defaultLat = value.latitude;
                                     defaultLng = value.longitude;
-                                    
-                                    
-                                     getAddress();
+
+                                    getAddress();
                                     _changeCameraPosition(
                                         defaultLat, defaultLng);
                                   });
-                                  
                                 }).onError((error, stackTrace) {
                                   print("Location Error $error");
                                 });
                               },
                               child: Container(
-                                padding: EdgeInsets.all(MediaQuery.of(context).size.width * 0.02),
-
+                                padding: EdgeInsets.all(
+                                    MediaQuery.of(context).size.width * 0.02),
                                 width: MediaQuery.of(context).size.width / 2,
                                 decoration: BoxDecoration(
                                     color: greenColor,
@@ -333,8 +322,10 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
                                       "Current Location",
                                       style: GoogleFonts.mulish(
                                           color: Colors.white,
-                                          
-                                          fontSize:MediaQuery.of(context).size.height*0.016 ,
+                                          fontSize: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.016,
                                           fontWeight: FontWeight.bold),
                                     )
                                   ],
@@ -358,7 +349,6 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
                                           "Loading...",
                                       style: GoogleFonts.mulish(
                                           color: whiteColor,
-                                          
                                           fontSize: 12,
                                           fontWeight: FontWeight.w600),
                                     ),

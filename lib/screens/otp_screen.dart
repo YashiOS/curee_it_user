@@ -23,6 +23,7 @@ class OtpScreen extends StatefulWidget {
 }
 
 class _OtpScreenState extends State<OtpScreen> {
+  bool verifyingOTP=false;
   bool otpEntered = false; // Track OTP completion
   String otp = ""; // Store the combined OTP
   
@@ -63,6 +64,9 @@ class _OtpScreenState extends State<OtpScreen> {
   }
 
   Future<void> submitOtp() async {
+    setState(() {
+      verifyingOTP = true;
+    });
     if (otpEntered) {
       print('OTP entered: $otp');
 
@@ -83,6 +87,7 @@ class _OtpScreenState extends State<OtpScreen> {
       );
 
       if (response.statusCode == 200) {
+       
    
       final data = json.decode(response.body);
       if(data!=null){
@@ -96,7 +101,9 @@ class _OtpScreenState extends State<OtpScreen> {
       User.phoneNumber=mobileNumber;
       User.userId=userid;
       context.read<StoreUserCubit>().saveUserData(id: id, userId: userid, name: name, phoneNumber: mobileNumber);
-
+       setState(() {
+          verifyingOTP=false;
+        });
        Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) =>BaseScreen(Navigatedfrom: "otpScreen",)),
@@ -105,6 +112,9 @@ class _OtpScreenState extends State<OtpScreen> {
       }
       }
     } catch (e) {
+      setState(() {
+          verifyingOTP=false;
+        });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('failed to logged in error: $e')),
       );
@@ -139,9 +149,9 @@ Widget build(BuildContext context) {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Image.asset(
-                    "lib/images/Medkaro (1) 2.png",
+                    "lib/images/final_medkaro_logo.png",
                     height: screenHeight * 0.06,
-                    width: screenWidth * 0.55,
+                    width: screenWidth * 0.5,
                   ),
                   Text(
                     "10-minute medicine delivery",
@@ -175,7 +185,7 @@ Widget build(BuildContext context) {
                         color:otpEntered?greenColor: scaffoldBlackColor,
                       ),
                       alignment: Alignment.center,
-                      child: Text(
+                      child:verifyingOTP?Container(height: 10,width: 10,child: CircularProgressIndicator(color: whiteColor,strokeWidth: 2,),) :Text(
                         "Next",
                         style: GoogleFonts.mulish(
                           color:otpEntered?whiteColor: greenColor,

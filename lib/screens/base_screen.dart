@@ -34,7 +34,7 @@ class _BaseScreenState extends State<BaseScreen> {
   @override
   void initState() {
     super.initState();
-    if (widget.Navigatedfrom == "splashScreen") {
+    if (widget.Navigatedfrom == "from_main") {
       final cubit = context.read<StoreUserCubit>();
 
       if (cubit.isUserDataAvailable()) {
@@ -56,54 +56,67 @@ class _BaseScreenState extends State<BaseScreen> {
           child: BlocBuilder<ServiceAvilableCubit, ServiceAvilableState>(
             builder: (context, state) {
               if (state is ServiceIsAvilable) {
-                return Scaffold(
-                  backgroundColor: ligtBlackColor,
-                  body: Stack(
-                    children: [
-                      TabBarView(children: [
-                        Center(child: HomeScreen()),
-                        Center(child: OrdersScreen()),
-                        Center(
-                            child: CartScreen(
-                          isNavigated: false,
-                        )),
-                      ]),
-                      SizedBox(
-                        height: MediaQuery.of(context).size.height,
-                        width: MediaQuery.of(context).size.width,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Container(
-                              width: MediaQuery.of(context).size.width,
-                              decoration: BoxDecoration(
-                                  color: scaffoldBlackColor,
-                                  border:
-                                      Border.all(color: scaffoldBlackColor)),
-                              child: TabBar(
-                                unselectedLabelColor: greyColor,
-                                labelColor: whiteColor,
-                                indicatorColor: whiteColor,
-                                labelStyle: GoogleFonts.mulish(fontSize: 12),
-                                tabs: [
-                                  Tab(
-                                      icon: Icon(Icons.house_outlined),
-                                      text: "Home"),
-                                  Tab(
-                                      icon: Icon(Icons.lock_clock),
-                                      text: "Orders"),
-                                  Tab(
-                                      icon: Icon(Icons.shopping_cart_outlined),
-                                      text: "Cart"),
-                                ],
-                              ),
+                return Builder(
+                  builder: (context) {
+                     final TabController tabController = DefaultTabController.of(context);
+                    return Scaffold(
+                      backgroundColor: ligtBlackColor,
+                      body: Stack(
+                        children: [
+                          TabBarView(children: [
+                            Center(child: HomeScreen()),
+                            Center(child: OrdersScreen()),
+                            Center(
+                                child: CartScreen(
+                              isNavigated: false,
+                            )),
+                          ]),
+                          SizedBox(
+                            height: MediaQuery.of(context).size.height,
+                            width: MediaQuery.of(context).size.width,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Container(
+                                  width: MediaQuery.of(context).size.width,
+                                  decoration: BoxDecoration(
+                                      color: scaffoldBlackColor,
+                                      border:
+                                          Border.all(color: scaffoldBlackColor)),
+                                  child: AnimatedBuilder(
+                                    animation: tabController,
+                                    builder: (context,_) {
+                                      return TabBar(
+                                        controller: tabController,
+                                        unselectedLabelColor: greyColor,
+                                        labelColor: whiteColor,
+                                        indicatorColor: whiteColor,
+                                        labelStyle: GoogleFonts.mulish(fontSize: 12),
+                                        tabs: [
+                                          Tab(
+                                              icon: Container(height: 24,width: 24, 
+                                                child: Image.asset("lib/images/Home.png",color: tabController.index == 0 ? whiteColor : greyColor,),),
+                                              text: "Home",),
+                                          Tab(
+                                              icon: Container(height: 24,width: 24, 
+                                                child: Image.asset("lib/images/Order Again.png",color: tabController.index == 1 ? whiteColor : greyColor,)),
+                                              text: "Order Again"),
+                                          Tab(
+                                              icon: Icon(Icons.shopping_cart_outlined),
+                                              text: "Cart"),
+                                        ],
+                                      );
+                                    }
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    );
+                  }
                 );
               }
               if (state is ServiceIsNotAvilable) {

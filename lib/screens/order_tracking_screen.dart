@@ -98,6 +98,14 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
 
   void showOrderSummaryBottomSheet() {
     final List<dynamic> items = orderTrackingDetails['orderItems'] ?? [];
+    final double totalSellingPrice = items.fold(0.0, (sum, item) {
+  final price = double.tryParse(item['sellingPrice'].toString()) ?? 0.0;
+  final quantity = int.tryParse(item['quantity'].toString()) ?? 1;
+  return sum + (price * quantity);
+});
+
+final double itemTotal = double.tryParse(orderTrackingDetails["itemTotal"].toString()) ?? 0.0;
+final double difference = itemTotal - totalSellingPrice;
     final size = MediaQuery.of(context).size;
     final width = size.width;
     final height = size.height;
@@ -113,11 +121,13 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
         return Padding(
           padding: EdgeInsets.only(
             bottom: MediaQuery.of(context).viewInsets.bottom,
-            left: width * 0.04,
-            right: width * 0.04,
+            left: width * 0.08,
+            right: width * 0.08,
             top: height * 0.015,
           ),
           child: Column(
+            spacing: 10,
+            crossAxisAlignment: CrossAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
@@ -129,25 +139,16 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                 ),
               ),
               SizedBox(height: height * 0.015),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    "Order ${orderTrackingDetails["orderId"] ?? ""}",
-                    style: GoogleFonts.mulish(
-                        fontWeight: FontWeight.bold,
-                        fontSize: width * 0.045,
-                        color: whiteColor),
+              Container(
+                width: double.infinity,
+                child: Text(
+                  "${orderTrackingDetails["orderId"] ?? ""}",
+                  style: GoogleFonts.mulish(
+                    fontSize: 13.78,
+                    color: whiteColor,
                   ),
-                  IconButton(
-                    icon: Icon(
-                      Icons.close,
-                      size: width * 0.06,
-                      color: whiteColor,
-                    ),
-                    onPressed: () => Navigator.pop(context),
-                  ),
-                ],
+                  textAlign: TextAlign.start,
+                ),
               ),
               SizedBox(height: height * 0.005),
               Row(
@@ -158,11 +159,6 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                         fontSize: width * 0.035, color: whiteColor),
                   ),
                 ],
-              ),
-              Divider(
-                color: greyColor,
-                thickness: 1,
-                height: height * 0.035,
               ),
               ConstrainedBox(
                 constraints: BoxConstraints(
@@ -175,7 +171,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                   itemBuilder: (context, index) {
                     final item = items[index];
                     return MedicineCard(
-                      Imgurl: item['productImageURL'] ?? "", // or item['image']
+                      // or item['image']
                       MedicineName: item['productName'].toString(),
                       price: item['sellingPrice'].toString(),
                       quantities: item['quantity'].toString(),
@@ -184,149 +180,138 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                 ),
               ),
               SizedBox(height: height * 0.015),
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Bill Details",
-                  style: GoogleFonts.mulish(
-                      fontWeight: FontWeight.bold,
-                      fontSize: width * 0.045,
-                      color: whiteColor),
-                ),
-              ),
-              Divider(
-                color: greyColor,
-                thickness: 1,
-                height: height * 0.035,
-              ),
-              SizedBox(height: height * 0.01),
+             
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.only(top: 0, bottom: 0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Icon(
-                            Icons.currency_rupee,
-                            color: greyColor,
-                          ),
                           Text(
-                            " Item total",
+                            "Item Total",
                             style: GoogleFonts.mulish(
-                                fontSize: width * 0.04,
-                                fontWeight: FontWeight.normal,
-                                color: greyColor),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w300,
+                                color: whiteColor),
                           ),
                         ],
                       ),
                     ),
                     Text(
-                      "₹ ${orderTrackingDetails["itemTotal"]}",
+                      "₹${orderTrackingDetails["itemTotal"]}",
                       style: GoogleFonts.mulish(
-                          fontSize: width * 0.04,
-                          fontWeight: FontWeight.bold,
-                          color: greyColor),
+                          fontSize: 14,
+                          fontWeight: FontWeight.w300,
+                          color: whiteColor),
                     ),
                   ],
                 ),
               ),
+
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.only(top: 0, bottom: 0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
                       child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Icon(
-                            Icons.shopping_bag_outlined,
-                            color: greyColor,
-                          ),
                           Text(
-                            " GST and Platform Fees ",
+                            "Item Discount ",
                             style: GoogleFonts.mulish(
-                                fontSize: width * 0.04,
-                                fontWeight: FontWeight.normal,
-                                color: greyColor),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w300,
+                                color: whiteColor),
                           ),
                         ],
+                      ),
+                    ),
+                    Text(
+                      "-₹$difference",
+                      style: GoogleFonts.mulish(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w300,
+                          color: greenColor),
+                    ),
+                  ],
+                ),
+              ),
+
+              Padding(
+                padding: const EdgeInsets.only(top: 0, bottom: 0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        "GST and Platform Fees ",
+                        style: GoogleFonts.mulish(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w400,
+                            color: greyColor),
                       ),
                     ),
                     Text(
                       "₹${orderTrackingDetails["gstServiceCharge"]}",
                       style: GoogleFonts.mulish(
-                          fontSize: width * 0.04, color: greyColor),
+                          fontSize: 12, color: greyColor,fontWeight: FontWeight.w400 ),
                     ),
                   ],
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(8.0),
+                padding: const EdgeInsets.only(top: 0, bottom: 0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Expanded(
                       child: Row(
                         children: [
-                          Icon(
-                            Icons.shopping_cart_outlined,
-                            color: greyColor,
-                          ),
                           Text(
-                            " Delivery charge (Inc taxes)",
+                            "Delivery Fee",
                             style: GoogleFonts.mulish(
-                                fontSize: width * 0.04,
-                                fontWeight: FontWeight.normal,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w400,
                                 color: greyColor),
                           ),
                         ],
                       ),
                     ),
                     Text(
-                      "₹ ${orderTrackingDetails["shippingCost"]}",
+                      "₹${orderTrackingDetails["shippingCost"]}",
                       style: GoogleFonts.mulish(
                         color: greyColor,
-                        fontSize: width * 0.04,
+                        fontWeight: FontWeight.w400,
+                        fontSize: 12,
                       ),
                     ),
                   ],
                 ),
               ),
-              Divider(
-                color: greyColor,
-                thickness: 1,
-                height: height * 0.035,
-              ),
-              SizedBox(height: height * 0.01),
+              
               Padding(
-                padding: const EdgeInsets.fromLTRB(0, 2, 8, 40),
+                padding:  EdgeInsets.only(  left: 0,top: 5,bottom: 10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      "Grand total",
+                      "Grand Total",
                       style: GoogleFonts.mulish(
                         fontWeight: FontWeight.bold,
-                        fontSize: width * 0.050,
+                        fontSize: 16,
                         color: whiteColor,
                       ),
                     ),
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.currency_rupee,
-                          color: whiteColor,
-                        ),
-                        Text(
-                          "${orderTrackingDetails["totalAmount"]}",
-                          style: GoogleFonts.mulish(
-                              fontWeight: FontWeight.bold,
-                              fontSize: width * 0.050,
-                              color: whiteColor),
-                        ),
-                      ],
+                    Text(
+                      "₹${orderTrackingDetails["totalAmount"]}",
+                      style: GoogleFonts.mulish(
+                          fontWeight: FontWeight.bold,
+                          fontSize:15,
+                          color: whiteColor),
                     ),
                   ],
                 ),
@@ -353,11 +338,16 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
             color: ligtBlackColor,
             shape: BoxShape.circle,
           ),
-          child: Icon(
-            icon,
-            size: width * 0.06,
-            color: whiteColor,
-          ),
+          child: title == "Delivery"
+              ? Container(
+                  height: 24,
+                  width: 24,
+                  child: Image.asset("lib/images/Home.png", color: whiteColor))
+              : Icon(
+                  icon,
+                  size: width * 0.06,
+                  color: whiteColor,
+                ),
         ),
         SizedBox(width: width * 0.04),
         Expanded(
@@ -395,43 +385,20 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     required double size,
     bool isInactive = false,
   }) {
-    final iconColor = isInactive
-        ? greyColor
-        : (color is MaterialColor ? color.shade800 : color);
-    final bgColor = isInactive
-        ? ligtBlackColor
-        : (color is MaterialColor ? color.shade100 : color.withOpacity(0.2));
+    
 
-    return Column(
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            color: bgColor,
-            shape: BoxShape.circle,
-          ),
-          child: Icon(
-            icon,
-            color: iconColor,
-            size: size * 0.07,
-          ),
-        ),
-        SizedBox(height: size * 0.015),
-        Text(
-          label,
-          style: GoogleFonts.mulish(
-            fontWeight: FontWeight.w600,
-            color: iconColor,
-           
-            fontSize: size * 0.03,
-          ),
-        ),
-      ],
+    return Text(
+      label,
+      style: GoogleFonts.mulish(
+        fontWeight: FontWeight.w600,
+        color: isInactive?greyColor:whiteColor,
+        fontSize: size * 0.03,
+      ),
     );
   }
 
   Widget MedicineCard(
-      {required String Imgurl,
-      required String MedicineName,
+      {required String MedicineName,
       required String quantities,
       required String price}) {
     final size = MediaQuery.of(context).size;
@@ -440,32 +407,16 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     int quantity = int.parse(quantities);
     double Price = double.parse(price);
     var total = quantity * Price;
-    final hasUrl = Imgurl != null && Imgurl.trim().isNotEmpty;
+
     return Container(
       margin: EdgeInsets.symmetric(vertical: height * 0.01),
-      padding: EdgeInsets.all(width * 0.03),
+      padding: EdgeInsets.only(top: width * 0.03, bottom: width * 0.03),
       decoration: BoxDecoration(
-        color: ligtBlackColor,
+        color: scaffoldBlackColor,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(width * 0.02),
-            child: hasUrl
-                ? Image.network(
-                    Imgurl,
-                    width: width * 0.15,
-                    height: width * 0.15,
-                    fit: BoxFit.cover,
-                  )
-                : Image.asset(
-                    "lib/images/capsule_image.png",
-                    width: width * 0.15,
-                    height: width * 0.15,
-                  ),
-          ),
-          SizedBox(width: width * 0.04),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -473,14 +424,15 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                 Text(
                   "$MedicineName",
                   style: GoogleFonts.mulish(
-                      fontSize: width * 0.04,
-                      fontWeight: FontWeight.w600,
+                      fontSize:13,
+                      fontWeight: FontWeight.w700,
                       color: whiteColor),
                 ),
                 SizedBox(height: height * 0.005),
                 Text(
                   "$quantity x ₹$Price",
                   style: GoogleFonts.mulish(
+                    fontWeight: FontWeight.w400,
                     fontSize: width * 0.035,
                     color: greyColor,
                   ),
@@ -528,7 +480,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
       backgroundColor: scaffoldBlackColor,
       body: Column(
         children: [
-          SizedBox(height: height * 0.02),
+          SizedBox(height: height * 0.03),
           Container(
             margin: EdgeInsets.all(width * 0.04),
             padding: EdgeInsets.all(width * 0.03),
@@ -545,7 +497,9 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                       }
                       if (widget.NavigatingFrom == "Order_SuccessScreen") {
                         Navigator.of(context).pushReplacement(MaterialPageRoute(
-                            builder: (context) => BaseScreen(Navigatedfrom: "orderTrackingScreen",)));
+                            builder: (context) => BaseScreen(
+                                  Navigatedfrom: "orderTrackingScreen",
+                                )));
                       }
 
                       //Navigator.pop(context);
@@ -557,7 +511,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                     ),
                   ),
                 ),
-                SizedBox(height: height * 0.01),
+                SizedBox(height: 70),
                 Container(
                   height: height * 0.45,
                   child: ClipRRect(
@@ -581,6 +535,9 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
               ],
             ),
           ),
+          SizedBox(
+            height: 90,
+          ),
           Expanded(
             child: Container(
               padding: EdgeInsets.all(width * 0.04),
@@ -596,117 +553,113 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                 ],
               ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
-                  Text(
-                    "Order is being packed",
-                    style: GoogleFonts.mulish(
-                      fontSize: width * 0.045,
-                      fontWeight: FontWeight.bold,
-                      color: whiteColor,
+                 
+                  Container(
+                    width: 320,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        DeliveryStatus(
+                          icon: Icons.check_circle,
+                          label: "Ordered",
+                          color: greenColor,
+                          size: width,
+                          isInactive: orderTrackingDetails["currentStatus"] ==
+                                      "Order Placed" ||
+                                  orderTrackingDetails["currentStatus"] ==
+                                      "Packing" ||
+                                  orderTrackingDetails["currentStatus"] ==
+                                      "On the way" ||
+                                  orderTrackingDetails["currentStatus"] ==
+                                      "Delivered"
+                              ? false
+                              : true,
+                        ),
+                        Expanded(
+                          child: Container(
+                            margin: EdgeInsets.only(top: 7),
+                            child: Divider(
+                              thickness: 1,
+                              color: ligtBlackColor,
+                            ),
+                          ),
+                        ),
+                        DeliveryStatus(
+                          icon: Icons.inventory_2,
+                          label: "Packing",
+                          color: greenColor,
+                          size: width,
+                          isInactive: orderTrackingDetails["currentStatus"] ==
+                                      "Packing" ||
+                                  orderTrackingDetails["currentStatus"] ==
+                                      "On the way" ||
+                                  orderTrackingDetails["currentStatus"] ==
+                                      "Delivered"
+                              ? false
+                              : true,
+                        ),
+                        Expanded(
+                          child: Container(
+                            margin: EdgeInsets.only(top: 7),
+                            child: Divider(
+                              thickness: 1,
+                              color: ligtBlackColor,
+                            ),
+                          ),
+                        ),
+                        DeliveryStatus(
+                          icon: Icons.local_shipping,
+                          label: "Enroute",
+                          color: greenColor,
+                          size: width,
+                          isInactive: orderTrackingDetails["currentStatus"] ==
+                                      "On the way" ||
+                                  orderTrackingDetails["currentStatus"] ==
+                                      "Delivered"
+                              ? false
+                              : true,
+                        ),
+                        Expanded(
+                          child: Container(
+                            margin: EdgeInsets.only(top: 7),
+                            child: Divider(
+                              thickness: 1,
+                              color: ligtBlackColor
+                            ),
+                          ),
+                        ),
+                        DeliveryStatus(
+                          icon: Icons.check_circle,
+                          label: "Delivered",
+                          color: greenColor,
+                          size: width,
+                          isInactive:
+                              orderTrackingDetails["currentStatus"] == "Delivered"
+                                  ? false
+                                  : true,
+                        ),
+                      ],
                     ),
                   ),
-                  SizedBox(height: height * 0.02),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      DeliveryStatus(
-                        icon: Icons.check_circle,
-                        label: "Ordered",
-                        color: greenColor,
-                        size: width,
-                        isInactive: orderTrackingDetails["currentStatus"] ==
-                                    "Order Placed" ||
-                                orderTrackingDetails["currentStatus"] ==
-                                    "Packing" ||
-                                orderTrackingDetails["currentStatus"] ==
-                                    "On the way" ||
-                                orderTrackingDetails["currentStatus"] ==
-                                    "Delivered"
-                            ? false
-                            : true,
-                      ),
-                      Expanded(
-                        child: Container(
-                          margin: EdgeInsets.only(top: 7),
-                          child: Divider(
-                            thickness: 2,
-                            color: Colors.grey.shade300,
-                          ),
-                        ),
-                      ),
-                      DeliveryStatus(
-                        icon: Icons.inventory_2,
-                        label: "Packing",
-                        color: greenColor,
-                        size: width,
-                        isInactive: orderTrackingDetails["currentStatus"] ==
-                                    "Packing" ||
-                                orderTrackingDetails["currentStatus"] ==
-                                    "On the way" ||
-                                orderTrackingDetails["currentStatus"] ==
-                                    "Delivered"
-                            ? false
-                            : true,
-                      ),
-                      Expanded(
-                        child: Container(
-                          margin: EdgeInsets.only(top: 7),
-                          child: Divider(
-                            thickness: 2,
-                            color: Colors.grey.shade300,
-                          ),
-                        ),
-                      ),
-                      DeliveryStatus(
-                        icon: Icons.local_shipping,
-                        label: "Enroute",
-                        color: greenColor,
-                        size: width,
-                        isInactive: orderTrackingDetails["currentStatus"] ==
-                                    "On the way" ||
-                                orderTrackingDetails["currentStatus"] ==
-                                    "Delivered"
-                            ? false
-                            : true,
-                      ),
-                      Expanded(
-                        child: Container(
-                          margin: EdgeInsets.only(top: 7),
-                          child: Divider(
-                            thickness: 2,
-                            color: Colors.grey.shade300,
-                          ),
-                        ),
-                      ),
-                      DeliveryStatus(
-                        icon: Icons.check_circle,
-                        label: "Delivered",
-                        color: greenColor,
-                        size: width,
-                        isInactive:
-                            orderTrackingDetails["currentStatus"] == "Delivered"
-                                ? false
-                                : true,
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: height * 0.015),
+                
                   Expanded(
                     child: Container(
                       padding: EdgeInsets.all(width * 0.04),
                       child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                       
                         children: [
                           OrderDetail(
                             icon: Icons.home_outlined,
-                            title: "Delivery ",
+                            title: "Delivery",
                             subtitle: orderTrackingDetails['shippingAddress'] ??
                                 "Unknown",
                             width: width,
                           ),
-                         
+                          SizedBox(height: 24,),
                           GestureDetector(
                             onTap: () {
                               showOrderSummaryBottomSheet();

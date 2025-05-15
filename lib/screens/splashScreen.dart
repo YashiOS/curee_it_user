@@ -77,12 +77,7 @@ class _SplashScreenState extends State<Splashscreen>
             mainAxisSize: MainAxisSize.min, 
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Image.asset(
-                "lib/images/Medkaro (1) 2.png",
-                height: screenHeight * 0.09,
-                width: screenWidth * 0.8,
-                fit: BoxFit.contain,
-              ),
+             
               Text(
                 "medicine delivered in minutes!",
                 style: GoogleFonts.mulish(

@@ -18,106 +18,101 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-   String? name;
-   String? phoneNumber;
+  String? name;
+  String? phoneNumber;
 
   @override
-  void initState(){
-
+  void initState() {
     super.initState();
     fetchUserProfile();
   }
 
-
   void showLogoutDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    builder: (context) => Dialog(
-      backgroundColor: ligtBlackColor, // Dark background
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              "Are you sure you want to\nlogout?",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: 17.02,
-                fontFamily: 'Mulish',
-                color: Colors.white,
-                fontWeight: FontWeight.w400,
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: ligtBlackColor, // Dark background
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                "Are you sure you want to\nlogout?",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 17.02,
+                  fontFamily: 'Mulish',
+                  color: Colors.white,
+                  fontWeight: FontWeight.w400,
+                ),
               ),
-            ),
-            const SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context); // Close the dialog
-                  },
-                  child: const Text(
-                    "Cancel",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 17.13,
-                      fontFamily: 'Mulish',
+              const SizedBox(height: 24),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context); // Close the dialog
+                    },
+                    child: const Text(
+                      "Cancel",
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 17.13,
+                        fontFamily: 'Mulish',
+                      ),
                     ),
                   ),
-                ),
-                TextButton(
-                  onPressed: () {
-                    context.read<StoreUserCubit>().clearUserData();
-                  Navigator.pushReplacement(context,MaterialPageRoute(builder: (context)=>LoginScreen()));
-                    // Perform logout logic here
-                   
-                  },
-                  child: const Text(
-                    "Logout",
-                    style: TextStyle(
-                      color: Color(0xFFBE404F), // reddish color
-                      fontSize: 17.13,
-                      fontFamily: 'Mulish',
-                      
+                  TextButton(
+                    onPressed: () {
+                      context.read<StoreUserCubit>().clearUserData();
+                      Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => LoginScreen()));
+                      // Perform logout logic here
+                    },
+                    child: const Text(
+                      "Logout",
+                      style: TextStyle(
+                        color: Color(0xFFBE404F), // reddish color
+                        fontSize: 17.13,
+                        fontFamily: 'Mulish',
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                ],
+              ),
+            ],
+          ),
         ),
       ),
-    ),
-  );
-}
+    );
+  }
 
   Future<void> fetchUserProfile() async {
     print("fetchUserProfile...");
-     try {
+    try {
       final response = await http.post(
         Uri.parse(
             'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/profile/user/profileDetails'),
         headers: {
           'Content-Type': 'application/json',
         },
-        body: json.encode({
-          "userId": User.userId
-        }),
+        body: json.encode({"userId": User.userId}),
       );
 
       if (response.statusCode == 200) {
-   
-      final data = json.decode(response.body);
-       print(data);
-       setState(() {
-         name=data["data"]["name"];
-       phoneNumber=data["data"]["mobileNumber"];
-       });
-    
+        final data = json.decode(response.body);
+        print(data);
+        setState(() {
+          name = data["data"]["name"];
+          phoneNumber = data["data"]["mobileNumber"];
+        });
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -129,24 +124,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: scaffoldBlackColor,
+        backgroundColor: scaffoldBlackColor,
         appBar: AppBar(
           centerTitle: true,
           shape: ContinuousRectangleBorder(
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(10),
-                bottomRight: Radius.circular(10),
-              ),
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(10),
+              bottomRight: Radius.circular(10),
             ),
+          ),
           backgroundColor: ligtBlackColor,
           leadingWidth: 100,
           title: Text(
             "Profile",
             style: GoogleFonts.mulish(
-                fontWeight: FontWeight.w400, fontSize: 22.69, color: whiteColor),
+                fontWeight: FontWeight.w400,
+                fontSize: 22.69,
+                color: whiteColor),
           ),
-           leading: GestureDetector(
-            onTap: (){
+          leading: GestureDetector(
+            onTap: () {
               Navigator.pop(context);
             },
             child: Padding(
@@ -179,12 +176,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     // Circle Avatar Placeholder
                     Container(
-                      width: 46,
-                      height: 46,
+                      width: 36,
+                      height: 36,
                       decoration: const BoxDecoration(
                         shape: BoxShape.circle,
-                        color: whiteColor,
                       ),
+                      child: Image.asset("lib/images/profile_icon.png"),
                     ),
                     const SizedBox(width: 16),
 
@@ -193,7 +190,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "${name??User.name}",
+                          "${name ?? User.name}",
                           style: GoogleFonts.mulish(
                             color: whiteColor,
                             fontSize: 18,
@@ -202,7 +199,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                         SizedBox(height: 2),
                         Text(
-                          "${phoneNumber??User.phoneNumber}",
+                          "${phoneNumber ?? User.phoneNumber}",
                           style: GoogleFonts.mulish(
                             color: whiteColor,
                             fontWeight: FontWeight.w300,
@@ -217,10 +214,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
               SizedBox(
                 height: 24,
               ),
-              
               GestureDetector(
-                onTap: (){
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context)=>LocationScreen()));
+                onTap: () {
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => LocationScreen()));
                 },
                 child: Container(
                   padding: const EdgeInsets.only(top: 16, bottom: 16, left: 16),
@@ -230,11 +227,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                   child: Row(
                     children: [
-                      
                       Container(
-                        width: 46,
-                        height: 46,
-                        
+                        width: 36,
+                        height: 36,
                         child: const Center(
                           child: Icon(
                             Icons.location_on, // Location icon
@@ -244,7 +239,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       const SizedBox(width: 16),
-                
+
                       // Name & Phone
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -272,14 +267,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
               ),
-                SizedBox(
+              SizedBox(
                 height: 24,
               ),
-              
               GestureDetector(
-                onTap: (){
+                onTap: () {
                   showLogoutDialog(context);
-                 
                 },
                 child: Container(
                   padding: const EdgeInsets.only(top: 16, bottom: 16, left: 16),
@@ -291,9 +284,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     children: [
                       // Circle Avatar Placeholder
                       Container(
-                        width: 46,
-                        height: 46,
-                        
+                        width: 36,
+                        height: 36,
                         child: const Center(
                           child: Icon(
                             Icons.logout, // Location icon
@@ -303,7 +295,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                       const SizedBox(width: 16),
-                
+
                       // Name & Phone
                       Text(
                         "Logout",
@@ -317,8 +309,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
               )
-             
-             
             ],
           ),
         ));

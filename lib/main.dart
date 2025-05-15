@@ -23,47 +23,95 @@ import 'dart:io' show Platform;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:hive/hive.dart';
 import 'package:hive_flutter/adapters.dart';
+
 late Box myBox;
 
-void main() async{
-
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
-   myBox=await Hive.openBox("Mybox");
- runApp(
-  MultiBlocProvider(
-    providers: [
-      BlocProvider(create: (context) => ServiceAvilableCubit()),
-      BlocProvider(create: (context) => StoreUserCubit(myBox)), // Add this too
-    ],
-    child: const MyApp(),
-  ),
-);
+  myBox = await Hive.openBox("Mybox");
+  runApp(
+    MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => ServiceAvilableCubit()),
+        BlocProvider(
+            create: (context) => StoreUserCubit(myBox)), // Add this too
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
+  Widget? _home;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _decideStartScreen();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  // Called on lifecycle changes
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      _decideStartScreen(); // Re-check login status when app resumes
+    }
+  }
+
+  void _decideStartScreen() async {
+    final isAvailable = context.read<StoreUserCubit>().isUserDataAvailable();
+
+    setState(() {
+      _home = isAvailable
+          ? BaseScreen(Navigatedfrom: "from_main")
+          : const LoginScreen();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      builder: (context,child){
-        return MediaQuery(data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(1.0)), child: child!);
+      builder: (context, child) {
+        return MediaQuery(
+          data: MediaQuery.of(context).copyWith(textScaler: TextScaler.linear(1.0)),
+          child: child!,
+        );
       },
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        appBarTheme: AppBarTheme(
-          color: ligtBlackColor
-        ),
+        appBarTheme: AppBarTheme(color: ligtBlackColor),
         scaffoldBackgroundColor: scaffoldBlackColor,
-       
         useMaterial3: true,
       ),
-      home:Splashscreen()
-      );
+      home: _home ?? _buildLoadingScreen(),
+    );
+  }
+
+  Widget _buildLoadingScreen() {
+    return Scaffold(
+      backgroundColor: scaffoldBlackColor,
+      body: Center(
+        child: CircularProgressIndicator(), // Optional loading indicator
+      ),
+    );
   }
 }
+
 
 class MyHomePage extends StatefulWidget {
   const MyHomePage({super.key, required this.title});

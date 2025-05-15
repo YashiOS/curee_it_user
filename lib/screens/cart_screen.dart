@@ -524,23 +524,21 @@ class _CartScreenState extends State<CartScreen> {
                 color: whiteColor,
               ),
             ),
-            leading: widget.isNavigated
-                ? GestureDetector(
-                    onTap: () {
-                      Navigator.pop(context);
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.only(left: 24.0),
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 4.0),
-                        child: Row(
-                          spacing: 4,
-                          children: [Image.asset("lib/images/Vector 9.png")],
-                        ),
-                      ),
-                    ),
-                  )
-                : Container(),
+            leading: GestureDetector(
+            onTap: () {
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>BaseScreen(Navigatedfrom: "")));
+            },
+            child: Padding(
+              padding: const EdgeInsets.only(left: 24.0),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 4.0),
+                child: Row(
+                  spacing: 4,
+                  children: [Image.asset("lib/images/Vector 9.png")],
+                ),
+              ),
+            ),
+          ),
           ),
           body: isLoading
               ? Center(
@@ -556,51 +554,27 @@ class _CartScreenState extends State<CartScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          SizedBox(
-                            height: 100,
-                          ),
-                          Center(
-                            child: Container(
-                                height: 204,
-                                width: 150,
-                                child:
-                                    Image.asset("lib/images/empty cart.png")),
-                          ),
-                          SizedBox(
-                            height: 200,
-                          ),
+                          
                           GestureDetector(
-                            onTap: () {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => BaseScreen(
-                                          Navigatedfrom: "",
-                                        )),
-                              );
+                            onTap: (){
+                               Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>BaseScreen(Navigatedfrom: "")));
                             },
-                            child: Container(
-                              height: 36,
-                              width: 311,
-                              decoration: BoxDecoration(
-                                  color: greenColor,
-                                  borderRadius: BorderRadius.circular(8)),
-                              child: Center(
-                                  child: Text(
-                                "Order Now",
-                                style: GoogleFonts.mulish(
-                                    color: whiteColor,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600),
-                              )),
+                            child: Center(
+                              child: Container(
+                                  height: 204,
+                                  width: 150,
+                                  child:
+                                      Image.asset("lib/images/empty cart.png")),
                             ),
-                          )
+                          ),
+                         
+                         
                         ],
                       ),
                     )
                   : Container(
                       padding: EdgeInsets.only(
-                          bottom: MediaQuery.of(context).size.height * 0.06),
+                          bottom: 25),
                       color: scaffoldBlackColor,
                       width: MediaQuery.of(context).size.width,
                       height: MediaQuery.of(context).size.height,
@@ -664,15 +638,7 @@ class _CartScreenState extends State<CartScreen> {
                                     if (requiresPrescription)
                                       GestureDetector(
                                         onTap: () {
-                                          if (imagePicked) {
-                                            continueWithoutPre = false;
-                                            setState(() {});
-                                            return;
-                                          }
-
-                                          continueWithoutPre = true;
-                                          payNow = true;
-                                          setState(() {});
+                                        
                                         },
                                         child: Container(
                                           padding: const EdgeInsets.symmetric(
@@ -699,7 +665,7 @@ class _CartScreenState extends State<CartScreen> {
                                                   Text(
                                                     'Continue without Prescription',
                                                     style: GoogleFonts.mulish(
-                                                      color: Colors.white,
+                                                      color: greyColor,
                                                       fontSize: 16,
                                                       fontWeight:
                                                           FontWeight.w500,
@@ -708,7 +674,7 @@ class _CartScreenState extends State<CartScreen> {
                                                   Text(
                                                     'We will call you to confirm your order',
                                                     style: GoogleFonts.mulish(
-                                                      color: Colors.white,
+                                                      color: greyColor,
                                                       fontSize: 13,
                                                       fontWeight:
                                                           FontWeight.w300,
@@ -720,9 +686,7 @@ class _CartScreenState extends State<CartScreen> {
                                                 width: 16,
                                                 height: 16,
                                                 decoration: BoxDecoration(
-                                                  color: continueWithoutPre
-                                                      ? greenColor
-                                                      : scaffoldBlackColor,
+                                                  color: ligtBlackColor,
                                                   shape: BoxShape.circle,
                                                 ),
                                               )
@@ -734,7 +698,7 @@ class _CartScreenState extends State<CartScreen> {
                                       Container(),
                                     Container(
                                       width: MediaQuery.of(context).size.width,
-                                      padding: EdgeInsets.only(bottom: 50),
+                                    
                                       decoration: BoxDecoration(
                                           color: ligtBlackColor,
                                           borderRadius:
@@ -833,7 +797,7 @@ class _CartScreenState extends State<CartScreen> {
                                                             top: screenHeight *
                                                                 0.035, // ≈28 for height ≈ 800
                                                             bottom: screenHeight *
-                                                                0.0175, // ≈14
+                                                                0.035, // ≈14
                                                           ),
                                                           child: Column(
                                                             crossAxisAlignment:
@@ -988,7 +952,7 @@ class _CartScreenState extends State<CartScreen> {
                                                               Column(
                                                                 mainAxisAlignment:
                                                                     MainAxisAlignment
-                                                                        .spaceBetween,
+                                                                        .start,
                                                                 children: [
                                                                   Row(
                                                                       mainAxisAlignment:

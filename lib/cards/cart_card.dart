@@ -343,7 +343,7 @@ class _CartCardState extends State<CartCard> {
                     children: [
                       
                       Text(
-                        "₹ ${((widget.sellingPrice) * _localQuantity).toStringAsFixed(2)}",
+                        "₹${((widget.sellingPrice) * _localQuantity).toStringAsFixed(2)}",
                         style: GoogleFonts.mulish(
                           fontWeight: FontWeight.w300,
                           fontSize: 13.78,

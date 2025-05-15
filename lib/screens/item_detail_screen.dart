@@ -436,7 +436,8 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Container(
-                              width: 200,
+                             
+                              width: 280,
                               child: Text(
                                 product['name'] ?? 'Unknown Product',
                                 style: GoogleFonts.mulish(
@@ -476,9 +477,9 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                       ),
                       Container(
                           margin: EdgeInsets.only(left: 24),
-                          height: 15,
+                          height: 18,
                           child: Text(
-                            "Slat composition",
+                            "Salt composition",
                             style: GoogleFonts.mulish(color: greyColor),
                           )),
                       SizedBox(
@@ -486,7 +487,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                       ),
                       Container(
                           margin: EdgeInsets.only(left: 24),
-                          height: 15,
+                          height: 18,
                           child: Text(
                             "${product['saltComposition'] ?? 'N/A'}",
                             style: GoogleFonts.mulish(color: whiteColor),
@@ -516,9 +517,9 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                       ),
                       Container(
                           margin: EdgeInsets.only(left: 24),
-                          height: 15,
+                          height: 18,
                           child: Text(
-                            "Introduction",
+                            "Description",
                             style: GoogleFonts.mulish(color: greyColor),
                           )),
                       Container(

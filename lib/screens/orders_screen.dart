@@ -1,4 +1,5 @@
 import 'package:cureeit_user_app/cards/order_card.dart';
+import 'package:cureeit_user_app/screens/base_screen.dart';
 import 'package:cureeit_user_app/user/user.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
@@ -76,13 +77,28 @@ class _OrdersScreenState extends State<OrdersScreen> {
               ),
             ),
             title: Text(
-              "History",
+              "Order Again",
               style: GoogleFonts.mulish(
                 fontWeight: FontWeight.w400,
                 fontSize: 22.69,
                 color: whiteColor,
               ),
             ),
+             leading: GestureDetector(
+            onTap: () {
+              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>BaseScreen(Navigatedfrom: "")));
+            },
+            child: Padding(
+              padding: const EdgeInsets.only(left: 24.0),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 4.0),
+                child: Row(
+                  spacing: 4,
+                  children: [Image.asset("lib/images/Vector 9.png")],
+                ),
+              ),
+            ),
+          ),
            
           ),
       body: isLoading

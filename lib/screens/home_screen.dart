@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:isolate';
 import 'dart:math';
 import 'package:cureeit_user_app/cubit/service_avilable_cubit.dart';
 import 'package:cureeit_user_app/current_address/api_services.dart';
@@ -29,8 +30,6 @@ import 'package:location/location.dart' as loc;
 
 import 'package:permission_handler/permission_handler.dart' as perm;
 
-
-
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 
@@ -48,10 +47,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   List onGoingOrders = [];
   late AnimationController _controller;
   late Animation<double> _bounceAnimation;
-  
- 
-  
- 
+
   final List<String> hints = [
     "Search for your medicine",
     "Try 'Paracetamol'",
@@ -91,75 +87,101 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   double defaultLng = 75.7873;
   bool _isFetchingCart = false;
   PlaceFromCoordinates placeFromCoordinates = PlaceFromCoordinates();
-   late Animation<Offset> _slideTransition;
+  late Animation<Offset> _slideTransition;
+  final ScrollController _scrollController = ScrollController();
+  double _lastScrollOffset = 0.0;
+  bool _isScrollingDown = false;
+  double _bottomWidgetHeight = 76; // Height of your bottom widget
+  late AnimationController _animationController;
+  late Animation<double> _animation;
   // To store product quantities
 
-void _showLocationDeniedDialog() {
-  showDialog(
-    context: context,
-    barrierDismissible: false,
-    builder: (context) => AlertDialog(
-      backgroundColor: ligtBlackColor,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(8),
-      ),
-      title: Text("Location Required",style: GoogleFonts.mulish(color: whiteColor),),
-      content: Text("Please enable location to use this app.",style: GoogleFonts.mulish(color: whiteColor),),
-      actions: [
-        TextButton(
-          style: TextButton.styleFrom(
-            backgroundColor: Color(0xFFBE404F),
-            foregroundColor: whiteColor,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            )
-          ),
-          onPressed: () {
-            exit(0); // Exit the app
-          },
-          child: Text("Exit",style: GoogleFonts.mulish(color: whiteColor),),
+  void _showLocationDeniedDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        backgroundColor: ligtBlackColor,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
         ),
-      ],
-    ),
-  );
-}
+        title: Text(
+          "Location Required",
+          style: GoogleFonts.mulish(color: whiteColor),
+        ),
+        content: Text(
+          "Please enable location to use this app.",
+          style: GoogleFonts.mulish(color: whiteColor),
+        ),
+        actions: [
+          TextButton(
+            style: TextButton.styleFrom(
+                backgroundColor: Color(0xFFBE404F),
+                foregroundColor: whiteColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                )),
+            onPressed: () {
+              exit(0); // Exit the app
+            },
+            child: Text(
+              "Exit",
+              style: GoogleFonts.mulish(color: whiteColor),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
+  void _scrollListener() {
+    final currentScrollOffset = _scrollController.offset;
+
+    if (currentScrollOffset > _lastScrollOffset && !_isScrollingDown) {
+      // Scrolling down
+      _isScrollingDown = true;
+      _animationController.reverse();
+    } else if (currentScrollOffset < _lastScrollOffset && _isScrollingDown) {
+      // Scrolling up
+      _isScrollingDown = false;
+      _animationController.forward();
+    }
+
+    _lastScrollOffset = currentScrollOffset;
+  }
 
   void _startAppInitialization() {
-  fetchAddresses();
-  fetchProducts();
-  changeSearchText();
-  fetchOrderHistory();
-}
+    fetchAddresses();
+    fetchProducts();
+    changeSearchText();
+    fetchOrderHistory();
+  }
 
-  
-Future<void> _checkLocationStatus() async {
-  print("Checking location status...");
-  loc.Location location = loc.Location();
+  Future<void> _checkLocationStatus() async {
+    print("Checking location status...");
+    loc.Location location = loc.Location();
 
-  bool serviceEnabled = await location.serviceEnabled();
-  if (!serviceEnabled) {
-    serviceEnabled = await location.requestService();
+    bool serviceEnabled = await location.serviceEnabled();
     if (!serviceEnabled) {
-      _showLocationDeniedDialog();
-      return;
+      serviceEnabled = await location.requestService();
+      if (!serviceEnabled) {
+        _showLocationDeniedDialog();
+        return;
+      }
     }
-  }
 
-  loc.PermissionStatus permissionGranted = await location.hasPermission();
-  if (permissionGranted == loc.PermissionStatus.denied) {
-    permissionGranted = await location.requestPermission();
-    if (permissionGranted != loc.PermissionStatus.granted) {
-      _showLocationDeniedDialog();
-      return;
+    loc.PermissionStatus permissionGranted = await location.hasPermission();
+    if (permissionGranted == loc.PermissionStatus.denied) {
+      permissionGranted = await location.requestPermission();
+      if (permissionGranted != loc.PermissionStatus.granted) {
+        _showLocationDeniedDialog();
+        return;
+      }
     }
+
+    // ✅ Location is enabled and permission is granted — now proceed
+    _startAppInitialization();
   }
-
-  // ✅ Location is enabled and permission is granted — now proceed
-  _startAppInitialization();
-}
-
-
 
   void changeSearchText() async {
     timer = Timer.periodic(Duration(seconds: 3), (_) async {
@@ -176,38 +198,50 @@ Future<void> _checkLocationStatus() async {
       });
     });
   }
-@override
-void initState() {
-  super.initState();
-  _controller = AnimationController(
-    duration: const Duration(milliseconds: 900),
-    vsync: this,
-  )..repeat(reverse: true);
-    _bounceAnimation = Tween<double>(
-    begin: 0.0,
-    end: -50.0, // or whatever vertical/horizontal movement you want
-  ).animate(
-    CurvedAnimation(
-      parent: _controller,
-      curve: Curves.bounceIn,
-    ),
-  );
-  WidgetsBinding.instance.addPostFrameCallback((_) {
-    _checkLocationStatus();
-  });
-}
 
-    @override
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 900),
+      vsync: this,
+    )..repeat(reverse: true);
+    _bounceAnimation = Tween<double>(
+      begin: 0.0,
+      end: -50.0, // or whatever vertical/horizontal movement you want
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.bounceIn,
+      ),
+    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkLocationStatus();
+    });
+    _scrollController.addListener(_scrollListener);
+
+    _animationController = AnimationController(
+      vsync: this,
+      duration: Duration(milliseconds: 300),
+    );
+
+    _animation = Tween<double>(
+      begin: -50,
+      end: 76,
+    ).animate(_animationController);
+  }
+
+  @override
   void dispose() {
     timer.cancel();
-      _animationTimer?.cancel();
-       _controller.dispose();
+    _animationTimer?.cancel();
+    _controller.dispose();
+    _scrollController.removeListener(_scrollListener);
+    _scrollController.dispose();
+    _animationController.dispose();
     // TODO: implement dispose
     super.dispose();
   }
-  
-
-
 
   List<dynamic> getOngoingOrders(List<dynamic> allOrders) {
     print("GET ON GOING ORDER");
@@ -310,6 +344,74 @@ void initState() {
     }
   }
 
+  Future<void> _removeFromCart(String ProductId) async {
+  
+    final String userId = User.userId!;
+    final String productId = ProductId;
+
+    final Map<String, dynamic> requestData = {
+      "userId": userId,
+      "productId": productId,
+    };
+
+    final url =
+        'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/cart/removeFromCart';
+    try {
+      final response = await http.delete(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(requestData),
+      );
+
+      if (response.statusCode == 200) {
+      
+         await fetchCartDetails();
+         setState(() {
+           
+           if(cartItems.length==0){
+              isTapped = false;
+              cartItems.clear();
+              totalAmount = 0;
+
+           }
+         });
+        
+       Fluttertoast.showToast(msg: "Removed from cart");
+       setState(() {
+         
+       });
+        
+      } else {
+        print(response.statusCode);
+      
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Failed to remove from cart",style: GoogleFonts.mulish(),),
+            backgroundColor: greenColor,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            duration: Duration(seconds: 2),
+          ),);
+        print('Failed to remove from cart');
+      }
+    } catch (error) {
+     
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Error removing from cart ",style: GoogleFonts.mulish(),),
+            backgroundColor: greenColor,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            duration: Duration(seconds: 2),
+          ),);
+      print('Error removing from cart: $error');
+    }
+  }
+
   Future<void> DidUpdateQuantity(int index, int change) async {
     print("DID UPDATE QUANTITY");
     final product = products[index];
@@ -317,16 +419,20 @@ void initState() {
     final String? userId = User.userId; // Example userId
     final int currentQuantity = quantities[index] ?? 0;
     final int newQuantity = currentQuantity + change;
+    
 
     // Update local state immediately for UI responsiveness
     setState(() {
-      if (newQuantity <= 1) {
+      if (newQuantity < 1) {
         quantities[index] = 0;
       } else {
         quantities[index] = newQuantity;
       }
     });
-
+if(newQuantity==0){
+       _removeFromCart(productId);
+       return;
+    }
     try {
       final response = await http.put(
         Uri.parse(
@@ -338,19 +444,17 @@ void initState() {
           "quantity": newQuantity < 1 ? 0 : newQuantity
         }),
       );
-      if(response.statusCode==200){
-          ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Updated cart')),
-        );
+      if (response.statusCode == 200) {
+        fetchCartDetails();
+       Fluttertoast.showToast(msg: "Updated Cart");
       }
       if (response.statusCode != 200) {
         // Handle error - revert local state in case of failure
         setState(() {
           quantities[index] = currentQuantity;
         });
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to update cart')),
-        );
+         Fluttertoast.showToast(msg: "Failed to update cart");
+       
       }
     } catch (e) {
       // Handle network errors - revert local state
@@ -363,105 +467,108 @@ void initState() {
     }
   }
 
- Future<void> fetchCartDetails() async {
- 
-  
-  print("FETCH CART DETAILS STARTED");
-  setState(() {
-   
-    isLoading = true;
-  });
+  Future<void> fetchCartDetails() async {
+    print("FETCH CART DETAILS STARTED");
+    setState(() {
+      isLoading = true;
+    });
 
-  try {
-    final cartApiUrl = Uri.parse(
-      "http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/cart/cartDetails");
-    final request = http.Request('GET', cartApiUrl)
-      ..headers.addAll({'Content-Type': 'application/json'})
-      ..body = jsonEncode({"userId": User.userId});
+    try {
+      final cartApiUrl = Uri.parse(
+          "http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/cart/cartDetails");
+      final request = http.Request('GET', cartApiUrl)
+        ..headers.addAll({'Content-Type': 'application/json'})
+        ..body = jsonEncode({"userId": User.userId});
 
-    final response = await http.Client().send(request);
-    final responseBody = await response.stream.bytesToString();
+      final response = await http.Client().send(request);
+      final responseBody = await response.stream.bytesToString();
 
-    if (response.statusCode == 200) {
-      final responseData = jsonDecode(responseBody);
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(responseBody);
 
-      if (responseData['status'] == 200 && responseData['data'] != null) {
-        final cartData = responseData['data'];
-        
-        setState(() {
-          finaltotalAmount = responseData["finalTotal"]?.toString() ?? "0";
-        });
-        final List<Map<String, dynamic>> tempCart = [];
-        double calculatedTotal = 0.0;
+        if (responseData['status'] == 200 && responseData['data'] != null) {
+          final cartData = responseData['data'];
 
-        // Process all cart items
-        for (var cartItem in cartData) {
-          try {
-            final productDetails = await fetchProductDetails(cartItem['productId']);
-            if (productDetails != null) {
-              // Safely parse numeric values
-              final quantity = int.tryParse(cartItem['quantity'].toString()) ?? 0;
-              final sellingPrice = double.tryParse(
-                (productDetails['sellingPrice'] ?? '0').toString()) ?? 0.0;
-              final productPrice = double.tryParse(
-                (cartItem["productPrice"] ?? '0').toString()) ?? 0.0;
+          setState(() {
+            finaltotalAmount = responseData["finalTotal"]?.toString() ?? "0";
+          });
+          final List<Map<String, dynamic>> tempCart = [];
+          double calculatedTotal = 0.0;
 
-              calculatedTotal += quantity * sellingPrice;
+          // Process all cart items
+          for (var cartItem in cartData) {
+            try {
+              final productDetails =
+                  await fetchProductDetails(cartItem['productId']);
+              if (productDetails != null) {
+                // Safely parse numeric values
+                final quantity =
+                    int.tryParse(cartItem['quantity'].toString()) ?? 0;
+                final sellingPrice = double.tryParse(
+                        (productDetails['sellingPrice'] ?? '0').toString()) ??
+                    0.0;
+                final productPrice = double.tryParse(
+                        (cartItem["productPrice"] ?? '0').toString()) ??
+                    0.0;
 
-              tempCart.add({
-                "productId": cartItem['productId'],
-                "quantity": quantity,
-                "name": productDetails['name'] ?? 'Unknown Product',
-                "sellingPrice": sellingPrice,
-                "packagingDetail": productDetails['packagingDetail'] ?? '',
-                "imageUrls": productDetails['imageUrls'] ?? [],
-                "productPrice": productPrice,
-              });
+                calculatedTotal += quantity * sellingPrice;
+
+                tempCart.add({
+                  "productId": cartItem['productId'],
+                  "quantity": quantity,
+                  "name": productDetails['name'] ?? 'Unknown Product',
+                  "sellingPrice": sellingPrice,
+                  "packagingDetail": productDetails['packagingDetail'] ?? '',
+                  "imageUrls": productDetails['imageUrls'] ?? [],
+                  "productPrice": productPrice,
+                });
+              }
+            } catch (e) {
+              print("❌ Error processing product ${cartItem['productId']}: $e");
             }
-          } catch (e) {
-            print("❌ Error processing product ${cartItem['productId']}: $e");
+          }
+
+          if (mounted) {
+            setState(() {
+              cartItems = tempCart;
+              totalAmount = calculatedTotal;
+              isLoading = false;
+            });
+          }
+        } else {
+          print("❌ Response did not contain valid cart data");
+          if (mounted) {
+            setState(() {
+              cartItems = [];
+              isLoading = false;
+            });
           }
         }
-
-        if (mounted) {
-          setState(() {
-            cartItems = tempCart;
-            totalAmount = calculatedTotal;
-            isLoading = false;
-           
-          });
-        }
       } else {
-        print("❌ Response did not contain valid cart data");
+        print("❌ Failed to fetch cart details. Status: ${response.statusCode}");
         if (mounted) {
+        
           setState(() {
-            cartItems = [];
+            cartItems.clear();
             isLoading = false;
-           
           });
         }
       }
-    } else {
-      print("❌ Failed to fetch cart details. Status: ${response.statusCode}");
+    } catch (error) {
+      print("❌ Error fetching cart details: $error");
       if (mounted) {
         setState(() {
           isLoading = false;
-          
+          _isFetchingCart = false;
         });
       }
     }
-  } catch (error) {
-    print("❌ Error fetching cart details: $error");
-    if (mounted) {
-      setState(() {
-        isLoading = false;
-        _isFetchingCart = false;
-      });
-    }
   }
-}
 
   Future<Map<String, dynamic>?> fetchProductDetails(String productId) async {
+    setState(() {
+      
+    });
     print("FETCH PRODUCT DETAILS");
     var productApiUrl = Uri.parse(
         "http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/product/productDetail");
@@ -482,7 +589,6 @@ void initState() {
         final responseData = jsonDecode(responseBody);
 
         if (responseData['status'] == 200 && responseData['data'] != null) {
-          
           return responseData['data']; // Return the data part of the response
         } else {
           print("❌ Product API did not return valid data.");
@@ -526,92 +632,70 @@ void initState() {
     });
   }
 
-  Widget buildOutOfRadius() {
-    return Container(
-      color: scaffoldBlackColor,
-      child: Column(
-        mainAxisSize: MainAxisSize
-            .min, // Ensures column takes only as much space as needed
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            "Sorry! Our services are not available in your area yet.",
-            textAlign: TextAlign.center, // Center the text inside the widget
-            style: GoogleFonts.mulish(
-              fontWeight: FontWeight.w700,
-              fontSize: 24,
-              color: whiteColor,
-            ),
+  Widget buildOutOfRadiusAsSliver() {
+    return SliverFillRemaining(
+      hasScrollBody: false,
+      child: Center(
+        child: Text(
+          "We’re not in your area yet—but we’re on our way!",
+          textAlign: TextAlign.center, // Center this text too
+          style: GoogleFonts.mulish(
+            fontWeight: FontWeight.w500,
+            fontSize: 20,
+            color: greyColor,
           ),
-          SizedBox(height: 12), // Add spacing between the two texts
-          Text(
-            "We will notify you as soon as the services are available",
-            textAlign: TextAlign.center, // Center this text too
-            style: GoogleFonts.mulish(
-              fontWeight: FontWeight.w500,
-              fontSize: 14,
-              color: greyColor,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget buildProductList() {
+  Widget buildProductListAsSliver() {
     if (products.isEmpty) {
-      return Center(
-        child: CircularProgressIndicator(color: secondaryColor),
+      return SliverToBoxAdapter(
+        child: Center(
+          child: CircularProgressIndicator(color: secondaryColor),
+        ),
       );
     }
 
-    // Calculate number of rows needed (2 items per row)
     int itemCount = (products.length / 2).ceil();
-    if (products.length > 6) itemCount = 3; // Limit to 6 items (3 rows)
+    if (products.length > 6) itemCount = 3;
 
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: ClampingScrollPhysics(),
-      itemCount: itemCount,
-      itemBuilder: (context, rowIndex) {
-        int firstIndex = rowIndex * 2;
-        int secondIndex = firstIndex + 1;
+    return SliverList(
+      delegate: SliverChildBuilderDelegate(
+        (context, rowIndex) {
+          int firstIndex = rowIndex * 2;
+          int secondIndex = firstIndex + 1;
 
-        return Container(
-          margin: cartItems.isNotEmpty
-              ? EdgeInsets.only(bottom: 20)
-              : EdgeInsets.only(bottom: 20),
-          child: Row(
-            children: [
-              // First product
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(right: 0),
-                  child: buildProductItem(firstIndex),
+          return Container(
+            margin: EdgeInsets.only(bottom: 20),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(right: 0),
+                    child: buildProductItem(firstIndex),
+                  ),
                 ),
-              ),
-              SizedBox(
-                width: 16,
-              ),
-              // Second product (or empty container if odd count)
-              secondIndex < products.length
-                  ? Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(left: 0),
-                        child: buildProductItem(secondIndex),
-                      ),
-                    )
-                  : Expanded(child: Container()),
-            ],
-          ),
-        );
-      },
+                SizedBox(width: 16),
+                secondIndex < products.length
+                    ? Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 0),
+                          child: buildProductItem(secondIndex),
+                        ),
+                      )
+                    : Expanded(child: Container()),
+              ],
+            ),
+          );
+        },
+        childCount: itemCount,
+      ),
     );
   }
 
   Widget buildProductItem(int index) {
-    
     final product = products[index];
     final bool isInCart = quantities[index] != null && quantities[index]! > 0;
     final height = MediaQuery.of(context).size.height;
@@ -726,7 +810,9 @@ void initState() {
                   height: 29,
                   decoration: BoxDecoration(
                     color: ligtBlackColor,
-                    border:isInCart?Border.all() :Border.all(color: greenColor,width: 1),
+                    border: isInCart
+                        ? Border.all()
+                        : Border.all(color: greenColor, width: 1),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: isInCart
@@ -734,10 +820,9 @@ void initState() {
                           width: 50,
                           height: 29,
                           decoration: BoxDecoration(
-                            color: greenColor,
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: greenColor,width: 1)
-                          ),
+                              color: greenColor,
+                              borderRadius: BorderRadius.circular(8),
+                              border: Border.all(color: greenColor, width: 1)),
                           child: FittedBox(
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -818,7 +903,6 @@ void initState() {
     if (Address.CurrentAddress != null) {
       String fullAddress = Address.CurrentAddress!["address"];
       print("in 2nd if condition");
-       
 
       setState(() {
         localAddress = fullAddress;
@@ -908,12 +992,11 @@ void initState() {
           print("checking if its in radius...");
 
           isInRadius = responseData['insideRadius'] == true;
-             
+
           print(isInRadius);
           if (isInRadius == true) {
-            
             context.read<ServiceAvilableCubit>().UpdateServiceAvilable(true);
-              fetchCartDetails();
+            fetchCartDetails();
           } else {
             isInRadius = false;
             context.read<ServiceAvilableCubit>().UpdateServiceAvilable(false);
@@ -996,367 +1079,429 @@ void initState() {
     bool ISserviceAvilable =
         context.watch<ServiceAvilableCubit>().ServiceAvilable;
     return Scaffold(
-        backgroundColor: scaffoldBlackColor,
-        key: _scaffoldKey,
-        body: Stack(children: [
-          Container(
-            color: scaffoldBlackColor,
-            padding: EdgeInsets.only(left: 20, right: 20, top: 40),
-            margin: EdgeInsets.only(bottom: cartItems.isEmpty ? 45 : 0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                GestureDetector(
-                  onTap: () async {
-                    if(localAddress.isEmpty ){
-                      return;
-                    }
-                    await Navigator.of(context).push(MaterialPageRoute(
-                        builder: (context) => LocationScreen()));
-                    checkLocation();
-                    localAddress = Address.CurrentAddress!["address"];
-                  },
-                  child: Container(
-                      height: 100,
-                      decoration: BoxDecoration(
-                          color: scaffoldBlackColor,
-                          borderRadius: BorderRadius.circular(8)),
-                          
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Container(
-                            height: 80,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                localAddress == null || localAddress.isEmpty
-                                    ? Container(
-                                        margin: EdgeInsets.only(bottom: 10),
-                                        child: Shimmer.fromColors(
-                                          baseColor: ligtBlackColor,
-                                          highlightColor: whiteColor,
-                                          child: Container(
-                                            width: 60,
-                                            height: 10,
-                                            // Matches your text height
-                                            decoration: BoxDecoration(
-                                              color: whiteColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                            ),
-                                          ),
-                                        ),
-                                      )
-                                    : Container(
-                                        width: 70,
-                                        child: Image.asset(
-                                            "lib/images/Medkaro (1) 2.png")),
-                                localAddress == null || localAddress.isEmpty
-                                    ? Container(
-                                        margin: EdgeInsets.only(bottom: 10),
-                                        child: Shimmer.fromColors(
-                                          baseColor: ligtBlackColor,
-                                          highlightColor: whiteColor,
-                                          child: Container(
-                                            width: 150,
-                                            height: 22,
-                                            // Matches your text height
-                                            decoration: BoxDecoration(
-                                              color: whiteColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                            ),
-                                          ),
-                                        ),
-                                      )
-                                    : Text(
-                                        "in 10 minutes",
-                                        style: GoogleFonts.mulish(
-                                            color: whiteColor,
-                                            fontSize: 24,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                localAddress == null || localAddress.isEmpty
-                                    ? Container(
-                                        margin: EdgeInsets.only(top: 10),
-                                        child: Shimmer.fromColors(
-                                          baseColor: ligtBlackColor,
-                                          highlightColor: whiteColor,
-                                          child: Container(
-                                            width: MediaQuery.of(context)
-                                                    .size
-                                                    .width *
-                                                0.4,
-                                            height: 8,
-                                            // Matches your text height
-                                            decoration: BoxDecoration(
-                                              color: whiteColor,
-                                              borderRadius:
-                                                  BorderRadius.circular(2),
-                                            ),
-                                          ),
-                                        ),
-                                      )
-                                    : Container(
-                                        width: 280,
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Container(
-                                              constraints: BoxConstraints(
-                                                minWidth: 100,
-                                                maxWidth: 250,
-                                              ),
-                                              child: Text(
-                                                "$localAddress",
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                                style: GoogleFonts.mulish(
-                                                    color: whiteColor,
-                                                    fontWeight: FontWeight.w300,
-                                                    fontSize: 15),
-                                              ),
-                                            ),
-                                            Icon(
-                                              Icons.arrow_drop_down,
-                                              color: whiteColor,
-                                            )
-                                          ],
-                                        ),
-                                      )
-                              ],
-                            ),
-                          ),
-                          GestureDetector(
-                            onTap: () async {
-                              await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) => ProfileScreen()));
-                              checkLocation();
-                              localAddress = Address.CurrentAddress!["address"];
-                            },
-                            child: localAddress == null || localAddress.isEmpty
-                                ? Container(
-                                    child: Shimmer.fromColors(
-                                      baseColor: ligtBlackColor,
-                                      highlightColor: whiteColor,
-                                      child: Container(
-                                        width: 36,
-                                        height: 36,
-                                        // Matches your text height
-                                        decoration: BoxDecoration(
-                                          color: whiteColor,
-                                          borderRadius:
-                                              BorderRadius.circular(50),
-                                        ),
-                                      ),
-                                    ),
-                                  )
-                                : Container(
-                                    height: 36,
-                                    width: 36,
-                                    decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: whiteColor
-                                    ),
-                                  ),
-                          ),
-                        ],
-                      )),
-                ),
-                onGoingOrders.isNotEmpty && localAddress != ""
-                    ? Container(
-                        margin: EdgeInsets.only(bottom: 15),
-                        height: 94,
+      backgroundColor: scaffoldBlackColor,
+      key: _scaffoldKey,
+      body: Stack(children: [
+        if (ISserviceAvilable && isInRadius != null && localAddress.isNotEmpty)
+          Positioned(
+            bottom: 0,
+            left: 55, // shift image slightly to the right
+            right: 0, // allow some stretching to the right if needed
+            child: IgnorePointer(
+              child: Image.asset(
+                'lib/images/final_homebike1.png',
+                fit: BoxFit.contain,
+                width: double.infinity,
+              ),
+            ),
+          ),
+        Container(
+          margin: EdgeInsets.all(20),
+          child: CustomScrollView(
+            controller: _scrollController,
+            slivers: [
+              SliverAppBar(
+                backgroundColor: scaffoldBlackColor,
+                expandedHeight: 80,
+                floating: false,
+                pinned: false,
+                flexibleSpace: FlexibleSpaceBar(
+                  background: GestureDetector(
+                    onTap: () async {
+                      if (localAddress.isEmpty) {
+                        return;
+                      }
+                      await Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => LocationScreen()));
+                      checkLocation();
+                      localAddress = Address.CurrentAddress!["address"];
+                    },
+                    child: Container(
+                        height: 80,
                         decoration: BoxDecoration(
-                            color: ligtBlackColor,
+                            color: scaffoldBlackColor,
                             borderRadius: BorderRadius.circular(8)),
-                        child: Center(
-                          child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                              itemCount: onGoingOrders.length,
-                              itemBuilder: (context, index) {
-                                String status = "";
-                                final order = onGoingOrders[index];
-                                if (order["currentStatus"] == "Order Placed") {
-                                  status = "Your order was placed!";
-                                }
-                                if (order["currentStatus"] == "Packing") {
-                                  status = "Packing your items";
-                                }
-                                if (order["currentStatus"] == "On the way") {
-                                  status = "Out for delivery";
-                                }
-                                return Container(
-                                 padding: EdgeInsets.all(16),
-                                  height: 80,
-                                  width: 350,
-                                 
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(
-                                        "$status",
-                                        style: GoogleFonts.mulish(
-                                            color: whiteColor,
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      Container(
-                                        height: 80,
-                                        decoration: BoxDecoration(
-                                          
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Container(
+                              height: 80,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  localAddress == null || localAddress.isEmpty
+                                      ? Container(
+                                          margin: EdgeInsets.only(bottom: 10),
+                                          child: Shimmer.fromColors(
+                                            baseColor: ligtBlackColor,
+                                            highlightColor: whiteColor,
+                                            child: Container(
+                                              width: 60,
+                                              height: 10,
+                                              // Matches your text height
+                                              decoration: BoxDecoration(
+                                                color: whiteColor,
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                      : Container(
+                                          width: 70,
+                                          child: Image.asset(
+                                              "lib/images/final_medkaro_logo.png")),
+                                  localAddress == null || localAddress.isEmpty
+                                      ? Container(
+                                          margin: EdgeInsets.only(bottom: 10),
+                                          child: Shimmer.fromColors(
+                                            baseColor: ligtBlackColor,
+                                            highlightColor: whiteColor,
+                                            child: Container(
+                                              width: 150,
+                                              height: 22,
+                                              // Matches your text height
+                                              decoration: BoxDecoration(
+                                                color: whiteColor,
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                      : Text(
+                                          "in 10 minutes",
+                                          style: GoogleFonts.mulish(
+                                              color: whiteColor,
+                                              fontSize: 24,
+                                              fontWeight: FontWeight.bold),
                                         ),
-                                        child: Image.asset(
-                      order["currentStatus"] == "Order Placed"
-                          ? 'lib/images/ordered.png'
-                          :order["currentStatus"] == "Packing"
-                              ? 'lib/images/packing.png'
-                              : order["currentStatus"] ==
-                                      "On the way"
-                                  ? 'lib/images/onTheWay.png'
-                                  :order["currentStatus"] ==
-                                          "Delivered"
-                                      ? 'lib/images/DELIVERED.png'
-                                      : 'lib/images/ordered.png', // Default image
-
-                      height: 80,
-                    ),)
-                                    ],
-                                  ),
-                                );
-                              }),
-                        ),
-                      )
-                    : SizedBox(
-                        height: 0,
-                      ),
-                GestureDetector(
-                  onTap: () {
-                    if (ISserviceAvilable) {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) => Search()));
-                    }
-                  },
-                  child: localAddress == null || localAddress.isEmpty
-                      ? Container(
-                          child: Shimmer.fromColors(
-                            baseColor: ligtBlackColor,
-                            highlightColor: whiteColor,
-                            child: Container(
-                              width: double.infinity,
-                              height: 43,
-                              // Matches your text height
-                              decoration: BoxDecoration(
-                                color: whiteColor,
-                                borderRadius: BorderRadius.circular(8),
+                                  localAddress == null || localAddress.isEmpty
+                                      ? Container(
+                                          margin: EdgeInsets.only(top: 10),
+                                          child: Shimmer.fromColors(
+                                            baseColor: ligtBlackColor,
+                                            highlightColor: whiteColor,
+                                            child: Container(
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.4,
+                                              height: 8,
+                                              // Matches your text height
+                                              decoration: BoxDecoration(
+                                                color: whiteColor,
+                                                borderRadius:
+                                                    BorderRadius.circular(2),
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                      : Container(
+                                          width: 280,
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Container(
+                                                constraints:
+                                                    const BoxConstraints(
+                                                  minWidth: 100,
+                                                  maxWidth: 250,
+                                                ),
+                                                child: Row(
+                                                  mainAxisSize:
+                                                      MainAxisSize.min,
+                                                  children: [
+                                                    if (Address.CurrentAddress![
+                                                                "type"] !=
+                                                            null &&
+                                                        Address.CurrentAddress![
+                                                                "type"] !=
+                                                            "")
+                                                      Padding(
+                                                        padding:
+                                                            const EdgeInsets
+                                                                .only(right: 4),
+                                                        child: Text(
+                                                          "${Address.CurrentAddress!["type"]} : ",
+                                                          style: GoogleFonts
+                                                              .mulish(
+                                                            color: whiteColor,
+                                                            fontWeight:
+                                                                FontWeight.bold,
+                                                            fontSize: 17,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    Flexible(
+                                                      child: Text(
+                                                        "$localAddress",
+                                                        maxLines: 1,
+                                                        overflow: TextOverflow
+                                                            .ellipsis,
+                                                        style:
+                                                            GoogleFonts.mulish(
+                                                          color: whiteColor,
+                                                          fontWeight:
+                                                              FontWeight.w300,
+                                                          fontSize: 15,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                              const Icon(
+                                                Icons.arrow_drop_down,
+                                                color: Colors.white,
+                                              ),
+                                            ],
+                                          ))
+                                ],
                               ),
                             ),
-                          ),
-                        )
-                      : Container(
-                          height: 43,
-                          decoration: BoxDecoration(
-                            color: ligtBlackColor,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          clipBehavior: Clip.hardEdge,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            children: [
-                              Padding(
-                                padding:
-                                    const EdgeInsets.only(left: 16, right: 5),
-                                child: Icon(Icons.search,
-                                    color: Colors.white, size: 16),
-                              ),
-                              Container(
-                                width: 250,
-                                child: Padding(
-                                  padding:
-                                      const EdgeInsets.only(left: 5, right: 26),
-                                  child: AnimatedSwitcher(
-                                    duration: Duration(milliseconds: 300),
-                                    transitionBuilder: (child, animation) {
-                                      final inAnimation = Tween<Offset>(
-                                        begin: Offset(0, 1), // from bottom
-                                        end: Offset.zero, // to center
-                                      ).animate(animation);
-
-                                      final outAnimation = Tween<Offset>(
-                                        begin: Offset(0, -1), // from center
-                                        end: Offset.zero, //, // to top
-                                      ).animate(animation);
-
-                                      return SlideTransition(
-                                        position: child.key ==
-                                                ValueKey(hints[currentIndex])
-                                            ? inAnimation // incoming child
-                                            : outAnimation, // outgoing child
-                                        child: child,
-                                      );
-                                    },
-                                    child: Align(
-                                      key:
-                                          ValueKey<String>(hints[currentIndex]),
-                                      alignment: Alignment.centerLeft,
-                                      child: Text(
-                                        currentHint ?? "",
-                                        style: GoogleFonts.mulish(
-                                          color: whiteColor,
-                                          fontSize: 15,
+                            GestureDetector(
+                              onTap: () async {
+                                await Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => ProfileScreen()));
+                                checkLocation();
+                                localAddress =
+                                    Address.CurrentAddress!["address"];
+                              },
+                              child:
+                                  localAddress == null || localAddress.isEmpty
+                                      ? Container(
+                                          child: Shimmer.fromColors(
+                                            baseColor: ligtBlackColor,
+                                            highlightColor: whiteColor,
+                                            child: Container(
+                                              width: 36,
+                                              height: 36,
+                                              // Matches your text height
+                                              decoration: BoxDecoration(
+                                                color: whiteColor,
+                                                borderRadius:
+                                                    BorderRadius.circular(50),
+                                              ),
+                                            ),
+                                          ),
+                                        )
+                                      : Container(
+                                          height: 36,
+                                          width: 36,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                          ),
+                                          child: Image.asset(
+                                              "lib/images/profile_icon.png"),
                                         ),
+                            ),
+                          ],
+                        )),
+                  ),
+                ),
+              ),
+              if (ISserviceAvilable&&onGoingOrders.isNotEmpty)
+                SliverAppBar(
+                  backgroundColor: scaffoldBlackColor,
+                  floating: false,
+                  expandedHeight: 64,
+                  pinned: false,
+                  flexibleSpace: FlexibleSpaceBar(
+                    background: onGoingOrders.isNotEmpty && localAddress != ""
+                        ? Container(
+                            margin: EdgeInsets.only(
+                              bottom: 15,
+                            ),
+                            height: 94,
+                            decoration: BoxDecoration(
+                                color: ligtBlackColor,
+                                borderRadius: BorderRadius.circular(8)),
+                            child: Center(
+                              child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: onGoingOrders.length,
+                                  itemBuilder: (context, index) {
+                                    String status = "";
+                                    final order = onGoingOrders[index];
+                                    if (order["currentStatus"] ==
+                                        "Order Placed") {
+                                      status = "Your order was placed!";
+                                    }
+                                    if (order["currentStatus"] == "Packing") {
+                                      status = "Packing your items";
+                                    }
+                                    if (order["currentStatus"] ==
+                                        "On the way") {
+                                      status = "Out for delivery";
+                                    }
+                                    return Container(
+                                      padding: EdgeInsets.all(16),
+                                      height: 80,
+                                      width: 350,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Text(
+                                            "$status",
+                                            style: GoogleFonts.mulish(
+                                                color: whiteColor,
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                          Container(
+                                            height: order["currentStatus"] ==
+                                                      "Order Placed"
+                                                  ? 36
+                                                  : 80, // ⬅️ Adjust here
+                                            decoration: BoxDecoration(),
+                                            child: Image.asset(
+                                              order["currentStatus"] ==
+                                                      "Order Placed"
+                                                  ? 'lib/images/ordered.png'
+                                                  : order["currentStatus"] ==
+                                                          "Packing"
+                                                      ? 'lib/images/packing.png'
+                                                      : order["currentStatus"] ==
+                                                              "On the way"
+                                                          ? 'lib/images/onTheWay.png'
+                                                          : order["currentStatus"] ==
+                                                                  "Delivered"
+                                                              ? 'lib/images/DELIVERED.png'
+                                                              : 'lib/images/ordered.png', // Default image
+                                              
+                                            ),
+                                          ),
+                                        ],
                                       ),
+                                    );
+                                  }),
+                            ),
+                          )
+                        : SizedBox(
+                            height: 0,
+                          ),
+                  ),
+                ),
+              if (ISserviceAvilable)
+                SliverAppBar(
+                  expandedHeight: 43,
+                  backgroundColor: scaffoldBlackColor,
+                  elevation: 0,
+                  pinned: true,
+                  flexibleSpace: Column(
+                    children: [
+                      GestureDetector(
+                        onTap: () {
+                          if (ISserviceAvilable) {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => Search()));
+                          }
+                        },
+                        child: localAddress == null || localAddress.isEmpty
+                            ? Container(
+                                child: Shimmer.fromColors(
+                                  baseColor: ligtBlackColor,
+                                  highlightColor: whiteColor,
+                                  child: Container(
+                                    width: double.infinity,
+                                    height: 43,
+                                    // Matches your text height
+                                    decoration: BoxDecoration(
+                                      color: whiteColor,
+                                      borderRadius: BorderRadius.circular(8),
                                     ),
                                   ),
                                 ),
+                              )
+                            : Container(
+                                height: 43,
+                                decoration: BoxDecoration(
+                                  color: ligtBlackColor,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                clipBehavior: Clip.hardEdge,
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.only(
+                                          left: 16, right: 5),
+                                      child: Icon(Icons.search,
+                                          color: Colors.white, size: 16),
+                                    ),
+                                    Container(
+                                      width: 250,
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(
+                                            left: 5, right: 26),
+                                        child: AnimatedSwitcher(
+                                          duration: Duration(milliseconds: 300),
+                                          transitionBuilder:
+                                              (child, animation) {
+                                            final inAnimation = Tween<Offset>(
+                                              begin:
+                                                  Offset(0, 1), // from bottom
+                                              end: Offset.zero, // to center
+                                            ).animate(animation);
+
+                                            final outAnimation = Tween<Offset>(
+                                              begin:
+                                                  Offset(0, -1), // from center
+                                              end: Offset.zero, //, // to top
+                                            ).animate(animation);
+
+                                            return SlideTransition(
+                                              position: child.key ==
+                                                      ValueKey(
+                                                          hints[currentIndex])
+                                                  ? inAnimation // incoming child
+                                                  : outAnimation, // outgoing child
+                                              child: child,
+                                            );
+                                          },
+                                          child: Align(
+                                            key: ValueKey<String>(
+                                                hints[currentIndex]),
+                                            alignment: Alignment.centerLeft,
+                                            child: Text(
+                                              currentHint ?? "",
+                                              style: GoogleFonts.mulish(
+                                                color: whiteColor,
+                                                fontSize: 15,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
-                            ],
-                          ),
-                        ),
-                ),
-                Expanded(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: EdgeInsets.only(top: 10, bottom: 15),
-                        child: Text(
-                          isInRadius == null ||localAddress.isEmpty
-                              ? ""
-                              : isInRadius!
-                                  ? "Featured Products"
-                                  : "",
-                          style: GoogleFonts.mulish(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w700,
-                            color: whiteColor,
-                          ),
-                        ),
                       ),
-                      Expanded(
-                        child: Container(
-                          color: scaffoldBlackColor,
-                          child: Center(
-                            child: MediaQuery.removePadding(
-                              context: context,
-                              removeTop: true,
-                              child: isInRadius == null || localAddress.isEmpty
-                                  ? LoadingIndicatorBallClip()
-                                  : isInRadius!
-                                      ? Container(
-                                        color: scaffoldBlackColor,
-                              padding: cartItems.isNotEmpty 
-                                  ? EdgeInsets.only(bottom: 160)
-                                  : EdgeInsets.only(bottom: 20),
-                                        child: buildProductList())
-                                      : buildOutOfRadius(),
+                      Padding(
+                        padding:
+                            EdgeInsets.only(right: 16, bottom: 10, top: 10),
+                        child: Align(
+                          alignment: Alignment.bottomLeft,
+                          child: Text(
+                            isInRadius == null || localAddress.isEmpty
+                                ? ""
+                                : isInRadius!
+                                    ? "Featured Products"
+                                    : "",
+                            style: GoogleFonts.mulish(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              color: whiteColor,
                             ),
                           ),
                         ),
@@ -1364,59 +1509,74 @@ void initState() {
                     ],
                   ),
                 ),
-              ],
-            ),
+              if (isInRadius == null || localAddress.isEmpty)
+                SliverFillRemaining(
+                    hasScrollBody: false,
+                    child: Center(child: LoadingIndicatorBallClip()))
+              else if (isInRadius!)
+                SliverPadding(
+                  padding: cartItems.isNotEmpty
+                      ? EdgeInsets.only(bottom: 50)
+                      : EdgeInsets.only(bottom: 50),
+                  sliver: buildProductListAsSliver(),
+                )
+              else
+                buildOutOfRadiusAsSliver(),
+            ],
           ),
-          if ((!isLoading &&
-                  cartItems.isNotEmpty &&
-                  ISserviceAvilable &&
-                  totalAmount != 0) ||
-              (isTapped) && ISserviceAvilable && totalAmount != 0) ...[
-            Positioned(
+        ),
+        if ((!isLoading &&
+                cartItems.isNotEmpty &&
+                ISserviceAvilable &&
+                totalAmount != 0) ||
+            (isTapped) && ISserviceAvilable && totalAmount != 0) ...[
+          // Replace your existing Positioned widget with this:
+          AnimatedBuilder(
+            animation: _animation,
+            builder: (context, child) {
+              return Positioned(
                 right: 0,
-                bottom: 76,
+                bottom: _animation.value,
                 child: Container(
                   width: MediaQuery.of(context).size.width,
-                  height: MediaQuery.of(context).size.height *
-                      0.10, // 12% of screen height
+                  height: MediaQuery.of(context).size.height * 0.10,
                   decoration: BoxDecoration(
-                      color: ligtBlackColor,
-                      boxShadow: [
-                        // Top shadow
-                        BoxShadow(
-                          color: Colors.white.withOpacity(0.1),
-                          offset: Offset(0, -2),
-                          blurRadius: 6,
-                          spreadRadius: 1,
-                        ),
-                        // Left shadow
-                        BoxShadow(
-                          color: Colors.white.withOpacity(0.1),
-                          offset: Offset(-2, 0),
-                          blurRadius: 6,
-                          spreadRadius: 1,
-                        ),
-                        // Right shadow
-                        BoxShadow(
-                          color: Colors.white.withOpacity(0.1),
-                          offset: Offset(2, 0),
-                          blurRadius: 6,
-                          spreadRadius: 1,
-                        ),
-                      ],
-                      borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(30),
-                          topRight: Radius.circular(30))),
+                    color: scaffoldBlackColor,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.white.withOpacity(0.1),
+                        offset: Offset(0, -2),
+                        blurRadius: 6,
+                        spreadRadius: 1,
+                      ),
+                      BoxShadow(
+                        color: Colors.white.withOpacity(0.1),
+                        offset: Offset(-2, 0),
+                        blurRadius: 6,
+                        spreadRadius: 1,
+                      ),
+                      BoxShadow(
+                        color: Colors.white.withOpacity(0.1),
+                        offset: Offset(2, 0),
+                        blurRadius: 6,
+                        spreadRadius: 1,
+                      ),
+                    ],
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(30),
+                      topRight: Radius.circular(30),
+                    ),
+                  ),
                   child: Padding(
                     padding: EdgeInsets.symmetric(
-                        horizontal: MediaQuery.of(context).size.width * 0.045,
-                        vertical: MediaQuery.of(context).size.height * 0.012),
+                      horizontal: MediaQuery.of(context).size.width * 0.045,
+                      vertical: MediaQuery.of(context).size.height * 0.012,
+                    ),
                     child: Column(
                       spacing: 8,
                       mainAxisAlignment: MainAxisAlignment.center,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -1441,80 +1601,91 @@ void initState() {
                                                 fit: BoxFit.contain,
                                                 loadingBuilder: (context, child,
                                                     loadingProgress) {
-                                                  if (loadingProgress == null) {
+                                                  if (loadingProgress == null)
                                                     return child;
-                                                  }
                                                   return const Center(
-                                                      child:
-                                                          CircularProgressIndicator(
-                                                    color: whiteColor,
-                                                  ));
+                                                    child:
+                                                        CircularProgressIndicator(
+                                                      color: whiteColor,
+                                                    ),
+                                                  );
                                                 },
                                                 errorBuilder: (context, error,
                                                     stackTrace) {
                                                   return const Center(
-                                                      child: Icon(
-                                                    Icons.error,
-                                                    color: whiteColor,
-                                                  ));
+                                                    child: Icon(
+                                                      Icons.error,
+                                                      color: whiteColor,
+                                                    ),
+                                                  );
                                                 },
                                               )
-                                            : Icon(Icons.image)),
+                                            : Icon(Icons.image),
+                                      ),
                                 Row(
                                   children: [
                                     Text(
                                       '${cartItems.length} Item(s)  ',
                                       style: TextStyle(
-                                          color: greyColor,
-                                          fontFamily: "Urbanist",
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.normal),
+                                        color: greyColor,
+                                        fontFamily: "Urbanist",
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.normal,
+                                      ),
                                     ),
                                     Text(
                                       "|  ₹ ${finaltotalAmount}",
                                       style: TextStyle(
-                                          color: whiteColor,
-                                          fontFamily: "Urbanist",
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.bold),
+                                        color: whiteColor,
+                                        fontFamily: "Urbanist",
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ],
-                                )
+                                ),
                               ],
                             ),
                             GestureDetector(
-                                onTap: () async {
-                                  await Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) => CartScreen(
-                                                isNavigated: true,
-                                              )));
-                                },
-                                child: Container(
-                                  width: 90,
-                                  height: 40,
-                                  decoration: BoxDecoration(
-                                      color: greenColor,
-                                      borderRadius: BorderRadius.circular(8)),
-                                  child: Center(
-                                    child: Text(
-                                      'View cart',
-                                      style: GoogleFonts.mulish(
-                                          color: whiteColor,
-                                          fontSize:13,
-                                              
-                                          fontWeight: FontWeight.bold),
+                              onTap: () async {
+                                await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        CartScreen(isNavigated: true),
+                                  ),
+                                );
+                              },
+                              child: Container(
+                                width: 90,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: greenColor,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    'View cart',
+                                    style: GoogleFonts.mulish(
+                                      color: whiteColor,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                ))
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ],
                     ),
                   ),
-                ))
-          ]
-        ]));
+                ),
+              );
+            },
+          )
+        ]
+      ]),
+    );
   }
 }

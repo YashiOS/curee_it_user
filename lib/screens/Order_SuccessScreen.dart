@@ -2,6 +2,7 @@ import 'package:cureeit_user_app/screens/cart_screen.dart';
 import 'package:cureeit_user_app/screens/order_tracking_screen.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 
 class OrderSuccessScreen extends StatefulWidget {
@@ -41,7 +42,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
             ),
             Text(
               'Order placed successfully!',
-              style: TextStyle(
+              style: GoogleFonts.mulish(
                 fontSize: 45,
                 fontWeight: FontWeight.w800,
                 color: greyColor,

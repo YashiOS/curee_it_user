@@ -128,7 +128,7 @@ class _LoginScreenState extends State<RegisterScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Image.asset(
-                      "lib/images/Medkaro (1) 2.png",
+                      "lib/images/final_medkaro_logo.png",
                       height: screenHeight * 0.06,
                       width: screenWidth * 0.55,
                     ),

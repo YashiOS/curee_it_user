@@ -21,10 +21,14 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _controller = TextEditingController();
-  
+  bool userLoggingIN=false;
   bool isButtonEnabled = false;
 
   void userLogin() async {
+    setState(() {
+      userLoggingIN=true;
+    });
+    
     try {
       final response = await http.post(
         Uri.parse(
@@ -38,12 +42,20 @@ class _LoginScreenState extends State<LoginScreen> {
       );
        print(response.body);
       if (response.statusCode == 200) {
+        setState(() {
+          
+          userLoggingIN=false;
+        });
          Navigator.pushReplacement(
         context,
         MaterialPageRoute(
             builder: (context) => OtpScreen(phoneNumber:_controller.text.trim(),purpose: "login",name: "",)),
       );
       if(response.statusCode==400){
+        setState(() {
+          
+          userLoggingIN=false;
+        });
         Navigator.pushReplacement(
         context,
         MaterialPageRoute(
@@ -53,6 +65,10 @@ class _LoginScreenState extends State<LoginScreen> {
        
       }
     } catch (e) {
+      setState(() {
+          
+          userLoggingIN=false;
+        });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Network error: $e')),
       );
@@ -179,9 +195,9 @@ void _showLocationDeniedDialog() {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Image.asset(
-                      "lib/images/Medkaro (1) 2.png",
+                      "lib/images/final_medkaro_logo.png",
                       height: screenHeight * 0.06,
-                      width: screenWidth * 0.55,
+                      width: screenWidth * 0.5,
                     ),
                     Text(
                       "10-minute medicine delivery",
@@ -247,7 +263,7 @@ void _showLocationDeniedDialog() {
                                 side: BorderSide(color: greenColor, width: 1),
                               ),
                             ),
-                            child: Text(
+                            child:userLoggingIN?Container(height: 10,width: 10,child: CircularProgressIndicator(color: whiteColor,strokeWidth: 2,)): Text(
                               "Next",
                               style: GoogleFonts.mulish(
                                 color: isButtonEnabled ? whiteColor : greenColor,

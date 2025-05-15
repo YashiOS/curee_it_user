@@ -13,10 +13,10 @@ import 'package:intl/intl.dart';
 class OrderCard extends StatelessWidget {
   final dynamic orderData;
   String prescriptionURL;
-   OrderCard( {
+  OrderCard({
     super.key,
     required this.orderData,
-    this.prescriptionURL="",
+    this.prescriptionURL = "",
   });
 
   String formatDate(String isoDate) {
@@ -44,14 +44,14 @@ class OrderCard extends StatelessWidget {
         return '${day}th';
     }
   }
-  
-void addMultipleTocart(context)async{
- 
-  List<dynamic> orderItems = orderData["orderItems"];
-   print(orderItems);
-  List productIds=orderItems.map((item)=>item['productId'].toString()).toList();
-   try{
-    final response = await http.post(
+
+  void addMultipleTocart(context) async {
+    List<dynamic> orderItems = orderData["orderItems"];
+    print(orderItems);
+    List productIds =
+        orderItems.map((item) => item['productId'].toString()).toList();
+    try {
+      final response = await http.post(
         Uri.parse(
             'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/cart/addMultipleToCart'),
         headers: {
@@ -63,16 +63,13 @@ void addMultipleTocart(context)async{
           'quantity': 1,
         }),
       );
-     
-        if(response.statusCode==200){
-          Navigator.of(context).push(MaterialPageRoute(builder: (context)=>CartScreen(isNavigated: true)));
-        }
 
-   }catch(e){
-
-   }
-  
-}
+      if (response.statusCode == 200) {
+        Navigator.of(context).push(MaterialPageRoute(
+            builder: (context) => CartScreen(isNavigated: true)));
+      }
+    } catch (e) {}
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -81,8 +78,8 @@ void addMultipleTocart(context)async{
     double shippingCost = double.parse(orderData['totalAmount']);
     List orderItems = orderData['orderItems'];
     String orderId = orderData['orderId'];
-
-   
+    print("THIS IS ORDER ID");
+    print(orderId);
 
     String allItems = formatOrderItems(orderItems);
 
@@ -108,8 +105,10 @@ void addMultipleTocart(context)async{
             Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) =>
-                    OrderdetailScreenNew(orderData: orderData,prescriptionURL: prescriptionURL,),
+                builder: (context) => OrderdetailScreenNew(
+                  orderData: orderData,
+                  prescriptionURL: prescriptionURL,
+                ),
               ),
             );
           }
@@ -197,35 +196,47 @@ void addMultipleTocart(context)async{
                         ],
                       ),
                       GestureDetector(
-                        onTap: (){
-                           
-                          if(orderStatus=="Delivered"||orderStatus==""){
-                                addMultipleTocart(context);
+                        onTap: () {
+                          if (orderStatus == "Delivered" || orderStatus == "") {
+                            addMultipleTocart(context);
                           }
                         },
                         child: Container(
-                          padding: EdgeInsets.symmetric(vertical: 8,horizontal: 16),
+                          padding:
+                              EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                           decoration: BoxDecoration(
                               color: greenColor,
-                              borderRadius: BorderRadius.circular(8)
-                          ),
-                          
-                          child:orderStatus=="Delivered"||orderStatus==""?Text(
-                            "Reorder",
-                            style: GoogleFonts.mulish(
-                              fontWeight: FontWeight.bold,
-                              fontSize: screenheight * 0.014,                           
-                              color: whiteColor,
-                            ),
-                          ): Text(
-                            orderStatus,
-                            style: GoogleFonts.mulish(
-                              fontWeight: FontWeight.bold,
-                              fontSize: screenheight * 0.014,
-                             
-                              color: whiteColor,
-                            ),
-                          ),
+                              borderRadius: BorderRadius.circular(8)),
+                          child: orderStatus == "Delivered" || orderStatus == ""
+                              ? Text(
+                                  "Reorder",
+                                  style: GoogleFonts.mulish(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: screenheight * 0.014,
+                                    color: whiteColor,
+                                  ),
+                                )
+                              : orderStatus == "Order Placed"
+                                  ? Text(
+                                      "Ordered",
+                                      style: GoogleFonts.mulish(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: screenheight * 0.014,
+                                        color: whiteColor,
+                                      ),
+                                    )
+                                  :orderStatus=="On the way"?Text("Enroute",style:GoogleFonts.mulish(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: screenheight * 0.014,
+                                        color: whiteColor,
+                                      ) ,) :Text(
+                                      orderStatus,
+                                      style: GoogleFonts.mulish(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: screenheight * 0.014,
+                                        color: whiteColor,
+                                      ),
+                                    ),
                         ),
                       ),
                     ],

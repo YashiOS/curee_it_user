@@ -66,17 +66,12 @@ dev_dependencies:
     sdk: flutter
   flutter_launcher_icons: ^0.14.3  
 
-flutter_icons:
-  android: true
-  image_path: "lib/images/app_icon3.png"
-  adaptive_icon_background: "#00b852" 
-
-flutter_native_splash:
-  color: "#000000" # dark background color
-  image: lib/images/medkarolog.png # optional logo (add this image in assets folder)
+flutter_launcher_icons:
   android: true
   ios: true
-  
+  image_path: "lib/images/App_icon4.png"
+
+
 
 
   # The "flutter_lints" package below contains a set of recommended lints to
