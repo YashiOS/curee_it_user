@@ -231,7 +231,7 @@ final double difference = itemTotal - totalSellingPrice;
                       ),
                     ),
                     Text(
-                      "-₹$difference",
+                      "-₹${difference.toStringAsFixed(2)}",
                       style: GoogleFonts.mulish(
                           fontSize: 14,
                           fontWeight: FontWeight.w300,

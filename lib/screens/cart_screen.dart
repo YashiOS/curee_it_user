@@ -5,6 +5,7 @@ import 'package:cureeit_user_app/current_address/google_maps_screen.dart';
 import 'package:cureeit_user_app/screens/Order_SuccessScreen.dart';
 import 'package:cureeit_user_app/screens/addresses_screen.dart';
 import 'package:cureeit_user_app/screens/base_screen.dart';
+import 'package:cureeit_user_app/screens/loading.dart';
 import 'package:cureeit_user_app/selected_Address/currentAddress.dart';
 import 'package:cureeit_user_app/user/user.dart';
 import 'package:cureeit_user_app/utils/razor_pay.dart';
@@ -293,7 +294,15 @@ class _CartScreenState extends State<CartScreen> {
     }
 
     int Total = double.parse(total).toInt();
+    
     try {
+      Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>  LoadingScreen(),
+        fullscreenDialog: true,
+      ),
+    );
       var url = Uri.parse(
           'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/order/createCheckout');
       var request = http.Request('POST', url)
@@ -318,6 +327,7 @@ class _CartScreenState extends State<CartScreen> {
       var response = await http.Client().send(request);
 
       if (response.statusCode == 200) {
+        Navigator.pop(context);
         var responseBody = await response.stream.bytesToString();
         Map<String, dynamic> responseData = jsonDecode(responseBody);
 
@@ -1052,10 +1062,10 @@ class _CartScreenState extends State<CartScreen> {
                                                                         razorpayPayment
                                                                             .initiatePayment(
                                                                           totalWholeAmount, // Amount in paise (e.g., 50000 = 500 INR)
-                                                                          'Cure it', // Product Name
+                                                                          'CUREEIT MEDICOS PRIVATE LIMITED', // Product Name
                                                                           'Please do the payment', // Description
                                                                           '8890170172',
-                                                                          'yash123@gmail.com',
+                                                                          'accounts@cureeit.com',
                                                                         );
                                                                       },
                                                                       child:

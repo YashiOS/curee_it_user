@@ -17,6 +17,7 @@ class LocationScreen extends StatefulWidget {
 
 class _LocationScreenState extends State<LocationScreen> {
   List<dynamic> addresses = [];
+  bool fetchingAddress=false;
 
   @override
   void initState() {

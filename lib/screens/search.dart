@@ -47,6 +47,8 @@ class _SearchState extends State<Search> {
         if (jsonResponse["success"] == true) {
           setState(() {
             _searchResults = jsonResponse["data"];
+            print("SEARCH RESULT****");
+            print(_searchResults);
           });
         } else {
           setState(() {
@@ -351,7 +353,7 @@ class _SearchState extends State<Search> {
                                         children: [
                                           Expanded(
                                             child: Text(
-                                              item['Description'] ??
+                                              item['description'] ??
                                                   'Medicine information',
                                               maxLines: 1,
                                               overflow: TextOverflow.ellipsis,
