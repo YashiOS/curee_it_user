@@ -20,6 +20,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
   bool isLoading = true;
 
   Future<void> fetchOrderHistory() async {
+    print("fetching cart");
     var url = Uri.parse(
         'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/order/orderHistory');
     var request =  http.Request('GET', url)
@@ -37,6 +38,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
       setState(() {
       
         orders = data['data'];
+        print(orders);
          
         orders.sort((item1, item2) {
   final dateA = DateTime.parse(item1['purchaseDate']);
@@ -94,7 +96,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                 padding: const EdgeInsets.only(left: 4.0),
                 child: Row(
                   spacing: 4,
-                  children: [Image.asset("lib/images/Vector 9.png")],
+                  children: [Image.asset("lib/images/Vector 9.png",scale: 0.8,)],
                 ),
               ),
             ),
@@ -124,7 +126,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                       orders.length, // Use the length of the orders array
                   itemBuilder: (context, index) {
                     return OrderCard(
-                      prescriptionURL:orders[0]["prescription"]["photoURL"] ,
+                      prescriptionURL:orders[0]["prescription"]?["photoURL"] ??"",
                         orderData:
                             orders[index]); // Pass the order data to the card
                   },

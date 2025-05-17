@@ -327,13 +327,14 @@ class _CartScreenState extends State<CartScreen> {
       var response = await http.Client().send(request);
 
       if (response.statusCode == 200) {
-        Navigator.pop(context);
+       
         var responseBody = await response.stream.bytesToString();
         Map<String, dynamic> responseData = jsonDecode(responseBody);
-
+         Navigator.pop(context);
         if (responseData['message'] == 'Order created successfully') {
           _removeAllFromCart(); //removing cart item from backend , not using await so it will be done in background ,so user does not have to wait
           cartItems.clear();
+          
           //            Navigator.push(
           // context,
           // MaterialPageRoute(
@@ -518,6 +519,7 @@ class _CartScreenState extends State<CartScreen> {
         Scaffold(
           backgroundColor: scaffoldBlackColor,
           appBar: AppBar(
+            elevation: 0,
             centerTitle: true,
             backgroundColor: ligtBlackColor,
             shape: ContinuousRectangleBorder(
@@ -544,7 +546,7 @@ class _CartScreenState extends State<CartScreen> {
                 padding: const EdgeInsets.only(left: 4.0),
                 child: Row(
                   spacing: 4,
-                  children: [Image.asset("lib/images/Vector 9.png")],
+                  children: [Image.asset("lib/images/Vector 9.png",scale: 0.8,)],
                 ),
               ),
             ),
@@ -560,6 +562,7 @@ class _CartScreenState extends State<CartScreen> {
                   ? Container(
                       height: double.infinity,
                       width: double.infinity,
+                      
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
@@ -584,7 +587,7 @@ class _CartScreenState extends State<CartScreen> {
                     )
                   : Container(
                       padding: EdgeInsets.only(
-                          bottom: 25),
+                          bottom: 100),
                       color: scaffoldBlackColor,
                       width: MediaQuery.of(context).size.width,
                       height: MediaQuery.of(context).size.height,
@@ -622,7 +625,7 @@ class _CartScreenState extends State<CartScreen> {
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text(
-                                                'Upload prescription',
+                                                'Upload Prescription',
                                                 style: GoogleFonts.mulish(
                                                   color: Colors.white,
                                                   fontSize: 16,

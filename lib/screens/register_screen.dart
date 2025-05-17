@@ -15,15 +15,23 @@ class RegisterScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<RegisterScreen> {
-  final TextEditingController _controller = TextEditingController();
+ 
   final TextEditingController _nameController = TextEditingController();
   bool isButtonEnabled = false;
+  bool isUserRegistring=false;
 
   void userRegister() async {
+    setState(() {
+      isUserRegistring=true;
+    });
+    print("PHONE NUMBER");
+    print(widget.phoneNumber);
+    var phoneno=widget.phoneNumber;
+    print(phoneno);
     try {
       final response = await http.post(
         Uri.parse(
-            'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/auth/user/register'),
+            'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/auth/user/verify'),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -34,24 +42,33 @@ class _LoginScreenState extends State<RegisterScreen> {
       );
 
       if (response.statusCode == 200) {
+        setState(() {
+          isUserRegistring=false;
+        });
        Navigator.pushReplacement(
         context,
         MaterialPageRoute(
-            builder: (context) => OtpScreen(phoneNumber:widget.phoneNumber,purpose: "login",name:_nameController.text.trim(),)),
+            builder: (context) => OtpScreen(phoneNumber:phoneno,purpose: "register",name:_nameController.text.trim(),)),
       );
       }
     } catch (e) {
+      setState(() {
+        isUserRegistring=false;
+      });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Network error: $e')),
       );
     }
+    setState(() {
+      isUserRegistring=false;
+    });
   }
 
   void _validateAndProceed() async {
-    String phoneNumber = _controller.text.trim();
+   
     String name=_nameController.text.trim();
 
-    if (phoneNumber.length <=1) {
+    if (name.length <=1) {
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text("name must be longer then 1 alphabet "),
@@ -81,24 +98,20 @@ class _LoginScreenState extends State<RegisterScreen> {
     }
     else {
       userRegister();
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-            builder: (context) => OtpScreen(phoneNumber: phoneNumber,purpose: "register",name: name,)),
-      );
+     
     }
   }
 
   @override
   void initState() {
-    _controller.addListener(_checkButton);
+    
     _nameController.addListener(_checkButton);
     super.initState();
   }
 
   void _checkButton() {
     setState(() {
-      isButtonEnabled = _controller.text.trim().length == 10&&_nameController.text.trim().length>1;
+      isButtonEnabled =_nameController.text.trim().length>1;
     });
   }
 
@@ -154,11 +167,9 @@ class _LoginScreenState extends State<RegisterScreen> {
                           Expanded(
                             child: TextField(
                               controller:
-                                  _controller, // <-- Attach controller here
+                                 _nameController, // <-- Attach controller here
                               style: GoogleFonts.mulish(color: whiteColor),
-                              keyboardType: TextInputType.phone,
-                              maxLength: 10,
-
+                              
                               decoration: InputDecoration(
                                 counterText: "",
                                 hintText: "Name",
@@ -192,7 +203,7 @@ class _LoginScreenState extends State<RegisterScreen> {
                                 side: BorderSide(color: greenColor, width: 1),
                               ),
                             ),
-                            child: Text(
+                            child:isUserRegistring?Container(height: 10,width: 10,child: CircularProgressIndicator(color: whiteColor,strokeWidth: 2,),) :Text(
                               "Next",
                               style: GoogleFonts.mulish(
                                 color: isButtonEnabled ? whiteColor : greenColor,
@@ -202,8 +213,7 @@ class _LoginScreenState extends State<RegisterScreen> {
                             ),
                           ),
                         ),
-                       
-
+                  
                       ],
                     ),
                   ],

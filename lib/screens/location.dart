@@ -27,6 +27,9 @@ class _LocationScreenState extends State<LocationScreen> {
   }
 
   Future<void> fetchAddresses() async {
+    setState(() {
+      fetchingAddress=true;
+    });
     var url = Uri.parse(
       'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/address/savedAddress',
     );
@@ -43,14 +46,23 @@ class _LocationScreenState extends State<LocationScreen> {
     if (response.statusCode == 200) {
       final data = json.decode(await response.stream.bytesToString());
       final fetchAddress = data["data"]["address"];
+      setState(() {
+        fetchingAddress=false;
+      });
       if (fetchAddress != null || fetchAddress.isNotEmpty) {
         addresses = data['data']['address'];
         setState(() {});
         print(addresses);
       }
     } else {
+       setState(() {
+        fetchingAddress=false;
+      });
       print('Failed to load addresses');
     }
+     setState(() {
+        fetchingAddress=false;
+      });
   }
 
   void UpdateAddress(Map<String, dynamic> address) {
@@ -89,7 +101,7 @@ class _LocationScreenState extends State<LocationScreen> {
                 padding: const EdgeInsets.only(left: 4.0),
                 child: Row(
                   spacing: 4,
-                  children: [Image.asset("lib/images/Vector 9.png")],
+                  children: [Image.asset("lib/images/Vector 9.png",scale: 0.8,)],
                 ),
               ),
             ),
@@ -205,7 +217,11 @@ class _LocationScreenState extends State<LocationScreen> {
               SingleChildScrollView(
                 child: Container(
                   height: 470,
-                  child: addresses.isEmpty
+                  child:fetchingAddress?Center(
+                    child: CircularProgressIndicator(
+                      color: whiteColor,
+                    ),
+                  ): addresses.isEmpty
                       ? Center(
                           child: Text(
                           "No saved addresses",
@@ -225,6 +241,7 @@ class _LocationScreenState extends State<LocationScreen> {
                                 setState(() {
                                   Address.selectedIndex = index;
                                 });
+                                Navigator.pop(context);
                               },
                               child: Column(
                                 children: [

@@ -64,6 +64,9 @@ class _OtpScreenState extends State<OtpScreen> {
   }
 
   Future<void> submitOtp() async {
+    print("OTP SCREEN PHONE NUMBER");
+    print(widget.phoneNumber);
+    
     setState(() {
       verifyingOTP = true;
     });
@@ -85,12 +88,11 @@ class _OtpScreenState extends State<OtpScreen> {
           "name":widget.name
         }),
       );
-
+     final data = json.decode(response.body);
+      print("OTP SCREEN");
+      print(data);
       if (response.statusCode == 200) {
-       
-   
-      final data = json.decode(response.body);
-      if(data!=null){
+      
          final id=data["user"]["_id"];
       final name=data["user"]["name"];
       final userid=data["user"]["userId"];
@@ -109,8 +111,25 @@ class _OtpScreenState extends State<OtpScreen> {
         MaterialPageRoute(builder: (context) =>BaseScreen(Navigatedfrom: "otpScreen",)),
       );
      
+      
       }
+      if(response.statusCode != 200){
+         setState(() {
+          verifyingOTP=false;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Wrong OTP",style: GoogleFonts.mulish(),),
+            backgroundColor: greenColor,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            duration: Duration(seconds: 2),
+          ),);
       }
+
+
     } catch (e) {
       setState(() {
           verifyingOTP=false;
@@ -119,7 +138,6 @@ class _OtpScreenState extends State<OtpScreen> {
         SnackBar(content: Text('failed to logged in error: $e')),
       );
     }
-      
     } else {
       print('OTP not fully entered');
     }

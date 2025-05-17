@@ -22,12 +22,9 @@ class _LoadingScreenState extends State<LoadingScreen> {
     return Scaffold(
       backgroundColor: scaffoldBlackColor,
       body: Center(
-        child: Lottie.asset(
-              'lib/images/Success_order.json',
-              width: 350,
-              height: 350,
-              repeat: true,
-            ),
+        child: CircularProgressIndicator(
+          color: whiteColor,
+        )
       ),
     );
   }

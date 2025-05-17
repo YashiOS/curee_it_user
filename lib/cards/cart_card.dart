@@ -196,68 +196,66 @@ class _CartCardState extends State<CartCard> {
       ),
       child: Container(
         padding:
-            EdgeInsets.only(right: MediaQuery.of(context).size.width * 0.02, left: MediaQuery.of(context).size.width * 0.03),
+            EdgeInsets.only(right: MediaQuery.of(context).size.width * 0.055, left: MediaQuery.of(context).size.width * 0.03),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             /// LEFT SECTION - Image + Name + Label
-            Expanded(
-              child: Row(
-                children: [
-                  SizedBox(
-                    width: 10,
-                  ),
-                  // Product Image
-
-                  /// Product Info
-                  Container(
-                    width: 180,
-                    child: GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                ItemDetailScreen(productId: widget.productId),
+            Row(
+              children: [
+                SizedBox(
+                  width: 10,
+                ),
+                // Product Image
+            
+                /// Product Info
+                Container(
+                  width: 135,
+                  child: GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) =>
+                              ItemDetailScreen(productId: widget.productId),
+                        ),
+                      );
+                    },
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          widget.productName,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.mulish(
+                            fontWeight: FontWeight.w700,
+                            fontSize: 13,
+                            color: whiteColor,
                           ),
-                        );
-                      },
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            widget.productName,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: GoogleFonts.mulish(
-                              fontWeight: FontWeight.w700,
-                              fontSize: 13,
-                              color: whiteColor,
-                            ),
+                        ),
+                        Text(
+                          widget.packLabel,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.mulish(
+                            fontWeight: FontWeight.w400,
+                            fontSize:
+                                MediaQuery.of(context).size.height * 0.015,
+                            color: greyColor,
                           ),
-                          Text(
-                            widget.packLabel,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: GoogleFonts.mulish(
-                              fontWeight: FontWeight.w400,
-                              fontSize:
-                                  MediaQuery.of(context).size.height * 0.015,
-                              color: greyColor,
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
 
             /// RIGHT SECTION - Quantity control + price
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 // Quantity Control
                 Container(
@@ -336,22 +334,28 @@ class _CartCardState extends State<CartCard> {
                 
                 // Price Column
                 Container(
-                  width: 80,
+                  width: 70,
                   height: 60,
-                  child: Column(
+                 
+                  child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      
-                      Text(
-                        "₹${((widget.sellingPrice) * _localQuantity).toStringAsFixed(2)}",
-                        style: GoogleFonts.mulish(
-                          fontWeight: FontWeight.w300,
-                          fontSize: 13.78,
-                          color: whiteColor,
-                        ),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          
+                          Text(
+                            "₹${((widget.sellingPrice) * _localQuantity).toStringAsFixed(2)}",
+                            style: GoogleFonts.mulish(
+                              fontWeight: FontWeight.w300,
+                              fontSize: 13.78,
+                              color: whiteColor,
+                            ),
+                          ),
+                          
+                          Text("${widget.productPrice * _localQuantity}")
+                        ],
                       ),
-                      
-                      Text("${widget.productPrice * _localQuantity}")
                     ],
                   ),
                 ),

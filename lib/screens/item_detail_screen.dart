@@ -1,3 +1,4 @@
+import 'package:cureeit_user_app/screens/cart_screen.dart';
 import 'package:cureeit_user_app/screens/search.dart';
 import 'package:cureeit_user_app/user/user.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
@@ -27,7 +28,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
   bool addingToCart = false;
   bool addingToFav = false;
   bool readMore = false;
-  int ?currentQuantity;
+  int? currentQuantity;
 
   @override
   void initState() {
@@ -44,27 +45,21 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
     });
   }
 
-  
-  Future<void> DidUpdateQuantity(
-       int change, String productId) async {
-       
-   
+  Future<void> DidUpdateQuantity(int change, String productId) async {
     final newQuantity = currentQuantity! + change;
     setState(() {
-       currentQuantity=newQuantity;
+      currentQuantity = newQuantity;
     });
-   
 
     if (newQuantity < 1) {
       // Remove from cart if quantity goes to 0
       setState(() {
-        currentQuantity=1;
+        currentQuantity = 1;
       });
       return;
     }
 
     final String? userId = User.userId; // Example userId
-  
 
     // Update local state immediately for UI responsiveness
 
@@ -83,7 +78,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
       if (response.statusCode != 200) {
         // Handle error - revert local state in case of failure
         setState(() {
-         currentQuantity=newQuantity;
+          currentQuantity = newQuantity;
         });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to update cart')),
@@ -91,16 +86,13 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
       }
     } catch (e) {
       // Handle network errors - revert local state
-      setState(() {
-       
-      });
+      setState(() {});
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Network error: $e')),
       );
     }
     setState(() {});
   }
-
 
   Future<void> checkIfFav() async {
     try {
@@ -199,10 +191,9 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
       var response = await http.Client().send(request);
 
       if (response.statusCode == 200) {
-       
         Fluttertoast.showToast(msg: "Added To Cart");
         setState(() {
-           currentQuantity=1;
+          currentQuantity = 1;
           isInCart = true;
         });
 
@@ -436,7 +427,6 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Container(
-                             
                               width: 280,
                               child: Text(
                                 product['name'] ?? 'Unknown Product',
@@ -507,7 +497,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                       ),
                       Container(
                           margin: EdgeInsets.only(left: 24),
-                          height: 15,
+                          height: 18,
                           child: Text(
                             "${product['mainUse'] ?? ''}",
                             style: GoogleFonts.mulish(color: whiteColor),
@@ -525,7 +515,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                       Container(
                         margin: EdgeInsets.only(left: 24, top: 5, right: 24),
                         child: Text(
-                          "${product['introduction'] ?? ''} , ${product['usageInstruction'] ?? ''}",
+                          "${product['usageInstruction'] ?? ''}",
                           style: GoogleFonts.mulish(color: whiteColor),
                         ),
                       ),
@@ -536,7 +526,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                "₹${(product["sellingPrice"])?? "00"}",
+                                "₹${(product["sellingPrice"]) ?? "00"}",
                                 style: GoogleFonts.mulish(
                                   fontWeight: FontWeight.w400,
                                   fontSize: MediaQuery.of(context).size.height *
@@ -549,47 +539,82 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                       width: 156,
                                       height: 36,
                                      
-                                      decoration: BoxDecoration(
-                                         color: greenColor,
-                                         borderRadius: BorderRadius.circular(8),
-                                      ),
                                       child: Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
                                         children: [
-                                          IconButton(
-                                              padding: EdgeInsets.zero,
-                                              constraints: BoxConstraints(),
-                                              icon: Icon(
-                                                Icons.remove,
-                                                size: 20,
-                                                color: whiteColor,
-                                              ),
-                                              onPressed: () {
-                                                DidUpdateQuantity(
-                                                     -1,widget.productId);
-                                              }),
-                                          Text(
-                                            '$currentQuantity',
-                                            style: GoogleFonts.mulish(
-                                              color: whiteColor,
-                                              fontWeight: FontWeight.bold,
-                                              fontSize:
-                                                  13,
+                                          Container(
+                                            decoration: BoxDecoration(
+                                        color: greenColor,
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                            width: 108,
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                IconButton(
+                                                  padding: EdgeInsets.zero,
+                                                  constraints: BoxConstraints(),
+                                                  icon: Icon(
+                                                    Icons.remove,
+                                                    size: 20,
+                                                    color: whiteColor,
+                                                  ),
+                                                  onPressed: () {
+                                                    DidUpdateQuantity(
+                                                        -1, widget.productId);
+                                                  },
+                                                ),
+                                                Text(
+                                                  '$currentQuantity',
+                                                  style: GoogleFonts.mulish(
+                                                    color: whiteColor,
+                                                    fontWeight: FontWeight.bold,
+                                                    fontSize: 13,
+                                                  ),
+                                                ),
+                                                IconButton(
+                                                  padding: EdgeInsets.zero,
+                                                  constraints: BoxConstraints(),
+                                                  icon: Icon(
+                                                    Icons.add,
+                                                    size: 20,
+                                                    color: whiteColor,
+                                                  ),
+                                                  onPressed: () {
+                                                    DidUpdateQuantity(
+                                                        1, widget.productId);
+                                                  },
+                                                ),
+                                              ],
                                             ),
                                           ),
-                                          IconButton(
-                                              padding: EdgeInsets.zero,
-                                              constraints: BoxConstraints(),
-                                              icon: Icon(
-                                                Icons.add,
-                                                size: 20,
-                                                color: whiteColor,
-                                              ),
+                                          Container(
+                                            decoration: BoxDecoration(
+                                        color: greenColor,
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                            width: 40,
+                                            child: TextButton(
                                               onPressed: () {
-                                                DidUpdateQuantity(
-                                                     1,widget.productId);
-                                              }),
+                                                // Navigate to cart screen
+                                                Navigator.pushReplacement(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        CartScreen(
+                                                            isNavigated: true),
+                                                  ),
+                                                );
+                                              },
+                                              style: TextButton.styleFrom(
+                                                padding: EdgeInsets.zero,
+                                              ),
+                                              child: Icon(Icons.shopping_cart_outlined,color: whiteColor,),
+                                            ),
+                                          ),
                                         ],
                                       ),
                                     )
@@ -613,7 +638,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             40)),
-                                                height: 10,// 40/667 ≈ 0.06
+                                                height: 10, // 40/667 ≈ 0.06
                                                 width: 10,
                                                 child:
                                                     CircularProgressIndicator(

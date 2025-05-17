@@ -152,7 +152,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 padding: const EdgeInsets.only(left: 4.0),
                 child: Row(
                   spacing: 4,
-                  children: [Image.asset("lib/images/Vector 9.png")],
+                  children: [Image.asset("lib/images/Vector 9.png",scale: 0.8,)],
                 ),
               ),
             ),

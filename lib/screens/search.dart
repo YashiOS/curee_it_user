@@ -18,6 +18,7 @@ class Search extends StatefulWidget {
 class _SearchState extends State<Search> {
   final TextEditingController _controller = TextEditingController();
   Timer? _debounce;
+  final FocusNode _focusNode = FocusNode(); 
   List<dynamic> _searchResults = [];
   bool _isLoading = false;
   bool isIncart = false;
@@ -98,6 +99,9 @@ class _SearchState extends State<Search> {
     _controller.addListener(() {
       _onSearchChanged();
     });
+     WidgetsBinding.instance.addPostFrameCallback((_) {
+    FocusScope.of(context).requestFocus(_focusNode);
+  });
   }
 
   @override
@@ -234,7 +238,7 @@ class _SearchState extends State<Search> {
               padding: const EdgeInsets.only(left: 4.0),
               child: Row(
                 spacing: 4,
-                children: [Image.asset("lib/images/Vector 9.png")],
+                children: [Image.asset("lib/images/Vector 9.png",scale: 0.8,)],
               ),
             ),
           ),
@@ -258,6 +262,8 @@ class _SearchState extends State<Search> {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       child: TextField(
+                         focusNode: _focusNode,
+                         autofocus: true,
                         cursorColor: whiteColor,
                         style: GoogleFonts.mulish(color: whiteColor),
                         controller: _controller,

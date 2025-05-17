@@ -40,7 +40,11 @@ class _LoginScreenState extends State<LoginScreen> {
           "mobileNumber": _controller.text.trim(),
         }),
       );
+      print("LOG IN BODY");
        print(response.body);
+       final Map<String, dynamic> responseBody = json.decode(response.body);
+       print(response.statusCode);
+       
       if (response.statusCode == 200) {
         setState(() {
           
@@ -51,6 +55,8 @@ class _LoginScreenState extends State<LoginScreen> {
         MaterialPageRoute(
             builder: (context) => OtpScreen(phoneNumber:_controller.text.trim(),purpose: "login",name: "",)),
       );
+      
+      }
       if(response.statusCode==400){
         setState(() {
           
@@ -61,8 +67,6 @@ class _LoginScreenState extends State<LoginScreen> {
         MaterialPageRoute(
             builder: (context) => RegisterScreen(phoneNumber:_controller.text.trim()),
       ));
-      }
-       
       }
     } catch (e) {
       setState(() {

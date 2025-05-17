@@ -94,6 +94,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   double _bottomWidgetHeight = 76; // Height of your bottom widget
   late AnimationController _animationController;
   late Animation<double> _animation;
+  Timer? _ongoingOrdersTimer;
+bool _isFetchingOngoingOrders = false;
   // To store product quantities
 
   void _showLocationDeniedDialog() {
@@ -156,6 +158,29 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     changeSearchText();
     fetchOrderHistory();
   }
+
+  void _startOngoingOrdersPolling() {
+    print("Hitting every 10 sec");
+  // Cancel any existing timer
+  _ongoingOrdersTimer?.cancel();
+  
+  // Start a new timer that fires every 10 seconds
+  _ongoingOrdersTimer = Timer.periodic(Duration(seconds: 10), (timer) async {
+    if (onGoingOrders.isEmpty) {
+        _ongoingOrdersTimer?.cancel();
+        _ongoingOrdersTimer = null;
+        _isFetchingOngoingOrders = false;
+        return;
+         
+      }
+
+     _isFetchingOngoingOrders = true;
+    if (_isFetchingOngoingOrders) {
+      await fetchOrderHistory(); // This will update onGoingOrders
+      // If there are no more ongoing orders, stop the timer
+    }
+  });
+}
 
   Future<void> _checkLocationStatus() async {
     print("Checking location status...");
@@ -239,6 +264,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     _scrollController.removeListener(_scrollListener);
     _scrollController.dispose();
     _animationController.dispose();
+    _ongoingOrdersTimer?.cancel();
     // TODO: implement dispose
     super.dispose();
   }
@@ -278,6 +304,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         });
 
         onGoingOrders = getOngoingOrders(AllOrders);
+        if(onGoingOrders.isNotEmpty){
+          _startOngoingOrdersPolling();
+        }
       });
     } else {
       throw Exception('Failed to load order history');
@@ -653,7 +682,7 @@ if(newQuantity==0){
     if (products.isEmpty) {
       return SliverToBoxAdapter(
         child: Center(
-          child: CircularProgressIndicator(color: secondaryColor),
+          child: Text("No items",style: GoogleFonts.mulish(color: whiteColor),),
         ),
       );
     }
@@ -726,8 +755,8 @@ if(newQuantity==0){
             width: double.infinity,
             height: 109,
             child: GestureDetector(
-              onTap: () {
-                Navigator.push(
+              onTap: () async{
+               await Navigator.push(
                   context,
                   MaterialPageRoute(
                     builder: (context) => ItemDetailScreen(
@@ -735,6 +764,7 @@ if(newQuantity==0){
                     ),
                   ),
                 );
+                fetchCartDetails();
               },
               child: Container(
                 width: double.infinity,
@@ -1596,30 +1626,33 @@ if(newQuantity==0){
                                         ),
                                         child: cartItems[0]['imageUrls']
                                                 .isNotEmpty
-                                            ? Image.network(
-                                                cartItems[0]['imageUrls'][0],
-                                                fit: BoxFit.contain,
-                                                loadingBuilder: (context, child,
-                                                    loadingProgress) {
-                                                  if (loadingProgress == null)
-                                                    return child;
-                                                  return const Center(
-                                                    child:
-                                                        CircularProgressIndicator(
-                                                      color: whiteColor,
-                                                    ),
-                                                  );
-                                                },
-                                                errorBuilder: (context, error,
-                                                    stackTrace) {
-                                                  return const Center(
-                                                    child: Icon(
-                                                      Icons.error,
-                                                      color: whiteColor,
-                                                    ),
-                                                  );
-                                                },
-                                              )
+                                            ? ClipRRect(
+                                              borderRadius: BorderRadius.circular(10),
+                                              child: Image.network(
+                                                  cartItems[0]['imageUrls'][0],
+                                                  fit: BoxFit.contain,
+                                                  loadingBuilder: (context, child,
+                                                      loadingProgress) {
+                                                    if (loadingProgress == null)
+                                                      return child;
+                                                    return const Center(
+                                                      child:
+                                                          CircularProgressIndicator(
+                                                        color: whiteColor,
+                                                      ),
+                                                    );
+                                                  },
+                                                  errorBuilder: (context, error,
+                                                      stackTrace) {
+                                                    return const Center(
+                                                      child: Icon(
+                                                        Icons.error,
+                                                        color: whiteColor,
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                            )
                                             : Icon(Icons.image),
                                       ),
                                 Row(
@@ -1655,6 +1688,7 @@ if(newQuantity==0){
                                         CartScreen(isNavigated: true),
                                   ),
                                 );
+                                fetchCartDetails();
                               },
                               child: Container(
                                 width: 90,

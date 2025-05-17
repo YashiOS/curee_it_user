@@ -22,6 +22,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
   Map<String, dynamic> orderTrackingDetails = {};
 
   bool HittingApi = false;
+  bool _isInitLoading=true;
 
   String formatDate(String isoDate) {
     // Parse the ISO 8601 string into a DateTime object
@@ -52,15 +53,24 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
 
       setState(() {
         if (data["data"].isNotEmpty) {
+          _isInitLoading=false;
           orderTrackingDetails = Map<String, dynamic>.from(data["data"][0]);
         }
       });
     } else {
+      setState(() {
+        _isInitLoading=false;
+      });
+      
       print('Failed to load tracking details');
     }
     if (HittingApi == false) {
       _hittingApi();
     }
+    setState(() {
+        _isInitLoading=false;
+      });
+      
   }
 
   @override
@@ -478,7 +488,11 @@ final double difference = itemTotal - totalSellingPrice;
 
     return Scaffold(
       backgroundColor: scaffoldBlackColor,
-      body: Column(
+      body:_isInitLoading?Center(
+        child: CircularProgressIndicator(
+          color: whiteColor,
+        ),
+      ) :Column(
         children: [
           SizedBox(height: height * 0.03),
           Container(
