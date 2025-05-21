@@ -10,10 +10,11 @@ import 'package:intl/intl.dart';
 
 class OrderTrackingScreen extends StatefulWidget {
   OrderTrackingScreen(
-      {super.key, required this.NavigatingFrom, required this.orderId});
+      {super.key, required this.NavigatingFrom, required this.orderId,required this.orderData});
   final String? userId = User.userId;
   late String orderId;
   final String NavigatingFrom;
+   final dynamic orderData;
   @override
   State<OrderTrackingScreen> createState() => _OrderTrackingScreenState();
 }
@@ -210,42 +211,27 @@ final double difference = itemTotal - totalSellingPrice;
                         ],
                       ),
                     ),
-                    Text(
-                      "₹${orderTrackingDetails["itemTotal"]}",
-                      style: GoogleFonts.mulish(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w300,
-                          color: whiteColor),
-                    ),
-                  ],
-                ),
-              ),
-
-              Padding(
-                padding: const EdgeInsets.only(top: 0, bottom: 0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            "Item Discount ",
-                            style: GoogleFonts.mulish(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w300,
-                                color: whiteColor),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Text(
-                      "-₹${difference.toStringAsFixed(2)}",
-                      style: GoogleFonts.mulish(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w300,
-                          color: greenColor),
+                    Row(
+                      children: [
+                        Text(
+                          "₹${orderTrackingDetails["itemTotal"]}",
+                          style: GoogleFonts.mulish(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w300,
+                              decoration: TextDecoration.lineThrough,
+                              decorationColor: greyColor,
+                              color: greyColor),
+                        ),
+                        SizedBox(width: 5,),
+                        Text(
+                          "₹${totalSellingPrice.toStringAsFixed(2)}",
+                          style: GoogleFonts.mulish(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w400,
+                             
+                              color: whiteColor),
+                        ),
+                      ],
                     ),
                   ],
                 ),
@@ -485,6 +471,7 @@ final double difference = itemTotal - totalSellingPrice;
     final size = MediaQuery.of(context).size;
     final width = size.width;
     final height = size.height;
+    print(widget.orderData);
 
     return Scaffold(
       backgroundColor: scaffoldBlackColor,

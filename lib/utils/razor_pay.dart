@@ -42,7 +42,7 @@ class RazorpayPayment {
         'email': email,
       },
       'theme': {
-        'color': '#F37254',
+        'color': '#1A1A1A',
       }
     };
 

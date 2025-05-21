@@ -48,7 +48,7 @@ class OrderdetailScreenNew extends StatelessWidget {
     return Scaffold(
         appBar: AppBar(
           backgroundColor:ligtBlackColor,
-          leadingWidth: 100,
+         centerTitle: true,
           leading: GestureDetector(
             onTap: (){
               Navigator.of(context).pop();
@@ -61,7 +61,7 @@ class OrderdetailScreenNew extends StatelessWidget {
                 padding: const EdgeInsets.only(left: 4.0),
                 child: Row(
                   spacing: 4,
-                  children: [Image.asset("lib/images/Vector 9.png")],
+                  children: [Image.asset("lib/images/Vector 9.png",scale: 0.8,)],
                 ),
               ),
                           ),
@@ -72,8 +72,8 @@ class OrderdetailScreenNew extends StatelessWidget {
             style: GoogleFonts.mulish(
                 color: whiteColor,
                
-                fontSize: 18,
-                fontWeight: FontWeight.w700),
+                fontSize: 22.69,
+                fontWeight: FontWeight.w400),
           ),
         ),
         body: Container(

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:math';
+import 'package:cureeit_user_app/cartManager/cartManager.dart';
 import 'package:cureeit_user_app/cubit/service_avilable_cubit.dart';
 import 'package:cureeit_user_app/current_address/api_services.dart';
 import 'package:cureeit_user_app/current_address/location_permission_helper.dart';
@@ -65,7 +66,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   int currentIndex = 0;
   String? currentHint;
   late Timer timer;
-
+ Map<String,bool> updatingQuantity={};
+  bool fisrtTime=false;
   Timer? _animationTimer;
   bool loaded = false;
   bool newUser = false;
@@ -77,6 +79,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   List<Map<String, dynamic>> cartItems = [];
   double totalAmount = 0.00;
   String finaltotalAmount = "";
+  int quantityCart=0;
   bool isLoading = true;
   bool isTapped = false;
   bool? isInRadius;
@@ -336,6 +339,7 @@ bool _isFetchingOngoingOrders = false;
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final product = products[index];
     final productId = product['productId'];
+    
     try {
       final response = await http.post(
         Uri.parse(
@@ -356,6 +360,7 @@ bool _isFetchingOngoingOrders = false;
           fetchCartDetails();
           isTapped = true;
           isAddingMap[index] = false;
+          CartManager.cartQuantities[productId]=(CartManager.cartQuantities[productId]??0)+1;
         });
         Fluttertoast.showToast(msg: "Added To Cart");
       } else {
@@ -382,6 +387,7 @@ bool _isFetchingOngoingOrders = false;
       "userId": userId,
       "productId": productId,
     };
+   
 
     final url =
         'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/cart/removeFromCart';
@@ -393,7 +399,7 @@ bool _isFetchingOngoingOrders = false;
       );
 
       if (response.statusCode == 200) {
-      
+      CartManager.cartQuantities.remove(productId);
          await fetchCartDetails();
          setState(() {
            
@@ -401,6 +407,7 @@ bool _isFetchingOngoingOrders = false;
               isTapped = false;
               cartItems.clear();
               totalAmount = 0;
+               
 
            }
          });
@@ -446,12 +453,13 @@ bool _isFetchingOngoingOrders = false;
     final product = products[index];
     final productId = product['productId'];
     final String? userId = User.userId; // Example userId
-    final int currentQuantity = quantities[index] ?? 0;
+    final int currentQuantity = CartManager.cartQuantities[productId] ?? 0;
     final int newQuantity = currentQuantity + change;
     
 
     // Update local state immediately for UI responsiveness
     setState(() {
+      updatingQuantity[productId]=true;
       if (newQuantity < 1) {
         quantities[index] = 0;
       } else {
@@ -462,6 +470,7 @@ if(newQuantity==0){
        _removeFromCart(productId);
        return;
     }
+    
     try {
       final response = await http.put(
         Uri.parse(
@@ -475,11 +484,19 @@ if(newQuantity==0){
       );
       if (response.statusCode == 200) {
         fetchCartDetails();
+        CartManager.cartQuantities[productId]=newQuantity;
+        setState(() {
+          updatingQuantity[productId]=false;
+        });
        Fluttertoast.showToast(msg: "Updated Cart");
       }
       if (response.statusCode != 200) {
+        setState(() {
+          updatingQuantity[productId]=false;
+        });
         // Handle error - revert local state in case of failure
         setState(() {
+          CartManager.cartQuantities[productId]=currentQuantity;
           quantities[index] = currentQuantity;
         });
          Fluttertoast.showToast(msg: "Failed to update cart");
@@ -488,15 +505,19 @@ if(newQuantity==0){
     } catch (e) {
       // Handle network errors - revert local state
       setState(() {
+        updatingQuantity[productId]=false;
+        CartManager.cartQuantities[productId]=currentQuantity;
         quantities[index] = currentQuantity;
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Network error: $e')),
       );
     }
+    
   }
 
   Future<void> fetchCartDetails() async {
+   
     print("FETCH CART DETAILS STARTED");
     setState(() {
       isLoading = true;
@@ -530,6 +551,7 @@ if(newQuantity==0){
               final productDetails =
                   await fetchProductDetails(cartItem['productId']);
               if (productDetails != null) {
+                
                 // Safely parse numeric values
                 final quantity =
                     int.tryParse(cartItem['quantity'].toString()) ?? 0;
@@ -539,8 +561,15 @@ if(newQuantity==0){
                 final productPrice = double.tryParse(
                         (cartItem["productPrice"] ?? '0').toString()) ??
                     0.0;
+                    if(CartManager.cartQuantities[cartItem["productId"]]==null){
+                       CartManager.cartQuantities[cartItem["productId"]]=quantity;
+                    }
+               
 
                 calculatedTotal += quantity * sellingPrice;
+                 quantityCart=CartManager.getTotalQuantity();
+                
+                
 
                 tempCart.add({
                   "productId": cartItem['productId'],
@@ -729,7 +758,7 @@ if(newQuantity==0){
     final bool isInCart = quantities[index] != null && quantities[index]! > 0;
     final height = MediaQuery.of(context).size.height;
     final width = MediaQuery.of(context).size.width;
-
+    
     final containerHeight = height * 0.45; // 🟢 Half screen height
     final containerWidth = width * 0.3;
 
@@ -764,7 +793,7 @@ if(newQuantity==0){
                     ),
                   ),
                 );
-                fetchCartDetails();
+               await fetchCartDetails();
               },
               child: Container(
                 width: double.infinity,
@@ -800,7 +829,7 @@ if(newQuantity==0){
             margin: EdgeInsets.only(top: 16, left: 10),
             child: Text(
               product['name'] ?? 'Product',
-              maxLines: 2,
+              maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: GoogleFonts.mulish(
                   fontSize: containerHeight * 0.04, color: whiteColor),
@@ -840,19 +869,19 @@ if(newQuantity==0){
                   height: 29,
                   decoration: BoxDecoration(
                     color: ligtBlackColor,
-                    border: isInCart
+                    border: isInCart||CartManager.cartQuantities[product['productId']]!=null
                         ? Border.all()
                         : Border.all(color: greenColor, width: 1),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: isInCart
+                  child:  CartManager.cartQuantities[product['productId']]!=null
                       ? Container(
-                          width: 50,
-                          height: 29,
+                          width: 52,
+                          height: 31,
                           decoration: BoxDecoration(
                               color: greenColor,
                               borderRadius: BorderRadius.circular(8),
-                              border: Border.all(color: greenColor, width: 1)),
+                        ),
                           child: FittedBox(
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -867,8 +896,8 @@ if(newQuantity==0){
                                   ),
                                   onPressed: () => DidUpdateQuantity(index, -1),
                                 ),
-                                Text(
-                                  '${quantities[index]}',
+                               updatingQuantity[product["productId"]]==true?Container(height: 10,width: 10,child: CircularProgressIndicator(color: whiteColor,),) :Text(
+                                  '${CartManager.cartQuantities[product['productId']]??0}',
                                   style: GoogleFonts.mulish(
                                     color: whiteColor,
                                     fontWeight: FontWeight.bold,
@@ -1358,6 +1387,8 @@ if(newQuantity==0){
                                   itemBuilder: (context, index) {
                                     String status = "";
                                     final order = onGoingOrders[index];
+                                    final orederId=order["orderId"];
+                                    
                                     if (order["currentStatus"] ==
                                         "Order Placed") {
                                       status = "Your order was placed!";
@@ -1372,17 +1403,31 @@ if(newQuantity==0){
                                     return Container(
                                       padding: EdgeInsets.all(16),
                                       height: 80,
-                                      width: 350,
+                                      width: MediaQuery.of(context).size.width * 0.9,
                                       child: Row(
+                                        crossAxisAlignment: CrossAxisAlignment.center,
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Text(
-                                            "$status",
-                                            style: GoogleFonts.mulish(
-                                                color: whiteColor,
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.bold),
+                                          Column(
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                "$status",
+                                                style: GoogleFonts.mulish(
+                                                    color: whiteColor,
+                                                    fontSize: 20,
+                                                    fontWeight: FontWeight.bold),
+                                              ),
+                                               Text(
+                                                "#$orederId",
+                                                style: GoogleFonts.mulish(
+                                                    color: greyColor,
+                                                    fontSize: 10,
+                                                    fontWeight: FontWeight.bold),
+                                              ),
+                                            ],
                                           ),
                                           Container(
                                             height: order["currentStatus"] ==
@@ -1546,7 +1591,7 @@ if(newQuantity==0){
               else if (isInRadius!)
                 SliverPadding(
                   padding: cartItems.isNotEmpty
-                      ? EdgeInsets.only(bottom: 50)
+                      ? EdgeInsets.only(bottom: 135)
                       : EdgeInsets.only(bottom: 50),
                   sliver: buildProductListAsSliver(),
                 )
@@ -1556,7 +1601,7 @@ if(newQuantity==0){
           ),
         ),
         if ((!isLoading &&
-                cartItems.isNotEmpty &&
+             cartItems.isNotEmpty&&
                 ISserviceAvilable &&
                 totalAmount != 0) ||
             (isTapped) && ISserviceAvilable && totalAmount != 0) ...[
@@ -1566,7 +1611,7 @@ if(newQuantity==0){
             builder: (context, child) {
               return Positioned(
                 right: 0,
-                bottom: _animation.value,
+                bottom: 76,
                 child: Container(
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.height * 0.10,
@@ -1658,7 +1703,7 @@ if(newQuantity==0){
                                 Row(
                                   children: [
                                     Text(
-                                      '${cartItems.length} Item(s)  ',
+                                      '${quantityCart} Item(s)  ',
                                       style: TextStyle(
                                         color: greyColor,
                                         fontFamily: "Urbanist",

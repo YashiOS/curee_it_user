@@ -52,7 +52,7 @@ class _BaseScreenState extends State<BaseScreen> {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: DefaultTabController(
-          length: 4,
+          length: 3,
           child: BlocBuilder<ServiceAvilableCubit, ServiceAvilableState>(
             builder: (context, state) {
               if (state is ServiceIsAvilable) {

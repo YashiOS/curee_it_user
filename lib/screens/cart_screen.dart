@@ -77,6 +77,23 @@ class _CartScreenState extends State<CartScreen> {
     }
   }
 
+ void checkPrescriptionRequirements() {
+    bool hasPrescriptionItems = cartItems.any((item) => 
+      item["prescription_required"] == "Yes"
+    );
+    
+    setState(() {
+      requiresPrescription = hasPrescriptionItems;
+      payNow = !hasPrescriptionItems;
+      if (!hasPrescriptionItems) {
+        
+        requiresPrescription=false;
+        imagePicked = false;
+        _imageFile = null;
+      }
+    });
+  }
+
   void removeItemFromCart(String productId) {
     setState(() {
       cartItems.removeWhere((item) => item['productId'] == productId);
@@ -88,6 +105,7 @@ class _CartScreenState extends State<CartScreen> {
         totalWholeAmount = 0.0;
       }
     });
+    checkPrescriptionRequirements();
   }
 
   Future<void> _removeAllFromCart() async {
@@ -140,6 +158,7 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   Future<void> fetchCartDetails() async {
+    
     var cartApiUrl = Uri.parse(
         "http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/cart/cartDetails");
     final String? userId = User.userId; // Replace with the actual userId
@@ -172,12 +191,17 @@ class _CartScreenState extends State<CartScreen> {
           for (var cartItem in cartData) {
             Map<String, dynamic>? productDetails =
                 await fetchProductDetails(cartItem['productId']);
-
+               
+            
             if (productDetails != null) {
               if (cartItem["prescription_required"] == "Yes") {
                 payNow = false;
-                requiresPrescription = true;
+                setState(() {
+                  requiresPrescription = true;
+                });
+                
               }
+
               double itemProductPrice =
                   (cartItem['productPrice'] ?? 0).toDouble();
               double itemSellingPrice =
@@ -357,7 +381,19 @@ class _CartScreenState extends State<CartScreen> {
         }
       } else {
         var responseBody = await response.stream.bytesToString();
+         ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Failed to Create Order",style: GoogleFonts.mulish(),),
+            backgroundColor: greenColor,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            duration: Duration(seconds: 2),
+          ),);
         throw Exception('Failed to Create Order --> $responseBody');
+        
+
       }
     } catch (error) {
       print('Error in Creating Order: $error');
@@ -836,54 +872,33 @@ class _CartScreenState extends State<CartScreen> {
                                                                           whiteColor,
                                                                     ),
                                                                   ),
-                                                                  Text(
-                                                                    "₹${totalProductPrice.toStringAsFixed(2)}",
-                                                                    style: GoogleFonts
-                                                                        .mulish(
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w300,
-                                                                      fontSize:
-                                                                          14,
-                                                                      color:
-                                                                          whiteColor,
+                                                                  Container(
+                                                                    child: Row(
+                                                                      children: [
+                                                                        Text(
+                                                                          "₹${totalProductPrice.toStringAsFixed(2)}",
+                                                                          style: GoogleFonts
+                                                                              .mulish(
+                                                                            fontWeight:
+                                                                                FontWeight
+                                                                                    .w300,
+                                                                            fontSize:
+                                                                                12,
+                                                                            color:
+                                                                                greyColor,
+                                                                                decoration: TextDecoration.lineThrough,
+                                                                                decorationColor: greyColor
+                                                                          ),
+                                                                        ),
+                                                                        SizedBox(width: 5,),
+                                                                        Text("₹${totalSellingPrice.toStringAsFixed(2)}",
+                                                                        style: GoogleFonts.mulish(fontWeight: FontWeight.w400,fontSize: 14,color: whiteColor),)
+                                                                      ],
                                                                     ),
                                                                   ),
                                                                 ],
                                                               ),
-                                                              Row(
-                                                                mainAxisAlignment:
-                                                                    MainAxisAlignment
-                                                                        .spaceBetween,
-                                                                children: [
-                                                                  Text(
-                                                                    "Item Discount",
-                                                                    style: GoogleFonts
-                                                                        .mulish(
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w300,
-                                                                      fontSize:
-                                                                          14,
-                                                                      color:
-                                                                          whiteColor,
-                                                                    ),
-                                                                  ),
-                                                                  Text(
-                                                                    "- ₹${(totalProductPrice - totalSellingPrice).toStringAsFixed(2)}",
-                                                                    style: GoogleFonts
-                                                                        .mulish(
-                                                                      fontWeight:
-                                                                          FontWeight
-                                                                              .w300,
-                                                                      fontSize:
-                                                                          14,
-                                                                      color:
-                                                                          greenColor,
-                                                                    ),
-                                                                  ),
-                                                                ],
-                                                              ),
+                                                              
                                                               Row(
                                                                 mainAxisAlignment:
                                                                     MainAxisAlignment
@@ -977,7 +992,7 @@ class _CartScreenState extends State<CartScreen> {
                                                                           style: GoogleFonts.mulish(
                                                                               fontWeight: FontWeight.bold,
                                                                               fontSize: 16,
-                                                                              color: greyColor),
+                                                                              color:whiteColor),
                                                                         ),
                                                                         Text(
                                                                           "₹${totalWholeAmount.toStringAsFixed(2)}",
@@ -995,36 +1010,9 @@ class _CartScreenState extends State<CartScreen> {
                                                                   SizedBox(
                                                                     height: 25,
                                                                   ),
-                                                                  Container(
-                                                                    height: 36,
-                                                                    width: double
-                                                                        .infinity,
-                                                                    alignment:
-                                                                        Alignment
-                                                                            .center,
-                                                                    decoration:
-                                                                        BoxDecoration(
-                                                                      color: payNow
-                                                                          ? greenColor
-                                                                          : ligtBlackColor,
-                                                                      border:
-                                                                          Border
-                                                                              .all(
-                                                                        color:
-                                                                            greenColor,
-                                                                        width:
-                                                                            1,
-                                                                      ),
-                                                                      // Setting the background color to primary color
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(
-                                                                              8), // Setting the border radius to 10
-                                                                    ),
-                                                                    child:
-                                                                        GestureDetector(
-                                                                      onTap:
-                                                                          () {
-                                                                        if (addresses.length ==
+                                                                  GestureDetector(
+                                                                    onTap: (){
+                                                                         if (addresses.length ==
                                                                             0) {
                                                                           return;
                                                                         }
@@ -1070,10 +1058,35 @@ class _CartScreenState extends State<CartScreen> {
                                                                           '8890170172',
                                                                           'accounts@cureeit.com',
                                                                         );
-                                                                      },
+                                                                    },
+                                                                    child: Container(
+                                                                      height: 36,
+                                                                      width: double
+                                                                          .infinity,
+                                                                      alignment:
+                                                                          Alignment
+                                                                              .center,
+                                                                      decoration:
+                                                                          BoxDecoration(
+                                                                        color: payNow
+                                                                            ? greenColor
+                                                                            : ligtBlackColor,
+                                                                        border:
+                                                                            Border
+                                                                                .all(
+                                                                          color:
+                                                                              greenColor,
+                                                                          width:
+                                                                              1,
+                                                                        ),
+                                                                        // Setting the background color to primary color
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(
+                                                                                8), // Setting the border radius to 10
+                                                                      ),
                                                                       child:
                                                                           Center(
-                                                                        child:
+                                                                                                                                                  child:
                                                                             Text(
                                                                           "Confirm and Pay",
                                                                           style:
@@ -1086,8 +1099,8 @@ class _CartScreenState extends State<CartScreen> {
                                                                             fontWeight:
                                                                                 FontWeight.w700,
                                                                           ),
-                                                                        ),
-                                                                      ),
+                                                                                                                                                  ),
+                                                                                                                                                ),
                                                                     ),
                                                                   ),
                                                                 ],

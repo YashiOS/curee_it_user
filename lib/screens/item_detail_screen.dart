@@ -1,3 +1,4 @@
+import 'package:cureeit_user_app/cartManager/cartManager.dart';
 import 'package:cureeit_user_app/screens/cart_screen.dart';
 import 'package:cureeit_user_app/screens/search.dart';
 import 'package:cureeit_user_app/user/user.dart';
@@ -29,7 +30,8 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
   bool addingToFav = false;
   bool readMore = false;
   int? currentQuantity;
-
+  bool isUpdatingQun=false;
+ 
   @override
   void initState() {
     print('INIT STATE CALLED');
@@ -45,17 +47,84 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
     });
   }
 
+   Future<void> _removeFromCart(String ProductId) async {
+  
+    final String userId = User.userId!;
+    final String productId = ProductId;
+
+    final Map<String, dynamic> requestData = {
+      "userId": userId,
+      "productId": productId,
+    };
+   
+
+    final url =
+        'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/cart/removeFromCart';
+    try {
+      final response = await http.delete(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(requestData),
+      );
+
+      if (response.statusCode == 200) {
+      CartManager.cartQuantities.remove(widget.productId);
+       
+        
+       Fluttertoast.showToast(msg: "Removed from cart");
+       
+        
+      } else {
+        print(response.statusCode);
+      
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Failed to remove from cart",style: GoogleFonts.mulish(),),
+            backgroundColor: greenColor,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            duration: Duration(seconds: 2),
+          ),);
+        print('Failed to remove from cart');
+      }
+    } catch (error) {
+     
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Error removing from cart ",style: GoogleFonts.mulish(),),
+            backgroundColor: greenColor,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            duration: Duration(seconds: 2),
+          ),);
+      print('Error removing from cart: $error');
+    }
+  }
+
+
   Future<void> DidUpdateQuantity(int change, String productId) async {
-    final newQuantity = currentQuantity! + change;
+    setState(() {
+      isUpdatingQun=true;
+ 
+    });
+    final newQuantity = CartManager.cartQuantities[widget.productId]! + change;
     setState(() {
       currentQuantity = newQuantity;
     });
 
     if (newQuantity < 1) {
-      // Remove from cart if quantity goes to 0
+      await _removeFromCart(widget.productId);
       setState(() {
-        currentQuantity = 1;
-      });
+      isUpdatingQun=false;
+      CartManager.cartQuantities.remove(widget.productId);
+ 
+    });
+      // Remove from cart if quantity goes to 0
+      
       return;
     }
 
@@ -74,10 +143,16 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
           "quantity": newQuantity,
         }),
       );
-
+      CartManager.cartQuantities[widget.productId]=newQuantity;
+      setState(() {
+        isUpdatingQun=false;
+      });
       if (response.statusCode != 200) {
+        
         // Handle error - revert local state in case of failure
         setState(() {
+          isUpdatingQun=false;
+ 
           currentQuantity = newQuantity;
         });
         ScaffoldMessenger.of(context).showSnackBar(
@@ -91,7 +166,9 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
         SnackBar(content: Text('Network error: $e')),
       );
     }
-    setState(() {});
+    setState(() {
+      isUpdatingQun=false;
+    });
   }
 
   Future<void> checkIfFav() async {
@@ -191,6 +268,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
       var response = await http.Client().send(request);
 
       if (response.statusCode == 200) {
+        CartManager.cartQuantities[widget.productId]=1;
         Fluttertoast.showToast(msg: "Added To Cart");
         setState(() {
           currentQuantity = 1;
@@ -234,6 +312,8 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
       if (response.statusCode == 200) {
         var responseBody = await response.stream.bytesToString();
         Map<String, dynamic> jsonData = jsonDecode(responseBody);
+        productId=jsonData["data"]["productId"];
+        print(productId);
 
         if (jsonData['data'] == null) {
           return {};
@@ -310,7 +390,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
               padding: const EdgeInsets.only(left: 4.0),
               child: Row(
                 spacing: 4,
-                children: [Image.asset("lib/images/Vector 9.png")],
+                children: [Image.asset("lib/images/Vector 9.png",scale: 0.8,)],
               ),
             ),
           ),
@@ -346,7 +426,9 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                         child: PageView.builder(
                           controller: _controller,
                           itemCount: product['imageUrls'].length,
+                          
                           itemBuilder: (context, index) {
+                            
                             return Container(
                               height: 203,
                               margin: EdgeInsets.all(24),
@@ -534,9 +616,9 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                   color: whiteColor,
                                 ),
                               ),
-                              isInCart
+                              isInCart || CartManager.cartQuantities[widget.productId]!=null
                                   ? Container(
-                                      width: 156,
+                                      width: 160,
                                       height: 36,
                                      
                                       child: Row(
@@ -548,7 +630,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                         color: greenColor,
                                         borderRadius: BorderRadius.circular(8),
                                       ),
-                                            width: 108,
+                                            width: 113,
                                             child: Row(
                                               mainAxisAlignment:
                                                   MainAxisAlignment
@@ -567,8 +649,15 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                                         -1, widget.productId);
                                                   },
                                                 ),
-                                                Text(
-                                                  '$currentQuantity',
+                                               isUpdatingQun?Container(
+                                                width: 10,
+                                                height: 10,
+                                                child: CircularProgressIndicator(
+                                                  color: whiteColor,
+                                                  strokeWidth: 2,
+                                                ),
+                                               ) :Text(
+                                                  '${CartManager.cartQuantities[widget.productId]??0}',
                                                   style: GoogleFonts.mulish(
                                                     color: whiteColor,
                                                     fontWeight: FontWeight.bold,
@@ -643,6 +732,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                                 child:
                                                     CircularProgressIndicator(
                                                   color: whiteColor,
+                                                  strokeWidth: 2,
                                                 ))
                                             : Text(
                                                 "Add to Cart",

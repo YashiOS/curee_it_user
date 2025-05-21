@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:cureeit_user_app/screens/cart_screen.dart';
 import 'package:cureeit_user_app/screens/item_detail_screen.dart';
 import 'package:cureeit_user_app/user/user.dart';
 import 'package:flutter/material.dart';
@@ -18,7 +19,7 @@ class Search extends StatefulWidget {
 class _SearchState extends State<Search> {
   final TextEditingController _controller = TextEditingController();
   Timer? _debounce;
-  final FocusNode _focusNode = FocusNode(); 
+  final FocusNode _focusNode = FocusNode();
   List<dynamic> _searchResults = [];
   bool _isLoading = false;
   bool isIncart = false;
@@ -99,9 +100,9 @@ class _SearchState extends State<Search> {
     _controller.addListener(() {
       _onSearchChanged();
     });
-     WidgetsBinding.instance.addPostFrameCallback((_) {
-    FocusScope.of(context).requestFocus(_focusNode);
-  });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FocusScope.of(context).requestFocus(_focusNode);
+    });
   }
 
   @override
@@ -213,6 +214,21 @@ class _SearchState extends State<Search> {
     final containerHeight = height * 0.45; // 🟢 Half screen height
     final containerWidth = width * 0.3;
     return Scaffold(
+      floatingActionButton: _inCartMap.isNotEmpty
+          ? FloatingActionButton(
+              onPressed: () {
+                Navigator.of(context).push(MaterialPageRoute(
+                    builder: (context) => CartScreen(isNavigated: true)));
+              },
+              child: Icon(
+                Icons.shopping_cart_outlined,
+                color: whiteColor,
+              ),
+              backgroundColor: greenColor,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8)),
+            )
+          : null,
       backgroundColor: scaffoldBlackColor,
       appBar: AppBar(
         centerTitle: true,
@@ -238,7 +254,12 @@ class _SearchState extends State<Search> {
               padding: const EdgeInsets.only(left: 4.0),
               child: Row(
                 spacing: 4,
-                children: [Image.asset("lib/images/Vector 9.png",scale: 0.8,)],
+                children: [
+                  Image.asset(
+                    "lib/images/Vector 9.png",
+                    scale: 0.8,
+                  )
+                ],
               ),
             ),
           ),
@@ -262,8 +283,8 @@ class _SearchState extends State<Search> {
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       child: TextField(
-                         focusNode: _focusNode,
-                         autofocus: true,
+                        focusNode: _focusNode,
+                        autofocus: true,
                         cursorColor: whiteColor,
                         style: GoogleFonts.mulish(color: whiteColor),
                         controller: _controller,
@@ -327,9 +348,11 @@ class _SearchState extends State<Search> {
                                         mainAxisAlignment:
                                             MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Expanded(
+                                          Container(
+                                            width: 200,
                                             child: Text(
                                               item['name'],
+                                              maxLines: 1,
                                               style: GoogleFonts.mulish(
                                                 fontSize: 17.02,
                                                 fontWeight: FontWeight.w400,
@@ -357,7 +380,9 @@ class _SearchState extends State<Search> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
-                                          Expanded(
+                                          Container(
+                                            width: 200,
+                                            
                                             child: Text(
                                               item['description'] ??
                                                   'Medicine information',
@@ -411,7 +436,10 @@ class _SearchState extends State<Search> {
                                                                     whiteColor,
                                                               ),
                                                               onPressed: () {
-                                                                DidUpdateQuantity(index, -1, productId);
+                                                                DidUpdateQuantity(
+                                                                    index,
+                                                                    -1,
+                                                                    productId);
                                                               }),
                                                           Text(
                                                             '$quantity',
@@ -441,7 +469,10 @@ class _SearchState extends State<Search> {
                                                                     whiteColor,
                                                               ),
                                                               onPressed: () {
-                                                               DidUpdateQuantity(index, 1, productId);
+                                                                DidUpdateQuantity(
+                                                                    index,
+                                                                    1,
+                                                                    productId);
                                                               }),
                                                         ],
                                                       ),

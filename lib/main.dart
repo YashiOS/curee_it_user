@@ -11,11 +11,13 @@ import 'package:cureeit_user_app/screens/login_screen.dart';
 import 'package:cureeit_user_app/screens/order_tracking_screen.dart';
 import 'package:cureeit_user_app/screens/orders_screen.dart';
 import 'package:cureeit_user_app/screens/otp_screen.dart';
+import 'package:cureeit_user_app/screens/policies_screen.dart';
 import 'package:cureeit_user_app/screens/profile_screen.dart';
 import 'package:cureeit_user_app/screens/register_screen.dart';
 import 'package:cureeit_user_app/screens/search.dart';
 import 'package:cureeit_user_app/screens/search_screen.dart';
 import 'package:cureeit_user_app/screens/splashScreen.dart';
+import 'package:cureeit_user_app/screens/terms_of_service_screen.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -98,7 +100,9 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
         scaffoldBackgroundColor: scaffoldBlackColor,
         useMaterial3: true,
       ),
-      home: _home ?? _buildLoadingScreen(),
+      home:_home ?? _buildLoadingScreen()
+      //_home ?? _buildLoadingScreen(),
+      //OtpScreen(phoneNumber: "", purpose: "", name: "")
     );
   }
 

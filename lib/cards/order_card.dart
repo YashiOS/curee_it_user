@@ -10,7 +10,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
-class OrderCard extends StatelessWidget {
+class OrderCard extends StatefulWidget {
   final dynamic orderData;
   String prescriptionURL;
   OrderCard({
@@ -18,6 +18,13 @@ class OrderCard extends StatelessWidget {
     required this.orderData,
     this.prescriptionURL = "",
   });
+
+  @override
+  State<OrderCard> createState() => _OrderCardState();
+}
+
+class _OrderCardState extends State<OrderCard> {
+  bool reOrdering=false;
 
   String formatDate(String isoDate) {
     // Parse the ISO 8601 string into a DateTime object
@@ -46,7 +53,10 @@ class OrderCard extends StatelessWidget {
   }
 
   void addMultipleTocart(context) async {
-    List<dynamic> orderItems = orderData["orderItems"];
+    setState(() {
+      reOrdering=true;
+    });
+    List<dynamic> orderItems = widget.orderData["orderItems"];
     print(orderItems);
     List productIds =
         orderItems.map((item) => item['productId'].toString()).toList();
@@ -65,19 +75,25 @@ class OrderCard extends StatelessWidget {
       );
 
       if (response.statusCode == 200) {
+        setState(() {
+      reOrdering=false;
+    });
         Navigator.of(context).push(MaterialPageRoute(
             builder: (context) => CartScreen(isNavigated: true)));
       }
     } catch (e) {}
+    setState(() {
+      reOrdering=false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    String orderStatus = orderData['currentStatus'];
-    String purchaseDate = orderData['purchaseDate'];
-    double shippingCost = double.parse(orderData['totalAmount']);
-    List orderItems = orderData['orderItems'];
-    String orderId = orderData['orderId'];
+    String orderStatus = widget.orderData['currentStatus'];
+    String purchaseDate = widget.orderData['purchaseDate'];
+    double shippingCost = double.parse(widget.orderData['totalAmount']);
+    List orderItems = widget.orderData['orderItems'];
+    String orderId = widget.orderData['orderId'];
     print("THIS IS ORDER ID");
     print(orderId);
 
@@ -91,27 +107,20 @@ class OrderCard extends StatelessWidget {
         onTap: () {
           if (orderStatus == "Order Placed" ||
               orderStatus == "Packing" ||
-              orderStatus == "On the way") {
+              orderStatus == "On the way"||
+              orderStatus == "Delivered") {
             Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => OrderTrackingScreen(
                   NavigatingFrom: "Order History",
                   orderId: orderId,
+                  orderData: "",
+
                 ),
               ),
             );
-          } else {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => OrderdetailScreenNew(
-                  orderData: orderData,
-                  prescriptionURL: prescriptionURL,
-                ),
-              ),
-            );
-          }
+          } 
         },
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -185,7 +194,7 @@ class OrderCard extends StatelessWidget {
                           SizedBox(
                             width: screenWidth * 0.4,
                             child: Text(
-                              orderData['shippingAddress'],
+                              widget.orderData['shippingAddress'],
                               style: GoogleFonts.mulish(
                                 fontWeight: FontWeight.w300,
                                 fontSize: 12,

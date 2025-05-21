@@ -1,3 +1,4 @@
+import 'package:cureeit_user_app/cartManager/cartManager.dart';
 import 'package:cureeit_user_app/screens/item_detail_screen.dart';
 import 'package:cureeit_user_app/user/user.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
@@ -85,7 +86,7 @@ class _CartCardState extends State<CartCard> {
     final String productId = widget.productId;
     if (_lastSentQuantity == quantity) return;
     _lastSentQuantity = quantity;
-
+  CartManager.cartQuantities[productId]=quantity;
     final Map<String, dynamic> requestData = {
       "userId": userId,
       "productId": productId,
@@ -139,7 +140,7 @@ class _CartCardState extends State<CartCard> {
       "userId": userId,
       "productId": productId,
     };
-
+    
     final url =
         'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/cart/removeFromCart';
     try {
@@ -150,6 +151,7 @@ class _CartCardState extends State<CartCard> {
       );
 
       if (response.statusCode == 200) {
+         CartManager.cartQuantities.remove(productId);
         widget.isDeleting(false);
         widget.onRemove();
         
@@ -341,9 +343,10 @@ class _CartCardState extends State<CartCard> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          
+                          Text("₹${(widget.productPrice * _localQuantity).toStringAsFixed(2)}",style: GoogleFonts.mulish(color:greyColor,decoration: TextDecoration.lineThrough,fontSize: 10,decorationColor: greyColor),),
                           Text(
                             "₹${((widget.sellingPrice) * _localQuantity).toStringAsFixed(2)}",
                             style: GoogleFonts.mulish(
@@ -353,7 +356,7 @@ class _CartCardState extends State<CartCard> {
                             ),
                           ),
                           
-                          Text("${widget.productPrice * _localQuantity}")
+                          
                         ],
                       ),
                     ],

@@ -141,9 +141,9 @@ class _LoginScreenState extends State<RegisterScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Image.asset(
-                      "lib/images/final_medkaro_logo.png",
+                      "lib/images/MEDKARO.png",
                       height: screenHeight * 0.06,
-                      width: screenWidth * 0.55,
+                      width: screenWidth * 0.5,
                     ),
                     Text(
                       "10-minute medicine delivery",
@@ -183,14 +183,12 @@ class _LoginScreenState extends State<RegisterScreen> {
                         ],
                       ),
                     ),
-                    SizedBox(height: screenHeight * 0.05),// Added some spacing
+                    SizedBox(height: screenHeight * 0.02),// Added some spacing
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        SizedBox(
-                          width: screenWidth * 0.23,
-                          height: screenHeight * 0.055,
+                        Expanded(
                           child: TextButton(
                             onPressed: () {
                               _validateAndProceed();
@@ -226,8 +224,8 @@ class _LoginScreenState extends State<RegisterScreen> {
                 left: 0,
                 right: 0,
                 child: SizedBox(
-                  height: 332,
-                  width: 743,
+                  height: screenHeight * 0.4, // 40% of screen height
+width: screenWidth * 0.9, 
                   child: Image.asset(
                     "lib/images/medkaroGadi.png",
                     width: 200,
