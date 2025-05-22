@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:cureeit_user_app/cartManager/cartManager.dart';
 import 'package:cureeit_user_app/screens/cart_screen.dart';
 import 'package:cureeit_user_app/screens/item_detail_screen.dart';
 import 'package:cureeit_user_app/user/user.dart';
@@ -24,6 +25,8 @@ class _SearchState extends State<Search> {
   bool _isLoading = false;
   bool isIncart = false;
   Map<String, bool> _inCartMap = {};
+ Map<String,bool> isAdding={};
+ Map<String,bool>isUpdating={};
 
   // Track quantities for each product
   Map<String, int> _quantityMap = {};
@@ -105,6 +108,67 @@ class _SearchState extends State<Search> {
     });
   }
 
+   Future<void> _removeFromCart(String ProductId) async {
+  
+    final String userId = User.userId!;
+    final String productId = ProductId;
+
+    final Map<String, dynamic> requestData = {
+      "userId": userId,
+      "productId": productId,
+    };
+   
+
+    final url =
+        'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/cart/removeFromCart';
+    try {
+      final response = await http.delete(
+        Uri.parse(url),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode(requestData),
+      );
+
+      if (response.statusCode == 200) {
+      CartManager.cartQuantities[productId]=0;
+        
+        
+        
+       Fluttertoast.showToast(msg: "Removed from cart");
+       setState(() {
+         
+       });
+        
+      } else {
+        print(response.statusCode);
+      
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Failed to remove from cart",style: GoogleFonts.mulish(),),
+            backgroundColor: greenColor,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            duration: Duration(seconds: 2),
+          ),);
+        print('Failed to remove from cart');
+      }
+    } catch (error) {
+     
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("Error removing from cart ",style: GoogleFonts.mulish(),),
+            backgroundColor: greenColor,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            duration: Duration(seconds: 2),
+          ),);
+      print('Error removing from cart: $error');
+    }
+  }
+
   @override
   void dispose() {
     _debounce?.cancel();
@@ -121,6 +185,7 @@ class _SearchState extends State<Search> {
       setState(() {
         _inCartMap[productId] = true;
         _quantityMap[productId] = 1;
+        isAdding[productId]=true;
       });
       final response = await http.post(
         Uri.parse(
@@ -136,12 +201,17 @@ class _SearchState extends State<Search> {
       );
 
       if (response.statusCode == 200) {
+       
+
         setState(() {
+          isAdding[productId]=false;
+           CartManager.cartQuantities[productId]=(CartManager.cartQuantities[productId]??0)+1;
           isIncart = true;
         });
         Fluttertoast.showToast(msg: "Added To Cart");
       } else {
         setState(() {
+          isAdding[productId]=false;
           _inCartMap.remove(productId);
           _quantityMap.remove(productId);
         });
@@ -150,16 +220,23 @@ class _SearchState extends State<Search> {
     } catch (e) {
       print('❌ Network error: $e');
     }
+    
+    setState(() {
+      isAdding[productId]=false;
+    });
   }
 
   Future<void> DidUpdateQuantity(
       int index, int change, String productId) async {
-    final currentQuantity = _quantityMap[productId] ?? 1;
+    final currentQuantity =CartManager.cartQuantities[productId]?? 1;
     final newQuantity = currentQuantity + change;
 
     if (newQuantity < 1) {
+     await _removeFromCart(productId);
+     
       // Remove from cart if quantity goes to 0
       setState(() {
+        isUpdating[productId]=false;
         _inCartMap.remove(productId);
         _quantityMap.remove(productId);
       });
@@ -168,6 +245,7 @@ class _SearchState extends State<Search> {
 
     final String? userId = User.userId; // Example userId
     setState(() {
+      isUpdating[productId]=true;
       _quantityMap[productId] = newQuantity;
     });
 
@@ -184,10 +262,16 @@ class _SearchState extends State<Search> {
           "quantity": newQuantity
         }),
       );
-
+      setState(() {
+        isUpdating[productId]=false;
+        CartManager.cartQuantities[productId]=newQuantity;
+      });
+     
       if (response.statusCode != 200) {
+        CartManager.cartQuantities[productId]=currentQuantity;
         // Handle error - revert local state in case of failure
         setState(() {
+          isUpdating[productId]=false;
           _quantityMap[productId] = currentQuantity;
         });
         ScaffoldMessenger.of(context).showSnackBar(
@@ -197,13 +281,16 @@ class _SearchState extends State<Search> {
     } catch (e) {
       // Handle network errors - revert local state
       setState(() {
+        isUpdating[productId]=false;
         _quantityMap[productId] = currentQuantity;
       });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Network error: $e')),
       );
     }
-    setState(() {});
+    setState(() {
+      isUpdating[productId]=false;
+    });
   }
 
   @override
@@ -403,7 +490,7 @@ class _SearchState extends State<Search> {
                                                 );
                                               }
                                             },
-                                            child: IsInCart
+                                            child: IsInCart &&CartManager.cartQuantities[productId]!=null &&CartManager.cartQuantities[productId]!>0
                                                 ? Container(
                                                     width: 50,
                                                     height: 29,
@@ -441,8 +528,8 @@ class _SearchState extends State<Search> {
                                                                     -1,
                                                                     productId);
                                                               }),
-                                                          Text(
-                                                            '$quantity',
+                                                         isUpdating[productId]==true?Container(height: 10,width: 10,child: CircularProgressIndicator(color: whiteColor,),): Text(
+                                                            '${CartManager.cartQuantities[productId]}',
                                                             style: GoogleFonts
                                                                 .mulish(
                                                               color: whiteColor,
@@ -490,7 +577,7 @@ class _SearchState extends State<Search> {
                                                             color: greenColor,
                                                             width: 1)),
                                                     child: Center(
-                                                      child: Text(
+                                                      child:isAdding[productId]==true?Container(height:10,width: 10, child:CircularProgressIndicator(color: whiteColor,strokeWidth: 2,)) :Text(
                                                         'Add',
                                                         style:
                                                             GoogleFonts.mulish(

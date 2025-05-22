@@ -151,9 +151,10 @@ class _CartCardState extends State<CartCard> {
       );
 
       if (response.statusCode == 200) {
-         CartManager.cartQuantities.remove(productId);
+         CartManager.cartQuantities[productId]=0;
+       
+       await widget.onRemove();
         widget.isDeleting(false);
-        widget.onRemove();
         
       } else {
         print(response.statusCode);

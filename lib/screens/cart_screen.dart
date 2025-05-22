@@ -78,6 +78,7 @@ class _CartScreenState extends State<CartScreen> {
   }
 
  void checkPrescriptionRequirements() {
+  
     bool hasPrescriptionItems = cartItems.any((item) => 
       item["prescription_required"] == "Yes"
     );
@@ -574,6 +575,11 @@ class _CartScreenState extends State<CartScreen> {
             ),
             leading: GestureDetector(
             onTap: () {
+              if(widget.isNavigated){
+                Navigator.pop(context);
+                return;
+              }
+              
               Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>BaseScreen(Navigatedfrom: "")));
             },
             child: Padding(

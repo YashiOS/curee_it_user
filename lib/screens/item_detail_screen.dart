@@ -68,7 +68,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
       );
 
       if (response.statusCode == 200) {
-      CartManager.cartQuantities.remove(widget.productId);
+      CartManager.cartQuantities[widget.productId]=0;
        
         
        Fluttertoast.showToast(msg: "Removed from cart");
@@ -616,7 +616,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                   color: whiteColor,
                                 ),
                               ),
-                              isInCart || CartManager.cartQuantities[widget.productId]!=null
+                              isInCart || CartManager.cartQuantities[widget.productId]!=null&&CartManager.cartQuantities[widget.productId]!>0
                                   ? Container(
                                       width: 160,
                                       height: 36,
@@ -687,9 +687,9 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                       ),
                                             width: 40,
                                             child: TextButton(
-                                              onPressed: () {
+                                              onPressed: () async{
                                                 // Navigate to cart screen
-                                                Navigator.pushReplacement(
+                                               await Navigator.push(
                                                   context,
                                                   MaterialPageRoute(
                                                     builder: (context) =>
@@ -697,6 +697,9 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                                                             isNavigated: true),
                                                   ),
                                                 );
+                                                setState(() {
+                                                  
+                                                });
                                               },
                                               style: TextButton.styleFrom(
                                                 padding: EdgeInsets.zero,
