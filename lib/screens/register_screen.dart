@@ -166,6 +166,7 @@ class _LoginScreenState extends State<RegisterScreen> {
                           
                           Expanded(
                             child: TextField(
+                               cursorColor: greenColor,
                               controller:
                                  _nameController, // <-- Attach controller here
                               style: GoogleFonts.mulish(color: whiteColor),

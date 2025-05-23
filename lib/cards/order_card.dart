@@ -115,8 +115,7 @@ class _OrderCardState extends State<OrderCard> {
                 builder: (context) => OrderTrackingScreen(
                   NavigatingFrom: "Order History",
                   orderId: orderId,
-                  orderData: "",
-
+                
                 ),
               ),
             );

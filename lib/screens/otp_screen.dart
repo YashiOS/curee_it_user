@@ -159,6 +159,9 @@ class _OtpScreenState extends State<OtpScreen> {
         );
       }
     } else {
+      setState(() {
+          verifyingOTP = false;
+        });
       print('OTP not fully entered');
     }
   }

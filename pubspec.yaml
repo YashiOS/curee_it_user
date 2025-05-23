@@ -59,6 +59,9 @@ dependencies:
   location: ^8.0.0
   permission_handler: ^12.0.0+1
   url_launcher: ^6.3.1
+  flutter_native_splash: ^2.4.4
+  flutter_svg: ^2.1.0
+  flutter_svg_provider: ^1.0.7
   
   
   
@@ -71,6 +74,18 @@ flutter_launcher_icons:
   android: true
   ios: true
   image_path: "lib/images/App_icon4.png"
+  android_adaptive_icon_background: "#1A1A1A" # Replace with your desired color
+  android_adaptive_icon_foreground: "lib/images/App_icon4.png"
+
+
+flutter_native_splash:
+  color: "#1A1A1A"
+  image: lib/images/SP2.png  # 1024x1024 PNG with transparent background
+  android_12:
+    image: lib/images/SP2.png
+    icon_background_color: "#1A1A1A"
+  web: false
+
 
 
 

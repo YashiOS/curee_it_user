@@ -56,6 +56,7 @@ class _OtpFormState extends State<OtpForm> {
             height: 50,
             width: 50,
             child: TextFormField(
+               cursorColor: greenColor,
               controller: controllers[index],
               focusNode: focusNodes[index],
               onChanged: (value) {

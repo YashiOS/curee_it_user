@@ -13,6 +13,7 @@ import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:cureeit_user_app/utils/widgets/LoadingIndicater.dart';
 
 import 'package:flutter_image_compress/flutter_image_compress.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 import 'package:flutter/material.dart';
@@ -77,18 +78,15 @@ class _CartScreenState extends State<CartScreen> {
     }
   }
 
- void checkPrescriptionRequirements() {
-  
-    bool hasPrescriptionItems = cartItems.any((item) => 
-      item["prescription_required"] == "Yes"
-    );
-    
+  void checkPrescriptionRequirements() {
+    bool hasPrescriptionItems =
+        cartItems.any((item) => item["prescription_required"] == "Yes");
+
     setState(() {
       requiresPrescription = hasPrescriptionItems;
       payNow = !hasPrescriptionItems;
       if (!hasPrescriptionItems) {
-        
-        requiresPrescription=false;
+        requiresPrescription = false;
         imagePicked = false;
         _imageFile = null;
       }
@@ -130,15 +128,19 @@ class _CartScreenState extends State<CartScreen> {
       } else {}
     } catch (error) {
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Failed to remove from cart , try again later",style: GoogleFonts.mulish(),),
-            backgroundColor: greenColor,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            duration: Duration(seconds: 2),
-          ),);
+        SnackBar(
+          content: Text(
+            "Failed to remove from cart , try again later",
+            style: GoogleFonts.mulish(),
+          ),
+          backgroundColor: greenColor,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          duration: Duration(seconds: 2),
+        ),
+      );
       print("item did not got removed $error");
     }
   }
@@ -159,7 +161,6 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   Future<void> fetchCartDetails() async {
-    
     var cartApiUrl = Uri.parse(
         "http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/cart/cartDetails");
     final String? userId = User.userId; // Replace with the actual userId
@@ -192,15 +193,13 @@ class _CartScreenState extends State<CartScreen> {
           for (var cartItem in cartData) {
             Map<String, dynamic>? productDetails =
                 await fetchProductDetails(cartItem['productId']);
-               
-            
+
             if (productDetails != null) {
               if (cartItem["prescription_required"] == "Yes") {
                 payNow = false;
                 setState(() {
                   requiresPrescription = true;
                 });
-                
               }
 
               double itemProductPrice =
@@ -319,15 +318,15 @@ class _CartScreenState extends State<CartScreen> {
     }
 
     int Total = double.parse(total).toInt();
-    
+
     try {
       Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) =>  LoadingScreen(),
-        fullscreenDialog: true,
-      ),
-    );
+        context,
+        MaterialPageRoute(
+          builder: (context) => LoadingScreen(),
+          fullscreenDialog: true,
+        ),
+      );
       var url = Uri.parse(
           'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/order/createCheckout');
       var request = http.Request('POST', url)
@@ -352,14 +351,13 @@ class _CartScreenState extends State<CartScreen> {
       var response = await http.Client().send(request);
 
       if (response.statusCode == 200) {
-       
         var responseBody = await response.stream.bytesToString();
         Map<String, dynamic> responseData = jsonDecode(responseBody);
-         Navigator.pop(context);
+        Navigator.pop(context);
         if (responseData['message'] == 'Order created successfully') {
           _removeAllFromCart(); //removing cart item from backend , not using await so it will be done in background ,so user does not have to wait
           cartItems.clear();
-          
+
           //            Navigator.push(
           // context,
           // MaterialPageRoute(
@@ -382,19 +380,21 @@ class _CartScreenState extends State<CartScreen> {
         }
       } else {
         var responseBody = await response.stream.bytesToString();
-         ScaffoldMessenger.of(context).showSnackBar(
+        ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("Failed to Create Order",style: GoogleFonts.mulish(),),
+            content: Text(
+              "Failed to Create Order",
+              style: GoogleFonts.mulish(),
+            ),
             backgroundColor: greenColor,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
             duration: Duration(seconds: 2),
-          ),);
+          ),
+        );
         throw Exception('Failed to Create Order --> $responseBody');
-        
-
       }
     } catch (error) {
       print('Error in Creating Order: $error');
@@ -574,25 +574,36 @@ class _CartScreenState extends State<CartScreen> {
               ),
             ),
             leading: GestureDetector(
-            onTap: () {
-              if(widget.isNavigated){
-                Navigator.pop(context);
-                return;
-              }
-              
-              Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>BaseScreen(Navigatedfrom: "")));
-            },
-            child: Padding(
-              padding: const EdgeInsets.only(left: 24.0),
+              onTap: () {
+                if (widget.isNavigated) {
+                  Navigator.pop(context);
+                  return;
+                }
+
+                Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => BaseScreen(Navigatedfrom: "")));
+              },
               child: Padding(
-                padding: const EdgeInsets.only(left: 4.0),
-                child: Row(
-                  spacing: 4,
-                  children: [Image.asset("lib/images/Vector 9.png",scale: 0.8,)],
+                padding: const EdgeInsets.only(left: 24.0),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 4.0),
+                  child: Row(
+                    spacing: 4,
+                    children: [
+                      SvgPicture.asset(
+                        colorFilter:
+                            ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                        "lib/images/back.svg",
+                        width: 24, // optional
+                        height: 24, // optional
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
           ),
           body: isLoading
               ? Center(
@@ -604,15 +615,17 @@ class _CartScreenState extends State<CartScreen> {
                   ? Container(
                       height: double.infinity,
                       width: double.infinity,
-                      
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
-                          
                           GestureDetector(
-                            onTap: (){
-                               Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>BaseScreen(Navigatedfrom: "")));
+                            onTap: () {
+                              Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) =>
+                                          BaseScreen(Navigatedfrom: "")));
                             },
                             child: Center(
                               child: Container(
@@ -622,14 +635,11 @@ class _CartScreenState extends State<CartScreen> {
                                       Image.asset("lib/images/empty cart.png")),
                             ),
                           ),
-                         
-                         
                         ],
                       ),
                     )
                   : Container(
-                      padding: EdgeInsets.only(
-                          bottom: 100),
+                      padding: EdgeInsets.only(bottom: 100),
                       color: scaffoldBlackColor,
                       width: MediaQuery.of(context).size.width,
                       height: MediaQuery.of(context).size.height,
@@ -692,9 +702,7 @@ class _CartScreenState extends State<CartScreen> {
                                       Container(),
                                     if (requiresPrescription)
                                       GestureDetector(
-                                        onTap: () {
-                                        
-                                        },
+                                        onTap: () {},
                                         child: Container(
                                           padding: const EdgeInsets.symmetric(
                                               horizontal: 16),
@@ -753,7 +761,6 @@ class _CartScreenState extends State<CartScreen> {
                                       Container(),
                                     Container(
                                       width: MediaQuery.of(context).size.width,
-                                    
                                       decoration: BoxDecoration(
                                           color: ligtBlackColor,
                                           borderRadius:
@@ -828,7 +835,7 @@ class _CartScreenState extends State<CartScreen> {
                                                                             "on remove is called");
                                                                         removeItemFromCart(
                                                                             item['productId']);
-                                                                            fetchCartDetails();
+                                                                        fetchCartDetails();
                                                                       },
                                                                       isDeleting: ItemDeleting,
                                                                       productImages: item['imageUrls'] ?? ''))
@@ -851,8 +858,9 @@ class _CartScreenState extends State<CartScreen> {
                                                                 0.055,
                                                             top: screenHeight *
                                                                 0.035, // ≈28 for height ≈ 800
-                                                            bottom: screenHeight *
-                                                                0.035, // ≈14
+                                                            bottom:
+                                                                screenHeight *
+                                                                    0.035, // ≈14
                                                           ),
                                                           child: Column(
                                                             crossAxisAlignment:
@@ -883,28 +891,29 @@ class _CartScreenState extends State<CartScreen> {
                                                                       children: [
                                                                         Text(
                                                                           "₹${totalProductPrice.toStringAsFixed(2)}",
-                                                                          style: GoogleFonts
-                                                                              .mulish(
-                                                                            fontWeight:
-                                                                                FontWeight
-                                                                                    .w300,
-                                                                            fontSize:
-                                                                                12,
-                                                                            color:
-                                                                                greyColor,
-                                                                                decoration: TextDecoration.lineThrough,
-                                                                                decorationColor: greyColor
-                                                                          ),
+                                                                          style: GoogleFonts.mulish(
+                                                                              fontWeight: FontWeight.w300,
+                                                                              fontSize: 12,
+                                                                              color: greyColor,
+                                                                              decoration: TextDecoration.lineThrough,
+                                                                              decorationColor: greyColor),
                                                                         ),
-                                                                        SizedBox(width: 5,),
-                                                                        Text("₹${totalSellingPrice.toStringAsFixed(2)}",
-                                                                        style: GoogleFonts.mulish(fontWeight: FontWeight.w400,fontSize: 14,color: whiteColor),)
+                                                                        SizedBox(
+                                                                          width:
+                                                                              5,
+                                                                        ),
+                                                                        Text(
+                                                                          "₹${totalSellingPrice.toStringAsFixed(2)}",
+                                                                          style: GoogleFonts.mulish(
+                                                                              fontWeight: FontWeight.w400,
+                                                                              fontSize: 14,
+                                                                              color: whiteColor),
+                                                                        )
                                                                       ],
                                                                     ),
                                                                   ),
                                                                 ],
                                                               ),
-                                                              
                                                               Row(
                                                                 mainAxisAlignment:
                                                                     MainAxisAlignment
@@ -998,7 +1007,7 @@ class _CartScreenState extends State<CartScreen> {
                                                                           style: GoogleFonts.mulish(
                                                                               fontWeight: FontWeight.bold,
                                                                               fontSize: 16,
-                                                                              color:whiteColor),
+                                                                              color: whiteColor),
                                                                         ),
                                                                         Text(
                                                                           "₹${totalWholeAmount.toStringAsFixed(2)}",
@@ -1017,56 +1026,65 @@ class _CartScreenState extends State<CartScreen> {
                                                                     height: 25,
                                                                   ),
                                                                   GestureDetector(
-                                                                    onTap: (){
-                                                                         if (addresses.length ==
-                                                                            0) {
-                                                                          return;
-                                                                        }
-                                                                        if (payNow ==
-                                                                            false) {
-                                                                          ScaffoldMessenger.of(context)
-                                                                              .showSnackBar(
-                                                                            SnackBar(
-                                                                                content: Text(
-                                                                              'Upload Prescription',
-                                                                              style: GoogleFonts.mulish(color: whiteColor),
-                                                                            )),
+                                                                    onTap: () {
+                                                                      if (addresses
+                                                                              .length ==
+                                                                          0) {
+                                                                        return;
+                                                                      }
+                                                                      if (payNow ==
+                                                                          false) {
+                                                                        ScaffoldMessenger.of(context)
+                                                                            .showSnackBar(
+                                                                          SnackBar(
+                                                                              content: Text(
+                                                                            'Upload Prescription',
+                                                                            style:
+                                                                                GoogleFonts.mulish(color: whiteColor),
+                                                                          )),
+                                                                        );
+                                                                        return;
+                                                                      }
+                                                                      RazorpayPayment
+                                                                          razorpayPayment =
+                                                                          RazorpayPayment(
+                                                                        onSuccess:
+                                                                            (PaymentSuccessResponse
+                                                                                response) {
+                                                                          createCheckout(
+                                                                            (totalWholeAmount).toStringAsFixed(2),
+                                                                            deliveryServiceFees,
+                                                                            "${Address.CurrentAddress!["address"]}",
+                                                                            response.paymentId.toString(),
                                                                           );
-                                                                          return;
-                                                                        }
-                                                                        RazorpayPayment
-                                                                            razorpayPayment =
-                                                                            RazorpayPayment(
-                                                                          onSuccess:
-                                                                              (PaymentSuccessResponse response) {
-                                                                            createCheckout(
-                                                                              (totalWholeAmount).toStringAsFixed(2),
-                                                                              deliveryServiceFees,
-                                                                              "${Address.CurrentAddress!["address"]}",
-                                                                              response.paymentId.toString(),
-                                                                            );
-                                                                          },
-                                                                          onFailure:
-                                                                              (PaymentFailureResponse response) {
-                                                                            // Handle payment failure
-                                                                            print('Payment Failed: ${response.message}');
-                                                                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                                                              content: Text('Payment Failed'),
-                                                                            ));
-                                                                          },
-                                                                        );
+                                                                        },
+                                                                        onFailure:
+                                                                            (PaymentFailureResponse
+                                                                                response) {
+                                                                          // Handle payment failure
+                                                                          print(
+                                                                              'Payment Failed: ${response.message}');
+                                                                          ScaffoldMessenger.of(context)
+                                                                              .showSnackBar(SnackBar(
+                                                                            content:
+                                                                                Text('Payment Failed'),
+                                                                          ));
+                                                                        },
+                                                                      );
 
-                                                                        razorpayPayment
-                                                                            .initiatePayment(
-                                                                          totalWholeAmount, // Amount in paise (e.g., 50000 = 500 INR)
-                                                                          'CUREEIT MEDICOS PRIVATE LIMITED', // Product Name
-                                                                          'Please do the payment', // Description
-                                                                          '8890170172',
-                                                                          'accounts@cureeit.com',
-                                                                        );
+                                                                      razorpayPayment
+                                                                          .initiatePayment(
+                                                                        totalWholeAmount, // Amount in paise (e.g., 50000 = 500 INR)
+                                                                        'CUREEIT MEDICOS PRIVATE LIMITED', // Product Name
+                                                                        'Please do the payment', // Description
+                                                                        '8890170172',
+                                                                        'accounts@cureeit.com',
+                                                                      );
                                                                     },
-                                                                    child: Container(
-                                                                      height: 36,
+                                                                    child:
+                                                                        Container(
+                                                                      height:
+                                                                          36,
                                                                       width: double
                                                                           .infinity,
                                                                       alignment:
@@ -1078,8 +1096,7 @@ class _CartScreenState extends State<CartScreen> {
                                                                             ? greenColor
                                                                             : ligtBlackColor,
                                                                         border:
-                                                                            Border
-                                                                                .all(
+                                                                            Border.all(
                                                                           color:
                                                                               greenColor,
                                                                           width:
@@ -1087,12 +1104,11 @@ class _CartScreenState extends State<CartScreen> {
                                                                         ),
                                                                         // Setting the background color to primary color
                                                                         borderRadius:
-                                                                            BorderRadius.circular(
-                                                                                8), // Setting the border radius to 10
+                                                                            BorderRadius.circular(8), // Setting the border radius to 10
                                                                       ),
                                                                       child:
                                                                           Center(
-                                                                                                                                                  child:
+                                                                        child:
                                                                             Text(
                                                                           "Confirm and Pay",
                                                                           style:
@@ -1105,8 +1121,8 @@ class _CartScreenState extends State<CartScreen> {
                                                                             fontWeight:
                                                                                 FontWeight.w700,
                                                                           ),
-                                                                                                                                                  ),
-                                                                                                                                                ),
+                                                                        ),
+                                                                      ),
                                                                     ),
                                                                   ),
                                                                 ],

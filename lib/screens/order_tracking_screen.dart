@@ -10,11 +10,11 @@ import 'package:intl/intl.dart';
 
 class OrderTrackingScreen extends StatefulWidget {
   OrderTrackingScreen(
-      {super.key, required this.NavigatingFrom, required this.orderId,required this.orderData});
+      {super.key, required this.NavigatingFrom, required this.orderId});
   final String? userId = User.userId;
   late String orderId;
   final String NavigatingFrom;
-   final dynamic orderData;
+   
   @override
   State<OrderTrackingScreen> createState() => _OrderTrackingScreenState();
 }
@@ -471,8 +471,6 @@ final double difference = itemTotal - totalSellingPrice;
     final size = MediaQuery.of(context).size;
     final width = size.width;
     final height = size.height;
-    print(widget.orderData);
-
     return Scaffold(
       backgroundColor: scaffoldBlackColor,
       body:_isInitLoading?Center(
@@ -501,6 +499,9 @@ final double difference = itemTotal - totalSellingPrice;
                             builder: (context) => BaseScreen(
                                   Navigatedfrom: "orderTrackingScreen",
                                 )));
+                      }
+                      if(widget.NavigatingFrom=="home"){
+                        Navigator.of(context).pop();
                       }
 
                       //Navigator.pop(context);

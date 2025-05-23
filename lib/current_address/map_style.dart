@@ -38,7 +38,7 @@ const String darkMapStyle = '''
     "elementType": "labels.text.fill",
     "stylers": [
       {
-        "color": "#d59563"
+        "color": "#ffffff"
       }
     ]
   },
@@ -156,6 +156,37 @@ const String darkMapStyle = '''
     "stylers": [
       {
         "color": "#17263c"
+      }
+    ]
+  },
+  // Add these building-specific styles
+  {
+    "featureType": "building",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#242f3e"  // Dark color for building sides
+      }
+    ]
+  },
+  {
+    "featureType": "building",
+    "elementType": "geometry.fill",
+    "stylers": [
+      {
+        "color": "#6a6a6a"  // Grey color for building roofs
+      },
+      {
+        "lightness": 50
+      }
+    ]
+  },
+  {
+    "featureType": "building",
+    "elementType": "labels",
+    "stylers": [
+      {
+        "visibility": "off"  // Hide building labels if needed
       }
     ]
   }

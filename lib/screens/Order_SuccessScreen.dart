@@ -22,7 +22,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
           builder: (context) => OrderTrackingScreen(
                 NavigatingFrom: "Order_SuccessScreen",
                 orderId: widget.orderId,
-                orderData: "",
+                
               )));
     });
   }

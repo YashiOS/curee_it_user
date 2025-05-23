@@ -5,6 +5,7 @@ import 'package:cureeit_user_app/screens/item_detail_screen.dart';
 import 'package:cureeit_user_app/user/user.dart';
 import 'package:flutter/material.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
@@ -342,10 +343,13 @@ class _SearchState extends State<Search> {
               child: Row(
                 spacing: 4,
                 children: [
-                  Image.asset(
-                    "lib/images/Vector 9.png",
-                    scale: 0.8,
-                  )
+                 SvgPicture.asset(
+                    colorFilter:
+                        ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                    "lib/images/back.svg",
+                    width: 24, // optional
+                    height: 24, // optional
+                  ),
                 ],
               ),
             ),
@@ -401,9 +405,10 @@ class _SearchState extends State<Search> {
                           itemCount: _searchResults.length,
                           itemBuilder: (context, index) {
                             final item = _searchResults[index];
+                            print(item);
                             final productId = item["productId"];
                             final IsInCart = _inCartMap[productId] ?? false;
-                            final quantity = _quantityMap[productId] ?? 1;
+
 
                             return GestureDetector(
                               onTap: () {
@@ -447,13 +452,28 @@ class _SearchState extends State<Search> {
                                               ),
                                             ),
                                           ),
-                                          Text(
-                                            "₹${item['sellingPrice']}",
-                                            style: GoogleFonts.mulish(
-                                              fontSize: 17,
-                                              fontWeight: FontWeight.w500,
-                                              color: whiteColor,
-                                            ),
+                                          Row(
+                                            children: [
+                                              Text(
+                                                "₹${item['price']}",
+                                                style: GoogleFonts.mulish(
+                                                  fontSize: 15,
+                                                  decoration: TextDecoration.lineThrough,
+                                                  decorationColor: greyColor,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: greyColor,
+                                                ),
+                                              ),
+                                              SizedBox(width: 5,),
+                                              Text(
+                                                "₹${item['sellingPrice']}",
+                                                style: GoogleFonts.mulish(
+                                                  fontSize: 17,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: whiteColor,
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ],
                                       ),

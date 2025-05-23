@@ -1,5 +1,6 @@
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 
@@ -61,7 +62,13 @@ class OrderdetailScreenNew extends StatelessWidget {
                 padding: const EdgeInsets.only(left: 4.0),
                 child: Row(
                   spacing: 4,
-                  children: [Image.asset("lib/images/Vector 9.png",scale: 0.8,)],
+                  children: [SvgPicture.asset(
+                    colorFilter:
+                        ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                    "lib/images/back.svg",
+                    width: 24, // optional
+                    height: 24, // optional
+                  ),],
                 ),
               ),
                           ),

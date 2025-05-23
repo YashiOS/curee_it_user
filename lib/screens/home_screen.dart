@@ -10,6 +10,7 @@ import 'package:cureeit_user_app/current_address/location_permission_helper.dart
 
 import 'package:cureeit_user_app/current_address/models/place_from_coordinates.dart';
 import 'package:cureeit_user_app/screens/location.dart';
+import 'package:cureeit_user_app/screens/order_tracking_screen.dart';
 import 'package:cureeit_user_app/selected_Address/currentAddress.dart';
 import 'package:cureeit_user_app/user/user.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
@@ -331,7 +332,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Future<void> didAddToCart(int index) async {
-    print("DID ADD TO CART");
+
     setState(() {
       isAddingMap[index] = true;
     });
@@ -376,6 +377,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         SnackBar(content: Text('Network error: $e')),
       );
     }
+    setState(() {
+      isAddingMap[index] = true;
+    });
   }
 
   Future<void> _removeFromCart(String ProductId) async {
@@ -1404,64 +1408,69 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                         "On the way") {
                                       status = "Out for delivery";
                                     }
-                                    return Container(
-                                      padding: EdgeInsets.all(16),
-                                      height: 80,
-                                      width: MediaQuery.of(context).size.width *
-                                          0.9,
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Column(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.center,
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                "$status",
-                                                style: GoogleFonts.mulish(
-                                                    color: whiteColor,
-                                                    fontSize: 20,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                              Text(
-                                                "#$orederId",
-                                                style: GoogleFonts.mulish(
-                                                    color: greyColor,
-                                                    fontSize: 10,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                            ],
-                                          ),
-                                          Container(
-                                            height: order["currentStatus"] ==
-                                                    "Order Placed"
-                                                ? 36
-                                                : 80, // ⬅️ Adjust here
-                                            decoration: BoxDecoration(),
-                                            child: Image.asset(
-                                              order["currentStatus"] ==
-                                                      "Order Placed"
-                                                  ? 'lib/images/ordered.png'
-                                                  : order["currentStatus"] ==
-                                                          "Packing"
-                                                      ? 'lib/images/packing.png'
-                                                      : order["currentStatus"] ==
-                                                              "On the way"
-                                                          ? 'lib/images/onTheWay.png'
-                                                          : order["currentStatus"] ==
-                                                                  "Delivered"
-                                                              ? 'lib/images/DELIVERED.png'
-                                                              : 'lib/images/ordered.png', // Default image
+                                    return GestureDetector(
+                                      onTap: (){
+                                        Navigator.of(context).push(MaterialPageRoute(builder: (context)=>OrderTrackingScreen(NavigatingFrom: "home", orderId: orederId)));
+                                      },
+                                      child: Container(
+                                        padding: EdgeInsets.all(16),
+                                        height: 80,
+                                        width: MediaQuery.of(context).size.width *
+                                            0.9,
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Text(
+                                                  "$status",
+                                                  style: GoogleFonts.mulish(
+                                                      color: whiteColor,
+                                                      fontSize: 20,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                                Text(
+                                                  "#$orederId",
+                                                  style: GoogleFonts.mulish(
+                                                      color: greyColor,
+                                                      fontSize: 10,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              ],
                                             ),
-                                          ),
-                                        ],
+                                            Container(
+                                              height: order["currentStatus"] ==
+                                                      "Order Placed"
+                                                  ? 36
+                                                  : 80, // ⬅️ Adjust here
+                                              decoration: BoxDecoration(),
+                                              child: Image.asset(
+                                                order["currentStatus"] ==
+                                                        "Order Placed"
+                                                    ? 'lib/images/ordered.png'
+                                                    : order["currentStatus"] ==
+                                                            "Packing"
+                                                        ? 'lib/images/packing.png'
+                                                        : order["currentStatus"] ==
+                                                                "On the way"
+                                                            ? 'lib/images/onTheWay.png'
+                                                            : order["currentStatus"] ==
+                                                                    "Delivered"
+                                                                ? 'lib/images/DELIVERED.png'
+                                                                : 'lib/images/ordered.png', // Default image
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     );
                                   }),

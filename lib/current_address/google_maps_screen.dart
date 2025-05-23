@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class GoogleMapsScreen extends StatefulWidget {
   const GoogleMapsScreen({super.key});
@@ -21,6 +22,7 @@ class GoogleMapsScreen extends StatefulWidget {
 
 class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
   GoogleMapController? _mapController;
+  bool currentLocationFething = false;
   TextEditingController searchPlaceController = TextEditingController();
   GetPlaces getPlaces = GetPlaces();
   // double defaultLat = 27.6008427;
@@ -34,7 +36,7 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
   void _changeCameraPosition(double lat, double lng) {
     CameraPosition newPosition = CameraPosition(
       target: LatLng(lat, lng),
-      zoom: 15.0, // Zoom level
+      zoom: 18, // Zoom level
     );
 
     // Animate the camera to the new position
@@ -48,6 +50,8 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
         defaultLng = value.results?[0].geometry?.location?.lng ?? 0.0;
         placeFromCoordinates = value;
         isLoading = false;
+
+        currentLocationFething = false;
       });
     });
   }
@@ -97,7 +101,15 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
               padding: const EdgeInsets.only(left: 4.0),
               child: Row(
                 spacing: 4,
-                children: [Image.asset("lib/images/Vector 9.png",scale: 0.8,)],
+                children: [
+                  SvgPicture.asset(
+                    colorFilter:
+                        ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                    "lib/images/back.svg",
+                    width: 24, // optional
+                    height: 24, // optional
+                  ),
+                ],
               ),
             ),
           ),
@@ -122,7 +134,7 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
                     mapType: MapType.normal,
                     initialCameraPosition: CameraPosition(
                       target: LatLng(defaultLat, defaultLng),
-                      zoom: 14.4746,
+                      zoom: 18,
                     ),
                     onCameraIdle: () {
                       ApiServices()
@@ -147,11 +159,12 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
                   ),
                 ),
                 Center(
-                  child: Icon(
-                    Icons.location_on,
-                    size: 36,
-                    color: whiteColor,
-                  ),
+                  child: Container(
+                      height: 35,
+                      width: 35,
+                      child: Image.asset(
+                        "lib/images/location.png",
+                      )),
                 ),
                 Container(
                   width: MediaQuery.of(context).size.width,
@@ -173,6 +186,7 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
                                   vertical: 4.0, horizontal: 18),
                               child: TextField(
                                 controller: searchPlaceController,
+                                cursorColor: greenColor,
                                 style: GoogleFonts.mulish(
                                     color: whiteColor,
                                     fontSize: 16,
@@ -290,6 +304,10 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
                           children: [
                             GestureDetector(
                               onTap: () {
+                                setState(() {
+                                  currentLocationFething = true;
+                                });
+
                                 determinePosition().then((value) {
                                   setState(() {
                                     defaultLat = value.latitude;
@@ -334,7 +352,15 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
                             ),
                             Container(
                               width: MediaQuery.of(context).size.width,
-                              color: ligtBlackColor,
+                              decoration: BoxDecoration(
+                                  color: ligtBlackColor,
+                                  border: currentLocationFething
+                                      ? Border(
+                                          top: BorderSide(
+                                              color: greenColor, width: 2),
+                                        )
+                                      : Border.all(
+                                          width: 0, color: Colors.transparent)),
                               padding: EdgeInsets.symmetric(vertical: 24),
                               child: Row(
                                 children: [
