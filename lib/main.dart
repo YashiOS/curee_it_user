@@ -20,6 +20,7 @@ import 'package:cureeit_user_app/screens/splashScreen.dart';
 import 'package:cureeit_user_app/screens/terms_of_service_screen.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'dart:io' show Platform;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -30,6 +31,9 @@ late Box myBox;
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+  ]);
   await Hive.initFlutter();
   myBox = await Hive.openBox("Mybox");
   runApp(

@@ -172,6 +172,21 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
               ),
             ),
             const SizedBox(height: 12),
+           Container(
+               margin: EdgeInsets.only(bottom: 10),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8),
+                 color: ligtBlackColor,
+              ),
+              child: TextField(
+                style: GoogleFonts.mulish(color: whiteColor ),
+                cursorColor: greenColor,
+                controller: _typeController,
+                decoration: _inputDecoration("Type (e.g., Home, Office)"),
+              ),
+            ),
+            const SizedBox(height: 12),
+
             Container(
               margin: EdgeInsets.only(bottom: 10),
               decoration: BoxDecoration(
@@ -200,22 +215,10 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
               ),
             ),
             const SizedBox(height: 12),
-            Container(
-               margin: EdgeInsets.only(bottom: 10),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                 color: ligtBlackColor,
-              ),
-              child: TextField(
-                style: GoogleFonts.mulish(color: whiteColor ),
-                cursorColor: greenColor,
-                controller: _typeController,
-                decoration: _inputDecoration("Type (e.g., Home, Office)"),
-              ),
-            ),
-            const SizedBox(height: 12),
+            
             GestureDetector(
               onTap: () {
+                
                 if (isButtonEnabled) {
                   addAddress();
                 }

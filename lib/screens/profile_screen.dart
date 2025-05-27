@@ -188,7 +188,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       decoration: const BoxDecoration(
                         shape: BoxShape.circle,
                       ),
-                      child: Image.asset("lib/images/profile_icon.png"),
+                      child: Image.asset("lib/images/profileIcon.png"),
                     ),
                     const SizedBox(width: 16),
 

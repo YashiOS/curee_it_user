@@ -7,6 +7,7 @@ class Assets {
   static const String cardsFavoritesCard = 'lib/cards/favorites_card.dart';
   static const String cardsOrderCard = 'lib/cards/order_card.dart';
   static const String cardsSearchCard = 'lib/cards/search_card.dart';
+  static const String cartManagerCartManager = 'lib/cartManager/cartManager.dart';
   static const String cubitServiceAvilableCubit = 'lib/cubit/service_avilable_cubit.dart';
   static const String cubitServiceAvilableState = 'lib/cubit/service_avilable_state.dart';
   static const String currentAddressApiServices = 'lib/current_address/api_services.dart';
@@ -59,6 +60,10 @@ class Assets {
   static const String imagesHugeiconsLocation = 'lib/images/hugeicons_location.png';
   static const String imagesImage = 'lib/images/image.png';
   static const String imagesItemImageBg = 'lib/images/item_image_bg.png';
+  static const String imagesLoaction2 = 'lib/images/loaction2.png';
+  static const String imagesLocation = 'lib/images/location.png';
+  static const String imagesLocation1 = 'lib/images/location1.png';
+  static const String imagesMEDKARO = 'lib/images/MEDKARO.png';
   static const String imagesMan = 'lib/images/man.png';
   static const String imagesMedicine1 = 'lib/images/medicine1.png';
   static const String imagesMedkaro (1) 2 = 'lib/images/Medkaro (1) 2.png';
@@ -77,12 +82,16 @@ class Assets {
   static const String imagesPacking = 'lib/images/packing.png';
   static const String imagesPlusButton = 'lib/images/plus_button.png';
   static const String imagesPrescription = 'lib/images/prescription.png';
-  static const String imagesProfileIcon = 'lib/images/profile_icon.png';
+  static const String imagesProfileIcon = 'lib/images/profileIcon.png';
+  static const String imagesProfileIcon1 = 'lib/images/profileIcon1.png';
+  static const String imagesSP = 'lib/images/SP.png';
+  static const String imagesSP1 = 'lib/images/SP1.png';
+  static const String imagesSP2 = 'lib/images/SP2.png';
+  static const String imagesSPLASH = 'lib/images/SPLASH.png';
   static const String imagesSaveButton = 'lib/images/saveButton.png';
   static const String imagesSearchButton = 'lib/images/search_button.png';
   static const String imagesSearchLight = 'lib/images/Search_light.png';
   static const String imagesSelectedButton = 'lib/images/selected_button.png';
-  static const String imagesSplash = 'lib/images/splash.png';
   static const String imagesSplashLogo = 'lib/images/splash_logo.png';
   static const String imagesSplashLogoFinal = 'lib/images/splash_logo_final.png';
   static const String imagesSplashNew = 'lib/images/splash_new.svg';
@@ -93,6 +102,8 @@ class Assets {
   static const String imagesUser = 'lib/images/user.png';
   static const String imagesVector 9 = 'lib/images/Vector 9.png';
   static const String isInRadiusServicesAvilable = 'lib/isInRadius/ServicesAvilable.dart';
+  static const String libImagesBack = 'lib/images/back.svg';
+  static const String libImagesProfileIcon = 'lib/images/profile_icon.png';
   static const String libMain = 'lib/main.dart';
   static const String localStorageCubitStoreUserCubit = 'lib/LocalStorageCubit/store_user_cubit.dart';
   static const String localStorageCubitStoreUserState = 'lib/LocalStorageCubit/store_user_state.dart';

@@ -53,8 +53,7 @@ class _SearchState extends State<Search> {
         if (jsonResponse["success"] == true) {
           setState(() {
             _searchResults = jsonResponse["data"];
-            print("SEARCH RESULT****");
-            print(_searchResults);
+           
           });
         } else {
           setState(() {

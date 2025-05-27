@@ -360,12 +360,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 left: 0,
                 right: 0,
                 child: SizedBox(
-                  height: screenHeight * 0.4, // 40% of screen height
+                  height: screenHeight * 0.36, // 40% of screen height
 width: screenWidth * 0.9, 
                   child: Image.asset(
                     "lib/images/medkaroGadi.png",
                     width: 200,
-                    fit: BoxFit.cover,
+                    fit: BoxFit.fill,
                   ),
                 ),
               ),

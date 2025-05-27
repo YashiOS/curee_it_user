@@ -1364,7 +1364,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                             shape: BoxShape.circle,
                                           ),
                                           child: Image.asset(
-                                              "lib/images/profile_icon.png"),
+                                              "lib/images/profileIcon.png"),
                                         ),
                             ),
                           ],

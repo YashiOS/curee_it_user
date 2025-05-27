@@ -34,6 +34,7 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
   late String mapDarkStyle;
 
   void _changeCameraPosition(double lat, double lng) {
+    
     CameraPosition newPosition = CameraPosition(
       target: LatLng(lat, lng),
       zoom: 18, // Zoom level
@@ -158,12 +159,70 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
                     },
                   ),
                 ),
+                // Add this widget just above the Center widget that contains your pin
+                // Add this to your Stack children (replace your current Positioned widgets)
+                Positioned(
+                  bottom: MediaQuery.of(context).size.height * 0.44 +
+                      25, // 25 is half of pin height
+                  left: 0,
+                  right: 0,
+                  child: Column(
+                    children: [
+                      Container(
+                        constraints: BoxConstraints(
+                            maxWidth: MediaQuery.of(context).size.width * 0.8),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                        decoration: BoxDecoration(
+                          color: ligtBlackColor,
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black26,
+                              blurRadius: 6,
+                              offset: Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          children: [
+                            Text(
+                              "Order will be delivered here",
+                              style: GoogleFonts.mulish(
+                                color: whiteColor,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w700,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                            Text(
+                              "Place the pin to your exact location",
+                              style: GoogleFonts.mulish(
+                                color: whiteColor,
+                                fontSize: 12.6,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ],
+                        ),
+                      ),
+                      CustomPaint(
+                        painter: TrianglePainter(
+                          color: ligtBlackColor,
+                        ),
+                        size: Size(20, 10),
+                      ),
+                    ],
+                  ),
+                ),
+
                 Center(
                   child: Container(
                       height: 35,
                       width: 35,
                       child: Image.asset(
-                        "lib/images/location.png",
+                        "lib/images/location1.png",
                       )),
                 ),
                 Container(
@@ -406,11 +465,14 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
                                         },
                                       );
                                     },
-                                    child: Icon(
-                                      Icons.check_circle,
-                                      color: greenColor,
-                                      size: 48,
-                                    ),
+                                    child:Container(
+                                      height: 50,
+                                      width: 50,
+                                      child: Image.asset(
+                                        'lib/images/tick.png',
+                                        fit:BoxFit.fill,
+                                      ),
+                                    )
                                   ),
                                 ],
                               ),
@@ -425,4 +487,26 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
             ),
     );
   }
+}
+
+class TrianglePainter extends CustomPainter {
+  final Color color;
+  TrianglePainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()..color = color;
+    var path = Path();
+    path.moveTo(0, 0);
+    path.lineTo(10, 10);
+    path.lineTo(20, 0);
+    path.close();
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  Size get size => Size(20, 10);
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
