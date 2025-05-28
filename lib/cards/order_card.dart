@@ -57,7 +57,7 @@ class _OrderCardState extends State<OrderCard> {
     setState(() {
       reOrdering=true;
     });
-    List<dynamic> orderItems = widget.orderData["orderItems"];
+    List<dynamic> orderItems = widget.orderData["products"];
     print(orderItems);
     List productIds =
         orderItems.map((item) => item['productId'].toString()).toList();
@@ -90,10 +90,10 @@ class _OrderCardState extends State<OrderCard> {
 
   @override
   Widget build(BuildContext context) {
-    String orderStatus = widget.orderData['currentStatus'];
+    String orderStatus = widget.orderData['status'];
     String purchaseDate = widget.orderData['purchaseDate'];
     double shippingCost = double.parse(widget.orderData['totalAmount']);
-    List orderItems = widget.orderData['orderItems'];
+    List orderItems = widget.orderData['products'];
     String orderId = widget.orderData['orderId'];
     print("THIS IS ORDER ID");
     print(orderId);

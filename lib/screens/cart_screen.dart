@@ -168,7 +168,7 @@ class _CartScreenState extends State<CartScreen> {
     final String? userId = User.userId; // Replace with the actual userId
 
     try {
-      var request = http.Request('GET', cartApiUrl)
+      var request = http.Request('POST', cartApiUrl)
         ..headers.addAll({
           'Content-Type': 'application/json',
         })
@@ -261,7 +261,7 @@ class _CartScreenState extends State<CartScreen> {
         "$baseUrl/product/productDetail");
 
     try {
-      var request = http.Request('GET', productApiUrl)
+      var request = http.Request('POST', productApiUrl)
         ..headers.addAll({
           'Content-Type': 'application/json',
         })

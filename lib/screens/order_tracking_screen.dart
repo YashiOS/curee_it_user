@@ -63,7 +63,10 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
         if (data["data"].isNotEmpty) {
           _isInitLoading=false;
           orderTrackingDetails = Map<String, dynamic>.from(data["data"][0]);
-          print(orderTrackingDetails["status"]);
+          print("address");
+          print(orderTrackingDetails['shippingAddress']);
+          
+          
         }
       });
     } else {
@@ -116,7 +119,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
   }
 
   void showOrderSummaryBottomSheet() {
-    final List<dynamic> items = orderTrackingDetails['orderItems'] ?? [];
+    final List<dynamic> items = orderTrackingDetails['products'] ?? [];
     final double totalSellingPrice = items.fold(0.0, (sum, item) {
   final price = double.tryParse(item['sellingPrice'].toString()) ?? 0.0;
   final quantity = int.tryParse(item['quantity'].toString()) ?? 1;
@@ -665,8 +668,7 @@ final double difference = itemTotal - totalSellingPrice;
                           OrderDetail(
                             icon: Icons.home_outlined,
                             title: "Delivery",
-                            subtitle: orderTrackingDetails['shippingAddress'] ??
-                                "Unknown",
+                            subtitle:orderTrackingDetails['dropDetails']?['address']?['street_address1'] ?? "Unknown",
                             width: width,
                           ),
                           SizedBox(height: 24,),

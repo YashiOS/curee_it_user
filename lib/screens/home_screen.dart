@@ -102,6 +102,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late Animation<double> _animation;
   Timer? _ongoingOrdersTimer;
   bool _isFetchingOngoingOrders = false;
+  int estTime=0;
   // To store product quantities
 
   void _showLocationDeniedDialog() {
@@ -278,16 +279,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     print("GET ON GOING ORDER");
     return allOrders
         .where((order) =>
-            order['currentStatus'] != 'Delivered' &&
-            order['currentStatus'] != 'delivered')
+            order['status'] != 'Delivered' &&
+            order['status'] != 'delivered')
         .toList();
   }
 
   Future<void> fetchOrderHistory() async {
     print("FETCH ORDER HISTORY");
-    var url = Uri.parse(
-        '$baseUrl/order/orderHistory');
-    var request = http.Request('GET', url)
+    var url = Uri.parse('$baseUrl/order/orderHistory');
+    var request = http.Request('POST', url)
       ..headers.addAll({
         'Content-Type': 'application/json',
       })
@@ -334,7 +334,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Future<void> didAddToCart(int index) async {
-
     setState(() {
       isAddingMap[index] = true;
     });
@@ -344,8 +343,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
     try {
       final response = await http.post(
-        Uri.parse(
-            '$baseUrl/cart/addToCart'),
+        Uri.parse('$baseUrl/cart/addToCart'),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -355,7 +353,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           'quantity': 1,
         }),
       );
-
+      print("ADDED TO CART");
+      print(response.statusCode);
+      print(response.body);
       if (response.statusCode == 200) {
         setState(() {
           quantities[index] = 1;
@@ -393,8 +393,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       "productId": productId,
     };
 
-    final url =
-        '$baseUrl/cart/removeFromCart';
+    final url = '$baseUrl/cart/removeFromCart';
     try {
       final response = await http.delete(
         Uri.parse(url),
@@ -477,8 +476,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
     try {
       final response = await http.put(
-        Uri.parse(
-            '$baseUrl/cart/updateQuantity'),
+        Uri.parse('$baseUrl/cart/updateQuantity'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           "userId": userId,
@@ -519,15 +517,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Future<void> fetchCartDetails() async {
-    print("FETCH CART DETAILS STARTED");
     setState(() {
       isLoading = true;
     });
 
     try {
-      final cartApiUrl = Uri.parse(
-          "$baseUrl/cart/cartDetails");
-      final request = http.Request('GET', cartApiUrl)
+      final cartApiUrl = Uri.parse("$baseUrl/cart/cartDetails");
+      final request = http.Request('POST', cartApiUrl)
         ..headers.addAll({'Content-Type': 'application/json'})
         ..body = jsonEncode({"userId": User.userId});
 
@@ -536,12 +532,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
       if (response.statusCode == 200) {
         final responseData = jsonDecode(responseBody);
-
+       
         if (responseData['status'] == 200 && responseData['data'] != null) {
           final cartData = responseData['data'];
 
           setState(() {
             finaltotalAmount = responseData["finalTotal"]?.toString() ?? "0";
+
+            print(" final total : $finaltotalAmount");
           });
           final List<Map<String, dynamic>> tempCart = [];
           double calculatedTotal = 0.0;
@@ -617,16 +615,20 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         });
       }
     }
+    print("*****LAST*****");
+    print(cartItems.length);
+    print(isLoading);
+
+    print(totalAmount);
   }
 
   Future<Map<String, dynamic>?> fetchProductDetails(String productId) async {
     setState(() {});
-  
-    var productApiUrl = Uri.parse(
-        "$baseUrl/product/productDetail");
+
+    var productApiUrl = Uri.parse("$baseUrl/product/productDetail");
 
     try {
-      var request = http.Request('GET', productApiUrl)
+      var request = http.Request('POST', productApiUrl)
         ..headers.addAll({
           'Content-Type': 'application/json',
         })
@@ -655,8 +657,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   Future<void> fetchProducts() async {
     print("FETCH PRODUCTS");
-    final response = await http.get(Uri.parse(
-        'https://api.medkaro.in/home/homeProducts'));
+    final response =
+        await http.get(Uri.parse('https://api.medkaro.in/home/homeProducts'));
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       setState(() {
@@ -707,18 +709,18 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         child: Center(
           child: Text(
             "No items",
-             style: GoogleFonts.mulish(
-            fontWeight: FontWeight.w500,
-            fontSize: 20,
-            color: greyColor,
-          ),
+            style: GoogleFonts.mulish(
+              fontWeight: FontWeight.w500,
+              fontSize: 20,
+              color: greyColor,
+            ),
           ),
         ),
       );
     }
 
     int itemCount = (products.length / 2).ceil();
-    if (products.length > 6) itemCount = 3;
+    if (products.length > 8) itemCount = 4;
 
     return SliverList(
       delegate: SliverChildBuilderDelegate(
@@ -1044,41 +1046,60 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     }
   }
 
+  Future<void> getEstTime(String lat, String long) async {
+    final String apiUrl = "$baseUrl/home/getEstTime";
+    try {
+      final response = await http.post(Uri.parse(apiUrl),
+          headers: {"Content-Type": "application/json"},
+          body: jsonEncode({"userLat": lat, "userLong": long}));
+
+      if (response.statusCode == 200) {
+        final responseData = jsonDecode(response.body);
+        setState(() {
+          estTime = (responseData["estimatedTimeMinutes"]);
+          print(estTime);
+        });
+       
+       
+      }
+    } catch (e) {
+      print("error $e");
+    }
+  }
 
   Future<void> checkLocation() async {
-    print("checking location...");
-    final String apiUrl =
-        "$baseUrl/home/check_location";
+   
+    final String apiUrl = "$baseUrl/home/check_location";
 
     try {
+      String latitude = "${Address.CurrentAddress!["userLat"]}";
+      String longitude = "${Address.CurrentAddress!["userLong"]}";
+
       final response = await http.post(
         Uri.parse(apiUrl),
         headers: {"Content-Type": "application/json"},
         body: jsonEncode({
-          "latitude": Address.CurrentAddress!["userLat"],
-          "longitude": Address.CurrentAddress!["userLong"],
+          "latitude": latitude,
+          "longitude": longitude,
         }),
       );
-
+     
       if (response.statusCode == 200) {
-        print("user lat: ${Address.CurrentAddress!["userLat"]}");
-         print("user long: ${Address.CurrentAddress!["userLong"]}");
         final responseData = jsonDecode(response.body);
+       
         setState(() {
-          print("checking if its in radius...");
-
           isInRadius = responseData['isAllowed'] == true;
-
-          print(isInRadius);
-          if (isInRadius == true) {
-
-            context.read<ServiceAvilableCubit>().UpdateServiceAvilable(true);
-            fetchCartDetails();
-          } else {
-            isInRadius = false;
-            context.read<ServiceAvilableCubit>().UpdateServiceAvilable(false);
-          }
         });
+        if (isInRadius == true) {
+          fetchCartDetails();
+          context.read<ServiceAvilableCubit>().UpdateServiceAvilable(true);
+          getEstTime(latitude,
+              longitude);
+             
+        } else {
+          isInRadius = false;
+          context.read<ServiceAvilableCubit>().UpdateServiceAvilable(false);
+        }
       } else {
         print("Failed to check_location: ${response.body}");
       }
@@ -1249,7 +1270,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                           ),
                                         )
                                       : Text(
-                                          "in 10 minutes",
+                                          "in $estTime minutes",
                                           style: GoogleFonts.mulish(
                                               color: whiteColor,
                                               fontSize: 24,
@@ -1407,26 +1428,32 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                     final order = onGoingOrders[index];
                                     final orederId = order["orderId"];
 
-                                    if (order["currentStatus"] ==
+                                    if (order["status"] ==
                                         "Order Placed") {
                                       status = "Your order was placed!";
                                     }
-                                    if (order["currentStatus"] == "Packing") {
+                                    if (order["status"] == "Packing") {
                                       status = "Packing your items";
                                     }
-                                    if (order["currentStatus"] ==
+                                    if (order["status"] ==
                                         "On the way") {
                                       status = "Out for delivery";
                                     }
                                     return GestureDetector(
-                                      onTap: (){
-                                        Navigator.of(context).push(MaterialPageRoute(builder: (context)=>OrderTrackingScreen(NavigatingFrom: "home", orderId: orederId)));
+                                      onTap: () {
+                                        Navigator.of(context).push(
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    OrderTrackingScreen(
+                                                        NavigatingFrom: "home",
+                                                        orderId: orederId)));
                                       },
                                       child: Container(
                                         padding: EdgeInsets.all(16),
                                         height: 80,
-                                        width: MediaQuery.of(context).size.width *
-                                            0.9,
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.9,
                                         child: Row(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.center,
@@ -1458,22 +1485,22 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                               ],
                                             ),
                                             Container(
-                                              height: order["currentStatus"] ==
+                                              height: order["status"] ==
                                                       "Order Placed"
                                                   ? 36
                                                   : 80, // ⬅️ Adjust here
                                               decoration: BoxDecoration(),
                                               child: Image.asset(
-                                                order["currentStatus"] ==
+                                                order["status"] ==
                                                         "Order Placed"
                                                     ? 'lib/images/ordered.png'
-                                                    : order["currentStatus"] ==
+                                                    : order["status"] ==
                                                             "Packing"
                                                         ? 'lib/images/packing.png'
-                                                        : order["currentStatus"] ==
+                                                        : order["status"] ==
                                                                 "On the way"
                                                             ? 'lib/images/onTheWay.png'
-                                                            : order["currentStatus"] ==
+                                                            : order["status"] ==
                                                                     "Delivered"
                                                                 ? 'lib/images/DELIVERED.png'
                                                                 : 'lib/images/ordered.png', // Default image
@@ -1634,10 +1661,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 cartItems.isNotEmpty &&
                 ISserviceAvilable &&
                 totalAmount != 0) ||
-            (isTapped) &&
-                ISserviceAvilable &&
-                totalAmount != 0 &&
-                cartItems.isNotEmpty) ...[
+            ISserviceAvilable && totalAmount != 0 && cartItems.isNotEmpty) ...[
           // Replace your existing Positioned widget with this:
           AnimatedBuilder(
             animation: _animation,

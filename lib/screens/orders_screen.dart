@@ -25,7 +25,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
     print("fetching cart");
     var url = Uri.parse(
         '$baseUrl/order/orderHistory');
-    var request =  http.Request('GET', url)
+    var request =  http.Request('POST', url)
       ..headers.addAll({
         'Content-Type': 'application/json',
       })
@@ -38,10 +38,8 @@ class _OrdersScreenState extends State<OrdersScreen> {
       Map<String, dynamic> data = jsonDecode(responseBody);
       
       setState(() {
-      
         orders = data['data'];
         print(orders);
-         
         orders.sort((item1, item2) {
   final dateA = DateTime.parse(item1['purchaseDate']);
   final dateB = DateTime.parse(item2['purchaseDate']);
@@ -138,7 +136,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                       orders.length, // Use the length of the orders array
                   itemBuilder: (context, index) {
                     return OrderCard(
-                      prescriptionURL:orders[0]["prescription"]?["photoURL"] ??"",
+                      prescriptionURL:orders[index]["prescription"]?["photoURL"] ??"",
                         orderData:
                             orders[index]); // Pass the order data to the card
                   },
