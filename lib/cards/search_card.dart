@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:cureeit_user_app/BaseUrl.dart';
 import 'package:cureeit_user_app/screens/item_detail_screen.dart';
 import 'package:cureeit_user_app/user/user.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
@@ -17,7 +18,7 @@ class _SearchCardState extends State<SearchCard> {
   bool isFav = false; // Variable to track if the product is in favourites
   Future<void> addToFavourites() async {
     final String apiUrl =
-        "http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/product/favourites";
+        "$baseUrl/product/favourites";
 
     try {
       final response = await http.post(
@@ -48,7 +49,7 @@ class _SearchCardState extends State<SearchCard> {
   Future<void> checkIfFav() async {
     try {
       const url =
-          'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/product/getfavouritesList';
+          '$baseUrl/product/getfavouritesList';
 
       var request = http.Request('GET', Uri.parse(url))
         ..headers.addAll({

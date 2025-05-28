@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:math';
+import 'package:cureeit_user_app/BaseUrl.dart';
 import 'package:cureeit_user_app/cartManager/cartManager.dart';
 import 'package:cureeit_user_app/cubit/service_avilable_cubit.dart';
 import 'package:cureeit_user_app/current_address/api_services.dart';
@@ -51,18 +52,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late Animation<double> _bounceAnimation;
 
   final List<String> hints = [
-    "Search for your medicine",
-    "Try 'Paracetamol'",
-    "Looking for Cough Syrup?",
-    "Enter salt or brand name",
-    "Got a headache? Try 'Saridon'",
-    "Search by symptoms like 'cold'",
-    "Find Ayurvedic medicines too",
-    "Try 'Disprin' for quick relief",
-    "Type 'Crocin' for fever meds",
-    "Try 'ORS' for dehydration",
-    "Search homeopathic remedies",
-    "Search for baby care products",
+    "Search for \"diapers\"",
+    "Search for \"dolo\"",
+    "Search for \"paracetamol\"",
+    "Search for \"ORS\"",
+    "Search for \"vicks\"",
+    "Search for \"thermometer\"",
+    "Search for \"stayfree\"",
+    "Search for \"anti-allergy\"",
+    "Search for \"multivitamins\"",
+    "Search for \"ipill\"",
+    "Search for \"condom\"",
+    "Search for \"nasal drops\"",
+    "Search for \"injection\"",
   ];
   int currentIndex = 0;
   String? currentHint;
@@ -284,7 +286,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Future<void> fetchOrderHistory() async {
     print("FETCH ORDER HISTORY");
     var url = Uri.parse(
-        'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/order/orderHistory');
+        '$baseUrl/order/orderHistory');
     var request = http.Request('GET', url)
       ..headers.addAll({
         'Content-Type': 'application/json',
@@ -343,7 +345,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     try {
       final response = await http.post(
         Uri.parse(
-            'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/cart/addToCart'),
+            '$baseUrl/cart/addToCart'),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -392,7 +394,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     };
 
     final url =
-        'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/cart/removeFromCart';
+        '$baseUrl/cart/removeFromCart';
     try {
       final response = await http.delete(
         Uri.parse(url),
@@ -476,7 +478,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     try {
       final response = await http.put(
         Uri.parse(
-            'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/cart/updateQuantity'),
+            '$baseUrl/cart/updateQuantity'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           "userId": userId,
@@ -524,7 +526,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
     try {
       final cartApiUrl = Uri.parse(
-          "http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/cart/cartDetails");
+          "$baseUrl/cart/cartDetails");
       final request = http.Request('GET', cartApiUrl)
         ..headers.addAll({'Content-Type': 'application/json'})
         ..body = jsonEncode({"userId": User.userId});
@@ -619,9 +621,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   Future<Map<String, dynamic>?> fetchProductDetails(String productId) async {
     setState(() {});
-    print("FETCH PRODUCT DETAILS");
+  
     var productApiUrl = Uri.parse(
-        "http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/product/productDetail");
+        "$baseUrl/product/productDetail");
 
     try {
       var request = http.Request('GET', productApiUrl)
@@ -654,7 +656,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Future<void> fetchProducts() async {
     print("FETCH PRODUCTS");
     final response = await http.get(Uri.parse(
-        'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/home/homeProducts'));
+        'https://api.medkaro.in/home/homeProducts'));
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       setState(() {
@@ -705,7 +707,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         child: Center(
           child: Text(
             "No items",
-            style: GoogleFonts.mulish(color: whiteColor),
+             style: GoogleFonts.mulish(
+            fontWeight: FontWeight.w500,
+            fontSize: 20,
+            color: greyColor,
+          ),
           ),
         ),
       );
@@ -977,7 +983,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       });
     }
     var url = Uri.parse(
-      'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/address/savedAddress',
+      '$baseUrl/address/savedAddress',
     );
 
     // Create the GET request with the userId as query parameter
@@ -1038,10 +1044,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     }
   }
 
+
   Future<void> checkLocation() async {
     print("checking location...");
     final String apiUrl =
-        "http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/home/check_location";
+        "$baseUrl/home/check_location";
 
     try {
       final response = await http.post(
@@ -1054,14 +1061,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       );
 
       if (response.statusCode == 200) {
+        print("user lat: ${Address.CurrentAddress!["userLat"]}");
+         print("user long: ${Address.CurrentAddress!["userLong"]}");
         final responseData = jsonDecode(response.body);
         setState(() {
           print("checking if its in radius...");
 
-          isInRadius = responseData['insideRadius'] == true;
+          isInRadius = responseData['isAllowed'] == true;
 
           print(isInRadius);
           if (isInRadius == true) {
+
             context.read<ServiceAvilableCubit>().UpdateServiceAvilable(true);
             fetchCartDetails();
           } else {
@@ -1531,7 +1541,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                       padding: const EdgeInsets.only(
                                           left: 16, right: 5),
                                       child: Icon(Icons.search,
-                                          color: Colors.white, size: 16),
+                                          color: Colors.white, size: 18),
                                     ),
                                     Container(
                                       width: 250,
@@ -1570,8 +1580,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                             child: Text(
                                               currentHint ?? "",
                                               style: GoogleFonts.mulish(
-                                                color: whiteColor,
-                                                fontSize: 15,
+                                                color: greyColor,
+                                                fontSize: 14,
                                               ),
                                             ),
                                           ),

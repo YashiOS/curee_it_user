@@ -36,26 +36,34 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
   }
 
   Future<void> fetchOrderTracking() async {
+    String orderId=widget.orderId;
     var url = Uri.parse(
-      'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/order/orderTracking',
+      'https://api.medkaro.in/order/orderTracking',
     );
-    var request = http.Request('GET', url)
-      ..headers.addAll({
-        'Content-Type': 'application/json',
-      })
-      ..body = jsonEncode({'userId': widget.userId, 'orderId': widget.orderId});
+     var response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'orderId': orderId}),
+    );
 
-    var response = await http.Client().send(request);
-
+    
+    print("RESPONSE");
+   print(response.statusCode);
+  print(response.body);
     if (response.statusCode == 200) {
-      final responseBody =
-          await response.stream.bytesToString(); // 🔐 only once
-      final data = json.decode(responseBody);
+       setState(() {
+        _isInitLoading=false;
+      });
+      final responseBody =jsonDecode(response.body);
+           // 🔐 only once
+      final data =responseBody;
+      
 
       setState(() {
         if (data["data"].isNotEmpty) {
           _isInitLoading=false;
           orderTrackingDetails = Map<String, dynamic>.from(data["data"][0]);
+          print(orderTrackingDetails["status"]);
         }
       });
     } else {
@@ -518,14 +526,14 @@ final double difference = itemTotal - totalSellingPrice;
                   height: height * 0.45,
                   child: ClipRRect(
                     child: Image.asset(
-                      orderTrackingDetails["currentStatus"] == "Order Placed"
+                      orderTrackingDetails["status"] == "Order Placed"
                           ? 'lib/images/ordered.png'
-                          : orderTrackingDetails["currentStatus"] == "Packing"
+                          : orderTrackingDetails["status"] == "Packing"
                               ? 'lib/images/packing.png'
-                              : orderTrackingDetails["currentStatus"] ==
+                              : orderTrackingDetails["status"] ==
                                       "On the way"
                                   ? 'lib/images/onTheWay.png'
-                                  : orderTrackingDetails["currentStatus"] ==
+                                  : orderTrackingDetails["status"] ==
                                           "Delivered"
                                       ? 'lib/images/DELIVERED.png'
                                       : 'lib/images/ordered.png', // Default image
@@ -570,13 +578,13 @@ final double difference = itemTotal - totalSellingPrice;
                           label: "Ordered",
                           color: greenColor,
                           size: width,
-                          isInactive: orderTrackingDetails["currentStatus"] ==
+                          isInactive: orderTrackingDetails["status"] ==
                                       "Order Placed" ||
-                                  orderTrackingDetails["currentStatus"] ==
+                                  orderTrackingDetails["status"] ==
                                       "Packing" ||
-                                  orderTrackingDetails["currentStatus"] ==
+                                  orderTrackingDetails["status"] ==
                                       "On the way" ||
-                                  orderTrackingDetails["currentStatus"] ==
+                                  orderTrackingDetails["status"] ==
                                       "Delivered"
                               ? false
                               : true,
@@ -595,11 +603,11 @@ final double difference = itemTotal - totalSellingPrice;
                           label: "Packing",
                           color: greenColor,
                           size: width,
-                          isInactive: orderTrackingDetails["currentStatus"] ==
+                          isInactive: orderTrackingDetails["status"] ==
                                       "Packing" ||
-                                  orderTrackingDetails["currentStatus"] ==
+                                  orderTrackingDetails["status"] ==
                                       "On the way" ||
-                                  orderTrackingDetails["currentStatus"] ==
+                                  orderTrackingDetails["status"] ==
                                       "Delivered"
                               ? false
                               : true,
@@ -618,9 +626,9 @@ final double difference = itemTotal - totalSellingPrice;
                           label: "Enroute",
                           color: greenColor,
                           size: width,
-                          isInactive: orderTrackingDetails["currentStatus"] ==
+                          isInactive: orderTrackingDetails["status"] ==
                                       "On the way" ||
-                                  orderTrackingDetails["currentStatus"] ==
+                                  orderTrackingDetails["status"] ==
                                       "Delivered"
                               ? false
                               : true,
@@ -640,7 +648,7 @@ final double difference = itemTotal - totalSellingPrice;
                           color: greenColor,
                           size: width,
                           isInactive:
-                              orderTrackingDetails["currentStatus"] == "Delivered"
+                              orderTrackingDetails["status"] == "Delivered"
                                   ? false
                                   : true,
                         ),

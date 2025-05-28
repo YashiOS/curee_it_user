@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cureeit_user_app/BaseUrl.dart';
 import 'package:cureeit_user_app/LocalStorageCubit/store_user_cubit.dart';
 import 'package:cureeit_user_app/screens/location.dart';
 import 'package:cureeit_user_app/screens/login_screen.dart';
@@ -100,7 +101,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     try {
       final response = await http.post(
         Uri.parse(
-            'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/profile/user/profileDetails'),
+            '$baseUrl/profile/user/profileDetails'),
         headers: {
           'Content-Type': 'application/json',
         },

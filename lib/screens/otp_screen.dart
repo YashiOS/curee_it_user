@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cureeit_user_app/BaseUrl.dart';
 import 'package:cureeit_user_app/LocalStorageCubit/store_user_cubit.dart';
 import 'package:cureeit_user_app/screens/base_screen.dart';
 import 'package:cureeit_user_app/screens/home_screen.dart';
@@ -83,7 +84,7 @@ class _OtpScreenState extends State<OtpScreen> {
       try {
         final response = await http.post(
           Uri.parse(
-              'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/auth/user/verifyOTP'),
+              '$baseUrl/auth/user/verifyOTP'),
           headers: {
             'Content-Type': 'application/json',
           },

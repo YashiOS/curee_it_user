@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:cureeit_user_app/BaseUrl.dart';
 import 'package:cureeit_user_app/cartManager/cartManager.dart';
 import 'package:cureeit_user_app/screens/cart_screen.dart';
 import 'package:cureeit_user_app/screens/item_detail_screen.dart';
@@ -46,7 +47,7 @@ class _SearchState extends State<Search> {
 
     try {
       final response = await http.get(Uri.parse(
-          "http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/search/searchProducts?keyword=$query"));
+          "$baseUrl/search/searchProducts?keyword=$query"));
 
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
@@ -120,7 +121,7 @@ class _SearchState extends State<Search> {
    
 
     final url =
-        'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/cart/removeFromCart';
+        '$baseUrl/cart/removeFromCart';
     try {
       final response = await http.delete(
         Uri.parse(url),
@@ -189,7 +190,7 @@ class _SearchState extends State<Search> {
       });
       final response = await http.post(
         Uri.parse(
-            'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/cart/addToCart'),
+            '$baseUrl/cart/addToCart'),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -254,7 +255,7 @@ class _SearchState extends State<Search> {
     try {
       final response = await http.put(
         Uri.parse(
-            'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/cart/updateQuantity'),
+            '$baseUrl/cart/updateQuantity'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           "userId": userId,
@@ -379,7 +380,7 @@ class _SearchState extends State<Search> {
                         style: GoogleFonts.mulish(color: whiteColor),
                         controller: _controller,
                         decoration: InputDecoration(
-                          hintText: "Search",
+                          
                           hintStyle: GoogleFonts.mulish(color: whiteColor),
                           border: InputBorder.none,
                         ),
@@ -399,7 +400,11 @@ class _SearchState extends State<Search> {
                   : _searchResults.isEmpty
                       ? Center(
                           child: Text("No results found",
-                              style: GoogleFonts.mulish(color: greyColor)))
+                             style: GoogleFonts.mulish(
+            fontWeight: FontWeight.w500,
+            fontSize: 20,
+            color: greyColor,
+          ),))
                       : ListView.builder(
                           itemCount: _searchResults.length,
                           itemBuilder: (context, index) {

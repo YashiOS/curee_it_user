@@ -1,3 +1,4 @@
+import 'package:cureeit_user_app/BaseUrl.dart';
 import 'package:cureeit_user_app/cards/address_card.dart';
 import 'package:cureeit_user_app/current_address/google_maps_screen.dart';
 import 'package:cureeit_user_app/selected_Address/currentAddress.dart';
@@ -28,7 +29,7 @@ class _AddressesScreenState extends State<AddressesScreen> {
   // Function to fetch addresses from the API
   Future<void> fetchAddresses() async {
     var url = Uri.parse(
-      'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/address/savedAddress',
+      '$baseUrl/address/savedAddress',
     );
 
     // Create the GET request with the userId as query parameter

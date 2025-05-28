@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cureeit_user_app/BaseUrl.dart';
 import 'package:cureeit_user_app/screens/cart_screen.dart';
 import 'package:cureeit_user_app/screens/order_tracking_screen.dart';
 import 'package:cureeit_user_app/screens/orderdetail_screen_new.dart';
@@ -63,7 +64,7 @@ class _OrderCardState extends State<OrderCard> {
     try {
       final response = await http.post(
         Uri.parse(
-            'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/cart/addMultipleToCart'),
+            '$baseUrl/cart/addMultipleToCart'),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -174,35 +175,12 @@ class _OrderCardState extends State<OrderCard> {
                     ],
                   ),
                   SizedBox(
-                    height: 24,
+                    height: 10,
                   ),
                   Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "Address",
-                            style: GoogleFonts.mulish(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 17.02,
-                              color: whiteColor,
-                            ),
-                          ),
-                          SizedBox(
-                            width: screenWidth * 0.4,
-                            child: Text(
-                              widget.orderData['shippingAddress'],
-                              style: GoogleFonts.mulish(
-                                fontWeight: FontWeight.w300,
-                                fontSize: 12,
-                                color: whiteColor,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                      
                       GestureDetector(
                         onTap: () {
                           if (orderStatus == "Delivered" || orderStatus == "") {
@@ -213,7 +191,8 @@ class _OrderCardState extends State<OrderCard> {
                           padding:
                               EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                           decoration: BoxDecoration(
-                              color: greenColor,
+                              color:orderStatus=="Delivered"||orderStatus==""? greenColor:ligtBlackColor,
+                              border:orderStatus!="Delivered" ?Border.all(color: greenColor,width: 1):Border.all(color: Colors.transparent,width: 0),
                               borderRadius: BorderRadius.circular(8)),
                           child: orderStatus == "Delivered" || orderStatus == ""
                               ? Text(
@@ -230,19 +209,19 @@ class _OrderCardState extends State<OrderCard> {
                                       style: GoogleFonts.mulish(
                                         fontWeight: FontWeight.bold,
                                         fontSize: screenheight * 0.014,
-                                        color: whiteColor,
+                                        color: greenColor,
                                       ),
                                     )
                                   :orderStatus=="On the way"?Text("Enroute",style:GoogleFonts.mulish(
                                         fontWeight: FontWeight.bold,
                                         fontSize: screenheight * 0.014,
-                                        color: whiteColor,
+                                        color: greenColor,
                                       ) ,) :Text(
                                       orderStatus,
                                       style: GoogleFonts.mulish(
                                         fontWeight: FontWeight.bold,
                                         fontSize: screenheight * 0.014,
-                                        color: whiteColor,
+                                        color: greenColor,
                                       ),
                                     ),
                         ),

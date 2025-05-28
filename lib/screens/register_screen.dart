@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cureeit_user_app/BaseUrl.dart';
 import 'package:cureeit_user_app/screens/otp_screen.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +32,7 @@ class _LoginScreenState extends State<RegisterScreen> {
     try {
       final response = await http.post(
         Uri.parse(
-            'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/auth/user/verify'),
+            '$baseUrl/auth/user/verify'),
         headers: {
           'Content-Type': 'application/json',
         },

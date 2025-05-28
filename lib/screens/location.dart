@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'package:cureeit_user_app/BaseUrl.dart';
 import 'package:cureeit_user_app/current_address/google_maps_screen.dart';
 import 'package:cureeit_user_app/selected_Address/currentAddress.dart';
 import 'package:cureeit_user_app/user/user.dart';
@@ -32,7 +32,7 @@ class _LocationScreenState extends State<LocationScreen> {
       fetchingAddress=true;
     });
     var url = Uri.parse(
-      'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/address/savedAddress',
+      '$baseUrl/address/savedAddress',
     );
 
     // Create the GET request with the userId as query parameter
@@ -232,7 +232,11 @@ class _LocationScreenState extends State<LocationScreen> {
                       ? Center(
                           child: Text(
                           "No saved addresses",
-                          style: GoogleFonts.mulish(color: whiteColor),
+                           style: GoogleFonts.mulish(
+            fontWeight: FontWeight.w500,
+            fontSize: 20,
+            color: greyColor,
+          ),
                         ))
                       : ListView.builder(
                           shrinkWrap: true,

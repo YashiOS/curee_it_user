@@ -1,6 +1,8 @@
 import 'dart:io';
 
+import 'package:cureeit_user_app/BaseUrl.dart';
 import 'package:cureeit_user_app/cards/cart_card.dart';
+import 'package:cureeit_user_app/cartManager/cartManager.dart';
 import 'package:cureeit_user_app/current_address/google_maps_screen.dart';
 import 'package:cureeit_user_app/screens/Order_SuccessScreen.dart';
 import 'package:cureeit_user_app/screens/addresses_screen.dart';
@@ -115,7 +117,7 @@ class _CartScreenState extends State<CartScreen> {
     };
 
     final url =
-        'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/cart/removeAllFromCart';
+        '$baseUrl/cart/removeAllFromCart';
     try {
       final response = await http.delete(
         Uri.parse(url),
@@ -162,7 +164,7 @@ class _CartScreenState extends State<CartScreen> {
 
   Future<void> fetchCartDetails() async {
     var cartApiUrl = Uri.parse(
-        "http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/cart/cartDetails");
+        "$baseUrl/cart/cartDetails");
     final String? userId = User.userId; // Replace with the actual userId
 
     try {
@@ -256,7 +258,7 @@ class _CartScreenState extends State<CartScreen> {
 
   Future<Map<String, dynamic>?> fetchProductDetails(String productId) async {
     var productApiUrl = Uri.parse(
-        "http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/product/productDetail");
+        "$baseUrl/product/productDetail");
 
     try {
       var request = http.Request('GET', productApiUrl)
@@ -287,7 +289,7 @@ class _CartScreenState extends State<CartScreen> {
 
   Future<void> fetchAddresses() async {
     var url = Uri.parse(
-      'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/address/savedAddress',
+      '$baseUrl/address/savedAddress',
     );
 
     var request = http.Request('GET', url)
@@ -328,7 +330,7 @@ class _CartScreenState extends State<CartScreen> {
         ),
       );
       var url = Uri.parse(
-          'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/order/createCheckout');
+          '$baseUrl/order/createCheckout');
       var request = http.Request('POST', url)
         ..headers.addAll({
           'Content-Type': 'application/json',
@@ -355,7 +357,8 @@ class _CartScreenState extends State<CartScreen> {
         Map<String, dynamic> responseData = jsonDecode(responseBody);
         Navigator.pop(context);
         if (responseData['message'] == 'Order created successfully') {
-          _removeAllFromCart(); //removing cart item from backend , not using await so it will be done in background ,so user does not have to wait
+          _removeAllFromCart();
+          CartManager.cartQuantities.clear(); //removing cart item from backend , not using await so it will be done in background ,so user does not have to wait
           cartItems.clear();
 
           //            Navigator.push(

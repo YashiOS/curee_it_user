@@ -1,3 +1,4 @@
+import 'package:cureeit_user_app/BaseUrl.dart';
 import 'package:cureeit_user_app/cartManager/cartManager.dart';
 import 'package:cureeit_user_app/screens/item_detail_screen.dart';
 import 'package:cureeit_user_app/user/user.dart';
@@ -94,7 +95,7 @@ class _CartCardState extends State<CartCard> {
     };
 
     final url =
-        'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/cart/updateQuantity';
+        '$baseUrl/cart/updateQuantity';
     try {
       final response = await http.put(
         Uri.parse(url),
@@ -142,7 +143,7 @@ class _CartCardState extends State<CartCard> {
     };
     
     final url =
-        'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/cart/removeFromCart';
+        '$baseUrl/cart/removeFromCart';
     try {
       final response = await http.delete(
         Uri.parse(url),

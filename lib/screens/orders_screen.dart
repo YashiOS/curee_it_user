@@ -1,3 +1,4 @@
+import 'package:cureeit_user_app/BaseUrl.dart';
 import 'package:cureeit_user_app/cards/order_card.dart';
 import 'package:cureeit_user_app/screens/base_screen.dart';
 import 'package:cureeit_user_app/user/user.dart';
@@ -23,7 +24,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
   Future<void> fetchOrderHistory() async {
     print("fetching cart");
     var url = Uri.parse(
-        'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/order/orderHistory');
+        '$baseUrl/order/orderHistory');
     var request =  http.Request('GET', url)
       ..headers.addAll({
         'Content-Type': 'application/json',
@@ -119,7 +120,11 @@ class _OrdersScreenState extends State<OrdersScreen> {
               )),
           ) // Show loader while data is loading
           : orders.length==0?Center(
-            child: Text("No orders",style:GoogleFonts.mulish(color: whiteColor,fontWeight: FontWeight.w700,fontSize: 17) ,),
+            child: Text("No orders", style: GoogleFonts.mulish(
+            fontWeight: FontWeight.w500,
+            fontSize: 20,
+            color: greyColor,
+          ) ,),
           ) :Container(
             margin: EdgeInsets.only(bottom: MediaQuery.of(context).size.height*0.03),
               width: MediaQuery.of(context).size.width,

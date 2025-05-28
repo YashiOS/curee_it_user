@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:cureeit_user_app/BaseUrl.dart';
 import 'package:cureeit_user_app/screens/policies_screen.dart';
 import 'package:cureeit_user_app/screens/terms_of_service_screen.dart';
 import 'package:flutter/gestures.dart';
@@ -36,7 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       final response = await http.post(
         Uri.parse(
-            'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/auth/user/verify'),
+            '$baseUrl/auth/user/verify'),
         headers: {
           'Content-Type': 'application/json',
         },

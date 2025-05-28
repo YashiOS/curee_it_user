@@ -1,3 +1,4 @@
+import 'package:cureeit_user_app/BaseUrl.dart';
 import 'package:cureeit_user_app/screens/base_screen.dart';
 import 'package:cureeit_user_app/screens/home_screen.dart';
 import 'package:cureeit_user_app/selected_Address/currentAddress.dart';
@@ -34,7 +35,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
 
   Future<void> addAddress() async {
     const String url =
-        'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/address/addAddress';
+        '$baseUrl/address/addAddress';
 
     Map<String, dynamic> addressData = {
       'userId': widget.userId,

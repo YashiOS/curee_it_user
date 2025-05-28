@@ -74,14 +74,14 @@ dev_dependencies:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "lib/images/App_icon4.png"
+  image_path: "lib/images/App_icon5.png"
   android_adaptive_icon_background: "#1A1A1A" # Replace with your desired color
-  android_adaptive_icon_foreground: "lib/images/App_icon4.png"
+  android_adaptive_icon_foreground: "lib/images/App_icon5.png"
 
 
 flutter_native_splash:
   color: "#000000"
-  image: lib/images/SPLASH1.png
+  image: lib/images/SPLASH2.png
     # 1024x1024 PNG with transparent background
   android_12:
     image: lib/images/SP2.png

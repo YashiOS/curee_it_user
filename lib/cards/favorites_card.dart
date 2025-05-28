@@ -1,3 +1,4 @@
+import 'package:cureeit_user_app/BaseUrl.dart';
 import 'package:cureeit_user_app/screens/item_detail_screen.dart';
 import 'package:cureeit_user_app/user/user.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
@@ -35,7 +36,7 @@ class _FavoritesCardState extends State<FavoritesCard> {
   Future<void> fetchProductDetails() async {
     try {
       var url = Uri.parse(
-          'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/product/productDetail');
+          '$baseUrl/product/productDetail');
       var request = http.Request('GET', url)
         ..headers.addAll({
           'Content-Type': 'application/json',
@@ -72,7 +73,7 @@ class _FavoritesCardState extends State<FavoritesCard> {
 
     try {
       var url = Uri.parse(
-          'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/product/removeFavourite');
+          '$baseUrl/product/removeFavourite');
       var request = http.Request('DELETE', url)
         ..headers.addAll({
           'Content-Type': 'application/json',
@@ -117,7 +118,7 @@ class _FavoritesCardState extends State<FavoritesCard> {
 
     try {
       var url = Uri.parse(
-          'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/cart/addToCart');
+          '$baseUrl/cart/addToCart');
       var request = http.Request('POST', url)
         ..headers.addAll({
           'Content-Type': 'application/json',

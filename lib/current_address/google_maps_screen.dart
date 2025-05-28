@@ -161,6 +161,7 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
                 ),
                 // Add this widget just above the Center widget that contains your pin
                 // Add this to your Stack children (replace your current Positioned widgets)
+                if (MediaQuery.of(context).viewInsets.bottom == 0)
                 Positioned(
                   bottom: MediaQuery.of(context).size.height * 0.44 +
                       25, // 25 is half of pin height
@@ -422,6 +423,7 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
                                           width: 0, color: Colors.transparent)),
                               padding: EdgeInsets.symmetric(vertical: 24),
                               child: Row(
+                                crossAxisAlignment:CrossAxisAlignment.center,
                                 children: [
                                   Container(
                                     padding:

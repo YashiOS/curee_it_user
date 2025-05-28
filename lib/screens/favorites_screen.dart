@@ -1,3 +1,4 @@
+import 'package:cureeit_user_app/BaseUrl.dart';
 import 'package:cureeit_user_app/cards/favorites_card.dart';
 import 'package:cureeit_user_app/user/user.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
@@ -24,7 +25,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
   Future<List<String>> fetchFavorites() async {
     const url =
-        'http://ec2-13-60-8-94.eu-north-1.compute.amazonaws.com:3000/product/getfavouritesList';
+        '$baseUrl/product/getfavouritesList';
 
     var request = http.Request('GET', Uri.parse(url))
       ..headers.addAll({
