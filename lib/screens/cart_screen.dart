@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:cureeit_user_app/BaseUrl.dart';
 import 'package:cureeit_user_app/cards/cart_card.dart';
 import 'package:cureeit_user_app/cartManager/cartManager.dart';
@@ -8,12 +7,12 @@ import 'package:cureeit_user_app/screens/Order_SuccessScreen.dart';
 import 'package:cureeit_user_app/screens/addresses_screen.dart';
 import 'package:cureeit_user_app/screens/base_screen.dart';
 import 'package:cureeit_user_app/screens/loading.dart';
+import 'package:cureeit_user_app/screens/placeOrder_screen.dart';
 import 'package:cureeit_user_app/selected_Address/currentAddress.dart';
 import 'package:cureeit_user_app/user/user.dart';
 import 'package:cureeit_user_app/utils/razor_pay.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:cureeit_user_app/utils/widgets/LoadingIndicater.dart';
-
 import 'package:flutter_image_compress/flutter_image_compress.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:path_provider/path_provider.dart';
@@ -60,6 +59,62 @@ class _CartScreenState extends State<CartScreen> {
     super.initState();
     fetchCartDetails();
     fetchAddresses();
+  }
+
+  void showPaymentDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: ligtBlackColor, // Dark background
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                "Verifying and confirming your order...",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 15.02,
+                  fontFamily: 'Mulish',
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 24),
+              Container(
+                height: 36,
+                width: double.infinity,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color:  greenColor ,
+                  border: Border.all(
+                    color: greenColor,
+                    width: 1,
+                  ),
+                  // Setting the background color to primary color
+                  borderRadius: BorderRadius.circular(
+                      8), // Setting the border radius to 10
+                ),
+                child: Center(
+                  child: Text(
+                    "Confirm and Pay",
+                    style: GoogleFonts.mulish(
+                      color:  whiteColor ,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   void reBuild() {
@@ -116,8 +171,7 @@ class _CartScreenState extends State<CartScreen> {
       "userId": userId,
     };
 
-    final url =
-        '$baseUrl/cart/removeAllFromCart';
+    final url = '$baseUrl/cart/removeAllFromCart';
     try {
       final response = await http.delete(
         Uri.parse(url),
@@ -163,8 +217,7 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   Future<void> fetchCartDetails() async {
-    var cartApiUrl = Uri.parse(
-        "$baseUrl/cart/cartDetails");
+    var cartApiUrl = Uri.parse("$baseUrl/cart/cartDetails");
     final String? userId = User.userId; // Replace with the actual userId
 
     try {
@@ -257,8 +310,7 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   Future<Map<String, dynamic>?> fetchProductDetails(String productId) async {
-    var productApiUrl = Uri.parse(
-        "$baseUrl/product/productDetail");
+    var productApiUrl = Uri.parse("$baseUrl/product/productDetail");
 
     try {
       var request = http.Request('POST', productApiUrl)
@@ -329,18 +381,17 @@ class _CartScreenState extends State<CartScreen> {
           fullscreenDialog: true,
         ),
       );
-      var url = Uri.parse(
-          '$baseUrl/order/createCheckout');
+      var url = Uri.parse('$baseUrl/order/createCheckout');
       var request = http.Request('POST', url)
         ..headers.addAll({
           'Content-Type': 'application/json',
         })
         ..body = jsonEncode({
           "userId": User.userId,
-          "prescriptionPhoto": base64Image,
-          "totalAmount": Total,
+         
+          
           "shippingAddress": shippingAddress,
-          "shippingCost": shippingCost,
+         //"availableId":
           "userLat": Address.CurrentAddress?["userLat"] ?? 0.0,
           "userLong": Address.CurrentAddress?["userLong"] ?? 0.0,
           "paymentDetails": {
@@ -358,7 +409,8 @@ class _CartScreenState extends State<CartScreen> {
         Navigator.pop(context);
         if (responseData['message'] == 'Order created successfully') {
           _removeAllFromCart();
-          CartManager.cartQuantities.clear(); //removing cart item from backend , not using await so it will be done in background ,so user does not have to wait
+          CartManager.cartQuantities
+              .clear(); //removing cart item from backend , not using await so it will be done in background ,so user does not have to wait
           cartItems.clear();
 
           //            Navigator.push(
@@ -1031,6 +1083,27 @@ class _CartScreenState extends State<CartScreen> {
                                                                   GestureDetector(
                                                                     onTap: () {
                                                                       if (addresses
+                                                                             .length ==
+                                                                          0) {
+                                                                        return;
+                                                                      }
+                                                                      if (payNow ==
+                                                                          false) {
+                                                                        ScaffoldMessenger.of(context)
+                                                                            .showSnackBar(
+                                                                          SnackBar(
+                                                                            backgroundColor: ligtBlackColor,
+                                                                              content: Text(
+                                                                            'Upload Prescription',
+                                                                            style:
+                                                                                GoogleFonts.mulish(color: whiteColor),
+                                                                          )),
+                                                                        );
+                                                                        return;
+                                                                      }
+                                                                      Navigator.of(context).push(MaterialPageRoute(builder: (context)=>MedicineAvailabilityScreen(prescriptionImage: _imageFile,)));
+                                                                      //showPaymentDialog(context);
+                                                                      /*if (addresses
                                                                               .length ==
                                                                           0) {
                                                                         return;
@@ -1082,7 +1155,7 @@ class _CartScreenState extends State<CartScreen> {
                                                                         'Please do the payment', // Description
                                                                         '8890170172',
                                                                         'accounts@cureeit.com',
-                                                                      );
+                                                                      );*/
                                                                     },
                                                                     child:
                                                                         Container(
@@ -1113,7 +1186,7 @@ class _CartScreenState extends State<CartScreen> {
                                                                           Center(
                                                                         child:
                                                                             Text(
-                                                                          "Confirm and Pay",
+                                                                          "Place order",
                                                                           style:
                                                                               GoogleFonts.mulish(
                                                                             color: payNow

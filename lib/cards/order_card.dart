@@ -91,10 +91,12 @@ class _OrderCardState extends State<OrderCard> {
   @override
   Widget build(BuildContext context) {
     String orderStatus = widget.orderData['status'];
-    String purchaseDate = widget.orderData['purchaseDate'];
-    double shippingCost = double.parse(widget.orderData['totalAmount']);
+    String purchaseDate = widget.orderData['createdAt'];
+    double shippingCost = double.parse(widget.orderData['totalAmount']??"0.0");
     List orderItems = widget.orderData['products'];
-    String orderId = widget.orderData['orderId'];
+    final total=orderItems.fold(0.0,(sum,item)=>sum+double.parse(item["productPrice"]));
+    
+    String orderId = widget.orderData['_id'];
     print("THIS IS ORDER ID");
     print(orderId);
 
@@ -104,135 +106,131 @@ class _OrderCardState extends State<OrderCard> {
       padding: EdgeInsets.only(
         top: MediaQuery.of(context).size.height * 0.02,
       ),
-      child: GestureDetector(
-        onTap: () {
-          if (orderStatus == "Order Placed" ||
-              orderStatus == "Packing" ||
-              orderStatus == "On the way"||
-              orderStatus == "Delivered") {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => OrderTrackingScreen(
-                  NavigatingFrom: "Order History",
-                  orderId: orderId,
-                
-                ),
-              ),
-            );
-          } 
-        },
-        child: LayoutBuilder(
-          builder: (context, constraints) {
-            final screenWidth = MediaQuery.of(context).size.width;
-            final screenheight = MediaQuery.of(context).size.height;
-
-            return Container(
-              padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(8),
-                color: ligtBlackColor,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            width: 165,
-                            child: Text(
-                              maxLines: 1,
-                              allItems,
-                              style: GoogleFonts.mulish(
-                                fontSize: 17.02,
-                                fontWeight: FontWeight.w500,
-                                color: whiteColor,
-                              ),
-                            ),
-                          ),
-                          Text(
-                            "${formatDate(purchaseDate) ?? "N/A"}",
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final screenWidth = MediaQuery.of(context).size.width;
+          final screenheight = MediaQuery.of(context).size.height;
+      
+          return Container(
+            padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(8),
+              color: ligtBlackColor,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: 165,
+                          child: Text(
+                            maxLines: 1,
+                            allItems,
                             style: GoogleFonts.mulish(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 12,
-                              color: greyColor,
+                              fontSize: 17.02,
+                              fontWeight: FontWeight.w500,
+                              color: whiteColor,
                             ),
                           ),
-                        ],
-                      ),
-                      Text(
-                        "₹ ${shippingCost.toStringAsFixed(2)}",
-                        style: GoogleFonts.mulish(
-                          fontWeight: FontWeight.w500,
-                          fontSize: 17,
-                          color: whiteColor,
                         ),
+                        Text(
+                          "${formatDate(purchaseDate) ?? "N/A"}",
+                          style: GoogleFonts.mulish(
+                            fontWeight: FontWeight.w600,
+                            fontSize: 12,
+                            color: greyColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                    if(orderStatus!="In Review")
+                    Text(
+                      "₹ ${shippingCost.toStringAsFixed(2)}",
+                      style: GoogleFonts.mulish(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 17,
+                        color: whiteColor,
                       ),
-                    ],
-                  ),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      
-                      GestureDetector(
-                        onTap: () {
-                          if (orderStatus == "Delivered" || orderStatus == "") {
-                            addMultipleTocart(context);
-                          }
-                        },
-                        child: Container(
-                          padding:
-                              EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                          decoration: BoxDecoration(
-                              color:orderStatus=="Delivered"||orderStatus==""? greenColor:ligtBlackColor,
-                              border:orderStatus!="Delivered" ?Border.all(color: greenColor,width: 1):Border.all(color: Colors.transparent,width: 0),
-                              borderRadius: BorderRadius.circular(8)),
-                          child: orderStatus == "Delivered" || orderStatus == ""
-                              ? Text(
-                                  "Reorder",
-                                  style: GoogleFonts.mulish(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: screenheight * 0.014,
-                                    color: whiteColor,
-                                  ),
-                                )
-                              : orderStatus == "Order Placed"
-                                  ? Text(
-                                      "Ordered",
-                                      style: GoogleFonts.mulish(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: screenheight * 0.014,
-                                        color: greenColor,
-                                      ),
-                                    )
-                                  :orderStatus=="On the way"?Text("Enroute",style:GoogleFonts.mulish(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: screenheight * 0.014,
-                                        color: greenColor,
-                                      ) ,) :Text(
-                                      orderStatus,
-                                      style: GoogleFonts.mulish(
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: screenheight * 0.014,
-                                        color: greenColor,
-                                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    
+                    GestureDetector(
+                      onTap: () {
+                        if (orderStatus == "Delivered" || orderStatus == "") {
+                          addMultipleTocart(context);
+                        }
+                      },
+                      child: Container(
+                        padding:
+                            EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                        decoration: BoxDecoration(
+                            color:orderStatus=="Delivered"||orderStatus==""? greenColor:ligtBlackColor,
+                            border:orderStatus!="Delivered" ?Border.all(color: greenColor,width: 1):Border.all(color: Colors.transparent,width: 0),
+                            borderRadius: BorderRadius.circular(8)),
+                        child: orderStatus == "Delivered" || orderStatus == ""
+                            ? Text(
+                                "Reorder",
+                                style: GoogleFonts.mulish(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: screenheight * 0.014,
+                                  color: whiteColor,
+                                ),
+                              )
+                            :orderStatus=="Available"?Text(
+                                    "Available",
+                                    style: GoogleFonts.mulish(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: screenheight * 0.014,
+                                      color: greenColor,
                                     ),
-                        ),
+                                  ) :orderStatus=="In Review"?Text(
+                                    "Verifying",
+                                    style: GoogleFonts.mulish(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: screenheight * 0.014,
+                                      color: greenColor,
+                                    ),
+                                  ) :orderStatus == "Order Placed"
+                                ? Text(
+                                    "Ordered",
+                                    style: GoogleFonts.mulish(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: screenheight * 0.014,
+                                      color: greenColor,
+                                    ),
+                                  )
+                                :orderStatus=="On the way"?Text("Enroute",style:GoogleFonts.mulish(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: screenheight * 0.014,
+                                      color: greenColor,
+                                    ) ,) :Text(
+                                    orderStatus,
+                                    style: GoogleFonts.mulish(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: screenheight * 0.014,
+                                      color: greenColor,
+                                    ),
+                                  ),
                       ),
-                    ],
-                  ),
-                ],
-              ),
-            );
-          },
-        ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }

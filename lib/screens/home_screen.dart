@@ -294,21 +294,28 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       ..body = jsonEncode({'userId': User.userId});
 
     var response = await http.Client().send(request);
-
+  
     if (response.statusCode == 200) {
       var responseBody = await response.stream.bytesToString();
       Map<String, dynamic> data = jsonDecode(responseBody);
+      print("ORDER HISTORY");
 
       setState(() {
         AllOrders = data['data'];
-
+        
+        print("DATES");
+      
+       print(AllOrders);
         AllOrders.sort((item1, item2) {
-          final dateA = DateTime.parse(item1['purchaseDate']);
-          final dateB = DateTime.parse(item2['purchaseDate']);
+          final dateA = DateTime.parse(item1['createdAt']?? '1970-01-01');
+          final dateB = DateTime.parse(item2['createdAt']?? '1970-01-01');
           return dateB.compareTo(dateA);
         });
 
-        onGoingOrders = getOngoingOrders(AllOrders);
+        onGoingOrders = AllOrders.where((order) {
+            String status = order['status']?.toString()?.toLowerCase() ?? '';
+            return status != 'delivered';
+          }).toList();
         if (onGoingOrders.isNotEmpty) {
           _startOngoingOrdersPolling();
         }
@@ -380,7 +387,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       );
     }
     setState(() {
-      isAddingMap[index] = true;
+      isAddingMap[index] = false;
     });
   }
 
@@ -615,11 +622,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         });
       }
     }
-    print("*****LAST*****");
-    print(cartItems.length);
-    print(isLoading);
-
-    print(totalAmount);
+   
   }
 
   Future<Map<String, dynamic>?> fetchProductDetails(String productId) async {
@@ -1272,7 +1275,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                       : Text(
                                           "in $estTime minutes",
                                           style: GoogleFonts.mulish(
-                                              color: whiteColor,
+                                              color:estTime==0?greyColor: whiteColor,
                                               fontSize: 24,
                                               fontWeight: FontWeight.bold),
                                         ),
@@ -1426,8 +1429,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   itemBuilder: (context, index) {
                                     String status = "";
                                     final order = onGoingOrders[index];
-                                    final orederId = order["orderId"];
-
+                                    final orederId = order["orderId"]??order["availableID"];
+                                   
+                                    print(order[status]);
+                                    if(order["status"]=="Available"){
+                                      status="Accepted your order";
+                                    }
+                                    if(order["status"]=="In Review"){
+                                      status ="Verifying Your order";
+                                    }
                                     if (order["status"] ==
                                         "Order Placed") {
                                       status = "Your order was placed!";
@@ -1503,7 +1513,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                             : order["status"] ==
                                                                     "Delivered"
                                                                 ? 'lib/images/DELIVERED.png'
-                                                                : 'lib/images/ordered.png', // Default image
+                                                                : 'lib/images/verifying.png', // Default image
                                               ),
                                             ),
                                           ],
