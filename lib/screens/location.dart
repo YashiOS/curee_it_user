@@ -121,7 +121,7 @@ class _LocationScreenState extends State<LocationScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               SizedBox(
-                height: 35,
+                height: 28,
               ),
               GestureDetector(
                 onTap: () {
@@ -162,7 +162,7 @@ class _LocationScreenState extends State<LocationScreen> {
                 ),
               ),
               SizedBox(
-                height: 24,
+                height: 16,
               ),
               GestureDetector(
                 onTap: () {
@@ -205,7 +205,7 @@ class _LocationScreenState extends State<LocationScreen> {
                 ),
               ),
               SizedBox(
-                height: 24,
+                height: 16,
               ),
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 8.0),
@@ -221,9 +221,9 @@ class _LocationScreenState extends State<LocationScreen> {
               SizedBox(
                 height: 24,
               ),
-              SingleChildScrollView(
+              Expanded(
                 child: Container(
-                  height: 470,
+                  
                   child:fetchingAddress?Center(
                     child: CircularProgressIndicator(
                       color: whiteColor,
@@ -233,10 +233,10 @@ class _LocationScreenState extends State<LocationScreen> {
                           child: Text(
                           "No saved addresses",
                            style: GoogleFonts.mulish(
-            fontWeight: FontWeight.w500,
-            fontSize: 20,
-            color: greyColor,
-          ),
+                            fontWeight: FontWeight.w500,
+                            fontSize: 20,
+                            color: greyColor,
+                          ),
                         ))
                       : ListView.builder(
                           shrinkWrap: true,
@@ -248,7 +248,7 @@ class _LocationScreenState extends State<LocationScreen> {
                               onTap: () {
                                 print(address);
                                 UpdateAddress(address);
-
+                
                                 setState(() {
                                   Address.selectedIndex = index;
                                 });
@@ -265,7 +265,7 @@ class _LocationScreenState extends State<LocationScreen> {
                                         borderRadius: BorderRadius.circular(8),
                                         color: ligtBlackColor,
                                       ),
-                                      margin: EdgeInsets.only(bottom: 10),
+                                      margin: EdgeInsets.only(bottom: 16),
                                       child: Container(
                                         height: 75,
                                         padding: EdgeInsets.symmetric(
@@ -323,7 +323,7 @@ class _LocationScreenState extends State<LocationScreen> {
                                                 ],
                                               ),
                                             ),
-
+                
                                             // Trailing radio button
                                             Container(
                                               width: 16,

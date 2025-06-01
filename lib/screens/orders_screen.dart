@@ -132,6 +132,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                 )
               : Container(
                   margin: EdgeInsets.only(
+                      top: 12,
                       bottom: MediaQuery.of(context).size.height * 0.03),
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.height,

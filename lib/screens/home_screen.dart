@@ -1416,7 +1416,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     background: onGoingOrders.isNotEmpty && localAddress != ""
                         ? Container(
                             margin: EdgeInsets.only(
-                              bottom: 15,
+                              bottom: 16,
                             ),
                             height: 94,
                             decoration: BoxDecoration(
@@ -1513,7 +1513,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                             : order["status"] ==
                                                                     "Delivered"
                                                                 ? 'lib/images/DELIVERED.png'
-                                                                : 'lib/images/verifying.png', // Default image
+                                                                : 'lib/images/veryfing.png', // Default image
                                               ),
                                             ),
                                           ],

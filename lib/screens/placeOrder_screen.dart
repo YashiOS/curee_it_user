@@ -157,25 +157,17 @@ class _MedicineAvailabilityScreenState extends State<MedicineAvailabilityScreen>
               Center(
                 child: Container(
                   height: 200,
-                  width: 200,
+                  width: 100,
                   child: LoadingIndicator(
                     indicatorType: Indicator.ballPulse, // Example
-                    colors: [greenColor],
+                    colors: [whiteColor],
                     strokeWidth: 2,
                     backgroundColor: scaffoldBlackColor,
                     pathBackgroundColor: Colors.black,
                   ),
                 ),
               ),
-              Container(
-                height: 50,
-                width: 350,
-                decoration: BoxDecoration(
-                  color: greenColor,
-                  borderRadius: BorderRadius.circular(8),  
-                ),
-                child: Center(child: Text("Order placing and sending to pharmacy...",style: GoogleFonts.mulish(color: whiteColor,fontSize: 14,fontWeight: FontWeight.w400),)),
-              )
+              
             ],
           ),
         ):SizedBox());

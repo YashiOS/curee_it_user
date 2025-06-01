@@ -90,7 +90,7 @@ class _CartScreenState extends State<CartScreen> {
                 width: double.infinity,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color:  greenColor ,
+                  color: greenColor,
                   border: Border.all(
                     color: greenColor,
                     width: 1,
@@ -103,7 +103,7 @@ class _CartScreenState extends State<CartScreen> {
                   child: Text(
                     "Confirm and Pay",
                     style: GoogleFonts.mulish(
-                      color:  whiteColor ,
+                      color: whiteColor,
                       fontSize: 12,
                       fontWeight: FontWeight.w700,
                     ),
@@ -388,10 +388,9 @@ class _CartScreenState extends State<CartScreen> {
         })
         ..body = jsonEncode({
           "userId": User.userId,
-         
-          
+
           "shippingAddress": shippingAddress,
-         //"availableId":
+          //"availableId":
           "userLat": Address.CurrentAddress?["userLat"] ?? 0.0,
           "userLong": Address.CurrentAddress?["userLong"] ?? 0.0,
           "paymentDetails": {
@@ -707,9 +706,75 @@ class _CartScreenState extends State<CartScreen> {
                               children: [
                                 Column(
                                   mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  spacing: 20,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  spacing: 5,
                                   children: [
+                                    GestureDetector(
+                                      onTap: () async {
+                                        await Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    AddressesScreen(
+                                                      userId: User.userId!,
+                                                    )));
+                                        setState(() {});
+                                      },
+                                      child: Container(
+                                        width: double.infinity,
+                                        
+                                        padding: const EdgeInsets.only(
+                                            left: 16,right: 16,top: 10,bottom: 10),
+                                        margin: EdgeInsets.only(top: 28,bottom: 10),
+                                        decoration: BoxDecoration(
+                                          color: ligtBlackColor,
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                        ),
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    "Delivering to",
+                                                    style: GoogleFonts.mulish(
+                                                      color: Colors.white,
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                    ),
+                                                  ),
+                                                  SizedBox(height: 4),
+                                                  Text(
+                                                    "${Address.CurrentAddress!["address"]}",
+                                                    style: GoogleFonts.mulish(
+                                                      color: greyColor,
+                                                      fontSize: 13,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Container(
+                                              width: 16,
+                                              height: 16,
+                                              margin: EdgeInsets.only(
+                                                  left:
+                                                      8), // Space before trailing widget
+                                              decoration: BoxDecoration(
+                                                color: greenColor,
+                                                shape: BoxShape.circle,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
                                     if (requiresPrescription)
                                       GestureDetector(
                                         onTap: () {
@@ -717,7 +782,7 @@ class _CartScreenState extends State<CartScreen> {
                                               context);
                                         },
                                         child: Container(
-                                          margin: EdgeInsets.only(top: 20),
+                                         margin: EdgeInsets.only(bottom: 10),
                                           padding: const EdgeInsets.symmetric(
                                               horizontal: 16),
                                           height: 56,
@@ -754,11 +819,12 @@ class _CartScreenState extends State<CartScreen> {
                                         ),
                                       )
                                     else
-                                      Container(),
+                                      SizedBox.shrink(),
                                     if (requiresPrescription)
                                       GestureDetector(
                                         onTap: () {},
                                         child: Container(
+                                          margin:EdgeInsets.only(bottom: 10) ,
                                           padding: const EdgeInsets.symmetric(
                                               horizontal: 16),
                                           height: 75,
@@ -813,7 +879,7 @@ class _CartScreenState extends State<CartScreen> {
                                         ),
                                       )
                                     else
-                                      Container(),
+                                      SizedBox.shrink(),
                                     Container(
                                       width: MediaQuery.of(context).size.width,
                                       decoration: BoxDecoration(
@@ -1083,7 +1149,7 @@ class _CartScreenState extends State<CartScreen> {
                                                                   GestureDetector(
                                                                     onTap: () {
                                                                       if (addresses
-                                                                             .length ==
+                                                                              .length ==
                                                                           0) {
                                                                         return;
                                                                       }
@@ -1092,16 +1158,18 @@ class _CartScreenState extends State<CartScreen> {
                                                                         ScaffoldMessenger.of(context)
                                                                             .showSnackBar(
                                                                           SnackBar(
-                                                                            backgroundColor: ligtBlackColor,
+                                                                              backgroundColor: ligtBlackColor,
                                                                               content: Text(
-                                                                            'Upload Prescription',
-                                                                            style:
-                                                                                GoogleFonts.mulish(color: whiteColor),
-                                                                          )),
+                                                                                'Upload Prescription',
+                                                                                style: GoogleFonts.mulish(color: whiteColor),
+                                                                              )),
                                                                         );
                                                                         return;
                                                                       }
-                                                                      Navigator.of(context).push(MaterialPageRoute(builder: (context)=>MedicineAvailabilityScreen(prescriptionImage: _imageFile,)));
+                                                                      Navigator.of(context).push(MaterialPageRoute(
+                                                                          builder: (context) => MedicineAvailabilityScreen(
+                                                                                prescriptionImage: _imageFile,
+                                                                              )));
                                                                       //showPaymentDialog(context);
                                                                       /*if (addresses
                                                                               .length ==

@@ -167,12 +167,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
         body: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 20,),
           color: scaffoldBlackColor,
           child: Column(
             children: [
               SizedBox(
-                height: 35,
+                height: 28,
               ),
               Container(
                 padding: const EdgeInsets.only(top: 24, bottom: 24, left: 16),
@@ -220,7 +220,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
               SizedBox(
-                height: 24,
+                height: 16,
               ),
               GestureDetector(
                 onTap: () {
@@ -276,7 +276,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
               SizedBox(
-                height: 24,
+                height: 16,
               ),
               GestureDetector(
                 onTap: () {

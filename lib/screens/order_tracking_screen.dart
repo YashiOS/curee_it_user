@@ -12,6 +12,7 @@ import 'package:cureeit_user_app/user/user.dart';
 import 'package:cureeit_user_app/utils/razor_pay.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -70,10 +71,9 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
       if (response.statusCode == 200) {
         var responseBody = await response.stream.bytesToString();
         Map<String, dynamic> responseData = jsonDecode(responseBody);
-       
+
         if (responseData['success'] == true) {
-          CartManager.cartQuantities
-              .clear(); 
+          CartManager.cartQuantities.clear();
           Navigator.pop(context);
           Navigator.push(
             context,
@@ -305,7 +305,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                     Row(
                       children: [
                         Text(
-                          "₹${orderTrackingDetails["itemTotal"]}",
+                          "₹${orderTrackingDetails["totalAmount"]}",
                           style: GoogleFonts.mulish(
                               fontSize: 12,
                               fontWeight: FontWeight.w300,
@@ -779,6 +779,65 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
             )),
       );
     }
+    if (orderTrackingDetails["status"] == "Canceled") {
+      return Scaffold(
+        backgroundColor: scaffoldBlackColor,
+        body: _isInitLoading
+            ? Center(
+                child: CircularProgressIndicator(
+                  color: whiteColor,
+                ),
+              )
+            : Container(
+                width: double.infinity,
+                margin: EdgeInsets.all(30),
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(
+                              height: 80,
+                              child: Container(
+                                height: 60,
+                                width: 60,
+                                decoration: BoxDecoration(
+                                  color: const Color.fromARGB(255, 246, 80, 69),
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Center(
+                                  child: Icon(
+                                    Icons.close,
+                                    color: Colors.white,
+                                    size: 30,
+                                  ),
+                                ),
+                              )),
+                          SizedBox(height: 20),
+                          Container(
+                            margin: EdgeInsets.all(5),
+                            child: Text(
+                              'Cancelled',
+                              style: GoogleFonts.mulish(
+                                fontSize: 26,
+                                fontWeight: FontWeight.bold,
+                                color: whiteColor,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+      );
+    }
+
     if (orderTrackingDetails["status"] == "In Review") {
       return Scaffold(
         backgroundColor: scaffoldBlackColor,
@@ -789,46 +848,50 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                 ),
               )
             : Container(
+                width: double.infinity,
                 margin: EdgeInsets.all(30),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                        height: 200,
-                        width: 300,
-                        child: Image.asset(
-                          'lib/images/verifying.png',
-                          fit: BoxFit.cover,
-                        )),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Container(
-                        margin: EdgeInsets.all(5),
-                        padding: EdgeInsets.all(15),
-                        decoration: BoxDecoration(
-                            color: ligtBlackColor,
-                            borderRadius: BorderRadius.circular(8)),
-                        child: Text(
-                            'We’ve received your order and forwarded it to the pharmacy.\nSit tight\nwe’ll update you soon!',
-                            style: GoogleFonts.mulish(
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Container(
+                            height: 80,
+                            child: SvgPicture.asset(
+                              "lib/images/veryfing.svg",
+                            ),
+                          ),
+                          SizedBox(height: 20),
+                          Container(
+                            margin: EdgeInsets.all(5),
+                            child: Text(
+                              'Verifying',
+                              style: GoogleFonts.mulish(
+                                fontSize: 26,
+                                fontWeight: FontWeight.bold,
                                 color: whiteColor,
-                                fontSize: 17,
-                                fontWeight: FontWeight.w400))),
-                    Center(
-                      child: Container(
-                        height: 200,
-                        width: 200,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Container(
+                        height: 60,
+                        width: 60,
                         child: LoadingIndicator(
-                          indicatorType: Indicator.ballPulse, // Example
+                          indicatorType: Indicator.ballPulse, // Bottom loader
                           colors: [whiteColor],
                           strokeWidth: 2,
                           backgroundColor: scaffoldBlackColor,
                           pathBackgroundColor: Colors.black,
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
       );
@@ -1077,7 +1140,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                                       icon: Icons.receipt_outlined,
                                       title: "Bill Details",
                                       subtitle:
-                                          "₹${orderTrackingDetails["totalAmount"]}",
+                                          "₹${orderTrackingDetails["finalTotal"]}",
                                       width: width,
                                     ),
                                   ),
