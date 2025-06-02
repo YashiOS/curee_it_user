@@ -1308,7 +1308,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                               Container(
                                                 constraints:
                                                     const BoxConstraints(
-                                                  minWidth: 100,
+                                                  minWidth: 50,
                                                   maxWidth: 250,
                                                 ),
                                                 child: Row(
@@ -1408,16 +1408,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ),
               if (ISserviceAvilable && onGoingOrders.isNotEmpty)
                 SliverAppBar(
-                  backgroundColor: scaffoldBlackColor,
+                  backgroundColor:scaffoldBlackColor,
                   floating: false,
                   expandedHeight: 64,
                   pinned: false,
                   flexibleSpace: FlexibleSpaceBar(
                     background: onGoingOrders.isNotEmpty && localAddress != ""
                         ? Container(
-                            margin: EdgeInsets.only(
-                              bottom: 16,
-                            ),
+                            
                             height: 94,
                             decoration: BoxDecoration(
                                 color: ligtBlackColor,
@@ -1530,11 +1528,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ),
               if (ISserviceAvilable)
                 SliverAppBar(
-                  expandedHeight: 43,
+                 toolbarHeight:MediaQuery.of(context).size.height * 0.07,
+            
                   backgroundColor: scaffoldBlackColor,
                   elevation: 0,
                   pinned: true,
                   flexibleSpace: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       GestureDetector(
                         onTap: () async {
@@ -1564,6 +1564,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 ),
                               )
                             : Container(
+                              margin: EdgeInsets.only(top: 20),
                                 height: 43,
                                 decoration: BoxDecoration(
                                   color: ligtBlackColor,
@@ -1630,9 +1631,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               ),
                       ),
                       Padding(
-                        padding:
-                            EdgeInsets.only(right: 16, bottom: 10, top: 10),
+                        padding: const EdgeInsets.only(top: 8),
                         child: Align(
+                          
                           alignment: Alignment.bottomLeft,
                           child: Text(
                             isInRadius == null || localAddress.isEmpty
