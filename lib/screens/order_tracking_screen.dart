@@ -779,7 +779,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
             )),
       );
     }
-    if (orderTrackingDetails["status"] == "Canceled") {
+    if (orderTrackingDetails["status"] == "Cancellec" || orderTrackingDetails["status"]=="Rejected") {
       return Scaffold(
         backgroundColor: scaffoldBlackColor,
         body: _isInitLoading
