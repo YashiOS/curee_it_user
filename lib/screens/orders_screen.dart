@@ -67,7 +67,10 @@ class _OrdersScreenState extends State<OrdersScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: scaffoldBlackColor,
+      
       appBar: AppBar(
+        elevation: 0,
+        scrolledUnderElevation: 0,
         centerTitle: true,
         backgroundColor: ligtBlackColor,
         shape: ContinuousRectangleBorder(

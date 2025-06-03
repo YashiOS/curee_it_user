@@ -56,6 +56,8 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        scrolledUnderElevation: 0,
+            elevation: 0,
         backgroundColor: ligtBlackColor,
         leadingWidth: 200,
         toolbarHeight: 60,

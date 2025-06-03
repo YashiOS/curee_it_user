@@ -137,6 +137,8 @@ class _MedicineAvailabilityScreenState extends State<MedicineAvailabilityScreen>
         backgroundColor: scaffoldBlackColor,
         
         appBar: AppBar(
+          scrolledUnderElevation: 0,
+            elevation: 0,
           automaticallyImplyLeading: false,
           backgroundColor: ligtBlackColor,
           centerTitle: true,

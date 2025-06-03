@@ -610,6 +610,7 @@ class _CartScreenState extends State<CartScreen> {
         Scaffold(
           backgroundColor: scaffoldBlackColor,
           appBar: AppBar(
+            scrolledUnderElevation: 0,
             elevation: 0,
             centerTitle: true,
             backgroundColor: ligtBlackColor,
@@ -722,10 +723,13 @@ class _CartScreenState extends State<CartScreen> {
                                       },
                                       child: Container(
                                         width: double.infinity,
-                                        
                                         padding: const EdgeInsets.only(
-                                            left: 16,right: 16,top: 10,bottom: 10),
-                                        margin: EdgeInsets.only(top: 28,bottom: 10),
+                                            left: 16,
+                                            right: 16,
+                                            top: 10,
+                                            bottom: 10),
+                                        margin: EdgeInsets.only(
+                                            top: 28, bottom: 10),
                                         decoration: BoxDecoration(
                                           color: ligtBlackColor,
                                           borderRadius:
@@ -782,7 +786,7 @@ class _CartScreenState extends State<CartScreen> {
                                               context);
                                         },
                                         child: Container(
-                                         margin: EdgeInsets.only(bottom: 10),
+                                          margin: EdgeInsets.only(bottom: 10),
                                           padding: const EdgeInsets.symmetric(
                                               horizontal: 16),
                                           height: 56,
@@ -824,7 +828,7 @@ class _CartScreenState extends State<CartScreen> {
                                       GestureDetector(
                                         onTap: () {},
                                         child: Container(
-                                          margin:EdgeInsets.only(bottom: 10) ,
+                                          margin: EdgeInsets.only(bottom: 10),
                                           padding: const EdgeInsets.symmetric(
                                               horizontal: 16),
                                           height: 75,
@@ -1170,6 +1174,12 @@ class _CartScreenState extends State<CartScreen> {
                                                                           builder: (context) => MedicineAvailabilityScreen(
                                                                                 prescriptionImage: _imageFile,
                                                                               )));
+                                                                      
+                                                                      CartManager
+                                                                          .cartQuantities
+                                                                          .clear(); //removing cart item from backend , not using await so it will be done in background ,so user does not have to wait
+                                                                      cartItems
+                                                                          .clear();
                                                                       //showPaymentDialog(context);
                                                                       /*if (addresses
                                                                               .length ==

@@ -580,6 +580,8 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
       return Scaffold(
         backgroundColor: scaffoldBlackColor,
         appBar: AppBar(
+          scrolledUnderElevation: 0,
+            elevation: 0,
           automaticallyImplyLeading: false,
           backgroundColor: ligtBlackColor,
           title: Text(
@@ -957,25 +959,26 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            ClipRRect(
-                              child: Image.asset(
-                                orderTrackingDetails["status"] == "Order Placed"
-                                    ? 'lib/images/ordered.png'
-                                    : orderTrackingDetails["status"] ==
-                                            "Packing"
-                                        ? 'lib/images/packing.png'
-                                        : orderTrackingDetails["status"] ==
-                                                "On the way"
-                                            ? 'lib/images/onTheWay.png'
-                                            : orderTrackingDetails["status"] ==
-                                                    "Delivered"
-                                                ? 'lib/images/DELIVERED.png'
-                                                : 'lib/images/ordered.png', // Default image
-
-                                height: orderTrackingDetails["status"] ==
-                                        "Delivered"
-                                    ? 120
-                                    : 80,
+                            Container(
+                              height: 80,
+                              child: ClipRRect(
+                                child: Image.asset(
+                                  orderTrackingDetails["status"] == "Order Placed"
+                                      ? 'lib/images/ordered.png'
+                                      : orderTrackingDetails["status"] ==
+                                              "Packing"
+                                          ? 'lib/images/packing.png'
+                                          : orderTrackingDetails["status"] ==
+                                                  "On the way"
+                                              ? 'lib/images/onTheWay.png'
+                                              : orderTrackingDetails["status"] ==
+                                                      "Delivered"
+                                                  ? 'lib/images/DELIVERED.png'
+                                                  : 'lib/images/ordered.png', // Default image
+                              
+                                  height: 
+                                       80,
+                                ),
                               ),
                             ),
                             SizedBox(

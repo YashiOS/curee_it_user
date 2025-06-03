@@ -1202,6 +1202,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             controller: _scrollController,
             slivers: [
               SliverAppBar(
+                
                 backgroundColor: scaffoldBlackColor,
                 expandedHeight: 80,
                 floating: false,
@@ -1408,6 +1409,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ),
               if (ISserviceAvilable && onGoingOrders.isNotEmpty)
                 SliverAppBar(
+                
                   backgroundColor:scaffoldBlackColor,
                   floating: false,
                   expandedHeight: 64,
@@ -1431,21 +1433,21 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                    
                                     print(order[status]);
                                     if(order["status"]=="Available"){
-                                      status="Accepted your order";
+                                      status="Order Confirmed";
                                     }
                                     if(order["status"]=="In Review"){
-                                      status ="Verifying Your order";
+                                      status ="Verifying Order";
                                     }
                                     if (order["status"] ==
                                         "Order Placed") {
-                                      status = "Your order was placed!";
+                                      status = "Order Placed!";
                                     }
                                     if (order["status"] == "Packing") {
-                                      status = "Packing your items";
+                                      status = "Packing Items";
                                     }
                                     if (order["status"] ==
                                         "On the way") {
-                                      status = "Out for delivery";
+                                      status = "Order Enroute";
                                     }
                                     return GestureDetector(
                                       onTap: () {
@@ -1493,12 +1495,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                               ],
                                             ),
                                             Container(
-                                              height: order["status"] ==
-                                                      "Order Placed"
+                                              height:order["status"]=="In Review"?50 :order["status"] ==
+                                                      "Order Placed" ||order["status"]=="Available"
                                                   ? 36
                                                   : 80, // ⬅️ Adjust here
                                               decoration: BoxDecoration(),
                                               child: Image.asset(
+                                                order["status"]=="Available"?
+                                                "lib/images/ordered.png":
                                                 order["status"] ==
                                                         "Order Placed"
                                                     ? 'lib/images/ordered.png'
@@ -1528,10 +1532,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ),
               if (ISserviceAvilable)
                 SliverAppBar(
+                  scrolledUnderElevation: 0,
+            elevation: 0,
                  toolbarHeight:MediaQuery.of(context).size.height * 0.07,
             
                   backgroundColor: scaffoldBlackColor,
-                  elevation: 0,
+                 
                   pinned: true,
                   flexibleSpace: Column(
                     mainAxisSize: MainAxisSize.min,
@@ -1616,7 +1622,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                 hints[currentIndex]),
                                             alignment: Alignment.centerLeft,
                                             child: Text(
-                                              currentHint ?? "",
+                                               currentHint ?? "",
                                               style: GoogleFonts.mulish(
                                                 color: greyColor,
                                                 fontSize: 14,

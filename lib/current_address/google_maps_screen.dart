@@ -79,6 +79,8 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
     return Scaffold(
       backgroundColor: scaffoldBlackColor,
       appBar: AppBar(
+        scrolledUnderElevation: 0,
+            elevation: 0,
         backgroundColor: scaffoldBlackColor,
         centerTitle: true,
         shape: ContinuousRectangleBorder(

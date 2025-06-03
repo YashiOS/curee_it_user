@@ -77,6 +77,8 @@ class _LocationScreenState extends State<LocationScreen> {
     return Scaffold(
         backgroundColor: ligtBlackColor,
         appBar: AppBar(
+          scrolledUnderElevation: 0,
+            elevation: 0,
           centerTitle: true,
           backgroundColor: ligtBlackColor,
           shape: ContinuousRectangleBorder(
@@ -86,7 +88,7 @@ class _LocationScreenState extends State<LocationScreen> {
             ),
           ),
           title: Text(
-            "Select Location",
+            "Address",
             style: GoogleFonts.mulish(
                 fontWeight: FontWeight.w400,
                 fontSize: 22.69,

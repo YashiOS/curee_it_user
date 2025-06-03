@@ -48,6 +48,8 @@ class OrderdetailScreenNew extends StatelessWidget {
    
     return Scaffold(
         appBar: AppBar(
+          scrolledUnderElevation: 0,
+            elevation: 0,
           backgroundColor:ligtBlackColor,
          centerTitle: true,
           leading: GestureDetector(
