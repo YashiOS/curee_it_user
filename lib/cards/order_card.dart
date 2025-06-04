@@ -92,7 +92,7 @@ class _OrderCardState extends State<OrderCard> {
   Widget build(BuildContext context) {
     String orderStatus = widget.orderData['status'];
     String purchaseDate = widget.orderData['createdAt'];
-    double shippingCost = double.parse(widget.orderData['totalAmount']??"0.0");
+    double finalTotal = double.parse(widget.orderData['finalTotal']??"0.0");
     List orderItems = widget.orderData['products'];
     final total=orderItems.fold(0.0,(sum,item)=>sum+double.parse(item["productPrice"]));
     
@@ -104,7 +104,7 @@ class _OrderCardState extends State<OrderCard> {
 
     return Padding(
       padding: EdgeInsets.only(
-        top: MediaQuery.of(context).size.height * 0.02,
+        top: 16,
       ),
       child: LayoutBuilder(
         builder: (context, constraints) {
@@ -148,9 +148,9 @@ class _OrderCardState extends State<OrderCard> {
                         ),
                       ],
                     ),
-                    if(orderStatus!="In Review")
+                    if(orderStatus!="In Review" || orderStatus!="Available")
                     Text(
-                      "₹ ${shippingCost.toStringAsFixed(2)}",
+                      "₹ ${finalTotal.toStringAsFixed(2)}",
                       style: GoogleFonts.mulish(
                         fontWeight: FontWeight.w500,
                         fontSize: 17,

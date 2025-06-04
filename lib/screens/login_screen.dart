@@ -83,6 +83,9 @@ class _LoginScreenState extends State<LoginScreen> {
         SnackBar(content: Text('Network error: $e')),
       );
     }
+    setState(() {
+          userLoggingIN = false;
+        });
   }
 
   void _validateAndProceed() async {
@@ -194,7 +197,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     return Scaffold(
       resizeToAvoidBottomInset:
-          true, // This makes the scaffold adjust when keyboard appears
+          false, // This makes the scaffold adjust when keyboard appears
       body: SingleChildScrollView(
         // <-- Wrap with scroll view
         child: Container(

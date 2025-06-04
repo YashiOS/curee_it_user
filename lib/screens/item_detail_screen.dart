@@ -360,6 +360,8 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
     return Scaffold(
       backgroundColor: scaffoldBlackColor,
       appBar: AppBar(
+        scrolledUnderElevation: 0,
+            elevation: 0,
         centerTitle: true,
         shape: ContinuousRectangleBorder(
           borderRadius: BorderRadius.only(
@@ -536,6 +538,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                           ),
                         ),
                       ),
+                     
                       Container(
                           margin: EdgeInsets.only(left: 24),
                           height: 15,
@@ -546,6 +549,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                       SizedBox(
                         height: 20,
                       ),
+                     if(product["saltComposition"]!=null&&product["saltComposition"]!="")   
                       Container(
                           margin: EdgeInsets.only(left: 24),
                           height: 18,
@@ -553,9 +557,11 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                             "Salt composition",
                             style: GoogleFonts.mulish(color: greyColor),
                           )),
+                      if(product["saltComposition"]!=null&&product["saltComposition"]!="")
                       SizedBox(
                         height: 5,
                       ),
+                      if(product["saltComposition"]!=null&&product["saltComposition"]!="")
                       Container(
                           margin: EdgeInsets.only(left: 24),
                           height: 18,
@@ -563,9 +569,11 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                             "${product['saltComposition'] ?? 'N/A'}",
                             style: GoogleFonts.mulish(color: whiteColor),
                           )),
+                      if(product["saltComposition"]!=null&&product["saltComposition"]!="")    
                       SizedBox(
                         height: 10,
                       ),
+                      if(product["mainUse"]!=null&&product["mainUse"]!="")
                       Container(
                           margin: EdgeInsets.only(left: 24),
                           height: 15,
@@ -573,9 +581,11 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                             "Use",
                             style: GoogleFonts.mulish(color: greyColor),
                           )),
+                      if(product["mainUse"]!=null&&product["mainUse"]!="")    
                       SizedBox(
                         height: 5,
                       ),
+                      if(product["mainUse"]!=null&&product["mainUse"]!="")
                       Container(
                           margin: EdgeInsets.only(left: 24),
                           height: 18,
@@ -583,9 +593,11 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                             "${product['mainUse'] ?? ''}",
                             style: GoogleFonts.mulish(color: whiteColor),
                           )),
+                       if(product["mainUse"]!=null&&product["mainUse"]!="")
                       SizedBox(
                         height: 10,
                       ),
+                     if(product["usageInstruction"]!=null&&product["usageInstruction"]!="")
                       Container(
                           margin: EdgeInsets.only(left: 24),
                           height: 18,
@@ -593,6 +605,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                             "Description",
                             style: GoogleFonts.mulish(color: greyColor),
                           )),
+                     if(product["usageInstruction"]!=null&&product["usageInstruction"]!="")
                       Container(
                         margin: EdgeInsets.only(left: 24, top: 5, right: 24),
                         child: Text(

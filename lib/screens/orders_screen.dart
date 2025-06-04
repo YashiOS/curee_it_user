@@ -67,7 +67,10 @@ class _OrdersScreenState extends State<OrdersScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: scaffoldBlackColor,
+      
       appBar: AppBar(
+        elevation: 0,
+        scrolledUnderElevation: 0,
         centerTitle: true,
         backgroundColor: ligtBlackColor,
         shape: ContinuousRectangleBorder(
@@ -132,6 +135,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                 )
               : Container(
                   margin: EdgeInsets.only(
+                      top: 12,
                       bottom: MediaQuery.of(context).size.height * 0.03),
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.height,

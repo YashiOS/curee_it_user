@@ -319,6 +319,8 @@ class _SearchState extends State<Search> {
           : null,
       backgroundColor: scaffoldBlackColor,
       appBar: AppBar(
+        scrolledUnderElevation: 0,
+            elevation: 0,
         centerTitle: true,
         shape: ContinuousRectangleBorder(
           borderRadius: BorderRadius.only(
@@ -363,7 +365,7 @@ class _SearchState extends State<Search> {
           children: [
             SizedBox(height: 8),
             Container(
-              height: 48,
+              height: 43,
               decoration: BoxDecoration(
                 color: ligtBlackColor,
                 borderRadius: BorderRadius.circular(8),

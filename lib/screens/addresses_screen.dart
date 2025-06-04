@@ -4,6 +4,7 @@ import 'package:cureeit_user_app/current_address/google_maps_screen.dart';
 import 'package:cureeit_user_app/selected_Address/currentAddress.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
@@ -67,53 +68,66 @@ class _AddressesScreenState extends State<AddressesScreen> {
     return Scaffold(
       backgroundColor: scaffoldBlackColor,
       appBar: AppBar(
-        backgroundColor: scaffoldBlackColor,
-        leadingWidth: 100,
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 12.0),
-          child: GestureDetector(
-            onTap: () {
-              Navigator.pop(context);
-            },
-            child: Padding(
-              padding: const EdgeInsets.only(left: 4.0),
-              child: Row(
-                spacing: 4,
-                children: [
-                  Icon(Icons.arrow_back, color: whiteColor),
-                  Text(
-                    "Back",
-                    style: GoogleFonts.mulish(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                        color: whiteColor),
-                  )
-                ],
+        scrolledUnderElevation: 0,
+            elevation: 0,
+           
+            centerTitle: true,
+            backgroundColor: ligtBlackColor,
+            shape: ContinuousRectangleBorder(
+              borderRadius: BorderRadius.only(
+                bottomLeft: Radius.circular(10),
+                bottomRight: Radius.circular(10),
+              ),
+            ),
+            title: Text(
+              "Addresses",
+              style: GoogleFonts.mulish(
+                fontWeight: FontWeight.w400,
+                fontSize: 22.69,
+                color: whiteColor,
+              ),
+            ),
+            leading: GestureDetector(
+              onTap: () {
+              
+                  Navigator.pop(context);
+                 
+                
+
+                
+              },
+              child: Padding(
+                padding: const EdgeInsets.only(left: 24.0),
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 4.0),
+                  child: Row(
+                    spacing: 4,
+                    children: [
+                      SvgPicture.asset(
+                        colorFilter:
+                            ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                        "lib/images/back.svg",
+                        width: 24, // optional
+                        height: 24, // optional
+                      ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
-        ),
-      ),
       body: Stack(
         children: [
           SizedBox(
-        
             width:
                 MediaQuery.of(context).size.width, // Set width to screen width
             height: MediaQuery.of(context).size.height,
             child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(vertical: 8.0, horizontal: 18),
+              padding:EdgeInsets.only(top: 28,left: 20,right: 20,bottom: 28),
+                  
               child: (ListView(
                 children: [
-                  Text(
-                    "Addresses",
-                    style: GoogleFonts.mulish(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 24,
-                      
-                        color: whiteColor),
-                  ),
+                  
                   ListView.builder(
                     shrinkWrap: true,
                     physics: const NeverScrollableScrollPhysics(),
@@ -152,13 +166,13 @@ class _AddressesScreenState extends State<AddressesScreen> {
                         decoration: BoxDecoration(
                           color:ligtBlackColor,
                           borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.grey.shade300),
+                         
                         ),
                         child: Text(
                           "+ Add new address",
                           style: GoogleFonts.mulish(
                             fontSize: 16,
-                            fontWeight: FontWeight.w800,
+                            fontWeight: FontWeight.w400,
                             color: whiteColor,
                           ),
                         ),

@@ -63,6 +63,10 @@ dependencies:
   flutter_svg: ^2.1.0
   flutter_svg_provider: ^1.0.7
   sms_autofill: ^2.4.1
+  flutter_otp_text_field: ^1.5.1+1
+  firebase_core: ^3.13.1
+  firebase_messaging: ^15.2.6
+ 
   
   
   
@@ -76,7 +80,7 @@ flutter_launcher_icons:
   ios: false
   image_path: "lib/images/App_icon5.png"
   android_adaptive_icon_background: "#1A1A1A" # Replace with your desired color
-  android_adaptive_icon_foreground: "lib/images/App_icon5.png"
+  android_adaptive_icon_foreground: "lib/images/App_icon7.png"
 
 
 flutter_native_splash:

@@ -173,7 +173,7 @@ class _OtpScreenState extends State<OtpScreen> {
     final screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      resizeToAvoidBottomInset: true, // Important!
+      resizeToAvoidBottomInset: false, // Important!
       body: SingleChildScrollView(
         // Wrap the whole body!
         child: Container(

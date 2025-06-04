@@ -44,10 +44,12 @@ class OrderdetailScreenNew extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    String orderStatus = orderData['currentStatus'];
+    String orderStatus = orderData['status'];
    
     return Scaffold(
         appBar: AppBar(
+          scrolledUnderElevation: 0,
+            elevation: 0,
           backgroundColor:ligtBlackColor,
          centerTitle: true,
           leading: GestureDetector(
@@ -118,7 +120,7 @@ class OrderdetailScreenNew extends StatelessWidget {
                               Column(
                                 children: [
                                   Text(
-                                    "Order " + orderData['currentStatus'],
+                                    "Order " + orderData['status'],
                                     style: GoogleFonts.mulish(
                                         color: whiteColor,
                                        
@@ -162,7 +164,7 @@ class OrderdetailScreenNew extends StatelessWidget {
                                           borderRadius:
                                               BorderRadius.circular(8)),
                                       child: Text(
-                                        orderData['currentStatus'],
+                                        orderData['status'],
                                         style: GoogleFonts.mulish(
                                             color: Colors.white,
                                             
@@ -172,7 +174,7 @@ class OrderdetailScreenNew extends StatelessWidget {
                                     ),
                                   ),
                                   Text(
-                                    orderData['currentStatus'] == "Pending"
+                                    orderData['status'] == "Pending"
                                         ? "Delivering in"
                                         : "Delivered in",
                                     style: GoogleFonts.mulish(
@@ -226,7 +228,7 @@ class OrderdetailScreenNew extends StatelessWidget {
                                     Container(
                                       width: 70,
                                       height: 2,
-                                      color: orderData['currentStatus'] ==
+                                      color: orderData['status'] ==
                                               "Pending"
                                           ? Colors.grey
                                           : greenColor,
@@ -234,7 +236,7 @@ class OrderdetailScreenNew extends StatelessWidget {
                                     Icon(
                                       Icons.check_circle,
                                       size: 24,
-                                      color: orderData['currentStatus'] ==
+                                      color: orderData['status'] ==
                                               "Pending"
                                           ? Colors.grey
                                           : greenColor,

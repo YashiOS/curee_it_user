@@ -16,33 +16,102 @@ class AddressCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: onTap,
+      child: Container(
+          padding: EdgeInsets.only(
+            left: 25,
+            right: 16,
+            
+          ),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(8),
+            color: ligtBlackColor,
+          ),
+          margin: EdgeInsets.only(bottom: 16),
+          child: Center(
+            child: Container(
+              height: 75,
+             
+              child: Row(
+                
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  // Leading icon (16x16 with 8px right margin)
+                  Container(
+                    // Space between icon and text
+                    decoration: BoxDecoration(
+                      color: ligtBlackColor,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Container(
+                      height: 16,
+                      width: 16,
+                      child: Image.asset("lib/images/hugeicons_location.png"),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 16,
+                  ),
+                  
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          address['address'] ?? '',
+                          style: GoogleFonts.mulish(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                            color: whiteColor,
+                          ),
+                        ),
+                        SizedBox(height: 2), // Space between title and subtitle
+                        Text(
+                          address['type'] ?? '',
+                          style: GoogleFonts.mulish(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w300,
+                            color: whiteColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  
+                  // Trailing radio button
+                  Container(
+                    width: 16,
+                    height: 16,
+                    margin:
+                        EdgeInsets.only(left: 8), // Space before trailing widget
+                    decoration: BoxDecoration(
+                      color: isSelected ? greenColor : scaffoldBlackColor,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          )),
+    );
+    /*GestureDetector(
+      onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0),
         child: Container(
-          padding: EdgeInsets.symmetric(vertical: 18, horizontal: 10),
+          padding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
           decoration: BoxDecoration(
             color: ligtBlackColor,
-            borderRadius: BorderRadius.circular(14),
-            border: isSelected
-                ? Border.all(
-                    color: greenColor, width: 2) // Highlight selection
-                : Border.all(color: Colors.transparent),
+            borderRadius: BorderRadius.circular(8),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  Image.asset(
-                    isSelected
-                        ? "lib/images/selected_button.png"
-                        : "lib/images/nonselected_button.png",
-                    height: 24,
-                    width: 24,
-                    fit: BoxFit.contain,
-                  ),
-                  SizedBox(width: 12), // Spacing between image and text
+                  
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -50,8 +119,7 @@ class AddressCard extends StatelessWidget {
                         address['type'],
                         style: GoogleFonts.mulish(
                           color: whiteColor,
-                          fontSize: 20,
-                         
+                          fontSize: 17,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -60,21 +128,31 @@ class AddressCard extends StatelessWidget {
                         child: Text(
                           address['address'],
                           style: GoogleFonts.mulish(
-                            color:whiteColor,
+                            color: whiteColor,
                             fontSize: 14,
-                            
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                       ),
                     ],
-                  )
+                  ),
+                  
                 ],
               ),
+              Container(
+                    width: 16,
+                    height: 16,
+                    margin: EdgeInsets.only(
+                        left: 8), // Space before trailing widget
+                    decoration: BoxDecoration(
+                      color:isSelected? greenColor:scaffoldBlackColor,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
             ],
           ),
         ),
       ),
-    );
+    );*/
   }
 }

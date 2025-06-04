@@ -23,6 +23,8 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        scrolledUnderElevation: 0,
+            elevation: 0,
         backgroundColor: Colors.grey.shade100.withOpacity(0.5),
         leadingWidth: 100,
         leading: Padding(

@@ -1202,6 +1202,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             controller: _scrollController,
             slivers: [
               SliverAppBar(
+                
                 backgroundColor: scaffoldBlackColor,
                 expandedHeight: 80,
                 floating: false,
@@ -1308,7 +1309,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                               Container(
                                                 constraints:
                                                     const BoxConstraints(
-                                                  minWidth: 100,
+                                                  minWidth: 50,
                                                   maxWidth: 250,
                                                 ),
                                                 child: Row(
@@ -1408,16 +1409,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ),
               if (ISserviceAvilable && onGoingOrders.isNotEmpty)
                 SliverAppBar(
-                  backgroundColor: scaffoldBlackColor,
+                
+                  backgroundColor:scaffoldBlackColor,
                   floating: false,
                   expandedHeight: 64,
                   pinned: false,
                   flexibleSpace: FlexibleSpaceBar(
                     background: onGoingOrders.isNotEmpty && localAddress != ""
                         ? Container(
-                            margin: EdgeInsets.only(
-                              bottom: 15,
-                            ),
+                            
                             height: 94,
                             decoration: BoxDecoration(
                                 color: ligtBlackColor,
@@ -1433,21 +1433,21 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                    
                                     print(order[status]);
                                     if(order["status"]=="Available"){
-                                      status="Accepted your order";
+                                      status="Order Confirmed";
                                     }
                                     if(order["status"]=="In Review"){
-                                      status ="Verifying Your order";
+                                      status ="Verifying Order";
                                     }
                                     if (order["status"] ==
                                         "Order Placed") {
-                                      status = "Your order was placed!";
+                                      status = "Order Placed!";
                                     }
                                     if (order["status"] == "Packing") {
-                                      status = "Packing your items";
+                                      status = "Packing Items";
                                     }
                                     if (order["status"] ==
                                         "On the way") {
-                                      status = "Out for delivery";
+                                      status = "Order Enroute";
                                     }
                                     return GestureDetector(
                                       onTap: () {
@@ -1495,12 +1495,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                               ],
                                             ),
                                             Container(
-                                              height: order["status"] ==
-                                                      "Order Placed"
+                                              height:order["status"]=="In Review"?50 :order["status"] ==
+                                                      "Order Placed" ||order["status"]=="Available"
                                                   ? 36
                                                   : 80, // ⬅️ Adjust here
                                               decoration: BoxDecoration(),
                                               child: Image.asset(
+                                                order["status"]=="Available"?
+                                                "lib/images/ordered.png":
                                                 order["status"] ==
                                                         "Order Placed"
                                                     ? 'lib/images/ordered.png'
@@ -1513,7 +1515,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                             : order["status"] ==
                                                                     "Delivered"
                                                                 ? 'lib/images/DELIVERED.png'
-                                                                : 'lib/images/verifying.png', // Default image
+                                                                : 'lib/images/veryfing.png', // Default image
                                               ),
                                             ),
                                           ],
@@ -1530,11 +1532,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 ),
               if (ISserviceAvilable)
                 SliverAppBar(
-                  expandedHeight: 43,
+                  scrolledUnderElevation: 0,
+            elevation: 0,
+                 toolbarHeight:MediaQuery.of(context).size.height * 0.07,
+            
                   backgroundColor: scaffoldBlackColor,
-                  elevation: 0,
+                 
                   pinned: true,
                   flexibleSpace: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       GestureDetector(
                         onTap: () async {
@@ -1564,6 +1570,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 ),
                               )
                             : Container(
+                              margin: EdgeInsets.only(top: 20),
                                 height: 43,
                                 decoration: BoxDecoration(
                                   color: ligtBlackColor,
@@ -1615,7 +1622,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                 hints[currentIndex]),
                                             alignment: Alignment.centerLeft,
                                             child: Text(
-                                              currentHint ?? "",
+                                               currentHint ?? "",
                                               style: GoogleFonts.mulish(
                                                 color: greyColor,
                                                 fontSize: 14,
@@ -1630,9 +1637,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               ),
                       ),
                       Padding(
-                        padding:
-                            EdgeInsets.only(right: 16, bottom: 10, top: 10),
+                        padding: const EdgeInsets.only(top: 8),
                         child: Align(
+                          
                           alignment: Alignment.bottomLeft,
                           child: Text(
                             isInRadius == null || localAddress.isEmpty

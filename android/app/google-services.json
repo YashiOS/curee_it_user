@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "95408405177",
+    "project_id": "medkaro-6300a",
+    "storage_bucket": "medkaro-6300a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:95408405177:android:318fe8f9f0e4a36199b968",
+        "android_client_info": {
+          "package_name": "com.example.curee_it_user_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD6lljABYr4CjCtTnn5Zqk1nact51bzwLA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
