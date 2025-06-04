@@ -103,11 +103,39 @@ class _MedicineAvailabilityScreenState extends State<MedicineAvailabilityScreen>
           // Handle API error
         }
       } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                "Failed to sent order to pharmacy! please try again",
+                style: GoogleFonts.mulish(),
+              ),
+              backgroundColor: greenColor,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              duration: Duration(seconds: 2),
+            ),
+          );
          setState(() {
       started=false;
     });
       }
     } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                "Failed to sent order to pharmacy! please try again",
+                style: GoogleFonts.mulish(),
+              ),
+              backgroundColor: greenColor,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              duration: Duration(seconds: 2),
+            ),
+          );
        setState(() {
       started=false;
     });
@@ -129,6 +157,7 @@ class _MedicineAvailabilityScreenState extends State<MedicineAvailabilityScreen>
      setState(() {
       started=false;
     });
+   
   }
 
   @override

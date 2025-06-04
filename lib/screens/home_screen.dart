@@ -1534,7 +1534,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 SliverAppBar(
                   scrolledUnderElevation: 0,
             elevation: 0,
-                 toolbarHeight:MediaQuery.of(context).size.height * 0.07,
+                 toolbarHeight:MediaQuery.of(context).size.height * 0.08,
             
                   backgroundColor: scaffoldBlackColor,
                  
@@ -1637,7 +1637,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(top: 8),
+                        padding: const EdgeInsets.only(top: 8,bottom: 10),
                         child: Align(
                           
                           alignment: Alignment.bottomLeft,

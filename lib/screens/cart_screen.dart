@@ -567,9 +567,11 @@ class _CartScreenState extends State<CartScreen> {
       final compressedFile = await FlutterImageCompress.compressAndGetFile(
         imageFile.absolute.path,
         targetPath,
-        quality: 5, // You can tune this
+        quality: 30, 
+        
+        // You can tune this
       );
-
+     print("image compressed");
       return File(compressedFile!.path);
     } catch (e) {
       print("Image compression error: $e");
