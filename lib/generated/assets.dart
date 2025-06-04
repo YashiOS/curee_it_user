@@ -51,7 +51,7 @@ class Assets {
   static const String imagesDELIVERED = 'lib/images/DELIVERED.png';
   static const String imagesDiabetesCare = 'lib/images/diabetes_care.png';
   static const String imagesDottedDivider = 'lib/images/dotted_divider.png';
-  static const String imagesEmpty cart = 'lib/images/empty cart.png';
+  static const String imagesEmptycart = 'lib/images/empty cart.png';
   static const String imagesFinalHomebike1 = 'lib/images/final_homebike1.png';
   static const String imagesFinalMedkaroLogo = 'lib/images/final_medkaro_logo.png';
   static const String imagesGallery = 'lib/images/gallery.png';
@@ -66,7 +66,6 @@ class Assets {
   static const String imagesMEDKARO = 'lib/images/MEDKARO.png';
   static const String imagesMan = 'lib/images/man.png';
   static const String imagesMedicine1 = 'lib/images/medicine1.png';
-  static const String imagesMedkaro (1) 2 = 'lib/images/Medkaro (1) 2.png';
   static const String imagesMedkaroGadi = 'lib/images/medkaroGadi.png';
   static const String imagesMedkaroLogo = 'lib/images/medkaroLogo.png';
   static const String imagesMedkarolog = 'lib/images/medkarolog.png';
@@ -75,9 +74,8 @@ class Assets {
   static const String imagesNeurobionForte = 'lib/images/neurobionForte.png';
   static const String imagesNonselectedButton = 'lib/images/nonselected_button.png';
   static const String imagesOnTheWay = 'lib/images/onTheWay.png';
-  static const String imagesOrder Again = 'lib/images/Order Again.png';
+  static const String imagesOrderAgain = 'lib/images/Order Again.png';
   static const String imagesOrderTracking = 'lib/images/OrderTracking.png';
-  static const String imagesOrderTracking 2 = 'lib/images/OrderTracking 2.png';
   static const String imagesOrdered = 'lib/images/ordered.png';
   static const String imagesPacking = 'lib/images/packing.png';
   static const String imagesPlusButton = 'lib/images/plus_button.png';
@@ -100,7 +98,6 @@ class Assets {
   static const String imagesUnableSearch = 'lib/images/unableSearch.png';
   static const String imagesUnablesaveButton = 'lib/images/unablesaveButton.png';
   static const String imagesUser = 'lib/images/user.png';
-  static const String imagesVector 9 = 'lib/images/Vector 9.png';
   static const String isInRadiusServicesAvilable = 'lib/isInRadius/ServicesAvilable.dart';
   static const String libImagesBack = 'lib/images/back.svg';
   static const String libImagesProfileIcon = 'lib/images/profile_icon.png';
@@ -123,7 +120,6 @@ class Assets {
   static const String screensOrderDetailScreen = 'lib/screens/order_detail_screen.dart';
   static const String screensOrderSuccessScreen = 'lib/screens/Order_SuccessScreen.dart';
   static const String screensOrderTrackingScreen = 'lib/screens/order_tracking_screen.dart';
-  static const String screensOrderTrackingScreen 2 = 'lib/screens/order_tracking_screen 2.dart';
   static const String screensOrderdetailScreenNew = 'lib/screens/orderdetail_screen_new.dart';
   static const String screensOrdersScreen = 'lib/screens/orders_screen.dart';
   static const String screensOtpScreen = 'lib/screens/otp_screen.dart';

@@ -73,7 +73,7 @@ dev_dependencies:
 
 flutter_launcher_icons:
   android: true
-  ios: true
+  ios: false
   image_path: "lib/images/App_icon5.png"
   android_adaptive_icon_background: "#1A1A1A" # Replace with your desired color
   android_adaptive_icon_foreground: "lib/images/App_icon5.png"
