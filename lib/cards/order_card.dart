@@ -58,7 +58,7 @@ class _OrderCardState extends State<OrderCard> {
       reOrdering=true;
     });
     List<dynamic> orderItems = widget.orderData["products"];
-    print(orderItems);
+   
     List productIds =
         orderItems.map((item) => item['productId'].toString()).toList();
     try {
@@ -97,8 +97,7 @@ class _OrderCardState extends State<OrderCard> {
     final total=orderItems.fold(0.0,(sum,item)=>sum+double.parse(item["productPrice"]));
     
     String orderId = widget.orderData['_id'];
-    print("THIS IS ORDER ID");
-    print(orderId);
+   
 
     String allItems = formatOrderItems(orderItems);
 

@@ -189,7 +189,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Future<void> _checkLocationStatus() async {
-    print("Checking location status...");
+    
     loc.Location location = loc.Location();
 
     bool serviceEnabled = await location.serviceEnabled();
@@ -276,7 +276,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   List<dynamic> getOngoingOrders(List<dynamic> allOrders) {
-    print("GET ON GOING ORDER");
+  
     return allOrders
         .where((order) =>
             order['status'] != 'Delivered' &&
@@ -285,7 +285,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Future<void> fetchOrderHistory() async {
-    print("FETCH ORDER HISTORY");
+   
     var url = Uri.parse('$baseUrl/order/orderHistory');
     var request = http.Request('POST', url)
       ..headers.addAll({
@@ -298,14 +298,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     if (response.statusCode == 200) {
       var responseBody = await response.stream.bytesToString();
       Map<String, dynamic> data = jsonDecode(responseBody);
-      print("ORDER HISTORY");
+    
 
       setState(() {
         AllOrders = data['data'];
         
-        print("DATES");
       
-       print(AllOrders);
         AllOrders.sort((item1, item2) {
           final dateA = DateTime.parse(item1['createdAt']?? '1970-01-01');
           final dateB = DateTime.parse(item2['createdAt']?? '1970-01-01');
@@ -326,14 +324,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   void UpdateAddress1() {
-    print("UPDATE ADDRESS1");
+   
     localAddress = Address.CurrentAddress!["address"];
     checkLocation();
     setState(() {});
   }
 
   void UpdateAddress(Map<String, dynamic> address) {
-    print("UPDATE ADDRESS");
+  
     Address.CurrentAddress = address;
     localAddress = Address.CurrentAddress!["address"];
 
@@ -360,9 +358,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           'quantity': 1,
         }),
       );
-      print("ADDED TO CART");
-      print(response.statusCode);
-      print(response.body);
+    
       if (response.statusCode == 200) {
         setState(() {
           quantities[index] = 1;
@@ -374,7 +370,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         });
         Fluttertoast.showToast(msg: "Added To Cart");
       } else {
-        print(response.statusCode);
+       
         ScaffoldMessenger.of(context).clearSnackBars();
         isAddingMap[index] = false;
         ScaffoldMessenger.of(context).showSnackBar(
@@ -422,8 +418,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         Fluttertoast.showToast(msg: "Removed from cart");
         setState(() {});
       } else {
-        print(response.statusCode);
-
+       
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -460,7 +455,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Future<void> DidUpdateQuantity(int index, int change) async {
-    print("DID UPDATE QUANTITY");
+  
     final product = products[index];
     final productId = product['productId'];
     final String? userId = User.userId; // Example userId
@@ -546,7 +541,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           setState(() {
             finaltotalAmount = responseData["finalTotal"]?.toString() ?? "0";
 
-            print(" final total : $finaltotalAmount");
+           
           });
           final List<Map<String, dynamic>> tempCart = [];
           double calculatedTotal = 0.0;
@@ -659,7 +654,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Future<void> fetchProducts() async {
-    print("FETCH PRODUCTS");
+   
     final response =
         await http.get(Uri.parse('https://api.medkaro.in/home/homeProducts'));
     if (response.statusCode == 200) {
@@ -676,7 +671,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   void addToCart(int index) {
-    print("ADD TO CART");
+   
     setState(() {
       quantities[index] = 1;
     });
@@ -977,10 +972,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Future<void> fetchAddresses() async {
-    print("FETCH ADDRESSES");
+  
     if (Address.CurrentAddress != null) {
       String fullAddress = Address.CurrentAddress!["address"];
-      print("in 2nd if condition");
+     
 
       setState(() {
         localAddress = fullAddress;
@@ -999,7 +994,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       ..body = jsonEncode({'userId': User.userId});
 
     var response = await http.Client().send(request);
-    print(response.statusCode);
+   
     if (response.statusCode == 200) {
       String address = await fetchLocationAndAddress();
       final data = json.decode(await response.stream.bytesToString());
@@ -1060,7 +1055,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         final responseData = jsonDecode(response.body);
         setState(() {
           estTime = (responseData["estimatedTimeMinutes"]);
-          print(estTime);
+         
         });
        
        
@@ -1117,7 +1112,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       final position = await determinePosition();
       defaultLat = position.latitude;
       defaultLng = position.longitude;
-      print("📍 Location: $defaultLat, $defaultLng");
+    
 
       // Get address from coordinates
       var value =
@@ -1431,7 +1426,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                     final order = onGoingOrders[index];
                                     final orederId = order["orderId"]??order["availableID"];
                                    
-                                    print(order[status]);
+                                   
                                     if(order["status"]=="Available"){
                                       status="Order Confirmed";
                                     }
@@ -1534,7 +1529,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 SliverAppBar(
                   scrolledUnderElevation: 0,
             elevation: 0,
-                 toolbarHeight:MediaQuery.of(context).size.height * 0.08,
+                 toolbarHeight:MediaQuery.of(context).size.height * 0.09,
             
                   backgroundColor: scaffoldBlackColor,
                  
@@ -1572,7 +1567,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             : Container(
                               margin: EdgeInsets.only(top: 20),
                                 height: 43,
+                                
                                 decoration: BoxDecoration(
+                                  
                                   color: ligtBlackColor,
                                   borderRadius: BorderRadius.circular(8),
                                 ),
@@ -1636,8 +1633,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 ),
                               ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 8,bottom: 10),
+                      Container(
+                        margin: EdgeInsets.only(top: 10,bottom: 10),
+                        
                         child: Align(
                           
                           alignment: Alignment.bottomLeft,

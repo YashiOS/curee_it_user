@@ -72,9 +72,7 @@ class _OtpScreenState extends State<OtpScreen> {
   }
 
   Future<void> submitOtp() async {
-    print("OTP SCREEN PHONE NUMBER");
-    print(widget.phoneNumber);
-
+   
     setState(() {
       verifyingOTP = true;
     });
@@ -96,8 +94,7 @@ class _OtpScreenState extends State<OtpScreen> {
           }),
         );
         final data = json.decode(response.body);
-        print("OTP SCREEN");
-        print(data);
+       
         if (response.statusCode == 200) {
           final id = data["user"]["_id"];
           final name = data["user"]["name"];

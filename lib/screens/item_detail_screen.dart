@@ -305,12 +305,12 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
         var responseBody = jsonDecode(response.body);
         Map<String, dynamic> jsonData = responseBody;
         productId = jsonData["data"]["productId"];
-        print(productId);
+       
 
         if (jsonData['data'] == null) {
           return {};
         }
-        print(jsonData["data"]);
+       
         return {
           'name': jsonData['data']['name'] ?? 'Unknown Product',
           'saltComposition': jsonData['data']['saltComposition'] ?? 'N/A',
@@ -597,7 +597,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                       SizedBox(
                         height: 10,
                       ),
-                     if(product["usageInstruction"]!=null&&product["usageInstruction"]!="")
+                     if(product["usageInstruction"]!=null&&product["usageInstruction"]!=""&&product["usageInstruction"]!="N/A")
                       Container(
                           margin: EdgeInsets.only(left: 24),
                           height: 18,
@@ -605,7 +605,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                             "Description",
                             style: GoogleFonts.mulish(color: greyColor),
                           )),
-                     if(product["usageInstruction"]!=null&&product["usageInstruction"]!="")
+                     if(product["usageInstruction"]!=null&&product["usageInstruction"]!=""&&product["usageInstruction"]!="N/A")
                       Container(
                         margin: EdgeInsets.only(left: 24, top: 5, right: 24),
                         child: Text(

@@ -89,7 +89,7 @@ class _FavoritesCardState extends State<FavoritesCard> {
         });
         var responseBody = await response.stream.bytesToString();
         Map<String, dynamic> responseData = jsonDecode(responseBody);
-        print("Response od removeFromFav is ${responseData}");
+       
         if (responseData['message'] ==
             'Item removed from favourites successfully') {
           widget.onUpdate();
@@ -305,7 +305,7 @@ class _FavoritesCardState extends State<FavoritesCard> {
                         padding: const EdgeInsets.all(8.0),
                         child: GestureDetector(
                           onTap: () {
-                            print("Button Tapped of Delete");
+                           
                             removeFromFav();
                           },
                           child: Stack(

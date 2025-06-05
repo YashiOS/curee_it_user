@@ -25,10 +25,9 @@ class _LoginScreenState extends State<RegisterScreen> {
     setState(() {
       isUserRegistring=true;
     });
-    print("PHONE NUMBER");
-    print(widget.phoneNumber);
+   
     var phoneno=widget.phoneNumber;
-    print(phoneno);
+   
     try {
       final response = await http.post(
         Uri.parse(

@@ -45,10 +45,10 @@ class _LoginScreenState extends State<LoginScreen> {
           "mobileNumber": _controller.text.trim(),
         }),
       );
-      print("LOG IN BODY");
-      print(response.body);
+    
+     
       final Map<String, dynamic> responseBody = json.decode(response.body);
-      print(response.statusCode);
+     
 
       if (response.statusCode == 200) {
         setState(() {
@@ -113,12 +113,12 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _checkLocationStatus() async {
-    print("checking location ON OF");
+   
     loc.Location location = loc.Location();
 
     bool serviceEnabled = await location.serviceEnabled();
     if (!serviceEnabled) {
-      print("checking location  OF");
+    
       serviceEnabled = await location.requestService();
       if (!serviceEnabled) {
         _showLocationDeniedDialog();
@@ -128,7 +128,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     loc.PermissionStatus permissionGranted = await location.hasPermission();
     if (permissionGranted == loc.PermissionStatus.denied) {
-      print("checking location ON ");
+     
       permissionGranted = await location.requestPermission();
       if (permissionGranted != loc.PermissionStatus.granted) {
         _showLocationDeniedDialog();

@@ -23,7 +23,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
   bool isLoading = true;
 
   Future<void> fetchOrderHistory() async {
-    print("fetching ORDERhiSTORY");
+   
     var url = Uri.parse('$baseUrl/order/orderHistory');
     var request = http.Request('POST', url)
       ..headers.addAll({
@@ -39,7 +39,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
 
       setState(() {
         orders = data['data'];
-        print(orders);
+      
         orders.sort((item1, item2) {
           final dateA = DateTime.parse(item1['createdAt']?? '1970-01-01');
           final dateB = DateTime.parse(item2['createdAt']?? '1970-01-01');
@@ -59,7 +59,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
   @override
   void initState() {
     super.initState();
-    print("intistate");
+   
     fetchOrderHistory();
   }
 
@@ -148,7 +148,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                           orders.length, // Use the length of the orders array
                       itemBuilder: (context, index) {
                         final order = orders[index];
-                        print(orders[index]["availableID"]);
+                       
                         return GestureDetector(
                           onTap: () async{
                            await Navigator.push(

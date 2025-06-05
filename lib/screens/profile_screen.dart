@@ -97,7 +97,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> fetchUserProfile() async {
-    print("fetchUserProfile...");
+   
     try {
       final response = await http.post(
         Uri.parse(
@@ -110,7 +110,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        print(data);
+      
         setState(() {
           name = data["data"]["name"];
           phoneNumber = data["data"]["mobileNumber"];

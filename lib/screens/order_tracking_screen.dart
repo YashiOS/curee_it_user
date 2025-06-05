@@ -18,6 +18,7 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:loading_indicator/loading_indicator.dart';
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class OrderTrackingScreen extends StatefulWidget {
   OrderTrackingScreen(
@@ -142,9 +143,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
           orderTrackingDetails = Map<String, dynamic>.from(data["data"][0]);
           if (orderTrackingDetails["status"] == "Available") {
             acceptedProducts = orderTrackingDetails["acceptedProducts"];
-            print(acceptedProducts);
           }
-          print(orderTrackingDetails["status"]);
         }
       });
     } else {
@@ -581,7 +580,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
         backgroundColor: scaffoldBlackColor,
         appBar: AppBar(
           scrolledUnderElevation: 0,
-            elevation: 0,
+          elevation: 0,
           automaticallyImplyLeading: false,
           backgroundColor: ligtBlackColor,
           title: Text(
@@ -755,13 +754,11 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
                       color: greenColor,
-
                       border: Border.all(
                         color: greenColor,
                         width: 1,
                       ),
-                      borderRadius: BorderRadius.circular(
-                          8),
+                      borderRadius: BorderRadius.circular(8),
                     ),
                     child: Center(
                       child: Text(
@@ -779,7 +776,8 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
             )),
       );
     }
-    if (orderTrackingDetails["status"] == "Cancelled" || orderTrackingDetails["status"]=="Rejected") {
+    if (orderTrackingDetails["status"] == "Cancelled" ||
+        orderTrackingDetails["status"] == "Rejected") {
       return Scaffold(
         backgroundColor: scaffoldBlackColor,
         body: _isInitLoading
@@ -953,7 +951,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                       ),
                       SizedBox(height: 70),
                       Container(
-                        height: height * 0.45,
+                        height: height * 0.39,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -961,7 +959,8 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                               height: 80,
                               child: ClipRRect(
                                 child: Image.asset(
-                                  orderTrackingDetails["status"] == "Order Placed"
+                                  orderTrackingDetails["status"] ==
+                                          "Order Placed"
                                       ? 'lib/images/ordered.png'
                                       : orderTrackingDetails["status"] ==
                                               "Packing"
@@ -969,13 +968,13 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                                           : orderTrackingDetails["status"] ==
                                                   "On the way"
                                               ? 'lib/images/onTheWay.png'
-                                              : orderTrackingDetails["status"] ==
+                                              : orderTrackingDetails[
+                                                          "status"] ==
                                                       "Delivered"
                                                   ? 'lib/images/DELIVERED.png'
                                                   : 'lib/images/ordered.png', // Default image
-                              
-                                  height: 
-                                       80,
+
+                                  height: 80,
                                 ),
                               ),
                             ),
@@ -1120,6 +1119,49 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                               padding: EdgeInsets.all(width * 0.04),
                               child: Column(
                                 children: [
+                                  GestureDetector(
+                                    onTap: () async {
+                                      if (orderTrackingDetails[
+                                                      "porterAPIResponse"]
+                                                  ["deliveryBoyNumber"] !=
+                                              null &&
+                                          orderTrackingDetails[
+                                                      "porterAPIResponse"]
+                                                  ["deliveryBoyNumber"] !=
+                                              "") {
+                                        final phone = orderTrackingDetails[
+                                                'porterAPIResponse']
+                                            ?['deliveryBoyNumber'];
+                                        if (phone != null &&
+                                            phone.toString().isNotEmpty) {
+                                          final Uri launchUri = Uri(
+                                            scheme: 'tel',
+                                            path: phone.toString(),
+                                          );
+                                          if (await canLaunchUrl(launchUri)) {
+                                            await launchUrl(launchUri);
+                                          } else {
+                                            // handle error
+                                            print(
+                                                'Could not launch $launchUri');
+                                          }
+                                        }
+                                      }
+                                    },
+                                    child: OrderDetail(
+                                      icon: Icons.phone,
+                                      title:
+                                          "${orderTrackingDetails['porterAPIResponse']?['partner_info']["name"] ?? "Not Assinged yet"}",
+                                      subtitle: orderTrackingDetails[
+                                                  'porterAPIResponse']
+                                              ?['deliveryBoyNumber'] ??
+                                          "+91 ",
+                                      width: width,
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 16,
+                                  ),
                                   OrderDetail(
                                     icon: Icons.home_outlined,
                                     title: "Delivery",
@@ -1131,7 +1173,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                                     width: width,
                                   ),
                                   SizedBox(
-                                    height: 24,
+                                    height: 16,
                                   ),
                                   GestureDetector(
                                     onTap: () {

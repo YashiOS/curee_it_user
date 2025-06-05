@@ -53,7 +53,7 @@ class _LocationScreenState extends State<LocationScreen> {
       if (fetchAddress != null || fetchAddress.isNotEmpty) {
         addresses = data['data']['address'];
         setState(() {});
-        print(addresses);
+       
       }
     } else {
        setState(() {
@@ -248,7 +248,7 @@ class _LocationScreenState extends State<LocationScreen> {
                             bool isSelected = Address.selectedIndex == index;
                             return GestureDetector(
                               onTap: () {
-                                print(address);
+                              
                                 UpdateAddress(address);
                 
                                 setState(() {

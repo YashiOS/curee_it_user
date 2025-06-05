@@ -69,7 +69,7 @@ class _SearchCardState extends State<SearchCard> {
           setState(() {
             // Check if the productId is in the favourites list
             isFav = favouritesList.contains(widget.productId);
-            print(isFav);
+          
           });
         } else {
           print(

@@ -1266,7 +1266,7 @@ class _CartScreenState extends State<CartScreen> {
                                                                           Center(
                                                                         child:
                                                                             Text(
-                                                                          "Place order",
+                                                                          "Place Order",
                                                                           style:
                                                                               GoogleFonts.mulish(
                                                                             color: payNow

@@ -102,9 +102,9 @@ class _CartCardState extends State<CartCard> {
         headers: {'Content-Type': 'application/json'},
         body: json.encode(requestData),
       );
-      print("Quantity in API is $quantity");
+   
       if (response.statusCode == 200) {
-        print("sucessfully updated");
+      
 
         await widget.onUpdate();
         setState(() {
@@ -158,7 +158,7 @@ class _CartCardState extends State<CartCard> {
         widget.isDeleting(false);
         
       } else {
-        print(response.statusCode);
+       
         widget.isDeleting(false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -192,8 +192,7 @@ class _CartCardState extends State<CartCard> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    print(widget.productPrice);
-    print(widget.sellingPrice);
+   
     return Padding(
       padding: EdgeInsets.only(
         top: 5,

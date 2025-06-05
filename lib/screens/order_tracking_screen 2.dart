@@ -428,7 +428,7 @@ class _orderTrackingScreenState2 extends State<orderTrackingScreen> {
                   child: GestureDetector(
                     onTap: () {
                       Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>BaseScreen(Navigatedfrom: "orderTrackingScreen",)));
-                      print("Close tapped");
+                     
                     },
                     child: Icon(
                       Icons.close,

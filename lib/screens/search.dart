@@ -27,8 +27,8 @@ class _SearchState extends State<Search> {
   bool _isLoading = false;
   bool isIncart = false;
   Map<String, bool> _inCartMap = {};
- Map<String,bool> isAdding={};
- Map<String,bool>isUpdating={};
+  Map<String, bool> isAdding = {};
+  Map<String, bool> isUpdating = {};
 
   // Track quantities for each product
   Map<String, int> _quantityMap = {};
@@ -46,15 +46,14 @@ class _SearchState extends State<Search> {
     });
 
     try {
-      final response = await http.get(Uri.parse(
-          "$baseUrl/search/searchProducts?keyword=$query"));
+      final response = await http
+          .get(Uri.parse("$baseUrl/search/searchProducts?keyword=$query"));
 
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
         if (jsonResponse["success"] == true) {
           setState(() {
             _searchResults = jsonResponse["data"];
-           
           });
         } else {
           setState(() {
@@ -83,7 +82,7 @@ class _SearchState extends State<Search> {
     _debounce = Timer(const Duration(milliseconds: 500), () {
       final query = _controller.text.trim();
 
-      print("Query  sent is $query");
+     
       if (query.isEmpty) {
         // Clear results immediately
         setState(() {
@@ -93,7 +92,7 @@ class _SearchState extends State<Search> {
       }
       if (query.isNotEmpty) {
         _fetchSearchResults(query);
-        print("done sent");
+       
       }
     });
   }
@@ -109,8 +108,7 @@ class _SearchState extends State<Search> {
     });
   }
 
-   Future<void> _removeFromCart(String ProductId) async {
-  
+  Future<void> _removeFromCart(String ProductId) async {
     final String userId = User.userId!;
     final String productId = ProductId;
 
@@ -118,10 +116,8 @@ class _SearchState extends State<Search> {
       "userId": userId,
       "productId": productId,
     };
-   
 
-    final url =
-        '$baseUrl/cart/removeFromCart';
+    final url = '$baseUrl/cart/removeFromCart';
     try {
       final response = await http.delete(
         Uri.parse(url),
@@ -130,42 +126,44 @@ class _SearchState extends State<Search> {
       );
 
       if (response.statusCode == 200) {
-      CartManager.cartQuantities[productId]=0;
-        
-        
-        
-       Fluttertoast.showToast(msg: "Removed from cart");
-       setState(() {
-         
-       });
-        
+        CartManager.cartQuantities[productId] = 0;
+
+        Fluttertoast.showToast(msg: "Removed from cart");
+        setState(() {});
       } else {
-        print(response.statusCode);
-      
+       
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("Failed to remove from cart",style: GoogleFonts.mulish(),),
+            content: Text(
+              "Failed to remove from cart",
+              style: GoogleFonts.mulish(),
+            ),
             backgroundColor: greenColor,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
             duration: Duration(seconds: 2),
-          ),);
+          ),
+        );
         print('Failed to remove from cart');
       }
     } catch (error) {
-     
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Error removing from cart ",style: GoogleFonts.mulish(),),
-            backgroundColor: greenColor,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            duration: Duration(seconds: 2),
-          ),);
+        SnackBar(
+          content: Text(
+            "Error removing from cart ",
+            style: GoogleFonts.mulish(),
+          ),
+          backgroundColor: greenColor,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          duration: Duration(seconds: 2),
+        ),
+      );
       print('Error removing from cart: $error');
     }
   }
@@ -186,11 +184,10 @@ class _SearchState extends State<Search> {
       setState(() {
         _inCartMap[productId] = true;
         _quantityMap[productId] = 1;
-        isAdding[productId]=true;
+        isAdding[productId] = true;
       });
       final response = await http.post(
-        Uri.parse(
-            '$baseUrl/cart/addToCart'),
+        Uri.parse('$baseUrl/cart/addToCart'),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -202,17 +199,16 @@ class _SearchState extends State<Search> {
       );
 
       if (response.statusCode == 200) {
-       
-
         setState(() {
-          isAdding[productId]=false;
-           CartManager.cartQuantities[productId]=(CartManager.cartQuantities[productId]??0)+1;
+          isAdding[productId] = false;
+          CartManager.cartQuantities[productId] =
+              (CartManager.cartQuantities[productId] ?? 0) + 1;
           isIncart = true;
         });
         Fluttertoast.showToast(msg: "Added To Cart");
       } else {
         setState(() {
-          isAdding[productId]=false;
+          isAdding[productId] = false;
           _inCartMap.remove(productId);
           _quantityMap.remove(productId);
         });
@@ -221,23 +217,23 @@ class _SearchState extends State<Search> {
     } catch (e) {
       print('❌ Network error: $e');
     }
-    
+
     setState(() {
-      isAdding[productId]=false;
+      isAdding[productId] = false;
     });
   }
 
   Future<void> DidUpdateQuantity(
       int index, int change, String productId) async {
-    final currentQuantity =CartManager.cartQuantities[productId]?? 1;
+    final currentQuantity = CartManager.cartQuantities[productId] ?? 1;
     final newQuantity = currentQuantity + change;
 
     if (newQuantity < 1) {
-     await _removeFromCart(productId);
-     
+      await _removeFromCart(productId);
+
       // Remove from cart if quantity goes to 0
       setState(() {
-        isUpdating[productId]=false;
+        isUpdating[productId] = false;
         _inCartMap.remove(productId);
         _quantityMap.remove(productId);
       });
@@ -246,7 +242,7 @@ class _SearchState extends State<Search> {
 
     final String? userId = User.userId; // Example userId
     setState(() {
-      isUpdating[productId]=true;
+      isUpdating[productId] = true;
       _quantityMap[productId] = newQuantity;
     });
 
@@ -254,8 +250,7 @@ class _SearchState extends State<Search> {
 
     try {
       final response = await http.put(
-        Uri.parse(
-            '$baseUrl/cart/updateQuantity'),
+        Uri.parse('$baseUrl/cart/updateQuantity'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
           "userId": userId,
@@ -264,15 +259,15 @@ class _SearchState extends State<Search> {
         }),
       );
       setState(() {
-        isUpdating[productId]=false;
-        CartManager.cartQuantities[productId]=newQuantity;
+        isUpdating[productId] = false;
+        CartManager.cartQuantities[productId] = newQuantity;
       });
-     
+
       if (response.statusCode != 200) {
-        CartManager.cartQuantities[productId]=currentQuantity;
+        CartManager.cartQuantities[productId] = currentQuantity;
         // Handle error - revert local state in case of failure
         setState(() {
-          isUpdating[productId]=false;
+          isUpdating[productId] = false;
           _quantityMap[productId] = currentQuantity;
         });
         ScaffoldMessenger.of(context).showSnackBar(
@@ -282,7 +277,7 @@ class _SearchState extends State<Search> {
     } catch (e) {
       // Handle network errors - revert local state
       setState(() {
-        isUpdating[productId]=false;
+        isUpdating[productId] = false;
         _quantityMap[productId] = currentQuantity;
       });
       ScaffoldMessenger.of(context).showSnackBar(
@@ -290,7 +285,7 @@ class _SearchState extends State<Search> {
       );
     }
     setState(() {
-      isUpdating[productId]=false;
+      isUpdating[productId] = false;
     });
   }
 
@@ -320,7 +315,7 @@ class _SearchState extends State<Search> {
       backgroundColor: scaffoldBlackColor,
       appBar: AppBar(
         scrolledUnderElevation: 0,
-            elevation: 0,
+        elevation: 0,
         centerTitle: true,
         shape: ContinuousRectangleBorder(
           borderRadius: BorderRadius.only(
@@ -345,7 +340,7 @@ class _SearchState extends State<Search> {
               child: Row(
                 spacing: 4,
                 children: [
-                 SvgPicture.asset(
+                  SvgPicture.asset(
                     colorFilter:
                         ColorFilter.mode(Colors.white, BlendMode.srcIn),
                     "lib/images/back.svg",
@@ -382,7 +377,6 @@ class _SearchState extends State<Search> {
                         style: GoogleFonts.mulish(color: whiteColor),
                         controller: _controller,
                         decoration: InputDecoration(
-                          
                           hintStyle: GoogleFonts.mulish(color: whiteColor),
                           border: InputBorder.none,
                         ),
@@ -401,24 +395,25 @@ class _SearchState extends State<Search> {
                     ))
                   : _searchResults.isEmpty
                       ? Center(
-                          child: Text("No results found",
-                             style: GoogleFonts.mulish(
-            fontWeight: FontWeight.w500,
-            fontSize: 20,
-            color: greyColor,
-          ),))
+                          child: Text(
+                          "No results found",
+                          style: GoogleFonts.mulish(
+                            fontWeight: FontWeight.w500,
+                            fontSize: 20,
+                            color: greyColor,
+                          ),
+                        ))
                       : ListView.builder(
                           itemCount: _searchResults.length,
                           itemBuilder: (context, index) {
                             final item = _searchResults[index];
-                            print(item);
+                          
                             final productId = item["productId"];
                             final IsInCart = _inCartMap[productId] ?? false;
 
-
                             return GestureDetector(
                               onTap: () {
-                                print("clicked");
+                               
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -435,188 +430,283 @@ class _SearchState extends State<Search> {
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Container(
-                                  width: 311,
-                                  padding: EdgeInsets.all(16),
-                                  child: Column(
+                                  padding: EdgeInsets.all(8),
+                                  child: Row(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      // First row with name and price
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Container(
-                                            width: 200,
-                                            child: Text(
-                                              item['name'],
-                                              maxLines: 1,
-                                              style: GoogleFonts.mulish(
-                                                fontSize: 17.02,
-                                                fontWeight: FontWeight.w400,
-                                                color: whiteColor,
-                                              ),
-                                            ),
+                                      // Image on the left
+                                      Container(
+                                        width: 80,
+                                        height: 80,
+                                        
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                            color: Colors.black,
+                                            width: 1,
                                           ),
-                                          Row(
-                                            children: [
-                                              Text(
-                                                "₹${item['price']}",
-                                                style: GoogleFonts.mulish(
-                                                  fontSize: 15,
-                                                  decoration: TextDecoration.lineThrough,
-                                                  decorationColor: greyColor,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: greyColor,
-                                                ),
-                                              ),
-                                              SizedBox(width: 5,),
-                                              Text(
-                                                "₹${item['sellingPrice']}",
-                                                style: GoogleFonts.mulish(
-                                                  fontSize: 17,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: whiteColor,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(
-                                        height: 5,
-                                      ),
-                                      // Second row with packaging info and Add button
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Container(
-                                            width: 200,
+                                          color: Colors.white,
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          
+                                        ),
+                                        child:Center(
+                                          child: Container(
+                                            height: 60,
+                                            width: 60,
+                                            child:Image.network(
+                                              
+                                              (item["imageUrls"] != null &&
+                                                        item["imageUrls"]
+                                                            is List &&
+                                                        item["imageUrls"]
+                                                            .isNotEmpty)
+                                                    ? item["imageUrls"][0]
+                                                    : 'https://via.placeholder.com/100x100.png?text=Medicine',
+                                                    fit: BoxFit.contain,
+                                            ) ,
                                             
-                                            child: Text(
-                                              item['description'] ??
-                                                  'Medicine information',
-                                              maxLines: 1,
-                                              overflow: TextOverflow.ellipsis,
-                                              style: GoogleFonts.mulish(
-                                                color: greyColor,
-                                                fontSize: 14,
-                                              ),
-                                            ),
                                           ),
-                                          GestureDetector(
-                                            onTap: () {
-                                              if (!IsInCart) {
-                                                didAddToCart(
-                                                  userId: User.userId!,
-                                                  productId: productId,
-                                                );
-                                              }
-                                            },
-                                            child: IsInCart &&CartManager.cartQuantities[productId]!=null &&CartManager.cartQuantities[productId]!>0
-                                                ? Container(
-                                                    width: 50,
-                                                    height: 29,
-                                                    decoration: BoxDecoration(
-                                                        color: greenColor,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(8),
-                                                        border: Border.all(
-                                                            color: greenColor,
-                                                            width: 1)),
-                                                    child: FittedBox(
-                                                      child: Row(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .spaceBetween,
-                                                        children: [
-                                                          IconButton(
-                                                              padding:
-                                                                  EdgeInsets
-                                                                      .zero,
-                                                              constraints:
-                                                                  BoxConstraints(),
-                                                              icon: Icon(
-                                                                Icons.remove,
-                                                                size:
-                                                                    containerHeight *
-                                                                        0.06,
-                                                                color:
-                                                                    whiteColor,
-                                                              ),
-                                                              onPressed: () {
-                                                                DidUpdateQuantity(
-                                                                    index,
-                                                                    -1,
-                                                                    productId);
-                                                              }),
-                                                         isUpdating[productId]==true?Container(height: 10,width: 10,child: CircularProgressIndicator(color: whiteColor,),): Text(
-                                                            '${CartManager.cartQuantities[productId]}',
-                                                            style: GoogleFonts
-                                                                .mulish(
-                                                              color: whiteColor,
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
-                                                              fontSize:
-                                                                  containerHeight *
-                                                                      0.05,
-                                                            ),
-                                                          ),
-                                                          IconButton(
-                                                              padding:
-                                                                  EdgeInsets
-                                                                      .zero,
-                                                              constraints:
-                                                                  BoxConstraints(),
-                                                              icon: Icon(
-                                                                Icons.add,
-                                                                size:
-                                                                    containerHeight *
-                                                                        0.06,
-                                                                color:
-                                                                    whiteColor,
-                                                              ),
-                                                              onPressed: () {
-                                                                DidUpdateQuantity(
-                                                                    index,
-                                                                    1,
-                                                                    productId);
-                                                              }),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  )
-                                                : Container(
-                                                    width: 50,
-                                                    height: 29,
-                                                    decoration: BoxDecoration(
-                                                        color: ligtBlackColor,
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(8),
-                                                        border: Border.all(
-                                                            color: greenColor,
-                                                            width: 1)),
-                                                    child: Center(
-                                                      child:isAdding[productId]==true?Container(height:10,width: 10, child:CircularProgressIndicator(color: whiteColor,strokeWidth: 2,)) :Text(
-                                                        'Add',
-                                                        style:
-                                                            GoogleFonts.mulish(
-                                                          fontSize: 10,
-                                                          color: greenColor,
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                        ),
-                                                      ),
+                                        ) ,
+                                      ),
+                                      SizedBox(width: 12),
+                                      // Text and buttons
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            // First row with name and price
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Container(
+                                                 
+                                                  width: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.4,
+                                                  child: Text(
+                                                    item['name'],
+                                                    maxLines: 3,
+                                                    style: GoogleFonts.mulish(
+                                                      fontSize: 13,
+                                                      fontWeight:
+                                                          FontWeight.w400,
+                                                      color: whiteColor,
                                                     ),
                                                   ),
-                                          ),
-                                        ],
+                                                ),
+                                                Column(
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.end,
+                                                  children: [
+                                                    Text(
+                                                      "₹${item['sellingPrice']}",
+                                                      style: GoogleFonts.mulish(
+                                                        fontSize: 13,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: whiteColor,
+                                                      ),
+                                                    ),
+                                                    SizedBox(width: 5),
+                                                    Text(
+                                                      "₹${item['price']}",
+                                                      style: GoogleFonts.mulish(
+                                                        fontSize: 12,
+                                                        decoration:
+                                                            TextDecoration
+                                                                .lineThrough,
+                                                        decorationColor:
+                                                            greyColor,
+                                                        fontWeight:
+                                                            FontWeight.w500,
+                                                        color: greyColor,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                            SizedBox(height: 5),
+                                            // Description and Add button
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              children: [
+                                                Container(
+                                                 width: MediaQuery.of(context).size.width * 0.35,
+                                                  child: Text(
+                                                    item['description'] ??
+                                                        'Medicine information',
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                    style: GoogleFonts.mulish(
+                                                      color: greyColor,
+                                                      fontSize: 11,
+                                                    ),
+                                                  ),
+                                                ),
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    if (!IsInCart) {
+                                                      didAddToCart(
+                                                        userId: User.userId!,
+                                                        productId: productId,
+                                                      );
+                                                    }
+                                                  },
+                                                  child: IsInCart &&
+                                                          CartManager.cartQuantities[
+                                                                  productId] !=
+                                                              null &&
+                                                          CartManager.cartQuantities[
+                                                                  productId]! >
+                                                              0
+                                                      ? Container(
+                                                          width: 50,
+                                                          height: 29,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color: greenColor,
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        8),
+                                                            border: Border.all(
+                                                                color:
+                                                                    greenColor,
+                                                                width: 1),
+                                                          ),
+                                                          child: FittedBox(
+                                                            child: Row(
+                                                              children: [
+                                                                IconButton(
+                                                                  padding:
+                                                                      EdgeInsets
+                                                                          .zero,
+                                                                  constraints:
+                                                                      BoxConstraints(),
+                                                                  icon: Icon(
+                                                                      Icons
+                                                                          .remove,
+                                                                      size: containerHeight *
+                                                                          0.06,
+                                                                      color:
+                                                                          whiteColor),
+                                                                  onPressed:
+                                                                      () {
+                                                                    DidUpdateQuantity(
+                                                                        index,
+                                                                        -1,
+                                                                        productId);
+                                                                  },
+                                                                ),
+                                                                isUpdating[productId] ==
+                                                                        true
+                                                                    ? Container(
+                                                                        height:
+                                                                            10,
+                                                                        width:
+                                                                            10,
+                                                                        child: CircularProgressIndicator(
+                                                                            color:
+                                                                                whiteColor),
+                                                                      )
+                                                                    : Text(
+                                                                        '${CartManager.cartQuantities[productId]}',
+                                                                        style: GoogleFonts
+                                                                            .mulish(
+                                                                          color:
+                                                                              whiteColor,
+                                                                          fontWeight:
+                                                                              FontWeight.bold,
+                                                                          fontSize:
+                                                                              containerHeight * 0.05,
+                                                                        ),
+                                                                      ),
+                                                                IconButton(
+                                                                  padding:
+                                                                      EdgeInsets
+                                                                          .zero,
+                                                                  constraints:
+                                                                      BoxConstraints(),
+                                                                  icon: Icon(
+                                                                      Icons.add,
+                                                                      size: containerHeight *
+                                                                          0.06,
+                                                                      color:
+                                                                          whiteColor),
+                                                                  onPressed:
+                                                                      () {
+                                                                    DidUpdateQuantity(
+                                                                        index,
+                                                                        1,
+                                                                        productId);
+                                                                  },
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ),
+                                                        )
+                                                      : Container(
+                                                          width: 50,
+                                                          height: 29,
+                                                          decoration:
+                                                              BoxDecoration(
+                                                            color:
+                                                                ligtBlackColor,
+                                                            borderRadius:
+                                                                BorderRadius
+                                                                    .circular(
+                                                                        8),
+                                                            border: Border.all(
+                                                                color:
+                                                                    greenColor,
+                                                                width: 1),
+                                                          ),
+                                                          child: Center(
+                                                            child: isAdding[
+                                                                        productId] ==
+                                                                    true
+                                                                ? Container(
+                                                                    height: 10,
+                                                                    width: 10,
+                                                                    child:
+                                                                        CircularProgressIndicator(
+                                                                      color:
+                                                                          whiteColor,
+                                                                      strokeWidth:
+                                                                          2,
+                                                                    ),
+                                                                  )
+                                                                : Text(
+                                                                    'Add',
+                                                                    style: GoogleFonts
+                                                                        .mulish(
+                                                                      fontSize:
+                                                                          10,
+                                                                      color:
+                                                                          greenColor,
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w600,
+                                                                    ),
+                                                                  ),
+                                                          ),
+                                                        ),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ],
                                   ),
