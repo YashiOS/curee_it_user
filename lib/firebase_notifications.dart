@@ -2,6 +2,10 @@ import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+
+class fcmToken{
+   static String ?fcmtoken;
+}
 // Top-level function for background messages
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   print("Background message: ${message.notification?.title}");
@@ -50,7 +54,7 @@ class PushNotificationService {
       // Get FCM token
       String? token = await _fcm.getToken();
       print("🔑 FCM Token: $token");
-
+     fcmToken.fcmtoken=token;
       // Setup message handlers
       _setupMessageHandlers();
 

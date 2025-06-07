@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:cureeit_user_app/BaseUrl.dart';
+import 'package:cureeit_user_app/firebase_notifications.dart';
 import 'package:cureeit_user_app/screens/policies_screen.dart';
 import 'package:cureeit_user_app/screens/terms_of_service_screen.dart';
 import 'package:flutter/gestures.dart';
@@ -43,6 +44,7 @@ class _LoginScreenState extends State<LoginScreen> {
         },
         body: json.encode({
           "mobileNumber": _controller.text.trim(),
+          "fcmToken":fcmToken.fcmtoken
         }),
       );
     
