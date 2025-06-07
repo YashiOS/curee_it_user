@@ -1666,7 +1666,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                             isInRadius == null || localAddress.isEmpty
                                 ? ""
                                 : isInRadius!
-                                    ? "Featured Products"
+                                    ? "Frequently Bought"
                                     : "",
                             style: GoogleFonts.mulish(
                               fontSize: 15,

@@ -30,6 +30,10 @@
         android:name="com.google.android.geo.API_KEY"
         android:value="AIzaSyDzbBfJlU-7h642LKSdwXR5jfu9wk0SE90"
         />
+        <meta-data
+        android:name="com.google.firebase.messaging.default_notification_icon"
+        android:resource="@drawable/ic_notification" />
+    
 
 
         <activity
@@ -48,6 +52,7 @@
             <meta-data
             android:name="io.flutter.embedding.android.NormalTheme"
               android:resource="@style/NormalTheme"
+             
               />
 
               
