@@ -607,25 +607,33 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                     shrinkWrap: true,
                     itemCount: acceptedProducts.length,
                     itemBuilder: (context, index) {
-                      final marketerName =
-                          acceptedProducts[index]["productMarketer"];
-                      final productid = acceptedProducts[index]["productId"];
-                      final productname =
-                          acceptedProducts[index]["productName"];
-                      final productStr =
-                          acceptedProducts[index]["productPrice"].toString();
-                      final productPrice = double.tryParse(productStr) ?? 1.0;
-                      final quent = acceptedProducts[index]["quantity"];
-                      final sellingPrice =
-                          acceptedProducts[index]["sellingPrice"] ?? 6.0;
-                      return OrderAcceptedCard(
-                        marketeproductMarketer: marketerName,
-                        productId: productid,
-                        productName: productname,
-                        productPrice: productPrice,
-                        quantity: quent,
-                        sellingPrice: sellingPrice,
-                      );
+                      final marketerName = acceptedProducts[index]["productMarketer"];
+final productid = acceptedProducts[index]["productId"];
+final productname = acceptedProducts[index]["productName"];
+
+// productPrice might be a String, so convert safely:
+final productStr = acceptedProducts[index]["productPrice"].toString();
+final productPrice = double.tryParse(productStr) ?? 0.0;
+
+// quantity might be int or String, ensure int:
+final quantityRaw = acceptedProducts[index]["quantity"];
+final quent = quantityRaw is int
+    ? quantityRaw
+    : int.tryParse(quantityRaw.toString()) ?? 1;
+
+// sellingPrice might be String or double, convert safely:
+final sellingPriceStr = acceptedProducts[index]["sellingPrice"].toString();
+final sellingPrice = double.tryParse(sellingPriceStr) ?? 0.0;
+
+return OrderAcceptedCard(
+  marketeproductMarketer: marketerName,
+  productId: productid,
+  productName: productname,
+  productPrice: productPrice,
+  quantity: quent,
+  sellingPrice: sellingPrice,
+);
+
                     }),
                 Container(
                   padding: EdgeInsets.only(right: 25, left: 25, bottom: 10),

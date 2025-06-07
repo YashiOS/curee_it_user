@@ -91,7 +91,7 @@ class _OrderCardState extends State<OrderCard> {
   @override
   Widget build(BuildContext context) {
     String orderStatus = widget.orderData['status'];
-    String purchaseDate = widget.orderData['createdAt'];
+    String purchaseDate = widget.orderData['purchaseDate'];
     double finalTotal = double.parse(widget.orderData['finalTotal']??"0.0");
     List orderItems = widget.orderData['products'];
     final total=orderItems.fold(0.0,(sum,item)=>sum+double.parse(item["productPrice"]));

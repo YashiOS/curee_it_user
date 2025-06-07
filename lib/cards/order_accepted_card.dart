@@ -40,7 +40,8 @@ class _OrderCardState extends State<OrderAcceptedCard> {
   Widget build(BuildContext context) {
     int quantity=widget.quantity;
     final productPrice = double.tryParse(widget.productPrice.toString()) ?? 0.0;
-    double sellingPrice=widget.sellingPrice;
+    final sellingPrice = double.tryParse(widget.sellingPrice.toString()) ?? 0.0;
+  
     
     return Padding(
       padding: EdgeInsets.only(
