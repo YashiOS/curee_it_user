@@ -262,7 +262,7 @@ class _CartCardState extends State<CartCard> {
               children: [
                 // Quantity Control
                 Container(
-                  width: 64,
+                  width: MediaQuery.of(context).size.width * 0.15,
                   height: 28,
                   decoration: BoxDecoration(
                     color: greenColor,
@@ -337,7 +337,8 @@ class _CartCardState extends State<CartCard> {
                 
                 // Price Column
                 Container(
-                  width: 70,
+                 width: MediaQuery.of(context).size.width * 0.18, // ~70 if screen is ~390px wide
+
                   height: 60,
                  
                   child: Row(

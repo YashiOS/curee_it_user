@@ -1,5 +1,6 @@
 import 'package:cureeit_user_app/LocalStorageCubit/store_user_cubit.dart';
 import 'package:cureeit_user_app/cubit/service_avilable_cubit.dart';
+import 'package:cureeit_user_app/firebase_notifications.dart';
 
 import 'package:cureeit_user_app/screens/base_screen.dart';
 
@@ -30,6 +31,7 @@ void main() async {
 );
   await Hive.initFlutter();
   myBox = await Hive.openBox("Mybox");
+  await PushNotificationService().initNotifications();
  
   runApp(
     MultiBlocProvider(

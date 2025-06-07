@@ -141,6 +141,8 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
         if (data["data"].isNotEmpty) {
           _isInitLoading = false;
           orderTrackingDetails = Map<String, dynamic>.from(data["data"][0]);
+          print("ORDER STATUS");
+          print(orderTrackingDetails["status"]);
           if (orderTrackingDetails["status"] == "Available") {
             acceptedProducts = orderTrackingDetails["acceptedProducts"];
           }
@@ -304,7 +306,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                     Row(
                       children: [
                         Text(
-                          "₹${orderTrackingDetails["totalAmount"]}",
+                          "₹${(orderTrackingDetails["totalAmount"])}",
                           style: GoogleFonts.mulish(
                               fontSize: 12,
                               fontWeight: FontWeight.w300,
@@ -710,7 +712,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                             color: whiteColor),
                       ),
                       Text(
-                        "₹${orderTrackingDetails["finalTotal"]}",
+                        "₹${double.parse(orderTrackingDetails["finalTotal"]).toStringAsFixed(2)}",
                         style: GoogleFonts.mulish(
                           fontWeight: FontWeight.w700,
                           fontSize: 15,
@@ -1115,79 +1117,81 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                             ),
                           ),
                           Expanded(
-                            child: Container(
-                              padding: EdgeInsets.all(width * 0.04),
-                              child: Column(
-                                children: [
-                                  GestureDetector(
-                                    onTap: () async {
-                                      if (orderTrackingDetails[
-                                                      "porterAPIResponse"]
-                                                  ["deliveryBoyNumber"] !=
-                                              null &&
-                                          orderTrackingDetails[
-                                                      "porterAPIResponse"]
-                                                  ["deliveryBoyNumber"] !=
-                                              "") {
-                                        final phone = orderTrackingDetails[
-                                                'porterAPIResponse']
-                                            ?['deliveryBoyNumber'];
-                                        if (phone != null &&
-                                            phone.toString().isNotEmpty) {
-                                          final Uri launchUri = Uri(
-                                            scheme: 'tel',
-                                            path: phone.toString(),
-                                          );
-                                          if (await canLaunchUrl(launchUri)) {
-                                            await launchUrl(launchUri);
-                                          } else {
-                                            // handle error
-                                            print(
-                                                'Could not launch $launchUri');
+                            child: SingleChildScrollView(
+                              child: Container(
+                                padding: EdgeInsets.all(width * 0.04),
+                                child: Column(
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () async {
+                                        if (orderTrackingDetails[
+                                                        "porterAPIResponse"]
+                                                    ["deliveryBoyNumber"] !=
+                                                null &&
+                                            orderTrackingDetails[
+                                                        "porterAPIResponse"]
+                                                    ["deliveryBoyNumber"] !=
+                                                "") {
+                                          final phone = orderTrackingDetails[
+                                                  'porterAPIResponse']
+                                              ?['deliveryBoyNumber'];
+                                          if (phone != null &&
+                                              phone.toString().isNotEmpty) {
+                                            final Uri launchUri = Uri(
+                                              scheme: 'tel',
+                                              path: phone.toString(),
+                                            );
+                                            if (await canLaunchUrl(launchUri)) {
+                                              await launchUrl(launchUri);
+                                            } else {
+                                              // handle error
+                                              print(
+                                                  'Could not launch $launchUri');
+                                            }
                                           }
                                         }
-                                      }
-                                    },
-                                    child: OrderDetail(
-                                      icon: Icons.phone,
-                                      title:
-                                          "${orderTrackingDetails['porterAPIResponse']?['partner_info']["name"] ?? "Not Assinged yet"}",
-                                      subtitle: orderTrackingDetails[
-                                                  'porterAPIResponse']
-                                              ?['deliveryBoyNumber'] ??
-                                          "+91 ",
-                                      width: width,
+                                      },
+                                      child: OrderDetail(
+                                        icon: Icons.phone,
+                                        title:
+                                            "${orderTrackingDetails['porterAPIResponse']?['partner_info']["name"] ?? "Searching for delivery partner"}",
+                                        subtitle: orderTrackingDetails[
+                                                    'porterAPIResponse']
+                                                ?['deliveryBoyNumber'] ??
+                                            "+91 ",
+                                        width: width,
+                                      ),
                                     ),
-                                  ),
-                                  SizedBox(
-                                    height: 16,
-                                  ),
-                                  OrderDetail(
-                                    icon: Icons.home_outlined,
-                                    title: "Delivery",
-                                    subtitle:
-                                        orderTrackingDetails['dropDetails']
-                                                    ?['address']
-                                                ?['street_address1'] ??
-                                            "Unknown",
-                                    width: width,
-                                  ),
-                                  SizedBox(
-                                    height: 16,
-                                  ),
-                                  GestureDetector(
-                                    onTap: () {
-                                      showOrderSummaryBottomSheet();
-                                    },
-                                    child: OrderDetail(
-                                      icon: Icons.receipt_outlined,
-                                      title: "Bill Details",
+                                    SizedBox(
+                                      height: 16,
+                                    ),
+                                    OrderDetail(
+                                      icon: Icons.home_outlined,
+                                      title: "Delivery",
                                       subtitle:
-                                          "₹${orderTrackingDetails["finalTotal"]}",
+                                          orderTrackingDetails['dropDetails']
+                                                      ?['address']
+                                                  ?['street_address1'] ??
+                                              "Unknown",
                                       width: width,
                                     ),
-                                  ),
-                                ],
+                                    SizedBox(
+                                      height: 16,
+                                    ),
+                                    GestureDetector(
+                                      onTap: () {
+                                        showOrderSummaryBottomSheet();
+                                      },
+                                      child: OrderDetail(
+                                        icon: Icons.receipt_outlined,
+                                        title: "Bill Details",
+                                        subtitle:
+                                            "₹${orderTrackingDetails["finalTotal"]}",
+                                        width: width,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           )

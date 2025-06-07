@@ -1157,6 +1157,15 @@ class _CartScreenState extends State<CartScreen> {
                                                                       if (addresses
                                                                               .length ==
                                                                           0) {
+                                                                            ScaffoldMessenger.of(context)
+                                                                            .showSnackBar(
+                                                                          SnackBar(
+                                                                              backgroundColor: ligtBlackColor,
+                                                                              content: Text(
+                                                                                'add your address first',
+                                                                                style: GoogleFonts.mulish(color: whiteColor),
+                                                                              )),
+                                                                        );
                                                                         return;
                                                                       }
                                                                       if (payNow ==

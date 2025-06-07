@@ -102,6 +102,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late Animation<double> _animation;
   Timer? _ongoingOrdersTimer;
   bool _isFetchingOngoingOrders = false;
+  bool fetching_time=true;
   int estTime=0;
   // To store product quantities
 
@@ -1045,6 +1046,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Future<void> getEstTime(String lat, String long) async {
+   
     final String apiUrl = "$baseUrl/home/getEstTime";
     try {
       final response = await http.post(Uri.parse(apiUrl),
@@ -1057,10 +1059,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           estTime = (responseData["estimatedTimeMinutes"]);
          
         });
-       
+       setState(() {
+      fetching_time=false;
+    });
        
       }
     } catch (e) {
+       setState(() {
+      fetching_time=false;
+    });
       print("error $e");
     }
   }
@@ -1268,7 +1275,23 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                             ),
                                           ),
                                         )
-                                      : Text(
+                                      :fetching_time?Container(
+                                          margin: EdgeInsets.only(bottom: 10),
+                                          child: Shimmer.fromColors(
+                                            baseColor: ligtBlackColor,
+                                            highlightColor: whiteColor,
+                                            child: Container(
+                                              width: 150,
+                                              height: 22,
+                                              // Matches your text height
+                                              decoration: BoxDecoration(
+                                                color: whiteColor,
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                            ),
+                                          ),
+                                        ): Text(
                                           "in $estTime minutes",
                                           style: GoogleFonts.mulish(
                                               color:estTime==0?greyColor: whiteColor,

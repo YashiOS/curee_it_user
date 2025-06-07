@@ -82,7 +82,6 @@ class _SearchState extends State<Search> {
     _debounce = Timer(const Duration(milliseconds: 500), () {
       final query = _controller.text.trim();
 
-     
       if (query.isEmpty) {
         // Clear results immediately
         setState(() {
@@ -92,7 +91,6 @@ class _SearchState extends State<Search> {
       }
       if (query.isNotEmpty) {
         _fetchSearchResults(query);
-       
       }
     });
   }
@@ -131,8 +129,6 @@ class _SearchState extends State<Search> {
         Fluttertoast.showToast(msg: "Removed from cart");
         setState(() {});
       } else {
-       
-
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -407,13 +403,12 @@ class _SearchState extends State<Search> {
                           itemCount: _searchResults.length,
                           itemBuilder: (context, index) {
                             final item = _searchResults[index];
-                          
+
                             final productId = item["productId"];
                             final IsInCart = _inCartMap[productId] ?? false;
 
                             return GestureDetector(
                               onTap: () {
-                               
                                 Navigator.push(
                                   context,
                                   MaterialPageRoute(
@@ -439,7 +434,6 @@ class _SearchState extends State<Search> {
                                       Container(
                                         width: 80,
                                         height: 80,
-                                        
                                         decoration: BoxDecoration(
                                           border: Border.all(
                                             color: Colors.black,
@@ -448,50 +442,49 @@ class _SearchState extends State<Search> {
                                           color: Colors.white,
                                           borderRadius:
                                               BorderRadius.circular(8),
-                                          
                                         ),
-                                        child:Center(
+                                        child: Center(
                                           child: Container(
                                             height: 60,
                                             width: 60,
-                                            child:Image.network(
-                                              
+                                            child: Image.network(
                                               (item["imageUrls"] != null &&
-                                                        item["imageUrls"]
-                                                            is List &&
-                                                        item["imageUrls"]
-                                                            .isNotEmpty)
-                                                    ? item["imageUrls"][0]
-                                                    : 'https://via.placeholder.com/100x100.png?text=Medicine',
-                                                    fit: BoxFit.contain,
-                                            ) ,
-                                            
+                                                      item["imageUrls"]
+                                                          is List &&
+                                                      item["imageUrls"]
+                                                          .isNotEmpty)
+                                                  ? item["imageUrls"][0]
+                                                  : 'https://via.placeholder.com/100x100.png?text=Medicine',
+                                              fit: BoxFit.contain,
+                                            ),
                                           ),
-                                        ) ,
+                                        ),
                                       ),
                                       SizedBox(width: 12),
                                       // Text and buttons
                                       Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
+                                        child: Row(
+                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment
+                                                  .spaceBetween,
                                           children: [
-                                            // First row with name and price
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
+                                            Column(
+                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                              crossAxisAlignment: CrossAxisAlignment.start,
                                               children: [
+                                                SizedBox(height: 3,),
                                                 Container(
-                                                 
-                                                  width: MediaQuery.of(context)
-                                                          .size
-                                                          .width *
-                                                      0.4,
+                                                  width:
+                                                      MediaQuery.of(context)
+                                                              .size
+                                                              .width *
+                                                          0.4,
                                                   child: Text(
                                                     item['name'],
                                                     maxLines: 3,
-                                                    style: GoogleFonts.mulish(
+                                                    style:
+                                                        GoogleFonts.mulish(
                                                       fontSize: 13,
                                                       fontWeight:
                                                           FontWeight.w400,
@@ -499,67 +492,66 @@ class _SearchState extends State<Search> {
                                                     ),
                                                   ),
                                                 ),
-                                                Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.end,
-                                                  children: [
-                                                    Text(
-                                                      "₹${item['sellingPrice']}",
-                                                      style: GoogleFonts.mulish(
-                                                        fontSize: 13,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        color: whiteColor,
-                                                      ),
-                                                    ),
-                                                    SizedBox(width: 5),
-                                                    Text(
-                                                      "₹${item['price']}",
-                                                      style: GoogleFonts.mulish(
-                                                        fontSize: 12,
-                                                        decoration:
-                                                            TextDecoration
-                                                                .lineThrough,
-                                                        decorationColor:
-                                                            greyColor,
-                                                        fontWeight:
-                                                            FontWeight.w500,
-                                                        color: greyColor,
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ],
-                                            ),
-                                            SizedBox(height: 5),
-                                            // Description and Add button
-                                            Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
                                                 Container(
-                                                 width: MediaQuery.of(context).size.width * 0.35,
+                                                  width:
+                                                      MediaQuery.of(context)
+                                                              .size
+                                                              .width *
+                                                          0.35,
                                                   child: Text(
                                                     item['description'] ??
                                                         'Medicine information',
                                                     maxLines: 1,
-                                                    overflow:
-                                                        TextOverflow.ellipsis,
-                                                    style: GoogleFonts.mulish(
+                                                    overflow: TextOverflow
+                                                        .ellipsis,
+                                                    style:
+                                                        GoogleFonts.mulish(
                                                       color: greyColor,
                                                       fontSize: 11,
                                                     ),
                                                   ),
                                                 ),
+                                              ],
+                                            ),
+                                            Column(
+                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.end,
+                                              children: [
+                                                 SizedBox(height: 3,),
+                                                Text(
+                                                  "₹${item['sellingPrice']}",
+                                                  style: GoogleFonts.mulish(
+                                                    fontSize: 13,
+                                                    fontWeight:
+                                                        FontWeight.w500,
+                                                    color: whiteColor,
+                                                  ),
+                                                ),
+                                              
+                                                Text(
+                                                  "₹${item['price']}",
+                                                  style: GoogleFonts.mulish(
+                                                    fontSize: 12,
+                                                    decoration:
+                                                        TextDecoration
+                                                            .lineThrough,
+                                                    decorationColor:
+                                                        greyColor,
+                                                    fontWeight:
+                                                        FontWeight.w500,
+                                                    color: greyColor,
+                                                  ),
+                                                ),
+                                                 SizedBox(height: 10),
                                                 GestureDetector(
                                                   onTap: () {
                                                     if (!IsInCart) {
                                                       didAddToCart(
-                                                        userId: User.userId!,
-                                                        productId: productId,
+                                                        userId:
+                                                            User.userId!,
+                                                        productId:
+                                                            productId,
                                                       );
                                                     }
                                                   },
@@ -575,7 +567,8 @@ class _SearchState extends State<Search> {
                                                           height: 29,
                                                           decoration:
                                                               BoxDecoration(
-                                                            color: greenColor,
+                                                            color:
+                                                                greenColor,
                                                             borderRadius:
                                                                 BorderRadius
                                                                     .circular(
@@ -616,20 +609,16 @@ class _SearchState extends State<Search> {
                                                                             10,
                                                                         width:
                                                                             10,
-                                                                        child: CircularProgressIndicator(
-                                                                            color:
-                                                                                whiteColor),
+                                                                        child:
+                                                                            CircularProgressIndicator(color: whiteColor),
                                                                       )
                                                                     : Text(
                                                                         '${CartManager.cartQuantities[productId]}',
-                                                                        style: GoogleFonts
-                                                                            .mulish(
-                                                                          color:
-                                                                              whiteColor,
-                                                                          fontWeight:
-                                                                              FontWeight.bold,
-                                                                          fontSize:
-                                                                              containerHeight * 0.05,
+                                                                        style:
+                                                                            GoogleFonts.mulish(
+                                                                          color: whiteColor,
+                                                                          fontWeight: FontWeight.bold,
+                                                                          fontSize: containerHeight * 0.05,
                                                                         ),
                                                                       ),
                                                                 IconButton(
@@ -639,7 +628,8 @@ class _SearchState extends State<Search> {
                                                                   constraints:
                                                                       BoxConstraints(),
                                                                   icon: Icon(
-                                                                      Icons.add,
+                                                                      Icons
+                                                                          .add,
                                                                       size: containerHeight *
                                                                           0.06,
                                                                       color:
@@ -677,8 +667,10 @@ class _SearchState extends State<Search> {
                                                                         productId] ==
                                                                     true
                                                                 ? Container(
-                                                                    height: 10,
-                                                                    width: 10,
+                                                                    height:
+                                                                        10,
+                                                                    width:
+                                                                        10,
                                                                     child:
                                                                         CircularProgressIndicator(
                                                                       color:
@@ -696,8 +688,7 @@ class _SearchState extends State<Search> {
                                                                       color:
                                                                           greenColor,
                                                                       fontWeight:
-                                                                          FontWeight
-                                                                              .w600,
+                                                                          FontWeight.w600,
                                                                     ),
                                                                   ),
                                                           ),

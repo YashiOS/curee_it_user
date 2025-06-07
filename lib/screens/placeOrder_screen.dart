@@ -70,7 +70,8 @@ class _MedicineAvailabilityScreenState extends State<MedicineAvailabilityScreen>
           "userLong": Address.CurrentAddress?["userLong"]?.toString() ?? "0.0",
         }),
       );
-
+      print(response.statusCode);
+ print(response.body);
       if (response.statusCode == 200) {
         setState(() {
       started=false;
@@ -82,7 +83,7 @@ class _MedicineAvailabilityScreenState extends State<MedicineAvailabilityScreen>
        
           Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (context)=>OrderTrackingScreen(NavigatingFrom: "order_place", orderId:AvilableId )));
         } else {
-         
+        
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
@@ -100,9 +101,11 @@ class _MedicineAvailabilityScreenState extends State<MedicineAvailabilityScreen>
            setState(() {
       started=false;
     });
+    Future.delayed(Duration(seconds: 2),()=>Navigator.pop(context));
           // Handle API error
         }
       } else {
+        
         ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
@@ -120,6 +123,7 @@ class _MedicineAvailabilityScreenState extends State<MedicineAvailabilityScreen>
          setState(() {
       started=false;
     });
+     Future.delayed(Duration(seconds: 2),()=>Navigator.pop(context));
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -139,25 +143,10 @@ class _MedicineAvailabilityScreenState extends State<MedicineAvailabilityScreen>
        setState(() {
       started=false;
     });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            "Failed to sent order to pharmacy! please try again",
-            style: GoogleFonts.mulish(),
-          ),
-          backgroundColor: greenColor,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
-          duration: Duration(seconds: 2),
-        ),
-      );
+    Future.delayed(Duration(seconds: 2),()=>Navigator.pop(context));
     }
-     setState(() {
-      started=false;
-    });
-   
+     
+  
   }
 
   @override
