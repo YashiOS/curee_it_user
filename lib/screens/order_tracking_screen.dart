@@ -446,7 +446,8 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
               Text(
                 title,
                 style: GoogleFonts.mulish(
-                  fontSize: 17,
+                  fontSize: MediaQuery.of(context).size.width * 0.04, // ~17 on 375px width
+
                   fontWeight: FontWeight.w700,
                   color: whiteColor,
                 ),
@@ -607,33 +608,37 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                     shrinkWrap: true,
                     itemCount: acceptedProducts.length,
                     itemBuilder: (context, index) {
-                      final marketerName = acceptedProducts[index]["productMarketer"];
-final productid = acceptedProducts[index]["productId"];
-final productname = acceptedProducts[index]["productName"];
+                      final marketerName =
+                          acceptedProducts[index]["productMarketer"];
+                      final productid = acceptedProducts[index]["productId"];
+                      final productname =
+                          acceptedProducts[index]["productName"];
 
 // productPrice might be a String, so convert safely:
-final productStr = acceptedProducts[index]["productPrice"].toString();
-final productPrice = double.tryParse(productStr) ?? 0.0;
+                      final productStr =
+                          acceptedProducts[index]["productPrice"].toString();
+                      final productPrice = double.tryParse(productStr) ?? 0.0;
 
 // quantity might be int or String, ensure int:
-final quantityRaw = acceptedProducts[index]["quantity"];
-final quent = quantityRaw is int
-    ? quantityRaw
-    : int.tryParse(quantityRaw.toString()) ?? 1;
+                      final quantityRaw = acceptedProducts[index]["quantity"];
+                      final quent = quantityRaw is int
+                          ? quantityRaw
+                          : int.tryParse(quantityRaw.toString()) ?? 1;
 
 // sellingPrice might be String or double, convert safely:
-final sellingPriceStr = acceptedProducts[index]["sellingPrice"].toString();
-final sellingPrice = double.tryParse(sellingPriceStr) ?? 0.0;
+                      final sellingPriceStr =
+                          acceptedProducts[index]["sellingPrice"].toString();
+                      final sellingPrice =
+                          double.tryParse(sellingPriceStr) ?? 0.0;
 
-return OrderAcceptedCard(
-  marketeproductMarketer: marketerName,
-  productId: productid,
-  productName: productname,
-  productPrice: productPrice,
-  quantity: quent,
-  sellingPrice: sellingPrice,
-);
-
+                      return OrderAcceptedCard(
+                        marketeproductMarketer: marketerName,
+                        productId: productid,
+                        productName: productname,
+                        productPrice: productPrice,
+                        quantity: quent,
+                        sellingPrice: sellingPrice,
+                      );
                     }),
                 Container(
                   padding: EdgeInsets.only(right: 25, left: 25, bottom: 10),
@@ -786,7 +791,7 @@ return OrderAcceptedCard(
             )),
       );
     }
-    if (orderTrackingDetails["status"] == "Cancelled" ||
+    if (orderTrackingDetails["status"] == "Not Available" ||
         orderTrackingDetails["status"] == "Rejected") {
       return Scaffold(
         backgroundColor: scaffoldBlackColor,
@@ -811,8 +816,8 @@ return OrderAcceptedCard(
                           Container(
                               height: 80,
                               child: Container(
-                                height: 60,
-                                width: 60,
+                                height: 80,
+                                width: 80,
                                 decoration: BoxDecoration(
                                   color: const Color.fromARGB(255, 246, 80, 69),
                                   shape: BoxShape.circle,
@@ -848,6 +853,52 @@ return OrderAcceptedCard(
 
     if (orderTrackingDetails["status"] == "In Review") {
       return Scaffold(
+        appBar: AppBar(
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          centerTitle: true,
+          backgroundColor: ligtBlackColor,
+          shape: ContinuousRectangleBorder(
+            borderRadius: BorderRadius.only(
+              bottomLeft: Radius.circular(10),
+              bottomRight: Radius.circular(10),
+            ),
+          ),
+          title: Text(
+            "Status",
+            style: GoogleFonts.mulish(
+              fontWeight: FontWeight.w400,
+              fontSize: 22.69,
+              color: whiteColor,
+            ),
+          ),
+          leading: GestureDetector(
+            onTap: () {
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => BaseScreen(Navigatedfrom: "")));
+            },
+            child: Padding(
+              padding: const EdgeInsets.only(left: 24.0),
+              child: Padding(
+                padding: const EdgeInsets.only(left: 4.0),
+                child: Row(
+                  spacing: 4,
+                  children: [
+                    SvgPicture.asset(
+                      colorFilter:
+                          ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                      "lib/images/back.svg",
+                      width: 24, // optional
+                      height: 24, // optional
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
         backgroundColor: scaffoldBlackColor,
         body: _isInitLoading
             ? Center(

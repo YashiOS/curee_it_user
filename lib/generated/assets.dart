@@ -5,6 +5,7 @@ class Assets {
   static const String cardsAddressCard = 'lib/cards/address_card.dart';
   static const String cardsCartCard = 'lib/cards/cart_card.dart';
   static const String cardsFavoritesCard = 'lib/cards/favorites_card.dart';
+  static const String cardsOrderAcceptedCard = 'lib/cards/order_accepted_card.dart';
   static const String cardsOrderCard = 'lib/cards/order_card.dart';
   static const String cardsSearchCard = 'lib/cards/search_card.dart';
   static const String cartManagerCartManager = 'lib/cartManager/cartManager.dart';
@@ -36,6 +37,8 @@ class Assets {
   static const String imagesAppIcon1 = 'lib/images/app_icon1.png';
   static const String imagesAppIcon2 = 'lib/images/app_icon2.png';
   static const String imagesAppIcon4 = 'lib/images/App_icon4.png';
+  static const String imagesAppIcon5 = 'lib/images/App_icon5.png';
+  static const String imagesAppIcon7 = 'lib/images/App_icon7.png';
   static const String imagesBack = 'lib/images/back.png';
   static const String imagesBackArrow = 'lib/images/back_arrow.png';
   static const String imagesBottel = 'lib/images/bottel.png';
@@ -51,7 +54,7 @@ class Assets {
   static const String imagesDELIVERED = 'lib/images/DELIVERED.png';
   static const String imagesDiabetesCare = 'lib/images/diabetes_care.png';
   static const String imagesDottedDivider = 'lib/images/dotted_divider.png';
-  static const String imagesEmptycart = 'lib/images/empty cart.png';
+  static const String imagesEmpty cart = 'lib/images/empty cart.png';
   static const String imagesFinalHomebike1 = 'lib/images/final_homebike1.png';
   static const String imagesFinalMedkaroLogo = 'lib/images/final_medkaro_logo.png';
   static const String imagesGallery = 'lib/images/gallery.png';
@@ -66,6 +69,7 @@ class Assets {
   static const String imagesMEDKARO = 'lib/images/MEDKARO.png';
   static const String imagesMan = 'lib/images/man.png';
   static const String imagesMedicine1 = 'lib/images/medicine1.png';
+  static const String imagesMedkaro (1) 2 = 'lib/images/Medkaro (1) 2.png';
   static const String imagesMedkaroGadi = 'lib/images/medkaroGadi.png';
   static const String imagesMedkaroLogo = 'lib/images/medkaroLogo.png';
   static const String imagesMedkarolog = 'lib/images/medkarolog.png';
@@ -74,8 +78,10 @@ class Assets {
   static const String imagesNeurobionForte = 'lib/images/neurobionForte.png';
   static const String imagesNonselectedButton = 'lib/images/nonselected_button.png';
   static const String imagesOnTheWay = 'lib/images/onTheWay.png';
-  static const String imagesOrderAgain = 'lib/images/Order Again.png';
+  static const String imagesOrder Again = 'lib/images/Order Again.png';
+  static const String imagesOrderCancled = 'lib/images/order_cancled.png';
   static const String imagesOrderTracking = 'lib/images/OrderTracking.png';
+  static const String imagesOrderTracking 2 = 'lib/images/OrderTracking 2.png';
   static const String imagesOrdered = 'lib/images/ordered.png';
   static const String imagesPacking = 'lib/images/packing.png';
   static const String imagesPlusButton = 'lib/images/plus_button.png';
@@ -85,7 +91,10 @@ class Assets {
   static const String imagesSP = 'lib/images/SP.png';
   static const String imagesSP1 = 'lib/images/SP1.png';
   static const String imagesSP2 = 'lib/images/SP2.png';
+  static const String imagesSP3 = 'lib/images/SP3.png';
   static const String imagesSPLASH = 'lib/images/SPLASH.png';
+  static const String imagesSPLASH1 = 'lib/images/SPLASH1.png';
+  static const String imagesSPLASH2 = 'lib/images/SPLASH2.png';
   static const String imagesSaveButton = 'lib/images/saveButton.png';
   static const String imagesSearchButton = 'lib/images/search_button.png';
   static const String imagesSearchLight = 'lib/images/Search_light.png';
@@ -98,9 +107,16 @@ class Assets {
   static const String imagesUnableSearch = 'lib/images/unableSearch.png';
   static const String imagesUnablesaveButton = 'lib/images/unablesaveButton.png';
   static const String imagesUser = 'lib/images/user.png';
+  static const String imagesVector 9 = 'lib/images/Vector 9.png';
+  static const String imagesVerifying = 'lib/images/verifying.png';
+  static const String imagesVeryfing = 'lib/images/veryfing.png';
   static const String isInRadiusServicesAvilable = 'lib/isInRadius/ServicesAvilable.dart';
+  static const String libBaseUrl = 'lib/BaseUrl.dart';
+  static const String libFirebaseNotifications = 'lib/firebase_notifications.dart';
+  static const String libFirebaseOptions = 'lib/firebase_options.dart';
   static const String libImagesBack = 'lib/images/back.svg';
   static const String libImagesProfileIcon = 'lib/images/profile_icon.png';
+  static const String libImagesVeryfing = 'lib/images/veryfing.svg';
   static const String libMain = 'lib/main.dart';
   static const String localStorageCubitStoreUserCubit = 'lib/LocalStorageCubit/store_user_cubit.dart';
   static const String localStorageCubitStoreUserState = 'lib/LocalStorageCubit/store_user_state.dart';
@@ -120,9 +136,11 @@ class Assets {
   static const String screensOrderDetailScreen = 'lib/screens/order_detail_screen.dart';
   static const String screensOrderSuccessScreen = 'lib/screens/Order_SuccessScreen.dart';
   static const String screensOrderTrackingScreen = 'lib/screens/order_tracking_screen.dart';
+  static const String screensOrderTrackingScreen 2 = 'lib/screens/order_tracking_screen 2.dart';
   static const String screensOrderdetailScreenNew = 'lib/screens/orderdetail_screen_new.dart';
   static const String screensOrdersScreen = 'lib/screens/orders_screen.dart';
   static const String screensOtpScreen = 'lib/screens/otp_screen.dart';
+  static const String screensPlaceOrderScreen = 'lib/screens/placeOrder_screen.dart';
   static const String screensPoliciesScreen = 'lib/screens/policies_screen.dart';
   static const String screensProfileScreen = 'lib/screens/profile_screen.dart';
   static const String screensRegisterScreen = 'lib/screens/register_screen.dart';

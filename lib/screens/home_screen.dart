@@ -313,7 +313,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
         onGoingOrders = AllOrders.where((order) {
             String status = order['status']?.toString()?.toLowerCase() ?? '';
-            return status != 'delivered';
+            return status != 'delivered'&&status !="not available";
           }).toList();
         if (onGoingOrders.isNotEmpty) {
           _startOngoingOrdersPolling();
@@ -728,7 +728,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           int secondIndex = firstIndex + 1;
 
           return Container(
-            margin: EdgeInsets.only(bottom: 20),
+            margin: EdgeInsets.only(bottom: 20,top: 12),
             child: Row(
               children: [
                 Expanded(
@@ -1070,6 +1070,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     });
       print("error $e");
     }
+   
   }
 
   Future<void> checkLocation() async {
@@ -1204,7 +1205,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             controller: _scrollController,
             slivers: [
               SliverAppBar(
-                
                 backgroundColor: scaffoldBlackColor,
                 expandedHeight: 80,
                 floating: false,
@@ -1436,7 +1436,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     background: onGoingOrders.isNotEmpty && localAddress != ""
                         ? Container(
                             
-                            height: 94,
+                            height: MediaQuery.of(context).size.height * 0.12, // ~94 on 780px screen
+
                             decoration: BoxDecoration(
                                 color: ligtBlackColor,
                                 borderRadius: BorderRadius.circular(8)),
@@ -1447,7 +1448,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   itemBuilder: (context, index) {
                                     String status = "";
                                     final order = onGoingOrders[index];
-                                    final orederId = order["orderId"]??order["availableID"];
+                                    final AvailId = order["availableID"]??"";
                                    
                                    
                                     if(order["status"]=="Available"){
@@ -1474,7 +1475,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                 builder: (context) =>
                                                     OrderTrackingScreen(
                                                         NavigatingFrom: "home",
-                                                        orderId: orederId)));
+                                                        orderId: AvailId)));
                                       },
                                       child: Container(
                                         padding: EdgeInsets.all(16),
@@ -1503,7 +1504,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                           FontWeight.bold),
                                                 ),
                                                 Text(
-                                                  "#$orederId",
+                                                  "#$AvailId",
                                                   style: GoogleFonts.mulish(
                                                       color: greyColor,
                                                       fontSize: 10,
