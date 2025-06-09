@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.curee_it_user_app">
+    package="com.cureeit.medkaro">
 
 <!-- Add these permissions -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />

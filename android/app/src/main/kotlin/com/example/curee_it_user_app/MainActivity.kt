@@ -1,4 +1,4 @@
-package com.example.curee_it_user_app
+package com.cureeit.medkaro
 
 import io.flutter.embedding.android.FlutterActivity
 

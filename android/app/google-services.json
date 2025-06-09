@@ -7,9 +7,28 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:95408405177:android:318fe8f9f0e4a36199b968",
+        "mobilesdk_app_id": "1:95408405177:android:aaa2001f90b174e399b968",
         "android_client_info": {
-          "package_name": "com.example.curee_it_user_app"
+          "package_name": "com.cureeit.medkaro"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD6lljABYr4CjCtTnn5Zqk1nact51bzwLA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:95408405177:android:9c8f3a8007a5456199b968",
+        "android_client_info": {
+          "package_name": "com.medkaro.vendor"
         }
       },
       "oauth_client": [],
