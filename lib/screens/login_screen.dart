@@ -3,6 +3,7 @@ import 'package:cureeit_user_app/BaseUrl.dart';
 import 'package:cureeit_user_app/firebase_notifications.dart';
 import 'package:cureeit_user_app/screens/policies_screen.dart';
 import 'package:cureeit_user_app/screens/terms_of_service_screen.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/gestures.dart';
 import 'package:location/location.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -29,7 +30,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _controller = TextEditingController();
   bool userLoggingIN = false;
   bool isButtonEnabled = false;
-
+ String ?fcmTOken;
   void userLogin() async {
     setState(() {
       userLoggingIN = true;

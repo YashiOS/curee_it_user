@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:cureeit_user_app/BaseUrl.dart';
+import 'package:cureeit_user_app/firebase_notifications.dart';
 import 'package:cureeit_user_app/screens/otp_screen.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
@@ -38,6 +39,7 @@ class _LoginScreenState extends State<RegisterScreen> {
         body: json.encode({
           "mobileNumber":widget.phoneNumber,
           "name":_nameController.text.trim(),
+          "fcmToken": fcmToken.fcmtoken
         }),
       );
 
