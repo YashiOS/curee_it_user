@@ -730,7 +730,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           int secondIndex = firstIndex + 1;
 
           return Container(
-            margin: EdgeInsets.only(bottom: 20,top: 12),
+            margin: EdgeInsets.only(bottom: 16),
             child: Row(
               children: [
                 Expanded(
@@ -772,13 +772,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       decoration: BoxDecoration(
         color: ligtBlackColor,
         borderRadius: BorderRadius.circular(8),
-        boxShadow: [
-          BoxShadow(
-            color: ligtBlackColor,
-            blurRadius: 4,
-            offset: Offset(0, 2),
-          ),
-        ],
+        
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1562,7 +1556,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 SliverAppBar(
                   scrolledUnderElevation: 0,
             elevation: 0,
-                 toolbarHeight:MediaQuery.of(context).size.height * 0.09,
+                 toolbarHeight:MediaQuery.of(context).size.height * 0.07,
             
                   backgroundColor: scaffoldBlackColor,
                  
@@ -1667,7 +1661,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               ),
                       ),
                       Container(
-                        margin: EdgeInsets.only(top: 10),
+                        margin: EdgeInsets.only(top: 5,bottom: 10),
                         
                         child: Align(
                           
@@ -1679,7 +1673,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                     ? "Frequently Bought"
                                     : "",
                             style: GoogleFonts.mulish(
-                              fontSize: 15,
+                              fontSize: MediaQuery.of(context).size.width * 0.038,
+
                               fontWeight: FontWeight.w600,
                               color: whiteColor,
                             ),
@@ -1697,7 +1692,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 SliverPadding(
                   padding: cartItems.isNotEmpty
                       ? EdgeInsets.only(bottom: 135)
-                      : EdgeInsets.only(bottom: 50),
+                      : EdgeInsets.only(bottom: 56),
                   sliver: buildProductListAsSliver(),
                 )
               else

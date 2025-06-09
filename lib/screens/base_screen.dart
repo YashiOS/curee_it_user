@@ -83,7 +83,7 @@ class _BaseScreenState extends State<BaseScreen> {
                                 width: MediaQuery.of(context).size.width,
                                 padding: EdgeInsets.only(
                                   bottom: Platform.isIOS
-                                      ? 20.0
+                                      ? 10.0
                                       : 0.0, // Add padding only for iOS
                                 ),
                                 decoration: BoxDecoration(
