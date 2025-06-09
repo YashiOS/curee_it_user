@@ -1196,7 +1196,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             ),
           ),
         Container(
-          margin: EdgeInsets.all(20),
+          margin: EdgeInsets.only(top: 40,left: 20,right: 20,bottom: 20),
+          
           child: CustomScrollView(
             controller: _scrollController,
             slivers: [
@@ -1251,7 +1252,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                         )
                                       : Container(
                                           width: 70,
-                                          margin: EdgeInsets.only(top: 10),
+                                         
                                           child: Image.asset(
                                               "lib/images/final_medkaro_logo.png")),
                                   localAddress == null || localAddress.isEmpty
@@ -1425,7 +1426,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               if (ISserviceAvilable && onGoingOrders.isNotEmpty)
                 SliverAppBar(
       backgroundColor:scaffoldBlackColor,
-      floating: false,
+      floating: true,
       expandedHeight:74 ,
       pinned: false,
       flexibleSpace: FlexibleSpaceBar(
@@ -1434,7 +1435,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   children: [
     Container(
       height: 90, // Slightly increased to fit both PageView and dots
-      margin: EdgeInsets.only(top: 8,),
+      margin: EdgeInsets.only(top: 8,bottom: 8),
       decoration: BoxDecoration(
         color: ligtBlackColor,
         borderRadius: BorderRadius.circular(8),
@@ -1556,7 +1557,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                 SliverAppBar(
                   scrolledUnderElevation: 0,
             elevation: 0,
-                 toolbarHeight:MediaQuery.of(context).size.height * 0.07,
+                 toolbarHeight:MediaQuery.of(context).size.height * 0.055,
             
                   backgroundColor: scaffoldBlackColor,
                  
@@ -1592,7 +1593,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 ),
                               )
                             : Container(
-                              margin: EdgeInsets.only(top: 20),
+                             
                                 height: 43,
                                 
                                 decoration: BoxDecoration(
@@ -1661,7 +1662,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               ),
                       ),
                       Container(
-                        margin: EdgeInsets.only(top: 5,bottom: 10),
+                        margin: EdgeInsets.only(top: 10,bottom: 5),
                         
                         child: Align(
                           
