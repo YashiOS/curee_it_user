@@ -107,9 +107,10 @@ class _BaseScreenState extends State<BaseScreen> {
                                               width: 24,
                                               child: Image.asset(
                                                 "lib/images/Home.png",
-                                                color: tabController.index == 0
-                                                    ? whiteColor
-                                                    : greyColor,
+                                                color:
+                                                    tabController.index == 0
+                                                        ? whiteColor
+                                                        : greyColor,
                                               ),
                                             ),
                                             text: "Home",
@@ -121,14 +122,15 @@ class _BaseScreenState extends State<BaseScreen> {
                                                   child: Image.asset(
                                                     "lib/images/Order Again.png",
                                                     color:
-                                                        tabController.index == 1
+                                                        tabController.index ==
+                                                                1
                                                             ? whiteColor
                                                             : greyColor,
                                                   )),
                                               text: "Order Again"),
                                           Tab(
-                                              icon: Icon(
-                                                  Icons.shopping_cart_outlined),
+                                              icon: Icon(Icons
+                                                  .shopping_cart_outlined),
                                               text: "Cart"),
                                         ],
                                       );

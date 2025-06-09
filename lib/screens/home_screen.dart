@@ -1257,6 +1257,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                         )
                                       : Container(
                                           width: 70,
+                                          margin: EdgeInsets.only(top: 10),
                                           child: Image.asset(
                                               "lib/images/final_medkaro_logo.png")),
                                   localAddress == null || localAddress.isEmpty
@@ -1666,7 +1667,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               ),
                       ),
                       Container(
-                        margin: EdgeInsets.only(top: 10,bottom: 10),
+                        margin: EdgeInsets.only(top: 10),
                         
                         child: Align(
                           
