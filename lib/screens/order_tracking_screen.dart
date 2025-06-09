@@ -197,7 +197,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
   }
 
   void showOrderSummaryBottomSheet() {
-    final List<dynamic> items = orderTrackingDetails['products'] ?? [];
+    final List<dynamic> items = orderTrackingDetails['acceptedProducts'] ?? [];
     final double totalSellingPrice = items.fold(0.0, (sum, item) {
       final price = double.tryParse(item['sellingPrice'].toString()) ?? 0.0;
       final quantity = int.tryParse(item['quantity'].toString()) ?? 1;
@@ -305,15 +305,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                     ),
                     Row(
                       children: [
-                        Text(
-                          "₹${(orderTrackingDetails["totalAmount"])}",
-                          style: GoogleFonts.mulish(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w300,
-                              decoration: TextDecoration.lineThrough,
-                              decorationColor: greyColor,
-                              color: greyColor),
-                        ),
+                        
                         SizedBox(
                           width: 5,
                         ),

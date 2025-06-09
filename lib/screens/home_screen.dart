@@ -104,6 +104,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   bool _isFetchingOngoingOrders = false;
   bool fetching_time=true;
   int estTime=0;
+   int _currentPage = 0;
+   final PageController _pageController = PageController();
   // To store product quantities
 
   void _showLocationDeniedDialog() {
@@ -1206,7 +1208,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             slivers: [
               SliverAppBar(
                 backgroundColor: scaffoldBlackColor,
-                expandedHeight: 80,
+                expandedHeight: 60,
                 floating: false,
                 pinned: false,
                 flexibleSpace: FlexibleSpaceBar(
@@ -1221,7 +1223,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                       localAddress = Address.CurrentAddress!["address"];
                     },
                     child: Container(
-                        height: 80,
+                        height: 75,
                         decoration: BoxDecoration(
                             color: scaffoldBlackColor,
                             borderRadius: BorderRadius.circular(8)),
@@ -1427,128 +1429,134 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ),
               if (ISserviceAvilable && onGoingOrders.isNotEmpty)
                 SliverAppBar(
-                
-                  backgroundColor:scaffoldBlackColor,
-                  floating: false,
-                  expandedHeight: 64,
-                  pinned: false,
-                  flexibleSpace: FlexibleSpaceBar(
-                    background: onGoingOrders.isNotEmpty && localAddress != ""
-                        ? Container(
-                            
-                            height: MediaQuery.of(context).size.height * 0.12, // ~94 on 780px screen
+      backgroundColor:scaffoldBlackColor,
+      floating: false,
+      expandedHeight:74 ,
+      pinned: false,
+      flexibleSpace: FlexibleSpaceBar(
+        background: onGoingOrders.isNotEmpty && localAddress != ""
+            ? Column(
+  children: [
+    Container(
+      height: 90, // Slightly increased to fit both PageView and dots
+      margin: EdgeInsets.only(top: 8,),
+      decoration: BoxDecoration(
+        color: ligtBlackColor,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Expanded(
+            child: PageView.builder(
+              controller: _pageController,
+              scrollDirection: Axis.horizontal,
+              itemCount: onGoingOrders.length,
+              onPageChanged: (index) {
+                setState(() {
+                  _currentPage = index;
+                });
+              },
+              itemBuilder: (context, index) {
+                final order = onGoingOrders[index];
+                final AvailId = order["availableID"] ?? "";
+                String status = switch (order["status"]) {
+                  "Available" => "Order Confirmed",
+                  "In Review" => "Verifying Order",
+                  "Order Placed" => "Order Placed!",
+                  "Packing" => "Packing Items",
+                  "On the way" => "Order Enroute",
+                  _ => "Order Status",
+                };
 
-                            decoration: BoxDecoration(
-                                color: ligtBlackColor,
-                                borderRadius: BorderRadius.circular(8)),
-                            child: Center(
-                              child: ListView.builder(
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount: onGoingOrders.length,
-                                  itemBuilder: (context, index) {
-                                    String status = "";
-                                    final order = onGoingOrders[index];
-                                    final AvailId = order["availableID"]??"";
-                                   
-                                   
-                                    if(order["status"]=="Available"){
-                                      status="Order Confirmed";
-                                    }
-                                    if(order["status"]=="In Review"){
-                                      status ="Verifying Order";
-                                    }
-                                    if (order["status"] ==
-                                        "Order Placed") {
-                                      status = "Order Placed!";
-                                    }
-                                    if (order["status"] == "Packing") {
-                                      status = "Packing Items";
-                                    }
-                                    if (order["status"] ==
-                                        "On the way") {
-                                      status = "Order Enroute";
-                                    }
-                                    return GestureDetector(
-                                      onTap: () {
-                                        Navigator.of(context).push(
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    OrderTrackingScreen(
-                                                        NavigatingFrom: "home",
-                                                        orderId: AvailId)));
-                                      },
-                                      child: Container(
-                                        padding: EdgeInsets.all(16),
-                                        height: 80,
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.9,
-                                        child: Row(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.center,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  "$status",
-                                                  style: GoogleFonts.mulish(
-                                                      color: whiteColor,
-                                                      fontSize: 20,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                                Text(
-                                                  "#$AvailId",
-                                                  style: GoogleFonts.mulish(
-                                                      color: greyColor,
-                                                      fontSize: 10,
-                                                      fontWeight:
-                                                          FontWeight.bold),
-                                                ),
-                                              ],
-                                            ),
-                                            Container(
-                                              height:order["status"]=="In Review"?50 :order["status"] ==
-                                                      "Order Placed" ||order["status"]=="Available"
-                                                  ? 36
-                                                  : 80, // ⬅️ Adjust here
-                                              decoration: BoxDecoration(),
-                                              child: Image.asset(
-                                                order["status"]=="Available"?
-                                                "lib/images/ordered.png":
-                                                order["status"] ==
-                                                        "Order Placed"
-                                                    ? 'lib/images/ordered.png'
-                                                    : order["status"] ==
-                                                            "Packing"
-                                                        ? 'lib/images/packing.png'
-                                                        : order["status"] ==
-                                                                "On the way"
-                                                            ? 'lib/images/onTheWay.png'
-                                                            : order["status"] ==
-                                                                    "Delivered"
-                                                                ? 'lib/images/DELIVERED.png'
-                                                                : 'lib/images/veryfing.png', // Default image
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    );
-                                  }),
+                return GestureDetector(
+                  onTap: () {
+                    Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => OrderTrackingScreen(
+                          NavigatingFrom: "home",
+                          orderId: AvailId,
+                        ),
+                      ),
+                    );
+                  },
+                  child: Container(
+                    padding: EdgeInsets.all(16),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "$status",
+                              style: GoogleFonts.mulish(
+                                color: whiteColor,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          )
-                        : SizedBox(
-                            height: 0,
+                            Text(
+                              "#$AvailId",
+                              style: GoogleFonts.mulish(
+                                color: greyColor,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Container(
+                          height: order["status"] == "In Review"
+                              ? 50
+                              : order["status"] == "Order Placed" ||
+                                      order["status"] == "Available"
+                                  ? 36
+                                  : 80,
+                          child: Image.asset(
+                            switch (order["status"]) {
+                              "Available" => "lib/images/ordered.png",
+                              "Order Placed" => "lib/images/ordered.png",
+                              "Packing" => "lib/images/packing.png",
+                              "On the way" => "lib/images/onTheWay.png",
+                              "Delivered" => "lib/images/DELIVERED.png",
+                              _ => "lib/images/veryfing.png",
+                            },
                           ),
+                        ),
+                      ],
+                    ),
                   ),
+                );
+              },
+            ),
+          ),
+         
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: List.generate(onGoingOrders.length, (index) {
+              return Container(
+                margin: EdgeInsets.symmetric(horizontal: 4),
+                width: 4,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: _currentPage == index ? Colors.white : Colors.grey,
+                  shape: BoxShape.circle,
                 ),
+              );
+            }),
+          ),
+          SizedBox(height: 12),
+        ],
+      ),
+    ),
+  ],
+)
+
+            : SizedBox.shrink(),
+      ),
+    ),
               if (ISserviceAvilable)
                 SliverAppBar(
                   scrolledUnderElevation: 0,

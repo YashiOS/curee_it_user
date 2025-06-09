@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:cureeit_user_app/LocalStorageCubit/store_user_cubit.dart';
 import 'package:cureeit_user_app/cubit/service_avilable_cubit.dart';
@@ -24,12 +25,12 @@ class BaseScreen extends StatefulWidget {
 class _BaseScreenState extends State<BaseScreen> {
   Map<String, dynamic>? userData;
 
- void storeDataGlobaly(){
-  User.id=userData!["id"];
-      User.name=userData!["name"];
-      User.phoneNumber=userData!["phoneNumber"];
-      User.userId=userData!["userId"];
- }
+  void storeDataGlobaly() {
+    User.id = userData!["id"];
+    User.name = userData!["name"];
+    User.phoneNumber = userData!["phoneNumber"];
+    User.userId = userData!["userId"];
+  }
 
   @override
   void initState() {
@@ -56,68 +57,90 @@ class _BaseScreenState extends State<BaseScreen> {
           child: BlocBuilder<ServiceAvilableCubit, ServiceAvilableState>(
             builder: (context, state) {
               if (state is ServiceIsAvilable) {
-                return Builder(
-                  builder: (context) {
-                     final TabController tabController = DefaultTabController.of(context);
-                    return Scaffold(
-                      backgroundColor: ligtBlackColor,
-                      body: Stack(
-                        children: [
-                          TabBarView(children: [
-                            Center(child: HomeScreen()),
-                            Center(child: OrdersScreen()),
-                            Center(
-                                child: CartScreen(
-                              isNavigated: false,
-                            )),
-                          ]),
-                          SizedBox(
-                            height: MediaQuery.of(context).size.height,
-                            width: MediaQuery.of(context).size.width,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Container(
-                                  width: MediaQuery.of(context).size.width,
-                                  decoration: BoxDecoration(
-                                      color: scaffoldBlackColor,
-                                      border:
-                                          Border.all(color: scaffoldBlackColor)),
-                                  child: AnimatedBuilder(
+                return Builder(builder: (context) {
+                  final TabController tabController =
+                      DefaultTabController.of(context);
+                  return Scaffold(
+                    backgroundColor: ligtBlackColor,
+                    body: Stack(
+                      children: [
+                        TabBarView(children: [
+                          Center(child: HomeScreen()),
+                          Center(child: OrdersScreen()),
+                          Center(
+                              child: CartScreen(
+                            isNavigated: false,
+                          )),
+                        ]),
+                        SizedBox(
+                          height: MediaQuery.of(context).size.height,
+                          width: MediaQuery.of(context).size.width,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Container(
+                                width: MediaQuery.of(context).size.width,
+                                padding: EdgeInsets.only(
+                                  bottom: Platform.isIOS
+                                      ? 20.0
+                                      : 0.0, // Add padding only for iOS
+                                ),
+                                decoration: BoxDecoration(
+                                    color: scaffoldBlackColor,
+                                    border:
+                                        Border.all(color: scaffoldBlackColor)),
+                                child: AnimatedBuilder(
                                     animation: tabController,
-                                    builder: (context,_) {
+                                    builder: (context, _) {
                                       return TabBar(
                                         controller: tabController,
                                         unselectedLabelColor: greyColor,
                                         labelColor: whiteColor,
                                         indicatorColor: whiteColor,
-                                        labelStyle: GoogleFonts.mulish(fontSize: 12),
+                                        labelStyle:
+                                            GoogleFonts.mulish(fontSize: 12),
                                         tabs: [
                                           Tab(
-                                              icon: Container(height: 24,width: 24, 
-                                                child: Image.asset("lib/images/Home.png",color: tabController.index == 0 ? whiteColor : greyColor,),),
-                                              text: "Home",),
+                                            icon: Container(
+                                              height: 24,
+                                              width: 24,
+                                              child: Image.asset(
+                                                "lib/images/Home.png",
+                                                color: tabController.index == 0
+                                                    ? whiteColor
+                                                    : greyColor,
+                                              ),
+                                            ),
+                                            text: "Home",
+                                          ),
                                           Tab(
-                                              icon: Container(height: 24,width: 24, 
-                                                child: Image.asset("lib/images/Order Again.png",color: tabController.index == 1 ? whiteColor : greyColor,)),
+                                              icon: Container(
+                                                  height: 24,
+                                                  width: 24,
+                                                  child: Image.asset(
+                                                    "lib/images/Order Again.png",
+                                                    color:
+                                                        tabController.index == 1
+                                                            ? whiteColor
+                                                            : greyColor,
+                                                  )),
                                               text: "Order Again"),
                                           Tab(
-                                              icon: Icon(Icons.shopping_cart_outlined),
+                                              icon: Icon(
+                                                  Icons.shopping_cart_outlined),
                                               text: "Cart"),
                                         ],
                                       );
-                                    }
-                                  ),
-                                ),
-                              ],
-                            ),
+                                    }),
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
-                    );
-                  }
-                );
+                        ),
+                      ],
+                    ),
+                  );
+                });
               }
               if (state is ServiceIsNotAvilable) {
                 return Scaffold(
