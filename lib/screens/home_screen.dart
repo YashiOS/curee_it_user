@@ -102,10 +102,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   late Animation<double> _animation;
   Timer? _ongoingOrdersTimer;
   bool _isFetchingOngoingOrders = false;
-  bool fetching_time=true;
-  int estTime=0;
-   int _currentPage = 0;
-   final PageController _pageController = PageController();
+  bool fetching_time = true;
+  int estTime = 0;
+  int _currentPage = 0;
+  final PageController _pageController = PageController();
   // To store product quantities
 
   void _showLocationDeniedDialog() {
@@ -192,7 +192,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Future<void> _checkLocationStatus() async {
-    
     loc.Location location = loc.Location();
 
     bool serviceEnabled = await location.serviceEnabled();
@@ -279,16 +278,13 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   List<dynamic> getOngoingOrders(List<dynamic> allOrders) {
-  
     return allOrders
         .where((order) =>
-            order['status'] != 'Delivered' &&
-            order['status'] != 'delivered')
+            order['status'] != 'Delivered' && order['status'] != 'delivered')
         .toList();
   }
 
   Future<void> fetchOrderHistory() async {
-   
     var url = Uri.parse('$baseUrl/order/orderHistory');
     var request = http.Request('POST', url)
       ..headers.addAll({
@@ -297,26 +293,24 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       ..body = jsonEncode({'userId': User.userId});
 
     var response = await http.Client().send(request);
-  
+
     if (response.statusCode == 200) {
       var responseBody = await response.stream.bytesToString();
       Map<String, dynamic> data = jsonDecode(responseBody);
-    
 
       setState(() {
         AllOrders = data['data'];
-        
-      
+
         AllOrders.sort((item1, item2) {
-          final dateA = DateTime.parse(item1['purchaseDate']?? '1970-01-01');
-          final dateB = DateTime.parse(item2['purchaseDate']?? '1970-01-01');
+          final dateA = DateTime.parse(item1['purchaseDate'] ?? '1970-01-01');
+          final dateB = DateTime.parse(item2['purchaseDate'] ?? '1970-01-01');
           return dateB.compareTo(dateA);
         });
 
         onGoingOrders = AllOrders.where((order) {
-            String status = order['status']?.toString()?.toLowerCase() ?? '';
-            return status != 'delivered'&&status !="not available";
-          }).toList();
+          String status = order['status']?.toString()?.toLowerCase() ?? '';
+          return status != 'delivered' && status != "not available";
+        }).toList();
         if (onGoingOrders.isNotEmpty) {
           _startOngoingOrdersPolling();
         }
@@ -327,14 +321,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   void UpdateAddress1() {
-   
     localAddress = Address.CurrentAddress!["address"];
     checkLocation();
     setState(() {});
   }
 
   void UpdateAddress(Map<String, dynamic> address) {
-  
     Address.CurrentAddress = address;
     localAddress = Address.CurrentAddress!["address"];
 
@@ -361,7 +353,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           'quantity': 1,
         }),
       );
-    
+
       if (response.statusCode == 200) {
         setState(() {
           quantities[index] = 1;
@@ -373,7 +365,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         });
         Fluttertoast.showToast(msg: "Added To Cart");
       } else {
-       
         ScaffoldMessenger.of(context).clearSnackBars();
         isAddingMap[index] = false;
         ScaffoldMessenger.of(context).showSnackBar(
@@ -421,7 +412,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         Fluttertoast.showToast(msg: "Removed from cart");
         setState(() {});
       } else {
-       
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
@@ -458,7 +448,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Future<void> DidUpdateQuantity(int index, int change) async {
-  
     final product = products[index];
     final productId = product['productId'];
     final String? userId = User.userId; // Example userId
@@ -537,14 +526,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
       if (response.statusCode == 200) {
         final responseData = jsonDecode(responseBody);
-       
+
         if (responseData['status'] == 200 && responseData['data'] != null) {
           final cartData = responseData['data'];
 
           setState(() {
             finaltotalAmount = responseData["finalTotal"]?.toString() ?? "0";
-
-           
           });
           final List<Map<String, dynamic>> tempCart = [];
           double calculatedTotal = 0.0;
@@ -620,7 +607,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         });
       }
     }
-   
   }
 
   Future<Map<String, dynamic>?> fetchProductDetails(String productId) async {
@@ -657,7 +643,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Future<void> fetchProducts() async {
-   
     final response =
         await http.get(Uri.parse('https://api.medkaro.in/home/homeProducts'));
     if (response.statusCode == 200) {
@@ -674,7 +659,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   void addToCart(int index) {
-   
     setState(() {
       quantities[index] = 1;
     });
@@ -772,7 +756,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       decoration: BoxDecoration(
         color: ligtBlackColor,
         borderRadius: BorderRadius.circular(8),
-        
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -969,10 +952,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Future<void> fetchAddresses() async {
-  
     if (Address.CurrentAddress != null) {
       String fullAddress = Address.CurrentAddress!["address"];
-     
 
       setState(() {
         localAddress = fullAddress;
@@ -991,7 +972,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       ..body = jsonEncode({'userId': User.userId});
 
     var response = await http.Client().send(request);
-   
+
     if (response.statusCode == 200) {
       String address = await fetchLocationAndAddress();
       final data = json.decode(await response.stream.bytesToString());
@@ -1042,7 +1023,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Future<void> getEstTime(String lat, String long) async {
-   
     final String apiUrl = "$baseUrl/home/getEstTime";
     try {
       final response = await http.post(Uri.parse(apiUrl),
@@ -1053,24 +1033,20 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         final responseData = jsonDecode(response.body);
         setState(() {
           estTime = (responseData["estimatedTimeMinutes"]);
-         
         });
-       setState(() {
-      fetching_time=false;
-    });
-       
+        setState(() {
+          fetching_time = false;
+        });
       }
     } catch (e) {
-       setState(() {
-      fetching_time=false;
-    });
+      setState(() {
+        fetching_time = false;
+      });
       print("error $e");
     }
-   
   }
 
   Future<void> checkLocation() async {
-   
     final String apiUrl = "$baseUrl/home/check_location";
 
     try {
@@ -1085,19 +1061,17 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           "longitude": longitude,
         }),
       );
-     
+
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
-       
+
         setState(() {
           isInRadius = responseData['isAllowed'] == true;
         });
         if (isInRadius == true) {
           fetchCartDetails();
           context.read<ServiceAvilableCubit>().UpdateServiceAvilable(true);
-          getEstTime(latitude,
-              longitude);
-             
+          getEstTime(latitude, longitude);
         } else {
           isInRadius = false;
           context.read<ServiceAvilableCubit>().UpdateServiceAvilable(false);
@@ -1116,7 +1090,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       final position = await determinePosition();
       defaultLat = position.latitude;
       defaultLng = position.longitude;
-    
 
       // Get address from coordinates
       var value =
@@ -1196,8 +1169,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
             ),
           ),
         Container(
-          margin: EdgeInsets.only(top: 40,left: 20,right: 20,bottom: 20),
-          
+          margin: EdgeInsets.only(top: 40, left: 20, right: 20, bottom: 20),
           child: CustomScrollView(
             controller: _scrollController,
             slivers: [
@@ -1252,7 +1224,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                         )
                                       : Container(
                                           width: 70,
-                                         
                                           child: Image.asset(
                                               "lib/images/final_medkaro_logo.png")),
                                   localAddress == null || localAddress.isEmpty
@@ -1273,29 +1244,35 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                             ),
                                           ),
                                         )
-                                      :fetching_time?Container(
-                                          margin: EdgeInsets.only(bottom: 10),
-                                          child: Shimmer.fromColors(
-                                            baseColor: ligtBlackColor,
-                                            highlightColor: whiteColor,
-                                            child: Container(
-                                              width: 150,
-                                              height: 22,
-                                              // Matches your text height
-                                              decoration: BoxDecoration(
-                                                color: whiteColor,
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
+                                      : fetching_time
+                                          ? Container(
+                                              margin:
+                                                  EdgeInsets.only(bottom: 10),
+                                              child: Shimmer.fromColors(
+                                                baseColor: ligtBlackColor,
+                                                highlightColor: whiteColor,
+                                                child: Container(
+                                                  width: 150,
+                                                  height: 22,
+                                                  // Matches your text height
+                                                  decoration: BoxDecoration(
+                                                    color: whiteColor,
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            8),
+                                                  ),
+                                                ),
                                               ),
+                                            )
+                                          : Text(
+                                              "in $estTime minutes",
+                                              style: GoogleFonts.mulish(
+                                                  color: estTime == 0
+                                                      ? greyColor
+                                                      : whiteColor,
+                                                  fontSize: 24,
+                                                  fontWeight: FontWeight.bold),
                                             ),
-                                          ),
-                                        ): Text(
-                                          "in $estTime minutes",
-                                          style: GoogleFonts.mulish(
-                                              color:estTime==0?greyColor: whiteColor,
-                                              fontSize: 24,
-                                              fontWeight: FontWeight.bold),
-                                        ),
                                   localAddress == null || localAddress.isEmpty
                                       ? Container(
                                           margin: EdgeInsets.only(top: 10),
@@ -1425,264 +1402,295 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               ),
               if (ISserviceAvilable && onGoingOrders.isNotEmpty)
                 SliverAppBar(
-      backgroundColor:scaffoldBlackColor,
-      floating: true,
-      expandedHeight:74 ,
-      pinned: false,
-      flexibleSpace: FlexibleSpaceBar(
-        background: onGoingOrders.isNotEmpty && localAddress != ""
-            ? Column(
-  children: [
-    Container(
-      height: 90, // Slightly increased to fit both PageView and dots
-      margin: EdgeInsets.only(top: 8,bottom: 8),
-      decoration: BoxDecoration(
-        color: ligtBlackColor,
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Expanded(
-            child: PageView.builder(
-              controller: _pageController,
-              scrollDirection: Axis.horizontal,
-              itemCount: onGoingOrders.length,
-              onPageChanged: (index) {
-                setState(() {
-                  _currentPage = index;
-                });
-              },
-              itemBuilder: (context, index) {
-                final order = onGoingOrders[index];
-                final AvailId = order["availableID"] ?? "";
-                String status = switch (order["status"]) {
-                  "Available" => "Order Confirmed",
-                  "In Review" => "Verifying Order",
-                  "Order Placed" => "Order Placed!",
-                  "Packing" => "Packing Items",
-                  "On the way" => "Order Enroute",
-                  _ => "Order Status",
-                };
-
-                return GestureDetector(
-                  onTap: () {
-                    Navigator.of(context).push(
-                      MaterialPageRoute(
-                        builder: (context) => OrderTrackingScreen(
-                          NavigatingFrom: "home",
-                          orderId: AvailId,
-                        ),
-                      ),
-                    );
-                  },
-                  child: Container(
-                    padding: EdgeInsets.all(16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "$status",
-                              style: GoogleFonts.mulish(
-                                color: whiteColor,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            Text(
-                              "#$AvailId",
-                              style: GoogleFonts.mulish(
-                                color: greyColor,
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                        Container(
-                          height: order["status"] == "In Review"
-                              ? 50
-                              : order["status"] == "Order Placed" ||
-                                      order["status"] == "Available"
-                                  ? 36
-                                  : 80,
-                          child: Image.asset(
-                            switch (order["status"]) {
-                              "Available" => "lib/images/ordered.png",
-                              "Order Placed" => "lib/images/ordered.png",
-                              "Packing" => "lib/images/packing.png",
-                              "On the way" => "lib/images/onTheWay.png",
-                              "Delivered" => "lib/images/DELIVERED.png",
-                              _ => "lib/images/veryfing.png",
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-            ),
-          ),
-         
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: List.generate(onGoingOrders.length, (index) {
-              return Container(
-                margin: EdgeInsets.symmetric(horizontal: 4),
-                width: 4,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: _currentPage == index ? Colors.white : Colors.grey,
-                  shape: BoxShape.circle,
-                ),
-              );
-            }),
-          ),
-          SizedBox(height: 12),
-        ],
-      ),
-    ),
-  ],
-)
-
-            : SizedBox.shrink(),
-      ),
-    ),
-              if (ISserviceAvilable)
-                SliverAppBar(
+                  backgroundColor: scaffoldBlackColor,
+                  floating: true,
                   scrolledUnderElevation: 0,
             elevation: 0,
-                 toolbarHeight:MediaQuery.of(context).size.height * 0.055,
-            
-                  backgroundColor: scaffoldBlackColor,
-                 
-                  pinned: true,
-                  flexibleSpace: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      GestureDetector(
-                        onTap: () async {
-                          if (ISserviceAvilable) {
-                            await Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => Search()));
-                            setState(() {});
-                            fetchCartDetails();
-                          }
-                        },
-                        child: localAddress == null || localAddress.isEmpty
-                            ? Container(
-                                child: Shimmer.fromColors(
-                                  baseColor: ligtBlackColor,
-                                  highlightColor: whiteColor,
-                                  child: Container(
-                                    width: double.infinity,
-                                    height: 43,
-                                    // Matches your text height
-                                    decoration: BoxDecoration(
-                                      color: whiteColor,
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                ),
-                              )
-                            : Container(
-                             
-                                height: 43,
+                  expandedHeight: null, //
+                  pinned: false,
+                  flexibleSpace: FlexibleSpaceBar(
+                    background: onGoingOrders.isNotEmpty && localAddress != ""
+                        ? Column(
+                            children: [
+                              Container(
+                                height:
+                                    84, // Slightly increased to fit both PageView and dots
+                                margin: EdgeInsets.only(top: 8,),
                                 
                                 decoration: BoxDecoration(
-                                  
                                   color: ligtBlackColor,
                                   borderRadius: BorderRadius.circular(8),
                                 ),
-                                clipBehavior: Clip.hardEdge,
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  mainAxisAlignment: MainAxisAlignment.start,
+                                child: Column(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Padding(
-                                      padding: const EdgeInsets.only(
-                                          left: 16, right: 5),
-                                      child: Icon(Icons.search,
-                                          color: Colors.white, size: 18),
+                                    Expanded(
+                                      child: PageView.builder(
+                                        controller: _pageController,
+                                        scrollDirection: Axis.horizontal,
+                                        itemCount: onGoingOrders.length,
+                                        onPageChanged: (index) {
+                                          setState(() {
+                                            _currentPage = index;
+                                          });
+                                        },
+                                        itemBuilder: (context, index) {
+                                          final order = onGoingOrders[index];
+                                          final AvailId =
+                                              order["availableID"] ?? "";
+                                          String status =
+                                              switch (order["status"]) {
+                                            "Available" => "Order Confirmed",
+                                            "In Review" => "Verifying Order",
+                                            "Order Placed" => "Order Placed!",
+                                            "Packing" => "Packing Items",
+                                            "On the way" => "Order Enroute",
+                                            _ => "Order Status",
+                                          };
+
+                                          return GestureDetector(
+                                            onTap: () {
+                                              Navigator.of(context).push(
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      OrderTrackingScreen(
+                                                    NavigatingFrom: "home",
+                                                    orderId: AvailId,
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            child: Container(
+                                              padding: EdgeInsets.only(left: 16,right: 16,bottom: 6,top: 16),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment
+                                                            .center,
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        "$status",
+                                                        style:
+                                                            GoogleFonts.mulish(
+                                                          color: whiteColor,
+                                                          fontSize: 20,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                      Text(
+                                                        "#$AvailId",
+                                                        style:
+                                                            GoogleFonts.mulish(
+                                                          color: greyColor,
+                                                          fontSize: 10,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  Container(
+                                                    height: order["status"] ==
+                                                            "In Review"
+                                                        ? 50
+                                                        : order["status"] ==
+                                                                    "Order Placed" ||
+                                                                order["status"] ==
+                                                                    "Available"
+                                                            ? 36
+                                                            : 80,
+                                                    child: Image.asset(
+                                                      switch (order["status"]) {
+                                                        "Available" =>
+                                                          "lib/images/ordered.png",
+                                                        "Order Placed" =>
+                                                          "lib/images/ordered.png",
+                                                        "Packing" =>
+                                                          "lib/images/packing.png",
+                                                        "On the way" =>
+                                                          "lib/images/onTheWay.png",
+                                                        "Delivered" =>
+                                                          "lib/images/DELIVERED.png",
+                                                        _ =>
+                                                          "lib/images/veryfing.png",
+                                                      },
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
                                     ),
-                                    Container(
-                                      width: 250,
-                                      child: Padding(
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: List.generate(
+                                          onGoingOrders.length, (index) {
+                                        return Container(
+
+                                         
+                                          width: 4,
+                                          height: 4,
+                                          decoration: BoxDecoration(
+                                            color: _currentPage == index
+                                                ? Colors.white
+                                                : Colors.grey,
+                                            shape: BoxShape.circle,
+                                          ),
+                                        );
+                                      }),
+                                    ),
+                                  SizedBox(height: 10,)
+                                  ],
+                                ),
+                              ),
+                             
+                            ],
+                          )
+                        : SizedBox.shrink(),
+                  ),
+                ),
+              
+              if (ISserviceAvilable)
+                SliverAppBar(
+                  scrolledUnderElevation: 0,
+                  elevation: 0,
+                  expandedHeight: null, //
+                  backgroundColor: scaffoldBlackColor,
+                  pinned: true,
+                  flexibleSpace: Container(
+                 
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        GestureDetector(
+                          onTap: () async {
+                            if (ISserviceAvilable) {
+                              await Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => Search()));
+                              setState(() {});
+                              fetchCartDetails();
+                            }
+                          },
+                          child: localAddress == null || localAddress.isEmpty
+                              ? Container(
+                               
+                                  child: Shimmer.fromColors(
+                                    baseColor: ligtBlackColor,
+                                    highlightColor: whiteColor,
+                                    child: Container(
+                                      width: double.infinity,
+                                      height: 43,
+                                      // Matches your text height
+                                      decoration: BoxDecoration(
+                                        color: whiteColor,
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              : Container(
+                                 margin: EdgeInsets.only(top: 14),
+                                  height: 43,
+                                  decoration: BoxDecoration(
+                                    color: ligtBlackColor,
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  clipBehavior: Clip.hardEdge,
+                                  child: Row(
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    children: [
+                                      Padding(
                                         padding: const EdgeInsets.only(
-                                            left: 5, right: 26),
-                                        child: AnimatedSwitcher(
-                                          duration: Duration(milliseconds: 300),
-                                          transitionBuilder:
-                                              (child, animation) {
-                                            final inAnimation = Tween<Offset>(
-                                              begin:
-                                                  Offset(0, 1), // from bottom
-                                              end: Offset.zero, // to center
-                                            ).animate(animation);
-
-                                            final outAnimation = Tween<Offset>(
-                                              begin:
-                                                  Offset(0, -1), // from center
-                                              end: Offset.zero, //, // to top
-                                            ).animate(animation);
-
-                                            return SlideTransition(
-                                              position: child.key ==
-                                                      ValueKey(
-                                                          hints[currentIndex])
-                                                  ? inAnimation // incoming child
-                                                  : outAnimation, // outgoing child
-                                              child: child,
-                                            );
-                                          },
-                                          child: Align(
-                                            key: ValueKey<String>(
-                                                hints[currentIndex]),
-                                            alignment: Alignment.centerLeft,
-                                            child: Text(
-                                               currentHint ?? "",
-                                              style: GoogleFonts.mulish(
-                                                color: greyColor,
-                                                fontSize: 14,
+                                            left: 16, right: 5),
+                                        child: Icon(Icons.search,
+                                            color: Colors.white, size: 18),
+                                      ),
+                                      Container(
+                                        width: 250,
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(
+                                              left: 5, right: 26),
+                                          child: AnimatedSwitcher(
+                                            duration: Duration(milliseconds: 300),
+                                            transitionBuilder:
+                                                (child, animation) {
+                                              final inAnimation = Tween<Offset>(
+                                                begin:
+                                                    Offset(0, 1), // from bottom
+                                                end: Offset.zero, // to center
+                                              ).animate(animation);
+                    
+                                              final outAnimation = Tween<Offset>(
+                                                begin:
+                                                    Offset(0, -1), // from center
+                                                end: Offset.zero, //, // to top
+                                              ).animate(animation);
+                    
+                                              return SlideTransition(
+                                                position: child.key ==
+                                                        ValueKey(
+                                                            hints[currentIndex])
+                                                    ? inAnimation // incoming child
+                                                    : outAnimation, // outgoing child
+                                                child: child,
+                                              );
+                                            },
+                                            child: Align(
+                                              key: ValueKey<String>(
+                                                  hints[currentIndex]),
+                                              alignment: Alignment.centerLeft,
+                                              child: Text(
+                                                currentHint ?? "",
+                                                style: GoogleFonts.mulish(
+                                                  color: greyColor,
+                                                  fontSize: 14,
+                                                ),
                                               ),
                                             ),
                                           ),
                                         ),
                                       ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
+                        ),
+                        Container(
+                          margin: EdgeInsets.only(top: 8,),
+                          child: Align(
+                            alignment: Alignment.bottomLeft,
+                            child: Text(
+                              isInRadius == null || localAddress.isEmpty
+                                  ? ""
+                                  : isInRadius!
+                                      ? "Frequently Bought"
+                                      : "",
+                              style: GoogleFonts.mulish(
+                                fontSize:
+                                    MediaQuery.of(context).size.width * 0.038,
+                                fontWeight: FontWeight.w600,
+                                color: whiteColor,
                               ),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(top: 10,bottom: 5),
-                        
-                        child: Align(
-                          
-                          alignment: Alignment.bottomLeft,
-                          child: Text(
-                            isInRadius == null || localAddress.isEmpty
-                                ? ""
-                                : isInRadius!
-                                    ? "Frequently Bought"
-                                    : "",
-                            style: GoogleFonts.mulish(
-                              fontSize: MediaQuery.of(context).size.width * 0.038,
-
-                              fontWeight: FontWeight.w600,
-                              color: whiteColor,
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                       
+                      ],
+                    ),
                   ),
                 ),
               if (isInRadius == null || localAddress.isEmpty)
@@ -1692,8 +1700,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
               else if (isInRadius!)
                 SliverPadding(
                   padding: cartItems.isNotEmpty
-                      ? EdgeInsets.only(bottom: 135)
-                      : EdgeInsets.only(bottom: 56),
+                      ? EdgeInsets.only(bottom: 135,top: 10)
+                      : EdgeInsets.only(bottom: 56,top: 10),
                   sliver: buildProductListAsSliver(),
                 )
               else

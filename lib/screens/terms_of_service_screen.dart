@@ -58,73 +58,51 @@ class TermsOfServiceScreen extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "1. Service Scope",
+                "Return Policy",
                 style: GoogleFonts.mulish(
-                    color: greenColor, fontSize: 18, fontWeight: FontWeight.w700),
+                    color: whiteColor, fontSize: 18, fontWeight: FontWeight.w700),
               ),
               Text(
-                "Medkaro facilitates the delivery of medicines and healthcare products in partnership with licensed pharmacies. We do not sell medicines directly.",
-                style: GoogleFonts.mulish(
-                    color: whiteColor, fontSize: 15, fontWeight: FontWeight.w300),
-              ),
-              Text(
-                "2. Prescription Policy",
-                style: GoogleFonts.mulish(
-                    color: greenColor, fontSize: 18, fontWeight: FontWeight.w700),
-              ),
-              Text(
-                '''Over-the-counter (OTC) medicines are available without a prescription as per Indian drug laws.
-        
-Scheduled medicines (e.g., Schedule H, H1, X) will only be delivered against a valid prescription issued by a registered medical practitioner.''',
+                '''Returns are only accepted in the following cases:
+
+Incorrect medicines delivered.
+
+Medicines past their expiry date.
+
+Products must be returned in their original, unopened packaging with the invoice.''',
                 style: GoogleFonts.mulish(
                     color: whiteColor, fontSize: 15, fontWeight: FontWeight.w300),
               ),
               Text(
-                "3. Customer Responsibility",
+                "How to Return",
                 style: GoogleFonts.mulish(
-                    color: greenColor, fontSize: 18, fontWeight: FontWeight.w700),
+                    color: whiteColor, fontSize: 18, fontWeight: FontWeight.w700),
               ),
               Text(
-                '''Customers must ensure the accuracy of their prescriptions and order details.
-        
-For prescription medicines, you may be required to upload a clear and valid prescription for verification.''',
+                '''Customers can return the product by either:
+
+Requesting a pickup (subject to availability).
+
+Dropping it off at the partner pharmacy.''',
+                style: GoogleFonts.mulish(
+                    color: whiteColor, fontSize: 15, fontWeight: FontWeight.w300),
+              ),
+              Text(
+                "Cancellation Policy",
+                style: GoogleFonts.mulish(
+                    color: whiteColor, fontSize: 18, fontWeight: FontWeight.w700),
+              ),
+              Text(
+                '''Orders cannot be canceled once confirmed. We appreciate your understanding and cooperation. For any concerns, please contact our support team at''',
                 style: GoogleFonts.mulish(
                     color: whiteColor, fontSize: 15, fontWeight: FontWeight.w300),
               ),
                  Text(
-                "4. Order Acceptance and Fulfillment",
+                "medkaro.in@gmail.com.",
                 style: GoogleFonts.mulish(
-                    color: greenColor, fontSize: 18, fontWeight: FontWeight.w700),
+                    color: greenColor, fontSize: 15, fontWeight: FontWeight.w500),
               ),
-              Text(
-                '''Orders are confirmed subject to availability and verification of prescriptions where applicable.
-        
-Medkaro reserves the right to cancel any order if it does not comply with these terms.''',
-                style: GoogleFonts.mulish(
-                    color: whiteColor, fontSize: 15, fontWeight: FontWeight.w300),
-              ),
-              Text(
-                "5. Limitation of Liability",
-                style: GoogleFonts.mulish(
-                    color: greenColor, fontSize: 18, fontWeight: FontWeight.w700),
-              ),
-               Text(
-                "Medkaro acts as an intermediary between customers and pharmacies. We are not liable for any issues related to the quality, efficacy, or adverse reactions of the medicines delivered.",
-                style: GoogleFonts.mulish(
-                    color: whiteColor, fontSize: 15, fontWeight: FontWeight.w300),
-              ),
-              Text(
-                "6. Compliance with Laws",
-                style: GoogleFonts.mulish(
-                    color: greenColor, fontSize: 18, fontWeight: FontWeight.w700),
-              ),
-              Text(
-                '''All transactions comply with the Drugs and Cosmetics Act, 1940, and other applicable laws in India.
-
-For any clarifications, feel free to reach out to our customer support team at medkaro.in@gmail.com.''',
-                style: GoogleFonts.mulish(
-                    color: whiteColor, fontSize: 15, fontWeight: FontWeight.w300),
-              ),
+             
             ],
           ),
         ),

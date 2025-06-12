@@ -225,7 +225,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                 }
               },
               child: Container(
-                width: 75,
+               
                 height: 35,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
@@ -238,7 +238,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                 alignment: Alignment.bottomCenter,
                 child: Center(
                   child: Text(
-                    "Save",
+                    "Save Address",
                     style: GoogleFonts.mulish(
                       color:isButtonEnabled? Colors.white:greenColor,
                       fontSize: MediaQuery.of(context).size.width * 0.04,

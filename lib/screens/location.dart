@@ -166,49 +166,7 @@ class _LocationScreenState extends State<LocationScreen> {
               SizedBox(
                 height: 16,
               ),
-              GestureDetector(
-                onTap: () {
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => GoogleMapsScreen()));
-                },
-                child: Container(
-                  padding: const EdgeInsets.only(top: 8, bottom: 8, left: 8),
-                  decoration: BoxDecoration(
-                    color: ligtBlackColor, // dark background
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      // Circle Avatar Placeholder\
-                      const SizedBox(width: 16),
-                      Container(
-                        height: 16,
-                        width: 16,
-                        child: Image.asset("lib/images/Add_ring_light.png"),
-                      ),
-                      //Image.asset("lib/images/Search_light.png",scale: 0.8,),
-                      const SizedBox(width: 16),
-
-                      // Name & Phone
-
-                      Container(
-                        child: Text(
-                          "Type your address",
-                          style: GoogleFonts.mulish(
-                            color: whiteColor,
-                            fontWeight: FontWeight.w300,
-                            fontSize: 17,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 16,
-              ),
+             
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 8.0),
                 child: Text(
