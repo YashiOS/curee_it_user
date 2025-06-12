@@ -1448,7 +1448,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                             "On the way" => "Order Enroute",
                                             _ => "Order Status",
                                           };
-
+print(AvailId);
                                           return GestureDetector(
                                             onTap: () {
                                               Navigator.of(context).push(

@@ -128,7 +128,8 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'availableId': orderId}),
     );
-
+    print("BODY");
+    print(response.body);
     if (response.statusCode == 200) {
       setState(() {
         _isInitLoading = false;
@@ -1205,7 +1206,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                                       child: OrderDetail(
                                         icon: Icons.phone,
                                         title:
-                                            "${orderTrackingDetails['porterAPIResponse']?['partner_info']["name"] ?? "Searching for delivery partner"}",
+                                            "${orderTrackingDetails['porterAPIResponse']?['partner_info']?["name"] ?? "Searching for delivery partner"}",
                                         subtitle: orderTrackingDetails[
                                                     'porterAPIResponse']
                                                 ?['deliveryBoyNumber'] ??
@@ -1237,7 +1238,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                                         icon: Icons.receipt_outlined,
                                         title: "Bill Details",
                                         subtitle:
-                                            "₹${orderTrackingDetails["finalTotal"]}",
+                                            "₹${orderTrackingDetails["finalTotal"]??0.0}",
                                         width: width,
                                       ),
                                     ),
