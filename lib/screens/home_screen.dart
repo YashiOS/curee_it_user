@@ -963,67 +963,62 @@ void showAddAddressBottomSheet(BuildContext context) {
     ),
     builder: (context) {
       return Padding(
+        
         padding: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom,
           top: 24,
           left: 20,
           right: 20,
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-           
-            SizedBox(height: 10),
-            Text(
-              "Add New Address",
-              style: GoogleFonts.mulish(
-                color: whiteColor,
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            SizedBox(height: 12),
-            Text(
-              "Quickly add a new delivery location to your account.",
-              textAlign: TextAlign.center,
-              style: GoogleFonts.mulish(
-                color: Colors.grey[300],
-                fontSize: 14,
-              ),
-            ),
-            SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => GoogleMapsScreen()),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: greenColor,
-                foregroundColor: Colors.white,
-                minimumSize: Size(double.infinity, 52),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(14),
-                ),
-              ),
-              child: Text(
-                "Add Address",
+        child: Container(
+         width: double.infinity,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+             
+              SizedBox(height: 10),
+              Text(
+                "Delivery Address",
                 style: GoogleFonts.mulish(
-                  fontSize: 16,
+                  color: whiteColor,
+                  fontSize: 20,
                   fontWeight: FontWeight.w600,
                 ),
               ),
-            ),
-            SizedBox(height: 24),
-          ],
+              SizedBox(height: 24),
+              ElevatedButton(
+                
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => GoogleMapsScreen()),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: greenColor,
+                  foregroundColor: Colors.white,
+                  minimumSize: Size(90, 40),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: Text(
+                  "Add",
+                  style: GoogleFonts.mulish(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              SizedBox(height: 24),
+            ],
+          ),
         ),
       );
     },
   );
 }
-
 
 void showAddressSelectorBottomSheet(BuildContext context, List addresses) {
   showModalBottomSheet(
@@ -1181,7 +1176,6 @@ void showAddressSelectorBottomSheet(BuildContext context, List addresses) {
   );
 }
 
-
   Future<void> fetchAddresses() async {
     if (Address.CurrentAddress != null) {
       String fullAddress = Address.CurrentAddress!["address"];
@@ -1301,8 +1295,6 @@ void showAddressSelectorBottomSheet(BuildContext context, List addresses) {
     }
   }
  
-
-
   Future<void> checkLocation() async {
     final String apiUrl = "$baseUrl/home/check_location";
 

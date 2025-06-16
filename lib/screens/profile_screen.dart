@@ -139,7 +139,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           backgroundColor: ligtBlackColor,
           leadingWidth: 100,
           title: Text(
-            "Profile",
+            "Settings",
             style: GoogleFonts.mulish(
                 fontWeight: FontWeight.w400,
                 fontSize: 22.69,
@@ -294,7 +294,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     backgroundColor: ligtBlackColor,
                     builder: (context) {
                       return Padding(
-                        padding: const EdgeInsets.all(16.0),
+                        padding: const EdgeInsets.only(left: 16,right: 16,top: 16,bottom: 24),
+                        
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisSize: MainAxisSize.min,
@@ -321,18 +322,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     }
                                   },
                                   child: Container(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 14, vertical: 10),
-                                    margin: EdgeInsets.only(bottom: 12),
+                                     height: 40,
+                                   width: 90,
+                                   
                                     decoration: BoxDecoration(
                                       color: greenColor, // Optional: change or remove for transparent
                                       borderRadius: BorderRadius.circular(12),
                                       
                                     ),
                                     child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Icon(Icons.phone, color: whiteColor),
-                                        SizedBox(width: 12),
+                                        Icon(Icons.phone, color: whiteColor,size: 16,),
+                                        SizedBox(width: 10),
                                         Text(
                                           "Call",
                                           style: GoogleFonts.mulish(
@@ -355,17 +357,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     }
                                   },
                                   child: Container(
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 14, vertical: 10),
-                                    margin: EdgeInsets.only(bottom: 8),
+                                   height: 40,
+                                   width: 90,
                                     decoration: BoxDecoration(
                                       color: greenColor, // Optional background
                                       borderRadius: BorderRadius.circular(12),
                                       
                                     ),
                                     child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Icon(Icons.email, color: whiteColor),
+                                        Icon(Icons.email, color: whiteColor,size: 16,),
                                         SizedBox(width: 12),
                                         Text(
                                           "Email",
@@ -410,7 +412,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         height: 36,
                         child: const Center(
                           child: Icon(
-                            Icons.support_agent, // Updated icon for support
+                            Icons.headphones_outlined, // Updated icon for support
                             color: whiteColor,
                             size: 28,
                           ),
@@ -431,14 +433,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             ),
                           ),
                           SizedBox(height: 2),
-                          Text(
-                            "Get help or contact support", // Updated subtitle
-                            style: GoogleFonts.mulish(
-                              color: whiteColor,
-                              fontWeight: FontWeight.w300,
-                              fontSize: 12,
-                            ),
-                          ),
+                          
                         ],
                       ),
                     ],

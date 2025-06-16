@@ -66,6 +66,8 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
         defaultLat = value.latitude;
         defaultLng = value.longitude;
 
+print(value.latitude);
+print(value.longitude);
         getAddress();
         _changeCameraPosition(defaultLat, defaultLng);
       });
