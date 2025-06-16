@@ -5,6 +5,7 @@ import 'package:cureeit_user_app/firebase_notifications.dart';
 import 'package:cureeit_user_app/screens/base_screen.dart';
 
 import 'package:cureeit_user_app/screens/login_screen.dart';
+import 'package:cureeit_user_app/screens/update_screen.dart';
 
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';

@@ -950,6 +950,237 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       ),
     );
   }
+  
+void showAddAddressBottomSheet(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+     isDismissible: false,
+     enableDrag: false, 
+    isScrollControlled: true,
+    backgroundColor: ligtBlackColor,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+    ),
+    builder: (context) {
+      return Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+          top: 24,
+          left: 20,
+          right: 20,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+           
+            SizedBox(height: 10),
+            Text(
+              "Add New Address",
+              style: GoogleFonts.mulish(
+                color: whiteColor,
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            SizedBox(height: 12),
+            Text(
+              "Quickly add a new delivery location to your account.",
+              textAlign: TextAlign.center,
+              style: GoogleFonts.mulish(
+                color: Colors.grey[300],
+                fontSize: 14,
+              ),
+            ),
+            SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(context);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => GoogleMapsScreen()),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: greenColor,
+                foregroundColor: Colors.white,
+                minimumSize: Size(double.infinity, 52),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(14),
+                ),
+              ),
+              child: Text(
+                "Add Address",
+                style: GoogleFonts.mulish(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+            SizedBox(height: 24),
+          ],
+        ),
+      );
+    },
+  );
+}
+
+
+void showAddressSelectorBottomSheet(BuildContext context, List addresses) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+     isDismissible: false,
+     enableDrag: false,  
+    backgroundColor: scaffoldBlackColor,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+    ),
+    builder: (context) {
+      return Padding(
+        padding: EdgeInsets.only(
+          top: 24,
+          left: 20,
+          right: 20,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+        ),
+        child: StatefulBuilder(
+          builder: (context, setModalState) {
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+               
+                SizedBox(height: 10),
+                Text(
+                  "Select Delivery Location",
+                  style: GoogleFonts.mulish(
+                    color: whiteColor,
+                    fontSize: 17,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                SizedBox(height: 16),
+                ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: addresses.length,
+                  itemBuilder: (context, index) {
+                    var address = addresses[index];
+                     final  selectAdd=address!["address"];
+        final  selectedLat=address!["userLat"];
+        final  selectedLong=address!["userLong"];
+        final  selectedType=address!["type"];
+        final  selectedLandMark=address!["landmark"]??"";
+        final  selectedFloor=address!["floor"]??"0";
+                    bool isSelected = Address.selectedIndex == index;
+                    
+                    return GestureDetector(
+                      onTap: () async {
+                        Address.CurrentAddress = {
+              "address": selectAdd,
+              "landmark": selectedLandMark,
+              "floor": selectedFloor,
+              "userLat": selectedLat,
+              "userLong": selectedLong,
+              "type":selectedType,
+              "_id": ""
+            };
+            setState(() {
+              Address.selectedIndex=index;
+            });
+             setState(() {
+                          localAddress = selectAdd;
+                        });
+                        
+                        Navigator.pop(context);
+                        
+                        // Show loading indicator while checking location
+                        setState(() {
+                          isInRadius = null; // Reset while checking
+                        });
+                        
+                        await checkLocation(); // Wait for location check to complete
+                        
+                        // Update UI based on location availability
+                        if (mounted) {
+                          setState(() {
+                            // isInRadius will be updated by checkLocation()
+                          });
+                        }
+            
+            
+            
+                      },
+                      child: Container(
+                        padding: EdgeInsets.only(left: 25, right: 16),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(8),
+                          color: ligtBlackColor,
+                        ),
+                        margin: EdgeInsets.only(bottom: 16),
+                        height: 75,
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Container(
+                              height: 16,
+                              width: 16,
+                              child: Image.asset(
+                                "lib/images/hugeicons_location.png",
+                              ),
+                            ),
+                            SizedBox(width: 16),
+                            Expanded(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    address['address'] ?? '',
+                                    style: GoogleFonts.mulish(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w500,
+                                      color: whiteColor,
+                                    ),
+                                  ),
+                                  SizedBox(height: 2),
+                                  Text(
+                                    address['type'] ?? '',
+                                    style: GoogleFonts.mulish(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w300,
+                                      color: whiteColor,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Container(
+                              width: 16,
+                              height: 16,
+                              margin: EdgeInsets.only(left: 8),
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? greenColor
+                                    : scaffoldBlackColor,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                SizedBox(height: 8),
+                
+              ],
+            );
+          },
+        ),
+      );
+    },
+  );
+}
+
 
   Future<void> fetchAddresses() async {
     if (Address.CurrentAddress != null) {
@@ -977,7 +1208,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       String address = await fetchLocationAndAddress();
       final data = json.decode(await response.stream.bytesToString());
       final fetchAddress = data["data"]["address"];
+      addresses = data['data']['address'];
       if (fetchAddress == null || fetchAddress.isEmpty) {
+         showAddAddressBottomSheet(context);
+        print("ADDRESS LIST IS EMPTY");
         setState(() {
           Address.CurrentAddress = {
             "address": address,
@@ -995,27 +1229,48 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           newUser = true;
           checkLocation();
         });
-      } else {
+        
+      }else if (addresses.length==1) {
+   
         SelectedAddress = data['data']['address'][0];
-        addresses = data['data']['address'];
+        final  selectAdd=SelectedAddress!["address"];
+        final  selectedLat=SelectedAddress!["userLat"];
+        final  selectedLong=SelectedAddress!["userLong"];
+        final  selectedType=SelectedAddress!["type"];
+        final  selectedLandMark=SelectedAddress!["landmark"]??"";
+        final  selectedFloor=SelectedAddress!["floor"]??"0";
+        
+        print("Selected Address");
+        print(SelectedAddress);
+        
+        print("ALL ADDRESS LIST");
+        print(addresses);
+         print(addresses.length);
         if (Address.CurrentAddress == null && SelectedAddress != null) {
           setState(() {
             Address.CurrentAddress = {
-              "address": address,
-              "landmark": "",
-              "floor": "",
-              "userLat": defaultLat,
-              "userLong": defaultLng,
-              "type": "",
+              "address": selectAdd,
+              "landmark": selectedLandMark,
+              "floor": selectedFloor,
+              "userLat": selectedLat,
+              "userLong": selectedLong,
+              "type":selectedType,
               "_id": ""
             };
             localAddress = address;
             Address.selectedIndex = null;
           });
           checkLocation();
-
           return;
         }
+      } else if(addresses.length>1){
+       if(Address.CurrentAddress==""||Address.CurrentAddress==null){
+          showAddressSelectorBottomSheet(context,addresses);
+          Address.selectedIndex=null;
+          
+
+       }
+      
       }
     } else {
       print('Failed to load addresses');
@@ -1045,6 +1300,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       print("error $e");
     }
   }
+ 
+
 
   Future<void> checkLocation() async {
     final String apiUrl = "$baseUrl/home/check_location";
@@ -1064,7 +1321,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
-
+        print("in check location");
+         print(responseData["isAllowed"]);
         setState(() {
           isInRadius = responseData['isAllowed'] == true;
         });
@@ -1073,8 +1331,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           context.read<ServiceAvilableCubit>().UpdateServiceAvilable(true);
           getEstTime(latitude, longitude);
         } else {
+
           isInRadius = false;
           context.read<ServiceAvilableCubit>().UpdateServiceAvilable(false);
+         
         }
       } else {
         print("Failed to check_location: ${response.body}");
@@ -1151,6 +1411,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     bool ISserviceAvilable =
         context.watch<ServiceAvilableCubit>().ServiceAvilable;
+       
     return Scaffold(
       backgroundColor: scaffoldBlackColor,
       key: _scaffoldKey,
@@ -1538,8 +1799,7 @@ print(AvailId);
                                       children: List.generate(
                                           onGoingOrders.length, (index) {
                                         return Container(
-
-                                         
+                                       margin: EdgeInsets.only(right: 4),
                                           width: 4,
                                           height: 4,
                                           decoration: BoxDecoration(
@@ -1555,7 +1815,6 @@ print(AvailId);
                                   ],
                                 ),
                               ),
-                             
                             ],
                           )
                         : SizedBox.shrink(),
@@ -1572,7 +1831,7 @@ print(AvailId);
                   flexibleSpace: Container(
                  
                     child: Column(
-                      mainAxisSize: MainAxisSize.min,
+                    
                       children: [
                         GestureDetector(
                           onTap: () async {
@@ -1670,7 +1929,8 @@ print(AvailId);
                                 ),
                         ),
                         Container(
-                          margin: EdgeInsets.only(top: 8,),
+                        padding: EdgeInsets.only(top: 5,bottom: 5),
+                        color: scaffoldBlackColor,
                           child: Align(
                             alignment: Alignment.bottomLeft,
                             child: Text(
@@ -1688,7 +1948,6 @@ print(AvailId);
                             ),
                           ),
                         ),
-                       
                       ],
                     ),
                   ),
@@ -1700,11 +1959,11 @@ print(AvailId);
               else if (isInRadius!)
                 SliverPadding(
                   padding: cartItems.isNotEmpty
-                      ? EdgeInsets.only(bottom: 135,top: 10)
-                      : EdgeInsets.only(bottom: 56,top: 10),
+                      ? EdgeInsets.only(bottom: 135,top: 2)
+                      : EdgeInsets.only(bottom: 56,top: 2),
                   sliver: buildProductListAsSliver(),
                 )
-              else
+              else 
                 buildOutOfRadiusAsSliver(),
             ],
           ),
@@ -1853,7 +2112,7 @@ print(AvailId);
                                 ),
                                 child: Center(
                                   child: Text(
-                                    'View cart',
+                                    'View Cart',
                                     style: GoogleFonts.mulish(
                                       color: whiteColor,
                                       fontSize: 13,

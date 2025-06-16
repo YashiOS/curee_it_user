@@ -161,7 +161,7 @@ class _MedicineAvailabilityScreenState extends State<MedicineAvailabilityScreen>
           backgroundColor: ligtBlackColor,
           centerTitle: true,
           title: Text(
-            "Order Placing",
+            "Placing Order",
             style: GoogleFonts.mulish(
               fontWeight: FontWeight.w400,
               fontSize: 22.69,

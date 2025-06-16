@@ -382,6 +382,7 @@ class _SearchState extends State<Search> {
                 ],
               ),
             ),
+            if(_searchResults.isNotEmpty)
             SizedBox(height: 12),
             Expanded(
               child: _isLoading
@@ -392,7 +393,7 @@ class _SearchState extends State<Search> {
                   : _searchResults.isEmpty
                       ? Center(
                           child: Text(
-                          "No results found",
+                          "No Results Found!",
                           style: GoogleFonts.mulish(
                             fontWeight: FontWeight.w500,
                             fontSize: 20,

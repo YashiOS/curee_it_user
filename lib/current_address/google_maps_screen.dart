@@ -90,7 +90,7 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
           ),
         ),
         title: Text(
-          "Current Location",
+          "Select Location",
           style: GoogleFonts.mulish(
               color: whiteColor, fontSize: 22.69, fontWeight: FontWeight.w400),
         ),

@@ -170,7 +170,7 @@ class _LocationScreenState extends State<LocationScreen> {
               Padding(
                 padding: EdgeInsets.symmetric(horizontal: 8.0),
                 child: Text(
-                  "Saved address",
+                  "Saved Address",
                   style: GoogleFonts.mulish(
                     fontSize: 18,
                     fontWeight: FontWeight.w500,
@@ -272,7 +272,7 @@ class _LocationScreenState extends State<LocationScreen> {
                                                       height:
                                                           2), // Space between title and subtitle
                                                   Text(
-                                                    address['landmark'] ?? '',
+                                                    address['type'] ?? '',
                                                     style: GoogleFonts.mulish(
                                                       fontSize: 13,
                                                       fontWeight:

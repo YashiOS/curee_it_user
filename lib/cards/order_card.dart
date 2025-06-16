@@ -13,9 +13,11 @@ import 'package:intl/intl.dart';
 
 class OrderCard extends StatefulWidget {
   final dynamic orderData;
+  final String AvailorderId;
   String prescriptionURL;
   OrderCard({
     super.key,
+    required this.AvailorderId,
     required this.orderData,
     this.prescriptionURL = "",
   });
@@ -166,7 +168,18 @@ class _OrderCardState extends State<OrderCard> {
                   children: [
                     
                     GestureDetector(
-                      onTap: () {
+                      onTap: () async{
+                        if(orderStatus == "Available"){
+                                 await Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => OrderTrackingScreen(
+                                  NavigatingFrom: "Order History",
+                                  orderId: widget.AvailorderId,
+                                ),
+                              ),
+                            );
+                        }
                         if (orderStatus == "Delivered" || orderStatus == "") {
                           addMultipleTocart(context);
                         }
@@ -175,7 +188,7 @@ class _OrderCardState extends State<OrderCard> {
                         padding:
                             EdgeInsets.symmetric(vertical: 8, horizontal: 16),
                         decoration: BoxDecoration(
-                            color:orderStatus=="Delivered"||orderStatus==""? greenColor:ligtBlackColor,
+                            color:orderStatus=="Delivered"||orderStatus==""||orderStatus=="Available"? greenColor:ligtBlackColor,
                             border:orderStatus!="Delivered" ?Border.all(color: greenColor,width: 1):Border.all(color: Colors.transparent,width: 0),
                             borderRadius: BorderRadius.circular(8)),
                         child: orderStatus == "Delivered" || orderStatus == ""
@@ -188,11 +201,11 @@ class _OrderCardState extends State<OrderCard> {
                                 ),
                               )
                             :orderStatus=="Available"?Text(
-                                    "Available",
+                                    "Pay Now",
                                     style: GoogleFonts.mulish(
                                       fontWeight: FontWeight.bold,
                                       fontSize: screenheight * 0.014,
-                                      color: greenColor,
+                                      color: whiteColor,
                                     ),
                                   ) :orderStatus=="In Review"?Text(
                                     "Verifying",

@@ -125,7 +125,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
           : orders.length == 0
               ? Center(
                   child: Text(
-                    "No orders",
+                    "No Orders!",
                     style: GoogleFonts.mulish(
                       fontWeight: FontWeight.w500,
                       fontSize: 20,
@@ -163,6 +163,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                             fetchOrderHistory();
                           },
                           child: OrderCard(
+                            AvailorderId: orders[index]["availableID"],
                               prescriptionURL: orders[index]["prescription"]
                                       ?["photoURL"] ??
                                   "",

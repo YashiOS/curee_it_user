@@ -11,6 +11,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+import 'package:url_launcher/url_launcher.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -97,11 +98,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> fetchUserProfile() async {
-   
     try {
       final response = await http.post(
-        Uri.parse(
-            '$baseUrl/profile/user/profileDetails'),
+        Uri.parse('$baseUrl/profile/user/profileDetails'),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -110,7 +109,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-      
+
         setState(() {
           name = data["data"]["name"];
           phoneNumber = data["data"]["mobileNumber"];
@@ -129,7 +128,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         backgroundColor: scaffoldBlackColor,
         appBar: AppBar(
           scrolledUnderElevation: 0,
-            elevation: 0,
+          elevation: 0,
           centerTitle: true,
           shape: ContinuousRectangleBorder(
             borderRadius: BorderRadius.only(
@@ -156,20 +155,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 padding: const EdgeInsets.only(left: 4.0),
                 child: Row(
                   spacing: 4,
-                  children: [SvgPicture.asset(
-                    colorFilter:
-                        ColorFilter.mode(Colors.white, BlendMode.srcIn),
-                    "lib/images/back.svg",
-                    width: 24, // optional
-                    height: 24, // optional
-                  ),],
+                  children: [
+                    SvgPicture.asset(
+                      colorFilter:
+                          ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                      "lib/images/back.svg",
+                      width: 24, // optional
+                      height: 24, // optional
+                    ),
+                  ],
                 ),
               ),
             ),
           ),
         ),
         body: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20,),
+          padding: const EdgeInsets.symmetric(
+            horizontal: 20,
+          ),
           color: scaffoldBlackColor,
           child: Column(
             children: [
@@ -265,6 +268,171 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           SizedBox(height: 2),
                           Text(
                             "Edit and add new addresses",
+                            style: GoogleFonts.mulish(
+                              color: whiteColor,
+                              fontWeight: FontWeight.w300,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SizedBox(
+                height: 16,
+              ),
+              GestureDetector(
+                onTap: () async {
+                  showModalBottomSheet(
+                    context: context,
+                    shape: RoundedRectangleBorder(
+                      borderRadius:
+                          BorderRadius.vertical(top: Radius.circular(20)),
+                    ),
+                    backgroundColor: ligtBlackColor,
+                    builder: (context) {
+                      return Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: 40,
+                              height: 4,
+                              decoration: BoxDecoration(
+                                color: greyColor,
+                                borderRadius: BorderRadius.circular(2),
+                              ),
+                            ),
+                           
+                            SizedBox(height: 16),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                GestureDetector(
+                                  onTap: () async {
+                                    Navigator.pop(context);
+                                    final uri = Uri.parse("tel:+91 8910115375");
+                                    if (await canLaunchUrl(uri)) {
+                                      await launchUrl(uri);
+                                    }
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 14, vertical: 10),
+                                    margin: EdgeInsets.only(bottom: 12),
+                                    decoration: BoxDecoration(
+                                      color: greenColor, // Optional: change or remove for transparent
+                                      borderRadius: BorderRadius.circular(12),
+                                      
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.phone, color: whiteColor),
+                                        SizedBox(width: 12),
+                                        Text(
+                                          "Call",
+                                          style: GoogleFonts.mulish(
+                                            color: whiteColor,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: () async {
+                                    Navigator.pop(context);
+                                    final uri =
+                                        Uri.parse("mailto:medkaro.in@gmail.com");
+                                    if (await canLaunchUrl(uri)) {
+                                      await launchUrl(uri);
+                                    }
+                                  },
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 14, vertical: 10),
+                                    margin: EdgeInsets.only(bottom: 8),
+                                    decoration: BoxDecoration(
+                                      color: greenColor, // Optional background
+                                      borderRadius: BorderRadius.circular(12),
+                                      
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.email, color: whiteColor),
+                                        SizedBox(width: 12),
+                                        Text(
+                                          "Email",
+                                          style: GoogleFonts.mulish(
+                                            color: whiteColor,
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                )
+                              ],
+                            )
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                  //final phoneNumber="+91 8910115375";
+                  //final Uri launchUri=Uri(
+                  //scheme: 'tel',
+                  //path: phoneNumber
+                  //);
+                  //if(await canLaunchUrl(launchUri)){
+                  //await launchUrl(launchUri);
+                  //}else{
+                  //print("faild to launch ");
+                  //}
+                },
+                child: Container(
+                  padding: const EdgeInsets.only(top: 16, bottom: 16, left: 16),
+                  decoration: BoxDecoration(
+                    color: ligtBlackColor,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 36,
+                        height: 36,
+                        child: const Center(
+                          child: Icon(
+                            Icons.support_agent, // Updated icon for support
+                            color: whiteColor,
+                            size: 28,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+
+                      // Title & Subtitle
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Help", // Updated title
+                            style: GoogleFonts.mulish(
+                              color: whiteColor,
+                              fontSize: 18,
+                              fontWeight: FontWeight.w400,
+                            ),
+                          ),
+                          SizedBox(height: 2),
+                          Text(
+                            "Get help or contact support", // Updated subtitle
                             style: GoogleFonts.mulish(
                               color: whiteColor,
                               fontWeight: FontWeight.w300,
