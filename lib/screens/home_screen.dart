@@ -72,6 +72,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Map<String, bool> updatingQuantity = {};
   bool fisrtTime = false;
   Timer? _animationTimer;
+  bool shown=false;
   bool loaded = false;
   bool newUser = false;
   bool GotproductDetail = false;
@@ -1204,7 +1205,11 @@ void showAddressSelectorBottomSheet(BuildContext context, List addresses) {
       final fetchAddress = data["data"]["address"];
       addresses = data['data']['address'];
       if (fetchAddress == null || fetchAddress.isEmpty) {
-         showAddAddressBottomSheet(context);
+        if(shown==false){
+          showAddAddressBottomSheet(context);
+        }
+        shown=true;
+        
         print("ADDRESS LIST IS EMPTY");
         setState(() {
           Address.CurrentAddress = {
