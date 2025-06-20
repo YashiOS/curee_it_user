@@ -9,15 +9,15 @@ import 'package:cureeit_user_app/screens/base_screen.dart';
 import 'package:cureeit_user_app/screens/loading.dart';
 import 'package:cureeit_user_app/selected_Address/currentAddress.dart';
 import 'package:cureeit_user_app/user/user.dart';
-import 'package:cureeit_user_app/utils/razor_pay.dart';
+import 'package:cureeit_user_app/utils/cashfree.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_cashfree_pg_sdk/utils/cfenums.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:loading_indicator/loading_indicator.dart';
-import 'package:razorpay_flutter/razorpay_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class OrderTrackingScreen extends StatefulWidget {
@@ -33,6 +33,7 @@ class OrderTrackingScreen extends StatefulWidget {
 
 class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
   var orderTrackingDetails;
+  var paymentOrderData;
   List acceptedProducts = [];
   bool HittingApi = false;
   bool _isInitLoading = true;
@@ -118,6 +119,18 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     return formattedDate;
   }
 
+Future<void> startPayment(String orderId, String paymentSessionId) async {
+    final cashFreePayment = CashfreePaymentService(
+      environment: CFEnvironment.SANDBOX,
+      orderId: orderId,
+      paymentSessionId: paymentSessionId,
+    );
+    
+    await cashFreePayment.initializeCashfree();
+    await cashFreePayment.webCheckout();
+  }
+
+
   Future<void> fetchOrderTracking() async {
     String orderId = widget.orderId;
     var url = Uri.parse(
@@ -163,6 +176,35 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
       _isInitLoading = false;
     });
   }
+Future<void> getPaymentSessionID() async {
+  var url = Uri.parse('$baseUrl/cashfree/getPaymentSessionID');
+  final totalAmount = orderTrackingDetails["finalTotal"];
+  var response = await http.post(
+    url,
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({'userId': User.userId, 'totalAmount': totalAmount}),
+  );
+
+  if (response.statusCode == 200) {
+    final data = jsonDecode(response.body);
+
+    final paymentSessionId = data["payment_session_id"];
+    final orderId = data["order_id"];
+
+    setState(() {
+      paymentOrderData = {
+        "payment_session_id": paymentSessionId,
+        "order_id": orderId,
+      };
+    });
+
+    print(paymentSessionId);
+    await startPayment(orderId, paymentSessionId);
+  } else {
+    print('Failed to load paymentOrderData details');
+  }
+}
+
 
   @override
   void initState() {
@@ -730,30 +772,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                 ),
                 GestureDetector(
                   onTap: () {
-                    RazorpayPayment razorpayPayment = RazorpayPayment(
-                      onSuccess: (PaymentSuccessResponse response) {
-                        createCheckout(
-                            (finalTotal).toStringAsFixed(2),
-                            shippingCost,
-                            "${Address.CurrentAddress!["address"]}",
-                            response.paymentId.toString(),
-                            avlId);
-                      },
-                      onFailure: (PaymentFailureResponse response) {
-                        print('Payment Failed: ${response.message}');
-                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                          content: Text('Payment Failed'),
-                        ));
-                      },
-                    );
-
-                    razorpayPayment.initiatePayment(
-                      finalTotal, // Amount in paise (e.g., 50000 = 500 INR)
-                      'CUREEIT MEDICOS PRIVATE LIMITED', // Product Name
-                      'Please do the payment', // Description
-                      '8890170172',
-                      'accounts@cureeit.com',
-                    );
+                getPaymentSessionID();
                   },
                   child: Container(
                     height: 36,

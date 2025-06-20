@@ -1245,6 +1245,8 @@ class _CartScreenState extends State<CartScreen> {
                                                                         '8890170172',
                                                                         'accounts@cureeit.com',
                                                                       );*/
+
+
                                                                     },
                                                                     child:
                                                                         Container(

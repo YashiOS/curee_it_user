@@ -30,7 +30,7 @@ android {
         applicationId = "com.cureeit.medkaro"
         minSdk = 21
         targetSdk = 34
-        versionCode = 2
+        versionCode = 4
         versionName = flutter.versionName
     }
 
