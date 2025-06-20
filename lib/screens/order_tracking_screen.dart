@@ -119,8 +119,13 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     return formattedDate;
   }
 
-Future<void> startPayment(String orderId, String paymentSessionId) async {
+Future<void> startPayment(String orderId, String paymentSessionId,String total, double shippingCost,String shippingAddress, String avlId,BuildContext context) async {
     final cashFreePayment = CashfreePaymentService(
+      context: context,
+      total: total,
+      avlId:avlId ,
+      shippingAddress:shippingAddress ,
+      shippingCost:shippingCost ,
       environment: CFEnvironment.SANDBOX,
       orderId: orderId,
       paymentSessionId: paymentSessionId,
@@ -176,7 +181,8 @@ Future<void> startPayment(String orderId, String paymentSessionId) async {
       _isInitLoading = false;
     });
   }
-Future<void> getPaymentSessionID() async {
+
+Future<void> getPaymentSessionID(double shippingCost,String shippingAddress,String avlId,BuildContext context) async {
   var url = Uri.parse('$baseUrl/cashfree/getPaymentSessionID');
   final totalAmount = orderTrackingDetails["finalTotal"];
   var response = await http.post(
@@ -199,7 +205,7 @@ Future<void> getPaymentSessionID() async {
     });
 
     print(paymentSessionId);
-    await startPayment(orderId, paymentSessionId);
+    await startPayment(orderId, paymentSessionId,totalAmount,shippingCost,shippingAddress,avlId,context);
   } else {
     print('Failed to load paymentOrderData details');
   }
@@ -772,7 +778,7 @@ Future<void> getPaymentSessionID() async {
                 ),
                 GestureDetector(
                   onTap: () {
-                getPaymentSessionID();
+                getPaymentSessionID(shippingCost,Address.CurrentAddress!["address"],avlId,context);
                   },
                   child: Container(
                     height: 36,

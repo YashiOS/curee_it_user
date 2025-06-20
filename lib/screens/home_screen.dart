@@ -1257,7 +1257,7 @@ void showAddressSelectorBottomSheet(BuildContext context, List addresses) {
               "_id": ""
             };
             localAddress = address;
-            Address.selectedIndex = null;
+            Address.selectedIndex = 0;
           });
           checkLocation();
           return;
