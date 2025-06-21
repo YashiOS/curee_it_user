@@ -32,6 +32,7 @@ class OrderTrackingScreen extends StatefulWidget {
 }
 
 class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
+  bool paymentStart=false;
   var orderTrackingDetails;
   var paymentOrderData;
   List acceptedProducts = [];
@@ -133,6 +134,10 @@ Future<void> startPayment(String orderId, String paymentSessionId,String total, 
     
     await cashFreePayment.initializeCashfree();
     await cashFreePayment.webCheckout();
+     setState(() {
+      paymentStart=false;
+  });
+
   }
 
 
@@ -185,6 +190,10 @@ Future<void> startPayment(String orderId, String paymentSessionId,String total, 
 Future<void> getPaymentSessionID(double shippingCost,String shippingAddress,String avlId,BuildContext context) async {
   var url = Uri.parse('$baseUrl/cashfree/getPaymentSessionID');
   final totalAmount = orderTrackingDetails["finalTotal"];
+  setState(() {
+      paymentStart=true;
+  });
+
   var response = await http.post(
     url,
     headers: {'Content-Type': 'application/json'},
@@ -794,7 +803,15 @@ Future<void> getPaymentSessionID(double shippingCost,String shippingAddress,Stri
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Center(
-                      child: Text(
+                      child:paymentStart?Container(
+                        height: 10,
+                        width: 10,
+                        
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: whiteColor,
+                        ),
+                      ) :Text(
                         "Confirm and Pay",
                         style: GoogleFonts.mulish(
                           color: whiteColor,
