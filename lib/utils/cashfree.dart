@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:cureeit_user_app/BaseUrl.dart';
 import 'package:cureeit_user_app/cartManager/cartManager.dart';
 import 'package:cureeit_user_app/screens/Order_SuccessScreen.dart';
@@ -38,6 +37,7 @@ class CashfreePaymentService {
     required this.orderId,
     required this.paymentSessionId,
   });
+
    Future<void> createCheckout(String total, double shippingCost,
       String shippingAddress, String transactionId, String avlId,) async {
     ;
@@ -60,12 +60,7 @@ class CashfreePaymentService {
           "shippingAddress": shippingAddress,
           "availableId": avlId,
           "userLat": Address.CurrentAddress?["userLat"] ?? 0.0,
-          "userLong": Address.CurrentAddress?["userLong"] ?? 0.0,
-          "paymentDetails": {
-            "gateway": "Paytm",
-            "transactionId": transactionId,
-            "status": "Paid"
-          }
+          "userLong": Address.CurrentAddress?["userLong"] ?? 0.0
         });
 
       var response = await http.Client().send(request);
@@ -108,10 +103,42 @@ class CashfreePaymentService {
     }
   }
 
-  void verifyPayment(String orderId) {
-    print("hitting creat checkout");
-    createCheckout(total, shippingCost, shippingAddress, paymentSessionId, avlId,);
-    print("Verify Payment: $orderId");
+  void verifyPayment(String orderId) async {
+   print("Verifying payment for order: $orderId");
+
+  try {
+    var url = Uri.parse('$baseUrl/cashfree/getPaymentStatus');
+    var response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'availableID': avlId, 'orderId': orderId}),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      final paymentStatus = data["paymentStatus"];
+
+      print("Payment status: $paymentStatus");
+      if (paymentStatus == true) {
+        createCheckout(total, shippingCost, shippingAddress, paymentSessionId, avlId);
+      } else {
+        print("Payment not successful. Status: $paymentStatus");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Payment failed or pending: $paymentStatus")),
+        );
+      }
+    } else {
+      print('Failed to fetch payment status');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to verify payment")),
+      );
+    }
+  } catch (e) {
+    print("Error while verifying payment: $e");
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text("Error verifying payment")),
+    );
+  }
   }
 
   void onError(CFErrorResponse errorResponse, String orderId) {
