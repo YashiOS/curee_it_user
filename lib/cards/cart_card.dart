@@ -9,6 +9,10 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'dart:async';
 
+class HandlingUpdate{
+  static bool isUpdating=false;
+}
+
 class CartCard extends StatefulWidget {
   final String productName;
   final String packLabel;
@@ -21,9 +25,11 @@ class CartCard extends StatefulWidget {
   final Function reBuild;
   final List<dynamic> productImages;
   final Function isDeleting;
+ 
 
-  const CartCard(
+   CartCard(
       {super.key,
+     
       required this.productName,
       required this.packLabel,
       required this.quantity,
@@ -69,65 +75,71 @@ class _CartCardState extends State<CartCard> {
   }
 
   void _onQuantityChanged(int newQuantity) async {
-    if (isUpdating) return;
     if (newQuantity == _localQuantity) return;
     setState(() {
       _localQuantity = newQuantity;
-      isUpdating = true;
+     HandlingUpdate.isUpdating=true;
+     
     });
-
+    
     _debounceTimer?.cancel();
-    _debounceTimer = Timer(const Duration(milliseconds: 500), () {
+    _debounceTimer = Timer(const Duration(seconds: 1), () {
       _updateQuantity(newQuantity);
     });
   }
 
   Future<void> _updateQuantity(int quantity) async {
+    widget.reBuild;
     final String userId = User.userId!;
     final String productId = widget.productId;
     if (_lastSentQuantity == quantity) return;
     _lastSentQuantity = quantity;
-  CartManager.cartQuantities[productId]=quantity;
+    CartManager.cartQuantities[productId] = quantity;
     final Map<String, dynamic> requestData = {
       "userId": userId,
       "productId": productId,
       "quantity": quantity
     };
 
-    final url =
-        '$baseUrl/cart/updateQuantity';
+    final url = '$baseUrl/cart/updateQuantity';
     try {
       final response = await http.put(
         Uri.parse(url),
         headers: {'Content-Type': 'application/json'},
         body: json.encode(requestData),
       );
-   
+
       if (response.statusCode == 200) {
+        await widget.onUpdate();
+       
+         HandlingUpdate.isUpdating=false;
       
 
-        await widget.onUpdate();
-        setState(() {
-          isUpdating = false;
-        });
       } else {
-         setState(() {
-          isUpdating = false;
+        setState(() {
+          CartManager.cartQuantities[productId] = _lastSentQuantity;
+          HandlingUpdate.isUpdating=false;
+        
         });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("Failed to update quantity !",style: GoogleFonts.mulish(),),
+            content: Text(
+              "Failed to update quantity !",
+              style: GoogleFonts.mulish(),
+            ),
             backgroundColor: greenColor,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
             duration: Duration(seconds: 2),
-          ),);
+          ),
+        );
         print(
             'Failed to update quantity. Status code: ${response.statusCode} ');
       }
     } catch (error) {
+      CartManager.cartQuantities[productId] = _lastSentQuantity;
       print('Error updating quantity: $error');
     }
   }
@@ -141,9 +153,8 @@ class _CartCardState extends State<CartCard> {
       "userId": userId,
       "productId": productId,
     };
-    
-    final url =
-        '$baseUrl/cart/removeFromCart';
+
+    final url = '$baseUrl/cart/removeFromCart';
     try {
       final response = await http.delete(
         Uri.parse(url),
@@ -152,38 +163,44 @@ class _CartCardState extends State<CartCard> {
       );
 
       if (response.statusCode == 200) {
-         CartManager.cartQuantities[productId]=0;
-       
-       await widget.onRemove();
+        CartManager.cartQuantities[productId] = 0;
+
+        await widget.onRemove();
         widget.isDeleting(false);
-        
       } else {
-       
         widget.isDeleting(false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("Failed to remove from cart",style: GoogleFonts.mulish(),),
+            content: Text(
+              "Failed to remove from cart",
+              style: GoogleFonts.mulish(),
+            ),
             backgroundColor: greenColor,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(8),
             ),
             duration: Duration(seconds: 2),
-          ),);
+          ),
+        );
         print('Failed to remove from cart');
       }
     } catch (error) {
       widget.isDeleting(false);
       ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Error removing from cart ",style: GoogleFonts.mulish(),),
-            backgroundColor: greenColor,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            duration: Duration(seconds: 2),
-          ),);
+        SnackBar(
+          content: Text(
+            "Error removing from cart ",
+            style: GoogleFonts.mulish(),
+          ),
+          backgroundColor: greenColor,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          duration: Duration(seconds: 2),
+        ),
+      );
       print('Error removing from cart: $error');
     }
   }
@@ -192,14 +209,15 @@ class _CartCardState extends State<CartCard> {
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-   
+
     return Padding(
       padding: EdgeInsets.only(
         top: 5,
       ),
       child: Container(
-        padding:
-            EdgeInsets.only(right: MediaQuery.of(context).size.width * 0.055, left: MediaQuery.of(context).size.width * 0.03),
+        padding: EdgeInsets.only(
+            right: MediaQuery.of(context).size.width * 0.055,
+            left: MediaQuery.of(context).size.width * 0.03),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -211,7 +229,7 @@ class _CartCardState extends State<CartCard> {
                   width: 10,
                 ),
                 // Product Image
-            
+
                 /// Product Info
                 Container(
                   width: 135,
@@ -270,11 +288,10 @@ class _CartCardState extends State<CartCard> {
                   ),
                   child: Center(
                     child: Row(
-                       // Changed to spaceBetween
-                      crossAxisAlignment: CrossAxisAlignment
-                      
-                          .center,
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly, // Added for vertical centering
+                      // Changed to spaceBetween
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      mainAxisAlignment: MainAxisAlignment
+                          .spaceEvenly, // Added for vertical centering
                       children: [
                         GestureDetector(
                           onTap: () {
@@ -296,23 +313,14 @@ class _CartCardState extends State<CartCard> {
                             ),
                           ),
                         ),
-                        isUpdating
-                            ? SizedBox(
-                                height: 8,
-                                width: 8,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: whiteColor,
-                                ),
-                              )
-                            : Text(
-                                "$_localQuantity",
-                                style: GoogleFonts.mulish(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 12,
-                                  color: whiteColor,
-                                ),
-                              ),
+                        Text(
+                          "$_localQuantity",
+                          style: GoogleFonts.mulish(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12,
+                            color: whiteColor,
+                          ),
+                        ),
                         GestureDetector(
                           onTap: () {
                             if (isUpdating == false) {
@@ -334,13 +342,14 @@ class _CartCardState extends State<CartCard> {
                     ),
                   ),
                 ),
-                
+
                 // Price Column
                 Container(
-                 width: MediaQuery.of(context).size.width * 0.18, // ~70 if screen is ~390px wide
+                  width: MediaQuery.of(context).size.width *
+                      0.18, // ~70 if screen is ~390px wide
 
                   height: 60,
-                 
+
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
@@ -348,7 +357,14 @@ class _CartCardState extends State<CartCard> {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text("₹${(widget.productPrice * _localQuantity).toStringAsFixed(2)}",style: GoogleFonts.mulish(color:greyColor,decoration: TextDecoration.lineThrough,fontSize: 10,decorationColor: greyColor),),
+                          Text(
+                            "₹${(widget.productPrice * _localQuantity).toStringAsFixed(2)}",
+                            style: GoogleFonts.mulish(
+                                color: greyColor,
+                                decoration: TextDecoration.lineThrough,
+                                fontSize: 10,
+                                decorationColor: greyColor),
+                          ),
                           Text(
                             "₹${((widget.sellingPrice) * _localQuantity).toStringAsFixed(2)}",
                             style: GoogleFonts.mulish(
@@ -357,8 +373,6 @@ class _CartCardState extends State<CartCard> {
                               color: whiteColor,
                             ),
                           ),
-                          
-                          
                         ],
                       ),
                     ],

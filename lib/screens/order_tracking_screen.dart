@@ -190,6 +190,7 @@ Future<void> startPayment(String orderId, String paymentSessionId,String total, 
 Future<void> getPaymentSessionID(double shippingCost,String shippingAddress,String avlId,BuildContext context) async {
   var url = Uri.parse('$baseUrl/cashfree/getPaymentSessionID');
   final totalAmount = orderTrackingDetails["finalTotal"];
+  final availableID = orderTrackingDetails["availableID"];
   setState(() {
       paymentStart=true;
   });
@@ -197,7 +198,7 @@ Future<void> getPaymentSessionID(double shippingCost,String shippingAddress,Stri
   var response = await http.post(
     url,
     headers: {'Content-Type': 'application/json'},
-    body: jsonEncode({'userId': User.userId, 'totalAmount': totalAmount}),
+    body: jsonEncode({'userId': User.userId, 'availableID': availableID,'totalAmount': totalAmount}),
   );
 
   if (response.statusCode == 200) {

@@ -107,6 +107,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   int estTime = 0;
   int _currentPage = 0;
   final PageController _pageController = PageController();
+  Timer? _debounceTimer;
   // To store product quantities
 
   void _showLocationDeniedDialog() {
@@ -335,13 +336,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Future<void> didAddToCart(int index) async {
-    setState(() {
-      isAddingMap[index] = true;
-    });
+   
+    //setState(() {
+      //isAddingMap[index] = true;
+    //});
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final product = products[index];
     final productId = product['productId'];
-
+    CartManager.cartQuantities[productId] =
+              (CartManager.cartQuantities[productId] ?? 0) + 1;
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/cart/addToCart'),
@@ -361,18 +364,20 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           fetchCartDetails();
           isTapped = true;
           isAddingMap[index] = false;
-          CartManager.cartQuantities[productId] =
-              (CartManager.cartQuantities[productId] ?? 0) + 1;
+          
         });
         Fluttertoast.showToast(msg: "Added To Cart");
       } else {
         ScaffoldMessenger.of(context).clearSnackBars();
+      CartManager.cartQuantities[productId]=0;
         isAddingMap[index] = false;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to add item to cart')),
         );
       }
     } catch (e) {
+      CartManager.cartQuantities[productId]=0;
+        isAddingMap[index] = false;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Network error: $e')),
       );
@@ -449,6 +454,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Future<void> DidUpdateQuantity(int index, int change) async {
+     _debounceTimer?.cancel();
     final product = products[index];
     final productId = product['productId'];
     final String? userId = User.userId; // Example userId
@@ -457,11 +463,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
     // Update local state immediately for UI responsiveness
     setState(() {
-      updatingQuantity[productId] = true;
+      //updatingQuantity[productId] = true;
       if (newQuantity < 1) {
         quantities[index] = 0;
       } else {
         quantities[index] = newQuantity;
+         CartManager.cartQuantities[productId] = newQuantity;
       }
     });
     if (newQuantity == 0) {
@@ -469,7 +476,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       return;
     }
 
-    try {
+    _debounceTimer=Timer(Duration(seconds: 1),()async{
+      print("callng");
+ try {
       final response = await http.put(
         Uri.parse('$baseUrl/cart/updateQuantity'),
         headers: {'Content-Type': 'application/json'},
@@ -481,7 +490,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       );
       if (response.statusCode == 200) {
         fetchCartDetails();
-        CartManager.cartQuantities[productId] = newQuantity;
+       
         setState(() {
           updatingQuantity[productId] = false;
         });
@@ -509,6 +518,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         SnackBar(content: Text('Network error: $e')),
       );
     }
+    } );       
+   
   }
 
   Future<void> fetchCartDetails() async {

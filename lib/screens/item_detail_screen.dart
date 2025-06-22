@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cureeit_user_app/BaseUrl.dart';
 import 'package:cureeit_user_app/cartManager/cartManager.dart';
 import 'package:cureeit_user_app/screens/cart_screen.dart';
@@ -33,6 +35,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
   bool readMore = false;
   int? currentQuantity;
   bool isUpdatingQun = false;
+  Timer? _debounceTimer;
 
   @override
   void initState() {
@@ -67,7 +70,10 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
       );
 
       if (response.statusCode == 200) {
-        CartManager.cartQuantities[widget.productId] = 0;
+        setState(() {
+          isInCart = false;
+          CartManager.cartQuantities.remove(widget.productId);
+        });
 
         Fluttertoast.showToast(msg: "Removed from cart");
       } else {
@@ -109,19 +115,22 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
   }
 
   Future<void> DidUpdateQuantity(int change, String productId) async {
-    setState(() {
-      isUpdatingQun = true;
-    });
+    _debounceTimer?.cancel();
     final newQuantity = CartManager.cartQuantities[widget.productId]! + change;
     setState(() {
+      
       currentQuantity = newQuantity;
+        CartManager.cartQuantities[widget.productId] = newQuantity;
     });
 
     if (newQuantity < 1) {
+      setState(() {
+        isUpdatingQun=true;
+      });
       await _removeFromCart(widget.productId);
       setState(() {
-        isUpdatingQun = false;
-        CartManager.cartQuantities.remove(widget.productId);
+       isUpdatingQun=false;
+       
       });
       // Remove from cart if quantity goes to 0
 
@@ -131,7 +140,9 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
     final String? userId = User.userId; // Example userId
 
     // Update local state immediately for UI responsiveness
+_debounceTimer=Timer(Duration(seconds: 1), ()async{
 
+});
     try {
       final response = await http.put(
         Uri.parse('$baseUrl/cart/updateQuantity'),
@@ -142,16 +153,15 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
           "quantity": newQuantity,
         }),
       );
-      CartManager.cartQuantities[widget.productId] = newQuantity;
-      setState(() {
-        isUpdatingQun = false;
-      });
+    
+      
       if (response.statusCode != 200) {
         // Handle error - revert local state in case of failure
         setState(() {
-          isUpdatingQun = false;
+         
 
           currentQuantity = newQuantity;
+           CartManager.cartQuantities[widget.productId] = currentQuantity!;
         });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to update cart')),
@@ -159,14 +169,16 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
       }
     } catch (e) {
       // Handle network errors - revert local state
-      setState(() {});
+      setState(() {
+        
+          currentQuantity = newQuantity;
+           CartManager.cartQuantities[widget.productId] = currentQuantity!;
+      });
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Network error: $e')),
       );
     }
-    setState(() {
-      isUpdatingQun = false;
-    });
+   
   }
 
   Future<void> checkIfFav() async {
@@ -244,8 +256,11 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
   }
 
   Future<void> addToCart() async {
+    //setState(() {
+    //addingToCart = true;
+    //});
     setState(() {
-      addingToCart = true;
+      CartManager.cartQuantities[widget.productId] = 1;
     });
 
     try {
@@ -263,8 +278,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
       var response = await http.Client().send(request);
 
       if (response.statusCode == 200) {
-        CartManager.cartQuantities[widget.productId] = 1;
-        Fluttertoast.showToast(msg: "Added To Cart");
+       // Fluttertoast.showToast(msg: "Added To Cart");
         setState(() {
           currentQuantity = 1;
           isInCart = true;
@@ -280,11 +294,16 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
       } else {
         setState(() {
           addingToCart = false;
+          isInCart = false;
+          CartManager.cartQuantities[widget.productId] = 0;
         });
+
         throw Exception('Failed to add to cart');
       }
     } catch (error) {
       setState(() {
+        isInCart = false;
+        CartManager.cartQuantities.remove(widget.productId);
         addingToCart = false;
       });
       print('Error adding to cart: $error');
@@ -295,22 +314,19 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
   Future<Map<String, dynamic>> fetchProductDetails(String productId) async {
     try {
       var url = Uri.parse('$baseUrl/product/productDetail');
-      var response =await http.post(url,
+      var response = await http.post(url,
           headers: {'Content-Type': 'application/json'},
           body: jsonEncode({'productId': productId}));
-
-      
 
       if (response.statusCode == 200) {
         var responseBody = jsonDecode(response.body);
         Map<String, dynamic> jsonData = responseBody;
         productId = jsonData["data"]["productId"];
-       
 
         if (jsonData['data'] == null) {
           return {};
         }
-       
+
         return {
           'name': jsonData['data']['name'] ?? 'Unknown Product',
           'saltComposition': jsonData['data']['saltComposition'] ?? 'N/A',
@@ -361,7 +377,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
       backgroundColor: scaffoldBlackColor,
       appBar: AppBar(
         scrolledUnderElevation: 0,
-            elevation: 0,
+        elevation: 0,
         centerTitle: true,
         shape: ContinuousRectangleBorder(
           borderRadius: BorderRadius.only(
@@ -538,7 +554,6 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                           ),
                         ),
                       ),
-                     
                       Container(
                           margin: EdgeInsets.only(left: 24),
                           height: 15,
@@ -549,70 +564,82 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
                       SizedBox(
                         height: 20,
                       ),
-                     if(product["saltComposition"]!=null&&product["saltComposition"]!="")   
-                      Container(
-                          margin: EdgeInsets.only(left: 24),
-                          height: 18,
-                          child: Text(
-                            "Salt composition",
-                            style: GoogleFonts.mulish(color: greyColor),
-                          )),
-                      if(product["saltComposition"]!=null&&product["saltComposition"]!="")
-                      SizedBox(
-                        height: 5,
-                      ),
-                      if(product["saltComposition"]!=null&&product["saltComposition"]!="")
-                      Container(
-                          margin: EdgeInsets.only(left: 24),
-                          height: 18,
-                          child: Text(
-                            "${product['saltComposition'] ?? 'N/A'}",
-                            style: GoogleFonts.mulish(color: whiteColor),
-                          )),
-                      if(product["saltComposition"]!=null&&product["saltComposition"]!="")    
-                      SizedBox(
-                        height: 10,
-                      ),
-                      if(product["mainUse"]!=null&&product["mainUse"]!="")
-                      Container(
-                          margin: EdgeInsets.only(left: 24),
-                          height: 15,
-                          child: Text(
-                            "Use",
-                            style: GoogleFonts.mulish(color: greyColor),
-                          )),
-                      if(product["mainUse"]!=null&&product["mainUse"]!="")    
-                      SizedBox(
-                        height: 5,
-                      ),
-                      if(product["mainUse"]!=null&&product["mainUse"]!="")
-                      Container(
-                          margin: EdgeInsets.only(left: 24),
-                          height: 18,
-                          child: Text(
-                            "${product['mainUse'] ?? ''}",
-                            style: GoogleFonts.mulish(color: whiteColor),
-                          )),
-                       if(product["mainUse"]!=null&&product["mainUse"]!="")
-                      SizedBox(
-                        height: 10,
-                      ),
-                     if(product["usageInstruction"]!=null&&product["usageInstruction"]!=""&&product["usageInstruction"]!="N/A")
-                      Container(
-                          margin: EdgeInsets.only(left: 24),
-                          height: 18,
-                          child: Text(
-                            "Description",
-                            style: GoogleFonts.mulish(color: greyColor),
-                          )),
-                     if(product["usageInstruction"]!=null&&product["usageInstruction"]!=""&&product["usageInstruction"]!="N/A")
-                      Container(
-                        margin: EdgeInsets.only(left: 24, top: 5, right: 24),
-                        child: Text(
-                          "${product['usageInstruction'] ?? ''}",
-                          style: GoogleFonts.mulish(color: whiteColor),
+                      if (product["saltComposition"] != null &&
+                          product["saltComposition"] != "")
+                        Container(
+                            margin: EdgeInsets.only(left: 24),
+                            height: 18,
+                            child: Text(
+                              "Salt composition",
+                              style: GoogleFonts.mulish(color: greyColor),
+                            )),
+                      if (product["saltComposition"] != null &&
+                          product["saltComposition"] != "")
+                        SizedBox(
+                          height: 5,
                         ),
-                      ),
+                      if (product["saltComposition"] != null &&
+                          product["saltComposition"] != "")
+                        Container(
+                            margin: EdgeInsets.only(left: 24),
+                            height: 18,
+                            child: Text(
+                              "${product['saltComposition'] ?? 'N/A'}",
+                              style: GoogleFonts.mulish(color: whiteColor),
+                            )),
+                      if (product["saltComposition"] != null &&
+                          product["saltComposition"] != "")
+                        SizedBox(
+                          height: 10,
+                        ),
+                      if (product["mainUse"] != null &&
+                          product["mainUse"] != "")
+                        Container(
+                            margin: EdgeInsets.only(left: 24),
+                            height: 15,
+                            child: Text(
+                              "Use",
+                              style: GoogleFonts.mulish(color: greyColor),
+                            )),
+                      if (product["mainUse"] != null &&
+                          product["mainUse"] != "")
+                        SizedBox(
+                          height: 5,
+                        ),
+                      if (product["mainUse"] != null &&
+                          product["mainUse"] != "")
+                        Container(
+                            margin: EdgeInsets.only(left: 24),
+                            height: 18,
+                            child: Text(
+                              "${product['mainUse'] ?? ''}",
+                              style: GoogleFonts.mulish(color: whiteColor),
+                            )),
+                      if (product["mainUse"] != null &&
+                          product["mainUse"] != "")
+                        SizedBox(
+                          height: 10,
+                        ),
+                      if (product["usageInstruction"] != null &&
+                          product["usageInstruction"] != "" &&
+                          product["usageInstruction"] != "N/A")
+                        Container(
+                            margin: EdgeInsets.only(left: 24),
+                            height: 18,
+                            child: Text(
+                              "Description",
+                              style: GoogleFonts.mulish(color: greyColor),
+                            )),
+                      if (product["usageInstruction"] != null &&
+                          product["usageInstruction"] != "" &&
+                          product["usageInstruction"] != "N/A")
+                        Container(
+                          margin: EdgeInsets.only(left: 24, top: 5, right: 24),
+                          child: Text(
+                            "${product['usageInstruction'] ?? ''}",
+                            style: GoogleFonts.mulish(color: whiteColor),
+                          ),
+                        ),
                       Container(
                         margin: EdgeInsets.only(
                             top: 24, left: 24, right: 24, bottom: 24),

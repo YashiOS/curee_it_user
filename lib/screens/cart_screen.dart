@@ -26,6 +26,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
 
 import 'package:razorpay_flutter/razorpay_flutter.dart';
+import 'package:shimmer/shimmer.dart';
 
 class CartScreen extends StatefulWidget {
   final isNavigated;
@@ -53,6 +54,7 @@ class _CartScreenState extends State<CartScreen> {
   bool payNow = true;
   bool imagePicked = false;
   File? _imageFile;
+ 
 
   @override
   void initState() {
@@ -119,7 +121,7 @@ class _CartScreenState extends State<CartScreen> {
 
   void reBuild() {
     setState(() {});
-    print("ruBuild done");
+    
   }
 
   void ItemDeleting(bool value) {
@@ -217,6 +219,10 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   Future<void> fetchCartDetails() async {
+ setState(() {
+   
+ });
+  
     var cartApiUrl = Uri.parse("$baseUrl/cart/cartDetails");
     final String? userId = User.userId; // Replace with the actual userId
 
@@ -567,11 +573,11 @@ class _CartScreenState extends State<CartScreen> {
       final compressedFile = await FlutterImageCompress.compressAndGetFile(
         imageFile.absolute.path,
         targetPath,
-        quality: 30, 
-        
+        quality: 30,
+
         // You can tune this
       );
-     print("image compressed");
+      print("image compressed");
       return File(compressedFile!.path);
     } catch (e) {
       print("Image compression error: $e");
@@ -958,8 +964,6 @@ class _CartScreenState extends State<CartScreen> {
                                                                       sellingPrice: (item['sellingPrice'] ?? 0).toDouble(),
                                                                       onUpdate: fetchCartDetails,
                                                                       onRemove: () async {
-                                                                        print(
-                                                                            "on remove is called");
                                                                         removeItemFromCart(
                                                                             item['productId']);
                                                                         fetchCartDetails();
@@ -1129,12 +1133,35 @@ class _CartScreenState extends State<CartScreen> {
                                                                           MainAxisAlignment
                                                                               .spaceBetween,
                                                                       children: [
-                                                                        Text(
-                                                                          "To Pay",
-                                                                          style: GoogleFonts.mulish(
-                                                                              fontWeight: FontWeight.bold,
-                                                                              fontSize: 16,
-                                                                              color: whiteColor),
+                                                                        Column(
+                                                                          crossAxisAlignment:
+                                                                              CrossAxisAlignment.start,
+                                                                          children: [
+                                                                            Text(
+                                                                              "To Pay",
+                                                                              style: GoogleFonts.mulish(
+                                                                                fontWeight: FontWeight.bold,
+                                                                                fontSize: 16,
+                                                                                color: whiteColor,
+                                                                              ),
+                                                                            ),
+                                                                            if(HandlingUpdate.isUpdating)
+                                                                            const SizedBox(height: 2),
+                                                                            if(HandlingUpdate.isUpdating)
+                                                                            Shimmer.fromColors(
+                                                                              baseColor: ligtBlackColor,
+                                                                              highlightColor: greenColor,
+                                                                              child: Container(
+                                                                                decoration: BoxDecoration(
+                                                                                   borderRadius: BorderRadius.circular(5),
+                                                                                    color: greenColor,
+                                                                                ),
+                                                                                width: 50, // or adjust as needed to match "To Pay" width
+                                                                                height: 4,
+                                                                              
+                                                                              ),
+                                                                            ),
+                                                                          ],
                                                                         ),
                                                                         Text(
                                                                           "₹${totalWholeAmount.toStringAsFixed(2)}",
@@ -1157,7 +1184,7 @@ class _CartScreenState extends State<CartScreen> {
                                                                       if (addresses
                                                                               .length ==
                                                                           0) {
-                                                                            ScaffoldMessenger.of(context)
+                                                                        ScaffoldMessenger.of(context)
                                                                             .showSnackBar(
                                                                           SnackBar(
                                                                               backgroundColor: ligtBlackColor,
@@ -1185,7 +1212,7 @@ class _CartScreenState extends State<CartScreen> {
                                                                           builder: (context) => MedicineAvailabilityScreen(
                                                                                 prescriptionImage: _imageFile,
                                                                               )));
-                                                                      
+
                                                                       CartManager
                                                                           .cartQuantities
                                                                           .clear(); //removing cart item from backend , not using await so it will be done in background ,so user does not have to wait
@@ -1245,8 +1272,6 @@ class _CartScreenState extends State<CartScreen> {
                                                                         '8890170172',
                                                                         'accounts@cureeit.com',
                                                                       );*/
-
-
                                                                     },
                                                                     child:
                                                                         Container(

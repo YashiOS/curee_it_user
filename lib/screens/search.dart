@@ -29,7 +29,7 @@ class _SearchState extends State<Search> {
   Map<String, bool> _inCartMap = {};
   Map<String, bool> isAdding = {};
   Map<String, bool> isUpdating = {};
-
+  Timer? _UpdateDebouner;
   // Track quantities for each product
   Map<String, int> _quantityMap = {};
   // Function to call search API
@@ -181,6 +181,8 @@ class _SearchState extends State<Search> {
         _inCartMap[productId] = true;
         _quantityMap[productId] = 1;
         isAdding[productId] = true;
+         CartManager.cartQuantities[productId] =
+              (CartManager.cartQuantities[productId] ?? 0) + 1;
       });
       final response = await http.post(
         Uri.parse('$baseUrl/cart/addToCart'),
@@ -197,13 +199,13 @@ class _SearchState extends State<Search> {
       if (response.statusCode == 200) {
         setState(() {
           isAdding[productId] = false;
-          CartManager.cartQuantities[productId] =
-              (CartManager.cartQuantities[productId] ?? 0) + 1;
+         
           isIncart = true;
         });
         Fluttertoast.showToast(msg: "Added To Cart");
       } else {
         setState(() {
+          CartManager.cartQuantities.remove(productId);
           isAdding[productId] = false;
           _inCartMap.remove(productId);
           _quantityMap.remove(productId);
@@ -211,6 +213,7 @@ class _SearchState extends State<Search> {
         print('❌ Failed to add item to cart. Status: ${response.statusCode}');
       }
     } catch (e) {
+      CartManager.cartQuantities.remove(productId);
       print('❌ Network error: $e');
     }
 
@@ -219,12 +222,15 @@ class _SearchState extends State<Search> {
     });
   }
 
-  Future<void> DidUpdateQuantity(
-      int index, int change, String productId) async {
+  Future<void> DidUpdateQuantity(int index, int change, String productId) async {
+     _UpdateDebouner?.cancel();
     final currentQuantity = CartManager.cartQuantities[productId] ?? 1;
     final newQuantity = currentQuantity + change;
 
     if (newQuantity < 1) {
+      setState(() {
+        isUpdating[productId]=true;
+      });
       await _removeFromCart(productId);
 
       // Remove from cart if quantity goes to 0
@@ -238,13 +244,14 @@ class _SearchState extends State<Search> {
 
     final String? userId = User.userId; // Example userId
     setState(() {
-      isUpdating[productId] = true;
+     
       _quantityMap[productId] = newQuantity;
+      CartManager.cartQuantities[productId] = newQuantity;
     });
 
-    // Update local state immediately for UI responsiveness
-
-    try {
+    _UpdateDebouner=Timer(Duration(seconds: 1), ()async{
+      print("search add api hit");
+        try {
       final response = await http.put(
         Uri.parse('$baseUrl/cart/updateQuantity'),
         headers: {'Content-Type': 'application/json'},
@@ -256,7 +263,7 @@ class _SearchState extends State<Search> {
       );
       setState(() {
         isUpdating[productId] = false;
-        CartManager.cartQuantities[productId] = newQuantity;
+        
       });
 
       if (response.statusCode != 200) {
@@ -280,6 +287,9 @@ class _SearchState extends State<Search> {
         SnackBar(content: Text('Network error: $e')),
       );
     }
+    });
+
+    
     setState(() {
       isUpdating[productId] = false;
     });
