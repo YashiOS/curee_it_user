@@ -360,7 +360,7 @@ class _SearchState extends State<Search> {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 18),
+        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -410,11 +410,17 @@ class _SearchState extends State<Search> {
                             color: greyColor,
                           ),
                         ))
-                      : ListView.builder(
+                      : GridView.builder(
+                         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3, // Number of columns
+          crossAxisSpacing: 4, // Horizontal space between items
+          mainAxisSpacing: 4, // Vertical space between items
+          childAspectRatio: 0.44, // Width/height ratio for each item
+        ),
                           itemCount: _searchResults.length,
                           itemBuilder: (context, index) {
                             final item = _searchResults[index];
-
+                        
                             final productId = item["productId"];
                             final IsInCart = _inCartMap[productId] ?? false;
 
@@ -430,55 +436,215 @@ class _SearchState extends State<Search> {
                                 );
                               },
                               child: Card(
-                                color: ligtBlackColor,
+                                color: scaffoldBlackColor,
                                 margin: EdgeInsets.symmetric(vertical: 8),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Container(
                                   padding: EdgeInsets.all(8),
-                                  child: Row(
+                                  child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
                                       // Image on the left
-                                      Container(
-                                        width: 80,
-                                        height: 80,
-                                        decoration: BoxDecoration(
-                                          border: Border.all(
-                                            color: Colors.black,
-                                            width: 1,
+                                      Stack(
+                                        children: [
+                                           Container(
+                                          width: double.infinity,
+                                          height: 130,
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
+                                              color: Colors.black,
+                                              width: 1,
+                                            ),
+                                            color: Colors.white,
+                                            borderRadius:
+                                                BorderRadius.circular(8),
                                           ),
-                                          color: Colors.white,
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                        ),
-                                        child: Center(
-                                          child: Container(
-                                            height: 60,
-                                            width: 60,
-                                            child: Image.network(
-                                              (item["imageUrls"] != null &&
-                                                      item["imageUrls"]
-                                                          is List &&
-                                                      item["imageUrls"]
-                                                          .isNotEmpty)
-                                                  ? item["imageUrls"][0]
-                                                  : 'https://via.placeholder.com/100x100.png?text=Medicine',
-                                              fit: BoxFit.contain,
+                                          child: Center(
+                                            child: Container(
+                                              height: 80,
+                                              width: 80,
+                                              child: Image.network(
+                                                (item["imageUrls"] != null &&
+                                                        item["imageUrls"]
+                                                            is List &&
+                                                        item["imageUrls"]
+                                                            .isNotEmpty)
+                                                    ? item["imageUrls"][0]
+                                                    : 'https://upload.wikimedia.org/wikipedia/commons/1/14/No_Image_Available.jpg',
+                                                fit: BoxFit.contain,
+                                              ),
                                             ),
                                           ),
                                         ),
+                                        Positioned(
+                                          bottom: 3,
+                                          right: 3,
+                                          child: GestureDetector(
+                                                    onTap: () {
+                                                      if (!IsInCart) {
+                                                        didAddToCart(
+                                                          userId:
+                                                              User.userId!,
+                                                          productId:
+                                                              productId,
+                                                        );
+                                                      }
+                                                    },
+                                                    child: IsInCart &&
+                                                            CartManager.cartQuantities[
+                                                                    productId] !=
+                                                                null &&
+                                                            CartManager.cartQuantities[
+                                                                    productId]! >
+                                                                0
+                                                        ? Container(
+                                                            width: 70,
+                                                            height: 29,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              color:
+                                                                  greenColor,
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          8),
+                                                              border: Border.all(
+                                                                  color:
+                                                                      greenColor,
+                                                                  width: 1),
+                                                            ),
+                                                            child: FittedBox(
+                                                              child: Row(
+                                                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                                                children: [
+                                                                  IconButton(
+                                                                    padding:
+                                                                        EdgeInsets
+                                                                            .zero,
+                                                                    constraints:
+                                                                        BoxConstraints(),
+                                                                    icon: Icon(
+                                                                        Icons
+                                                                            .remove,
+                                                                        size: containerHeight *
+                                                                            0.08,
+                                                                        color:
+                                                                            whiteColor),
+                                                                    onPressed:
+                                                                        () {
+                                                                      DidUpdateQuantity(
+                                                                          index,
+                                                                          -1,
+                                                                          productId);
+                                                                    },
+                                                                  ),
+                                                                  SizedBox(width: 10,),
+                                                                  isUpdating[productId] ==
+                                                                          true
+                                                                      ? Container(
+                                                                          height:
+                                                                              10,
+                                                                          width:
+                                                                              10,
+                                                                          child:
+                                                                              CircularProgressIndicator(color: whiteColor),
+                                                                        )
+                                                                      : Text(
+                                                                          '${CartManager.cartQuantities[productId]}',
+                                                                          style:
+                                                                              GoogleFonts.mulish(
+                                                                            color: whiteColor,
+                                                                            fontWeight: FontWeight.bold,
+                                                                            fontSize: containerHeight * 0.06,
+                                                                          ),
+                                                                        ),
+                                                                        SizedBox(width: 10,),
+                                                                  IconButton(
+                                                                    padding:
+                                                                        EdgeInsets
+                                                                            .zero,
+                                                                    constraints:
+                                                                        BoxConstraints(),
+                                                                    icon: Icon(
+                                                                        Icons
+                                                                            .add,
+                                                                        size: containerHeight *
+                                                                            0.08,
+                                                                        color:
+                                                                            whiteColor),
+                                                                    onPressed:
+                                                                        () {
+                                                                      DidUpdateQuantity(
+                                                                          index,
+                                                                          1,
+                                                                          productId);
+                                                                    },
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ),
+                                                          )
+                                                        : Container(
+                                                            width: 50,
+                                                            height: 29,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              color:
+                                                                 ligtBlackColor,
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          8),
+                                                              border: Border.all(
+                                                                  color:
+                                                                      greenColor,
+                                                                  width: 1),
+                                                            ),
+                                                            child: Center(
+                                                              child: isAdding[
+                                                                          productId] ==
+                                                                      true
+                                                                  ? Container(
+                                                                      height:
+                                                                          10,
+                                                                      width:
+                                                                          10,
+                                                                      child:
+                                                                          CircularProgressIndicator(
+                                                                        color:
+                                                                            whiteColor,
+                                                                        strokeWidth:
+                                                                            2,
+                                                                      ),
+                                                                    )
+                                                                  : Text(
+                                                                      'Add',
+                                                                      style: GoogleFonts
+                                                                          .mulish(
+                                                                        fontSize:
+                                                                            10,
+                                                                        color:
+                                                                            greenColor,
+                                                                        fontWeight:
+                                                                            FontWeight.w600,
+                                                                      ),
+                                                                    ),
+                                                            ),
+                                                          ),
+                                                  ),
+                                        ),
+                                        ],
+                                        
                                       ),
-                                      SizedBox(width: 12),
+                                     
                                       // Text and buttons
                                       Expanded(
-                                        child: Row(
+                                        child: Column(
                                           crossAxisAlignment: CrossAxisAlignment.start,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment
-                                                  .spaceBetween,
+                                         
                                           children: [
                                             Column(
                                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -525,11 +691,11 @@ class _SearchState extends State<Search> {
                                               ],
                                             ),
                                             Column(
-                                              mainAxisAlignment: MainAxisAlignment.center,
+                                              mainAxisAlignment: MainAxisAlignment.start,
                                               crossAxisAlignment:
-                                                  CrossAxisAlignment.end,
+                                                  CrossAxisAlignment.start,
                                               children: [
-                                                 SizedBox(height: 3,),
+                                                
                                                 Text(
                                                   "₹${item['sellingPrice']}",
                                                   style: GoogleFonts.mulish(
@@ -554,157 +720,7 @@ class _SearchState extends State<Search> {
                                                     color: greyColor,
                                                   ),
                                                 ),
-                                                 SizedBox(height: 10),
-                                                GestureDetector(
-                                                  onTap: () {
-                                                    if (!IsInCart) {
-                                                      didAddToCart(
-                                                        userId:
-                                                            User.userId!,
-                                                        productId:
-                                                            productId,
-                                                      );
-                                                    }
-                                                  },
-                                                  child: IsInCart &&
-                                                          CartManager.cartQuantities[
-                                                                  productId] !=
-                                                              null &&
-                                                          CartManager.cartQuantities[
-                                                                  productId]! >
-                                                              0
-                                                      ? Container(
-                                                          width: 50,
-                                                          height: 29,
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            color:
-                                                                greenColor,
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        8),
-                                                            border: Border.all(
-                                                                color:
-                                                                    greenColor,
-                                                                width: 1),
-                                                          ),
-                                                          child: FittedBox(
-                                                            child: Row(
-                                                              children: [
-                                                                IconButton(
-                                                                  padding:
-                                                                      EdgeInsets
-                                                                          .zero,
-                                                                  constraints:
-                                                                      BoxConstraints(),
-                                                                  icon: Icon(
-                                                                      Icons
-                                                                          .remove,
-                                                                      size: containerHeight *
-                                                                          0.06,
-                                                                      color:
-                                                                          whiteColor),
-                                                                  onPressed:
-                                                                      () {
-                                                                    DidUpdateQuantity(
-                                                                        index,
-                                                                        -1,
-                                                                        productId);
-                                                                  },
-                                                                ),
-                                                                isUpdating[productId] ==
-                                                                        true
-                                                                    ? Container(
-                                                                        height:
-                                                                            10,
-                                                                        width:
-                                                                            10,
-                                                                        child:
-                                                                            CircularProgressIndicator(color: whiteColor),
-                                                                      )
-                                                                    : Text(
-                                                                        '${CartManager.cartQuantities[productId]}',
-                                                                        style:
-                                                                            GoogleFonts.mulish(
-                                                                          color: whiteColor,
-                                                                          fontWeight: FontWeight.bold,
-                                                                          fontSize: containerHeight * 0.05,
-                                                                        ),
-                                                                      ),
-                                                                IconButton(
-                                                                  padding:
-                                                                      EdgeInsets
-                                                                          .zero,
-                                                                  constraints:
-                                                                      BoxConstraints(),
-                                                                  icon: Icon(
-                                                                      Icons
-                                                                          .add,
-                                                                      size: containerHeight *
-                                                                          0.06,
-                                                                      color:
-                                                                          whiteColor),
-                                                                  onPressed:
-                                                                      () {
-                                                                    DidUpdateQuantity(
-                                                                        index,
-                                                                        1,
-                                                                        productId);
-                                                                  },
-                                                                ),
-                                                              ],
-                                                            ),
-                                                          ),
-                                                        )
-                                                      : Container(
-                                                          width: 50,
-                                                          height: 29,
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            color:
-                                                                ligtBlackColor,
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        8),
-                                                            border: Border.all(
-                                                                color:
-                                                                    greenColor,
-                                                                width: 1),
-                                                          ),
-                                                          child: Center(
-                                                            child: isAdding[
-                                                                        productId] ==
-                                                                    true
-                                                                ? Container(
-                                                                    height:
-                                                                        10,
-                                                                    width:
-                                                                        10,
-                                                                    child:
-                                                                        CircularProgressIndicator(
-                                                                      color:
-                                                                          whiteColor,
-                                                                      strokeWidth:
-                                                                          2,
-                                                                    ),
-                                                                  )
-                                                                : Text(
-                                                                    'Add',
-                                                                    style: GoogleFonts
-                                                                        .mulish(
-                                                                      fontSize:
-                                                                          10,
-                                                                      color:
-                                                                          greenColor,
-                                                                      fontWeight:
-                                                                          FontWeight.w600,
-                                                                    ),
-                                                                  ),
-                                                          ),
-                                                        ),
-                                                ),
+                                                 
                                               ],
                                             ),
                                           ],

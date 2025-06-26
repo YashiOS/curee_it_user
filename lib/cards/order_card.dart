@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:cureeit_user_app/BaseUrl.dart';
 import 'package:cureeit_user_app/screens/cart_screen.dart';
 import 'package:cureeit_user_app/screens/order_tracking_screen.dart';
-import 'package:cureeit_user_app/screens/orderdetail_screen_new.dart';
+
 import 'package:cureeit_user_app/user/user.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
@@ -11,6 +11,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 
+// ignore: must_be_immutable
 class OrderCard extends StatefulWidget {
   final dynamic orderData;
   final String AvailorderId;

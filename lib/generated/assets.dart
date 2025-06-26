@@ -54,7 +54,7 @@ class Assets {
   static const String imagesDELIVERED = 'lib/images/DELIVERED.png';
   static const String imagesDiabetesCare = 'lib/images/diabetes_care.png';
   static const String imagesDottedDivider = 'lib/images/dotted_divider.png';
-  static const String imagesEmpty cart = 'lib/images/empty cart.png';
+  static const String imagesEmpty_cart = 'lib/images/empty cart.png';
   static const String imagesFinalHomebike1 = 'lib/images/final_homebike1.png';
   static const String imagesFinalMedkaroLogo = 'lib/images/final_medkaro_logo.png';
   static const String imagesGallery = 'lib/images/gallery.png';

@@ -446,60 +446,66 @@ _debounceTimer=Timer(Duration(seconds: 1), ()async{
                           controller: _controller,
                           itemCount: product['imageUrls'].length,
                           itemBuilder: (context, index) {
-                            return Container(
-                              height: 203,
-                              margin: EdgeInsets.all(24),
-                              decoration: BoxDecoration(
-                                color: whiteColor,
-                                borderRadius: BorderRadius.circular(10),
+                            return InteractiveViewer(
+                              panEnabled: true,
+                              scaleEnabled: true,
+                              minScale: 1,
+                              maxScale: 4,
+                              child: Container(
+                                height: 203,
+                                margin: EdgeInsets.all(24),
+                                decoration: BoxDecoration(
+                                  color: whiteColor,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                padding: EdgeInsets.only(bottom: 40),
+                                child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(20),
+                                    child: SizedBox(
+                                      width: MediaQuery.of(context).size.width,
+                                      height: 203,
+                                      child: Padding(
+                                          padding: EdgeInsets.only(top: 28),
+                                          child: product['imageUrls'] != []
+                                              ? SizedBox(
+                                                  width: 176,
+                                                  child: Image.network(
+                                                    product['imageUrls'][index],
+                                                    fit: BoxFit.contain,
+                                                    loadingBuilder: (context,
+                                                        child, loadingProgress) {
+                                                      if (loadingProgress ==
+                                                          null) {
+                                                        return child;
+                                                      }
+                                                      return const Center(
+                                                          child:
+                                                              CircularProgressIndicator(
+                                                        color: whiteColor,
+                                                      ));
+                                                    },
+                                                    errorBuilder: (context, error,
+                                                        stackTrace) {
+                                                      return const Center(
+                                                          child: Icon(Icons.error,
+                                                              color: whiteColor));
+                                                    },
+                                                  ),
+                                                )
+                                              : Text(
+                                                  "No Image",
+                                                  style: TextStyle(
+                                                      fontSize:
+                                                          MediaQuery.of(context)
+                                                                  .size
+                                                                  .height *
+                                                              0.027,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: Colors.grey
+                                                          .withOpacity(0.4)),
+                                                )),
+                                    )),
                               ),
-                              padding: EdgeInsets.only(bottom: 40),
-                              child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(20),
-                                  child: SizedBox(
-                                    width: MediaQuery.of(context).size.width,
-                                    height: 203,
-                                    child: Padding(
-                                        padding: EdgeInsets.only(top: 28),
-                                        child: product['imageUrls'] != []
-                                            ? SizedBox(
-                                                width: 176,
-                                                child: Image.network(
-                                                  product['imageUrls'][index],
-                                                  fit: BoxFit.contain,
-                                                  loadingBuilder: (context,
-                                                      child, loadingProgress) {
-                                                    if (loadingProgress ==
-                                                        null) {
-                                                      return child;
-                                                    }
-                                                    return const Center(
-                                                        child:
-                                                            CircularProgressIndicator(
-                                                      color: whiteColor,
-                                                    ));
-                                                  },
-                                                  errorBuilder: (context, error,
-                                                      stackTrace) {
-                                                    return const Center(
-                                                        child: Icon(Icons.error,
-                                                            color: whiteColor));
-                                                  },
-                                                ),
-                                              )
-                                            : Text(
-                                                "No Image",
-                                                style: TextStyle(
-                                                    fontSize:
-                                                        MediaQuery.of(context)
-                                                                .size
-                                                                .height *
-                                                            0.027,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.grey
-                                                        .withOpacity(0.4)),
-                                              )),
-                                  )),
                             );
                           },
                         ),

@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:cureeit_user_app/BaseUrl.dart';
 import 'package:cureeit_user_app/LocalStorageCubit/store_user_cubit.dart';
 import 'package:cureeit_user_app/screens/base_screen.dart';
-import 'package:cureeit_user_app/screens/home_screen.dart';
+
 import 'package:cureeit_user_app/selected_Address/otp_form.dart';
 import 'package:cureeit_user_app/user/user.dart';
 
@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
+
 
 class OtpScreen extends StatefulWidget {
   final String phoneNumber;
@@ -30,14 +31,32 @@ class OtpScreen extends StatefulWidget {
 class _OtpScreenState extends State<OtpScreen> {
   bool verifyingOTP = false;
   bool otpEntered = false; // Track OTP completion
-  String otp = ""; // Store the combined OTP
+  String otp = "";
+    //String? signature;
+    //final TextEditingController _otpController = TextEditingController(); // Store the combined OTP
 
   @override
   void initState() {
     show();
+    //listenOtp();
     // TODO: implement initState
     super.initState();
   }
+
+
+
+  /*void listenOtp()async{
+    try {
+      // Get app signature (important for Android)
+      signature = await SmsAutoFill().getAppSignature;
+      print("App Signature: $signature");
+      
+      // Start listening for SMS
+      await SmsAutoFill().listenForCode();
+    } catch (e) {
+      print("Error initializing SMS listener: $e");
+    }
+  }*/
 
   void handleOtpEntered(bool entered) {
     print(entered);
@@ -71,12 +90,15 @@ class _OtpScreenState extends State<OtpScreen> {
     });
   }
 
+   
+
+
   Future<void> submitOtp() async {
    
     setState(() {
       verifyingOTP = true;
     });
-    if (otpEntered) {
+    if (otp.length==4) {
       print('OTP entered: $otp');
 
       try {
@@ -100,7 +122,7 @@ class _OtpScreenState extends State<OtpScreen> {
           final name = data["user"]["name"];
           final userid = data["user"]["userId"];
           final mobileNumber = data["user"]["mobileNumber"];
-
+ 
           User.id = id;
           User.name = name;
           User.phoneNumber = mobileNumber;
@@ -164,6 +186,8 @@ class _OtpScreenState extends State<OtpScreen> {
     }
   }
 
+  
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -202,6 +226,7 @@ class _OtpScreenState extends State<OtpScreen> {
                       ),
                     ),
                     SizedBox(height: screenHeight * 0.12),
+                  
                     OtpForm(
                       onOtpEntered: handleOtpEntered,
                       onOtpChanged: handleOtpChanged,
