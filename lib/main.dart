@@ -78,12 +78,16 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   }
 
   void _decideStartScreen() async {
+
     final isAvailable = context.read<StoreUserCubit>().isUserDataAvailable();
 
     setState(() {
       _home = isAvailable
-          ? BaseScreen(Navigatedfrom: "from_main")
+          ? UpdateScreen()
           : const LoginScreen();
+      // _home = isAvailable
+      //     ? BaseScreen(Navigatedfrom: "from_main")
+      //     : const LoginScreen();
     });
   }
 
