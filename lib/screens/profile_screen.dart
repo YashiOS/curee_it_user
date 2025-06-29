@@ -351,7 +351,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   onTap: () async {
                                     Navigator.pop(context);
                                     final uri =
-                                        Uri.parse("mailto:medkaro.in@gmail.com");
+                                        Uri.parse("mailto:accounts@medkaro.in");
                                     if (await canLaunchUrl(uri)) {
                                       await launchUrl(uri);
                                     }

@@ -38,6 +38,7 @@ class _UpdateScreenState extends State<UpdateScreen> {
 
   Future<void> _showUpdateDialog() async {
     return showDialog(
+      barrierDismissible: false,
       context: context,
       builder: (context) => Dialog(
         backgroundColor: ligtBlackColor, // Dark background
