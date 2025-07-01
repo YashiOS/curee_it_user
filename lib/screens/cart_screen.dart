@@ -702,7 +702,7 @@ class _CartScreenState extends State<CartScreen> {
                       ),
                     )
                   : Container(
-                      padding: EdgeInsets.only(bottom: 100),
+                      padding: EdgeInsets.only( bottom: widget.isNavigated?20:100),
                       color: scaffoldBlackColor,
                       width: MediaQuery.of(context).size.width,
                       height: MediaQuery.of(context).size.height,

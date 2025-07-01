@@ -152,7 +152,7 @@ class _OrderCardState extends State<OrderCard> {
                     ),
                     if(orderStatus!="In Review" || orderStatus!="Available")
                     Text(
-                      "₹ ${finalTotal.toStringAsFixed(2)}",
+                      "₹${finalTotal.toStringAsFixed(2)}",
                       style: GoogleFonts.mulish(
                         fontWeight: FontWeight.w500,
                         fontSize: 17,

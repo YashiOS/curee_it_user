@@ -72,7 +72,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Map<String, bool> updatingQuantity = {};
   bool fisrtTime = false;
   Timer? _animationTimer;
-  bool shown=false;
+  bool shown = false;
   bool loaded = false;
   bool newUser = false;
   bool GotproductDetail = false;
@@ -336,15 +336,14 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Future<void> didAddToCart(int index) async {
-   
     //setState(() {
-      //isAddingMap[index] = true;
+    //isAddingMap[index] = true;
     //});
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final product = products[index];
     final productId = product['productId'];
     CartManager.cartQuantities[productId] =
-              (CartManager.cartQuantities[productId] ?? 0) + 1;
+        (CartManager.cartQuantities[productId] ?? 0) + 1;
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/cart/addToCart'),
@@ -364,20 +363,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           fetchCartDetails();
           isTapped = true;
           isAddingMap[index] = false;
-          
         });
         Fluttertoast.showToast(msg: "Added To Cart");
       } else {
         ScaffoldMessenger.of(context).clearSnackBars();
-      CartManager.cartQuantities[productId]=0;
+        CartManager.cartQuantities[productId] = 0;
         isAddingMap[index] = false;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Failed to add item to cart')),
         );
       }
     } catch (e) {
-      CartManager.cartQuantities[productId]=0;
-        isAddingMap[index] = false;
+      CartManager.cartQuantities[productId] = 0;
+      isAddingMap[index] = false;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Network error: $e')),
       );
@@ -454,7 +452,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Future<void> DidUpdateQuantity(int index, int change) async {
-     _debounceTimer?.cancel();
+    _debounceTimer?.cancel();
     final product = products[index];
     final productId = product['productId'];
     final String? userId = User.userId; // Example userId
@@ -468,7 +466,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         quantities[index] = 0;
       } else {
         quantities[index] = newQuantity;
-         CartManager.cartQuantities[productId] = newQuantity;
+        CartManager.cartQuantities[productId] = newQuantity;
       }
     });
     if (newQuantity == 0) {
@@ -476,50 +474,49 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       return;
     }
 
-    _debounceTimer=Timer(Duration(seconds: 1),()async{
+    _debounceTimer = Timer(Duration(seconds: 1), () async {
       print("callng");
- try {
-      final response = await http.put(
-        Uri.parse('$baseUrl/cart/updateQuantity'),
-        headers: {'Content-Type': 'application/json'},
-        body: json.encode({
-          "userId": userId,
-          "productId": productId,
-          "quantity": newQuantity < 1 ? 0 : newQuantity
-        }),
-      );
-      if (response.statusCode == 200) {
-        fetchCartDetails();
-       
+      try {
+        final response = await http.put(
+          Uri.parse('$baseUrl/cart/updateQuantity'),
+          headers: {'Content-Type': 'application/json'},
+          body: json.encode({
+            "userId": userId,
+            "productId": productId,
+            "quantity": newQuantity < 1 ? 0 : newQuantity
+          }),
+        );
+        if (response.statusCode == 200) {
+          fetchCartDetails();
+
+          setState(() {
+            updatingQuantity[productId] = false;
+          });
+          Fluttertoast.showToast(msg: "Updated Cart");
+        }
+        if (response.statusCode != 200) {
+          setState(() {
+            updatingQuantity[productId] = false;
+          });
+          // Handle error - revert local state in case of failure
+          setState(() {
+            CartManager.cartQuantities[productId] = currentQuantity;
+            quantities[index] = currentQuantity;
+          });
+          Fluttertoast.showToast(msg: "Failed to update cart");
+        }
+      } catch (e) {
+        // Handle network errors - revert local state
         setState(() {
           updatingQuantity[productId] = false;
-        });
-        Fluttertoast.showToast(msg: "Updated Cart");
-      }
-      if (response.statusCode != 200) {
-        setState(() {
-          updatingQuantity[productId] = false;
-        });
-        // Handle error - revert local state in case of failure
-        setState(() {
           CartManager.cartQuantities[productId] = currentQuantity;
           quantities[index] = currentQuantity;
         });
-        Fluttertoast.showToast(msg: "Failed to update cart");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Network error: $e')),
+        );
       }
-    } catch (e) {
-      // Handle network errors - revert local state
-      setState(() {
-        updatingQuantity[productId] = false;
-        CartManager.cartQuantities[productId] = currentQuantity;
-        quantities[index] = currentQuantity;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Network error: $e')),
-      );
-    }
-    } );       
-   
+    });
   }
 
   Future<void> fetchCartDetails() async {
@@ -842,7 +839,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     Text(
                       "₹${product['discountedPrice']}",
                       style: GoogleFonts.mulish(
-                        color: whiteColor.withOpacity(0.8),
+                        color: whiteColor,
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
                       ),
@@ -962,231 +959,224 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       ),
     );
   }
-  
-void showAddAddressBottomSheet(BuildContext context) {
-  showModalBottomSheet(
-    context: context,
-     isDismissible: false,
-     enableDrag: false, 
-    isScrollControlled: true,
-    backgroundColor: ligtBlackColor,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-    ),
-    builder: (context) {
-      return Padding(
-        
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-          top: 24,
-          left: 20,
-          right: 20,
-        ),
-        child: Container(
-         width: double.infinity,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-             
-              SizedBox(height: 10),
-              Text(
-                "Delivery Address",
-                style: GoogleFonts.mulish(
-                  color: whiteColor,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              SizedBox(height: 24),
-              ElevatedButton(
-                
-                onPressed: () {
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => GoogleMapsScreen()),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: greenColor,
-                  foregroundColor: Colors.white,
-                  minimumSize: Size(90, 40),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: Text(
-                  "Add",
-                  style: GoogleFonts.mulish(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-              SizedBox(height: 24),
-            ],
-          ),
-        ),
-      );
-    },
-  );
-}
 
-void showAddressSelectorBottomSheet(BuildContext context, List addresses) {
-  showModalBottomSheet(
-    context: context,
-    isScrollControlled: true,
-     isDismissible: false,
-     enableDrag: false,  
-    backgroundColor: scaffoldBlackColor,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-    ),
-    builder: (context) {
-      return Padding(
-        padding: EdgeInsets.only(
-          top: 24,
-          left: 20,
-          right: 20,
-          bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-        ),
-        child: StatefulBuilder(
-          builder: (context, setModalState) {
-            return Column(
+  void showAddAddressBottomSheet(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isDismissible: false,
+      enableDrag: false,
+      isScrollControlled: true,
+      backgroundColor: ligtBlackColor,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+            top: 24,
+            left: 20,
+            right: 20,
+          ),
+          child: Container(
+            width: double.infinity,
+            child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-               
                 SizedBox(height: 10),
                 Text(
-                  "Select Delivery Location",
+                  "Delivery Address",
                   style: GoogleFonts.mulish(
                     color: whiteColor,
-                    fontSize: 17,
+                    fontSize: 20,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-                SizedBox(height: 16),
-                ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: addresses.length,
-                  itemBuilder: (context, index) {
-                    var address = addresses[index];
-                     final  selectAdd=address!["address"];
-        final  selectedLat=address!["userLat"];
-        final  selectedLong=address!["userLong"];
-        final  selectedType=address!["type"];
-        final  selectedLandMark=address!["landmark"]??"";
-        final  selectedFloor=address!["floor"]??"0";
-                    bool isSelected = Address.selectedIndex == index;
-                    
-                    return GestureDetector(
-                      onTap: () async {
-                        Address.CurrentAddress = {
-              "address": selectAdd,
-              "landmark": selectedLandMark,
-              "floor": selectedFloor,
-              "userLat": selectedLat,
-              "userLong": selectedLong,
-              "type":selectedType,
-              "_id": ""
-            };
-            setState(() {
-              Address.selectedIndex=index;
-            });
-             setState(() {
-                          localAddress = selectAdd;
-                        });
-                        
-                        Navigator.pop(context);
-                        
-                        // Show loading indicator while checking location
-                        setState(() {
-                          isInRadius = null; // Reset while checking
-                        });
-                        
-                        await checkLocation(); // Wait for location check to complete
-                        
-                        // Update UI based on location availability
-                        if (mounted) {
-                          setState(() {
-                            // isInRadius will be updated by checkLocation()
-                          });
-                        }
-            
-            
-            
-                      },
-                      child: Container(
-                        padding: EdgeInsets.only(left: 25, right: 16),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          color: ligtBlackColor,
-                        ),
-                        margin: EdgeInsets.only(bottom: 16),
-                        height: 75,
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            Container(
-                              height: 16,
-                              width: 16,
-                              child: Image.asset(
-                                "lib/images/hugeicons_location.png",
-                              ),
-                            ),
-                            SizedBox(width: 16),
-                            Expanded(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    address['address'] ?? '',
-                                    style: GoogleFonts.mulish(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w500,
-                                      color: whiteColor,
-                                    ),
-                                  ),
-                                  SizedBox(height: 2),
-                                  Text(
-                                    address['type'] ?? '',
-                                    style: GoogleFonts.mulish(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.w300,
-                                      color: whiteColor,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                            Container(
-                              width: 16,
-                              height: 16,
-                              margin: EdgeInsets.only(left: 8),
-                              decoration: BoxDecoration(
-                                color: isSelected
-                                    ? greenColor
-                                    : scaffoldBlackColor,
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => GoogleMapsScreen()),
                     );
                   },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: greenColor,
+                    foregroundColor: Colors.white,
+                    minimumSize: Size(90, 40),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  child: Text(
+                    "Add",
+                    style: GoogleFonts.mulish(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                 ),
-                SizedBox(height: 8),
-                
+                SizedBox(height: 24),
               ],
-            );
-          },
-        ),
-      );
-    },
-  );
-}
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void showAddressSelectorBottomSheet(BuildContext context, List addresses) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      isDismissible: false,
+      enableDrag: false,
+      backgroundColor: scaffoldBlackColor,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: EdgeInsets.only(
+            top: 24,
+            left: 20,
+            right: 20,
+            bottom: MediaQuery.of(context).viewInsets.bottom + 24,
+          ),
+          child: StatefulBuilder(
+            builder: (context, setModalState) {
+              return Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  SizedBox(height: 10),
+                  Text(
+                    "Select Delivery Location",
+                    style: GoogleFonts.mulish(
+                      color: whiteColor,
+                      fontSize: 17,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  SizedBox(height: 16),
+                  ListView.builder(
+                    shrinkWrap: true,
+                    itemCount: addresses.length,
+                    itemBuilder: (context, index) {
+                      var address = addresses[index];
+                      final selectAdd = address!["address"];
+                      final selectedLat = address!["userLat"];
+                      final selectedLong = address!["userLong"];
+                      final selectedType = address!["type"];
+                      final selectedLandMark = address!["landmark"] ?? "";
+                      final selectedFloor = address!["floor"] ?? "0";
+                      bool isSelected = Address.selectedIndex == index;
+
+                      return GestureDetector(
+                        onTap: () async {
+                          Address.CurrentAddress = {
+                            "address": selectAdd,
+                            "landmark": selectedLandMark,
+                            "floor": selectedFloor,
+                            "userLat": selectedLat,
+                            "userLong": selectedLong,
+                            "type": selectedType,
+                            "_id": ""
+                          };
+                          setState(() {
+                            Address.selectedIndex = index;
+                          });
+                          setState(() {
+                            localAddress = selectAdd;
+                          });
+
+                          Navigator.pop(context);
+
+                          // Show loading indicator while checking location
+                          setState(() {
+                            isInRadius = null; // Reset while checking
+                          });
+
+                          await checkLocation(); // Wait for location check to complete
+
+                          // Update UI based on location availability
+                          if (mounted) {
+                            setState(() {
+                              // isInRadius will be updated by checkLocation()
+                            });
+                          }
+                        },
+                        child: Container(
+                          padding: EdgeInsets.only(left: 25, right: 16),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(8),
+                            color: ligtBlackColor,
+                          ),
+                          margin: EdgeInsets.only(bottom: 16),
+                          height: 75,
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Container(
+                                height: 16,
+                                width: 16,
+                                child: Image.asset(
+                                  "lib/images/hugeicons_location.png",
+                                ),
+                              ),
+                              SizedBox(width: 16),
+                              Expanded(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      address['address'] ?? '',
+                                      style: GoogleFonts.mulish(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w500,
+                                        color: whiteColor,
+                                      ),
+                                    ),
+                                    SizedBox(height: 2),
+                                    Text(
+                                      address['type'] ?? '',
+                                      style: GoogleFonts.mulish(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w300,
+                                        color: whiteColor,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              Container(
+                                width: 16,
+                                height: 16,
+                                margin: EdgeInsets.only(left: 8),
+                                decoration: BoxDecoration(
+                                  color: isSelected
+                                      ? greenColor
+                                      : scaffoldBlackColor,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                  SizedBox(height: 8),
+                ],
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
 
   Future<void> fetchAddresses() async {
     if (Address.CurrentAddress != null) {
@@ -1216,11 +1206,11 @@ void showAddressSelectorBottomSheet(BuildContext context, List addresses) {
       final fetchAddress = data["data"]["address"];
       addresses = data['data']['address'];
       if (fetchAddress == null || fetchAddress.isEmpty) {
-        if(shown==false){
+        if (shown == false) {
           showAddAddressBottomSheet(context);
         }
-        shown=true;
-        
+        shown = true;
+
         print("ADDRESS LIST IS EMPTY");
         setState(() {
           Address.CurrentAddress = {
@@ -1239,23 +1229,21 @@ void showAddressSelectorBottomSheet(BuildContext context, List addresses) {
           newUser = true;
           checkLocation();
         });
-        
-      }else if (addresses.length==1) {
-   
+      } else if (addresses.length == 1) {
         SelectedAddress = data['data']['address'][0];
-        final  selectAdd=SelectedAddress!["address"];
-        final  selectedLat=SelectedAddress!["userLat"];
-        final  selectedLong=SelectedAddress!["userLong"];
-        final  selectedType=SelectedAddress!["type"];
-        final  selectedLandMark=SelectedAddress!["landmark"]??"";
-        final  selectedFloor=SelectedAddress!["floor"]??"0";
-        
+        final selectAdd = SelectedAddress!["address"];
+        final selectedLat = SelectedAddress!["userLat"];
+        final selectedLong = SelectedAddress!["userLong"];
+        final selectedType = SelectedAddress!["type"];
+        final selectedLandMark = SelectedAddress!["landmark"] ?? "";
+        final selectedFloor = SelectedAddress!["floor"] ?? "0";
+
         print("Selected Address");
         print(SelectedAddress);
-        
+
         print("ALL ADDRESS LIST");
         print(addresses);
-         print(addresses.length);
+        print(addresses.length);
         if (Address.CurrentAddress == null && SelectedAddress != null) {
           setState(() {
             Address.CurrentAddress = {
@@ -1264,7 +1252,7 @@ void showAddressSelectorBottomSheet(BuildContext context, List addresses) {
               "floor": selectedFloor,
               "userLat": selectedLat,
               "userLong": selectedLong,
-              "type":selectedType,
+              "type": selectedType,
               "_id": ""
             };
             localAddress = address;
@@ -1273,14 +1261,11 @@ void showAddressSelectorBottomSheet(BuildContext context, List addresses) {
           checkLocation();
           return;
         }
-      } else if(addresses.length>1){
-       if(Address.CurrentAddress==""||Address.CurrentAddress==null){
-          showAddressSelectorBottomSheet(context,addresses);
-          Address.selectedIndex=null;
-          
-
-       }
-      
+      } else if (addresses.length > 1) {
+        if (Address.CurrentAddress == "" || Address.CurrentAddress == null) {
+          showAddressSelectorBottomSheet(context, addresses);
+          Address.selectedIndex = null;
+        }
       }
     } else {
       print('Failed to load addresses');
@@ -1310,7 +1295,7 @@ void showAddressSelectorBottomSheet(BuildContext context, List addresses) {
       print("error $e");
     }
   }
- 
+
   Future<void> checkLocation() async {
     final String apiUrl = "$baseUrl/home/check_location";
 
@@ -1330,7 +1315,7 @@ void showAddressSelectorBottomSheet(BuildContext context, List addresses) {
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         print("in check location");
-         print(responseData["isAllowed"]);
+        print(responseData["isAllowed"]);
         setState(() {
           isInRadius = responseData['isAllowed'] == true;
         });
@@ -1339,10 +1324,8 @@ void showAddressSelectorBottomSheet(BuildContext context, List addresses) {
           context.read<ServiceAvilableCubit>().UpdateServiceAvilable(true);
           getEstTime(latitude, longitude);
         } else {
-
           isInRadius = false;
           context.read<ServiceAvilableCubit>().UpdateServiceAvilable(false);
-         
         }
       } else {
         print("Failed to check_location: ${response.body}");
@@ -1419,7 +1402,7 @@ void showAddressSelectorBottomSheet(BuildContext context, List addresses) {
   Widget build(BuildContext context) {
     bool ISserviceAvilable =
         context.watch<ServiceAvilableCubit>().ServiceAvilable;
-       
+
     return Scaffold(
       backgroundColor: scaffoldBlackColor,
       key: _scaffoldKey,
@@ -1674,7 +1657,7 @@ void showAddressSelectorBottomSheet(BuildContext context, List addresses) {
                   backgroundColor: scaffoldBlackColor,
                   floating: true,
                   scrolledUnderElevation: 0,
-            elevation: 0,
+                  elevation: 0,
                   expandedHeight: null, //
                   pinned: false,
                   flexibleSpace: FlexibleSpaceBar(
@@ -1684,8 +1667,10 @@ void showAddressSelectorBottomSheet(BuildContext context, List addresses) {
                               Container(
                                 height:
                                     84, // Slightly increased to fit both PageView and dots
-                                margin: EdgeInsets.only(top: 8,),
-                                
+                                margin: EdgeInsets.only(
+                                  top: 8,
+                                ),
+
                                 decoration: BoxDecoration(
                                   color: ligtBlackColor,
                                   borderRadius: BorderRadius.circular(8),
@@ -1717,7 +1702,7 @@ void showAddressSelectorBottomSheet(BuildContext context, List addresses) {
                                             "On the way" => "Order Enroute",
                                             _ => "Order Status",
                                           };
-print(AvailId);
+                                          print(AvailId);
                                           return GestureDetector(
                                             onTap: () {
                                               Navigator.of(context).push(
@@ -1731,7 +1716,11 @@ print(AvailId);
                                               );
                                             },
                                             child: Container(
-                                              padding: EdgeInsets.only(left: 16,right: 16,bottom: 6,top: 16),
+                                              padding: EdgeInsets.only(
+                                                  left: 16,
+                                                  right: 16,
+                                                  bottom: 6,
+                                                  top: 16),
                                               child: Row(
                                                 mainAxisAlignment:
                                                     MainAxisAlignment
@@ -1807,7 +1796,7 @@ print(AvailId);
                                       children: List.generate(
                                           onGoingOrders.length, (index) {
                                         return Container(
-                                       margin: EdgeInsets.only(right: 4),
+                                          margin: EdgeInsets.only(right: 4),
                                           width: 4,
                                           height: 4,
                                           decoration: BoxDecoration(
@@ -1819,7 +1808,9 @@ print(AvailId);
                                         );
                                       }),
                                     ),
-                                  SizedBox(height: 10,)
+                                    SizedBox(
+                                      height: 10,
+                                    )
                                   ],
                                 ),
                               ),
@@ -1828,7 +1819,6 @@ print(AvailId);
                         : SizedBox.shrink(),
                   ),
                 ),
-              
               if (ISserviceAvilable)
                 SliverAppBar(
                   scrolledUnderElevation: 0,
@@ -1837,9 +1827,7 @@ print(AvailId);
                   backgroundColor: scaffoldBlackColor,
                   pinned: true,
                   flexibleSpace: Container(
-                 
                     child: Column(
-                    
                       children: [
                         GestureDetector(
                           onTap: () async {
@@ -1854,7 +1842,6 @@ print(AvailId);
                           },
                           child: localAddress == null || localAddress.isEmpty
                               ? Container(
-                               
                                   child: Shimmer.fromColors(
                                     baseColor: ligtBlackColor,
                                     highlightColor: whiteColor,
@@ -1870,7 +1857,7 @@ print(AvailId);
                                   ),
                                 )
                               : Container(
-                                 margin: EdgeInsets.only(top: 14),
+                                  margin: EdgeInsets.only(top: 14),
                                   height: 43,
                                   decoration: BoxDecoration(
                                     color: ligtBlackColor,
@@ -1878,7 +1865,8 @@ print(AvailId);
                                   ),
                                   clipBehavior: Clip.hardEdge,
                                   child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
                                     mainAxisAlignment: MainAxisAlignment.start,
                                     children: [
                                       Padding(
@@ -1893,7 +1881,8 @@ print(AvailId);
                                           padding: const EdgeInsets.only(
                                               left: 5, right: 26),
                                           child: AnimatedSwitcher(
-                                            duration: Duration(milliseconds: 300),
+                                            duration:
+                                                Duration(milliseconds: 300),
                                             transitionBuilder:
                                                 (child, animation) {
                                               final inAnimation = Tween<Offset>(
@@ -1901,13 +1890,14 @@ print(AvailId);
                                                     Offset(0, 1), // from bottom
                                                 end: Offset.zero, // to center
                                               ).animate(animation);
-                    
-                                              final outAnimation = Tween<Offset>(
-                                                begin:
-                                                    Offset(0, -1), // from center
+
+                                              final outAnimation =
+                                                  Tween<Offset>(
+                                                begin: Offset(
+                                                    0, -1), // from center
                                                 end: Offset.zero, //, // to top
                                               ).animate(animation);
-                    
+
                                               return SlideTransition(
                                                 position: child.key ==
                                                         ValueKey(
@@ -1937,8 +1927,8 @@ print(AvailId);
                                 ),
                         ),
                         Container(
-                        padding: EdgeInsets.only(top: 5,bottom: 5),
-                        color: scaffoldBlackColor,
+                          padding: EdgeInsets.only(top: 5, bottom: 5),
+                          color: scaffoldBlackColor,
                           child: Align(
                             alignment: Alignment.bottomLeft,
                             child: Text(
@@ -1967,11 +1957,11 @@ print(AvailId);
               else if (isInRadius!)
                 SliverPadding(
                   padding: cartItems.isNotEmpty
-                      ? EdgeInsets.only(bottom: 135,top: 2)
-                      : EdgeInsets.only(bottom: 56,top: 2),
+                      ? EdgeInsets.only(bottom: 135, top: 2)
+                      : EdgeInsets.only(bottom: 56, top: 2),
                   sliver: buildProductListAsSliver(),
                 )
-              else 
+              else
                 buildOutOfRadiusAsSliver(),
             ],
           ),
