@@ -116,7 +116,10 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
     return Scaffold(
       backgroundColor: scaffoldBlackColor,
       body: Center(
-        child: CircularProgressIndicator(), // Optional loading indicator
+        child: CircularProgressIndicator(
+          color:greenColor,
+          
+        ), // Optional loading indicator
       ),
     );
   }

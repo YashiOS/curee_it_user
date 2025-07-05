@@ -446,7 +446,6 @@ class _SearchState extends State<Search> {
                                   return Stack(
                                     children: [
                                       Container(
-                                       
                                         color: scaffoldBlackColor,
                                         padding: EdgeInsets.all(height*0.01),
                                         child: Column(

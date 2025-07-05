@@ -261,7 +261,9 @@ Future<void> _showUpdateDialog() async {
       backgroundColor: scaffoldBlackColor,
       body: _isCheckingUpdate
           ? const Center(
-              child: CircularProgressIndicator(),
+              child: CircularProgressIndicator(
+                color: greenColor,
+              ),
             )
           : Container(),
     );

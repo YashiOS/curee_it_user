@@ -1207,7 +1207,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       addresses = data['data']['address'];
       if (fetchAddress == null || fetchAddress.isEmpty) {
         if (shown == false) {
-          showAddAddressBottomSheet(context);
+         // showAddAddressBottomSheet(context);
+         Navigator.of(context).push(MaterialPageRoute(builder: (context)=>GoogleMapsScreen()));
         }
         shown = true;
 
