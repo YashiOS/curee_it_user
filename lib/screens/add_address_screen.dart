@@ -1,9 +1,11 @@
 import 'package:cureeit_user_app/BaseUrl.dart';
+import 'package:cureeit_user_app/LocalStorageCubit/store_user_cubit.dart';
 import 'package:cureeit_user_app/screens/base_screen.dart';
 import 'package:cureeit_user_app/screens/home_screen.dart';
 import 'package:cureeit_user_app/selected_Address/currentAddress.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
@@ -32,10 +34,13 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
   final _floorController = TextEditingController();
   final _typeController = TextEditingController();
   bool isButtonEnabled = false;
+  bool addingAddress = false;
 
   Future<void> addAddress() async {
-    const String url =
-        '$baseUrl/address/addAddress';
+    setState(() {
+      addingAddress = true;
+    });
+    const String url = '$baseUrl/address/addAddress';
 
     Map<String, dynamic> addressData = {
       'userId': widget.userId,
@@ -56,6 +61,16 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
 
       if (response.statusCode == 200) {
         Fluttertoast.showToast(msg: "Address Added");
+        context.read<StoreUserCubit>().saveUserAddress(
+              address:
+                  "${_line1Controller.text}, ${_line2Controller.text}".trim(),
+              floor: _floorController.text.trim(),
+              landmark: _landmarkController.text.trim(),
+              type: _typeController.text.trim(),
+              userId: widget.userId,
+              userLat: widget.userLat.toString(),
+              userlong: widget.userLong.toString(),
+            );
         Address.CurrentAddress = {
           "address":
               "${_line1Controller.text}, ${_line2Controller.text}".trim(),
@@ -66,12 +81,23 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
           "type": _typeController.text.trim(),
           "_id": widget.userId,
         };
-        Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => BaseScreen(Navigatedfrom: "add_address_screen",)));
+        setState(() {
+          addingAddress = false;
+        });
+        Navigator.of(context).pushReplacement(MaterialPageRoute(
+            builder: (context) => BaseScreen(
+                  Navigatedfrom: "add_address_screen",
+                )));
       } else {
+        setState(() {
+          addingAddress = false;
+        });
         Fluttertoast.showToast(msg: "Failed to add address");
       }
     } catch (e) {
+      setState(() {
+        addingAddress = false;
+      });
       print('Error: $e');
     }
   }
@@ -79,7 +105,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
   InputDecoration _inputDecoration(String hint) {
     return InputDecoration(
         hintText: hint,
-        hintStyle:  GoogleFonts.mulish(color: whiteColor),
+        hintStyle: GoogleFonts.mulish(color: whiteColor),
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         border: InputBorder.none);
@@ -132,12 +158,13 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                 color: whiteColor,
               ),
             ),
-            SizedBox(height: 10,),
+            SizedBox(
+              height: 10,
+            ),
             Text(
               "For a seamless delivery experience, help us locate you perfectly",
               style: GoogleFonts.mulish(
                 fontSize: MediaQuery.of(context).size.width * 0.03,
-               
                 fontWeight: FontWeight.bold,
                 color: greyColor,
               ),
@@ -151,7 +178,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                 color: ligtBlackColor,
               ),
               child: TextField(
-                style: GoogleFonts.mulish(color: whiteColor ),
+                style: GoogleFonts.mulish(color: whiteColor),
                 cursorColor: greenColor,
                 controller: _line1Controller,
                 decoration: _inputDecoration("Flat/House No., Street, Area"),
@@ -159,28 +186,27 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
             ),
             const SizedBox(height: 12),
             Container(
-              
               margin: EdgeInsets.only(bottom: 10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
                 color: ligtBlackColor,
               ),
               child: TextField(
-                style: GoogleFonts.mulish(color: whiteColor ),
+                style: GoogleFonts.mulish(color: whiteColor),
                 cursorColor: greenColor,
                 controller: _line2Controller,
                 decoration: _inputDecoration("City, State, Pincode"),
               ),
             ),
             const SizedBox(height: 12),
-           Container(
-               margin: EdgeInsets.only(bottom: 10),
+            Container(
+              margin: EdgeInsets.only(bottom: 10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
-                 color: ligtBlackColor,
+                color: ligtBlackColor,
               ),
               child: TextField(
-                style: GoogleFonts.mulish(color: whiteColor ),
+                style: GoogleFonts.mulish(color: whiteColor),
                 cursorColor: greenColor,
                 controller: _typeController,
                 decoration: _inputDecoration("Type (e.g., Home, Office)"),
@@ -195,7 +221,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                 color: ligtBlackColor,
               ),
               child: TextField(
-                style: GoogleFonts.mulish(color: whiteColor ),
+                style: GoogleFonts.mulish(color: whiteColor),
                 cursorColor: greenColor,
                 controller: _landmarkController,
                 decoration: _inputDecoration("Landmark (Optional)"),
@@ -209,46 +235,48 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                 color: ligtBlackColor,
               ),
               child: TextField(
-                style: GoogleFonts.mulish(color: whiteColor ),
+                style: GoogleFonts.mulish(color: whiteColor),
                 cursorColor: greenColor,
                 controller: _floorController,
                 decoration: _inputDecoration("Floor (Optional)"),
               ),
             ),
             const SizedBox(height: 12),
-            
+
             GestureDetector(
               onTap: () {
-                
                 if (isButtonEnabled) {
                   addAddress();
                 }
               },
               child: Container(
-               
-                height: 35,
+                width: double.infinity,
+                height: 36,
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(
-                    color: greenColor,
-                    width: 1
-                  ),
-                  color: isButtonEnabled?greenColor:scaffoldBlackColor
-                ),
-                alignment: Alignment.bottomCenter,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: greenColor, width: 1),
+                    color: isButtonEnabled ? greenColor : scaffoldBlackColor),
                 child: Center(
-                  child: Text(
-                    "Save Address",
-                    style: GoogleFonts.mulish(
-                      color:isButtonEnabled? Colors.white:greenColor,
-                      fontSize: MediaQuery.of(context).size.width * 0.04,
-                     
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+                  child: addingAddress
+                      ? Container(
+                          height: 10,
+                          width: 10,
+                          child: CircularProgressIndicator(
+                            color: whiteColor,
+                            strokeWidth: 2,
+                          ))
+                      : Text(
+                          "Save Address",
+                          style: GoogleFonts.mulish(
+                            color: isButtonEnabled ? Colors.white : greenColor,
+                            fontSize: MediaQuery.of(context).size.width * 0.04,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
                 ),
               ),
             ),
+            const SizedBox(height: 12),
           ],
         ),
       ),

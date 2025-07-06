@@ -6,8 +6,35 @@ part 'store_user_state.dart';
 
 class StoreUserCubit extends Cubit<StoreUserState> {
   StoreUserCubit(this._myBox) : super(StoreUserInitial());
-    final Box _myBox;
- 
+  final Box _myBox;
+
+  void saveUserAddress({
+    required String userId,
+    required String address,
+    required String landmark,
+    required String floor,
+    required String userLat,
+    required String userlong,
+    required String type,
+  }) {
+    _myBox.put('userAddress', {
+      "userId": userId,
+      "address": address,
+      "landmark": landmark,
+      "floor": floor,
+      "userLat": userLat,
+      "userlong": userlong,
+      "type": type
+    });
+  }
+
+  Map<String, dynamic>? getUserAddress() {
+    final data = _myBox.get('userAddress');
+    if (data != null && data is Map) {
+      return Map<String, dynamic>.from(data);
+    }
+    return null;
+  }
 
   void saveUserData({
     required String id,
@@ -24,7 +51,7 @@ class StoreUserCubit extends Cubit<StoreUserState> {
     // emit some success state if needed
   }
 
-   Map<String, dynamic>? getUserData() {
+  Map<String, dynamic>? getUserData() {
     final data = _myBox.get('user');
     if (data != null && data is Map) {
       return Map<String, dynamic>.from(data);
@@ -33,6 +60,7 @@ class StoreUserCubit extends Cubit<StoreUserState> {
   }
 
   void clearUserData() {
+    _myBox.delete('userAddress');
     _myBox.delete('user');
     // emit a state if needed
   }
@@ -41,6 +69,4 @@ class StoreUserCubit extends Cubit<StoreUserState> {
   bool isUserDataAvailable() {
     return _myBox.containsKey('user');
   }
-
-
 }

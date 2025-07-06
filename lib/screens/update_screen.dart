@@ -259,13 +259,7 @@ Future<void> _showUpdateDialog() async {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: scaffoldBlackColor,
-      body: _isCheckingUpdate
-          ? const Center(
-              child: CircularProgressIndicator(
-                color: greenColor,
-              ),
-            )
-          : Container(),
+      body: Container(),
     );
   }
 }

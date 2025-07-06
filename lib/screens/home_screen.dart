@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:isolate';
 import 'dart:math';
 import 'package:cureeit_user_app/BaseUrl.dart';
+import 'package:cureeit_user_app/LocalStorageCubit/store_user_cubit.dart';
 import 'package:cureeit_user_app/cartManager/cartManager.dart';
 import 'package:cureeit_user_app/cubit/service_avilable_cubit.dart';
 import 'package:cureeit_user_app/current_address/api_services.dart';
@@ -104,10 +105,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Timer? _ongoingOrdersTimer;
   bool _isFetchingOngoingOrders = false;
   bool fetching_time = true;
-  int estTime = 0;
+ String estTime = "0";
   int _currentPage = 0;
   final PageController _pageController = PageController();
   Timer? _debounceTimer;
+
+  bool _isInitialized = false;
   // To store product quantities
 
   void _showLocationDeniedDialog() {
@@ -165,10 +168,19 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   void _startAppInitialization() {
-    fetchAddresses();
-    fetchProducts();
+    if (_isInitialized) return;
+
+    print("*******************INTILAZING APP*****");
+    Future.microtask(() async {
+      await Future.wait([
+        fetchAddresses(),
+        fetchProducts(),
+        fetchOrderHistory(),
+      ]);
+    });
+    _isInitialized = true;
+
     changeSearchText();
-    fetchOrderHistory();
   }
 
   void _startOngoingOrdersPolling() {
@@ -520,6 +532,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Future<void> fetchCartDetails() async {
+    print("*******************FETCH CART DETAILS******************");
     setState(() {
       isLoading = true;
     });
@@ -619,12 +632,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Future<Map<String, dynamic>?> fetchProductDetails(String productId) async {
-    setState(() {});
+    print("****************FETCH PRODUCT DETAILS*****************");
 
     var productApiUrl = Uri.parse("$baseUrl/product/productDetail");
 
     try {
-      var request = http.Request('POST', productApiUrl)
+      var request = await http.Request('POST', productApiUrl)
         ..headers.addAll({
           'Content-Type': 'application/json',
         })
@@ -1179,14 +1192,37 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Future<void> fetchAddresses() async {
-    if (Address.CurrentAddress != null) {
+    if (!mounted) return;
+    print("***************FECTH ADDRESS CALLED*****************");
+    if (Address.CurrentAddress != null && Address.CurrentAddress == {}) {
       String fullAddress = Address.CurrentAddress!["address"];
 
       setState(() {
         localAddress = fullAddress;
-        checkLocation();
       });
+
+      checkLocation();
+      return;
     }
+    final address = context.read<StoreUserCubit>().getUserAddress();
+    if (address != null && localAddress != address['address']) {
+      Address.CurrentAddress = {
+        "address": address[address],
+        "landmark": address['landmark'],
+        "floor": address['floor'],
+        "userLat": address['userLat'],
+        "userLong": address['userlong'],
+        "type": address['type'],
+        "_id": address['_id']
+      };
+      // Show loading indicator while checking locati
+      await checkLocation();
+      localAddress = address['address'];
+      Address.selectedIndex = null;
+
+      return;
+    }
+    print("CALLING API********");
     var url = Uri.parse(
       '$baseUrl/address/savedAddress',
     );
@@ -1207,8 +1243,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       addresses = data['data']['address'];
       if (fetchAddress == null || fetchAddress.isEmpty) {
         if (shown == false) {
-         // showAddAddressBottomSheet(context);
-         Navigator.of(context).push(MaterialPageRoute(builder: (context)=>GoogleMapsScreen()));
+          // showAddAddressBottomSheet(context);
+          Navigator.of(context).push(
+              MaterialPageRoute(builder: (context) => GoogleMapsScreen()));
         }
         shown = true;
 
@@ -1269,23 +1306,56 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         }
       }
     } else {
-      print('Failed to load addresses');
+      print(
+          'Failed to load addresses ${response.statusCode} ${response.stream.bytesToString()}');
+    }
+  }
+
+  Future<bool> PharmacyOpen() async {
+    String latitude = "${Address.CurrentAddress!["userLat"]}";
+    String longitude = "${Address.CurrentAddress!["userLong"]}";
+    final String apiUrl = "$baseUrl/home/check-serviceability";
+    try {
+      final response = await http.post(Uri.parse(apiUrl),
+          body: {"userLat": latitude, "userLong": longitude});
+      final data = jsonDecode(response.body);
+      if (data["serviceable"] == true) {
+       
+        return true;
+      } else {
+        if (mounted) {
+           setState(() {
+          estTime = "Pharmacy closed";
+           fetching_time = false;
+          });
+        }
+
+        return false;
+      }
+    } catch (e) {
+      print("Error in checking is pharmacy is open $e");
+      return false;
     }
   }
 
   Future<void> getEstTime(String lat, String long) async {
+     print("*****************EST TIME CALLED********************");
+    if (!mounted) return;
+
+    final pharmacyOpen = await PharmacyOpen();
+    if (pharmacyOpen == false) return;
+   
     final String apiUrl = "$baseUrl/home/getEstTime";
     try {
       final response = await http.post(Uri.parse(apiUrl),
           headers: {"Content-Type": "application/json"},
           body: jsonEncode({"userLat": lat, "userLong": long}));
-
+      print("EST TIME RESPONSE ${response.body}");
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         setState(() {
-          estTime = (responseData["estimatedTimeMinutes"]);
-        });
-        setState(() {
+          estTime ="in ${(responseData["estimatedTimeMinutes"]).toString()} minutes";
+          print("EST TIME IS $estTime");
           fetching_time = false;
         });
       }
@@ -1298,6 +1368,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Future<void> checkLocation() async {
+    if (!mounted) return;
+    print("*************CHECK LOACTION CALLED***************");
     final String apiUrl = "$baseUrl/home/check_location";
 
     try {
@@ -1315,15 +1387,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
-        print("in check location");
-        print(responseData["isAllowed"]);
+
         setState(() {
           isInRadius = responseData['isAllowed'] == true;
         });
         if (isInRadius == true) {
-          fetchCartDetails();
           context.read<ServiceAvilableCubit>().UpdateServiceAvilable(true);
+
           getEstTime(latitude, longitude);
+          fetchCartDetails();
         } else {
           isInRadius = false;
           context.read<ServiceAvilableCubit>().UpdateServiceAvilable(false);
@@ -1457,7 +1529,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  localAddress == null || localAddress.isEmpty
+                                  localAddress == "" || localAddress.isEmpty
                                       ? Container(
                                           margin: EdgeInsets.only(bottom: 10),
                                           child: Shimmer.fromColors(
@@ -1479,7 +1551,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                           width: 70,
                                           child: Image.asset(
                                               "lib/images/final_medkaro_logo.png")),
-                                  localAddress == null || localAddress.isEmpty
+                                  localAddress == ""
                                       ? Container(
                                           margin: EdgeInsets.only(bottom: 10),
                                           child: Shimmer.fromColors(
@@ -1518,7 +1590,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                               ),
                                             )
                                           : Text(
-                                              "in $estTime minutes",
+                                              "$estTime",
                                               style: GoogleFonts.mulish(
                                                   color: estTime == 0
                                                       ? greyColor
@@ -1526,7 +1598,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                   fontSize: 24,
                                                   fontWeight: FontWeight.bold),
                                             ),
-                                  localAddress == null || localAddress.isEmpty
+                                  localAddress == ""
                                       ? Container(
                                           margin: EdgeInsets.only(top: 10),
                                           child: Shimmer.fromColors(
@@ -1620,33 +1692,32 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                 localAddress =
                                     Address.CurrentAddress!["address"];
                               },
-                              child:
-                                  localAddress == null || localAddress.isEmpty
-                                      ? Container(
-                                          child: Shimmer.fromColors(
-                                            baseColor: ligtBlackColor,
-                                            highlightColor: whiteColor,
-                                            child: Container(
-                                              width: 36,
-                                              height: 36,
-                                              // Matches your text height
-                                              decoration: BoxDecoration(
-                                                color: whiteColor,
-                                                borderRadius:
-                                                    BorderRadius.circular(50),
-                                              ),
-                                            ),
-                                          ),
-                                        )
-                                      : Container(
-                                          height: 36,
+                              child: localAddress == ""
+                                  ? Container(
+                                      child: Shimmer.fromColors(
+                                        baseColor: ligtBlackColor,
+                                        highlightColor: whiteColor,
+                                        child: Container(
                                           width: 36,
+                                          height: 36,
+                                          // Matches your text height
                                           decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
+                                            color: whiteColor,
+                                            borderRadius:
+                                                BorderRadius.circular(50),
                                           ),
-                                          child: Image.asset(
-                                              "lib/images/profileIcon.png"),
                                         ),
+                                      ),
+                                    )
+                                  : Container(
+                                      height: 36,
+                                      width: 36,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                      ),
+                                      child: Image.asset(
+                                          "lib/images/profileIcon.png"),
+                                    ),
                             ),
                           ],
                         )),
@@ -1841,7 +1912,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               fetchCartDetails();
                             }
                           },
-                          child: localAddress == null || localAddress.isEmpty
+                          child: localAddress == ""
                               ? Container(
                                   child: Shimmer.fromColors(
                                     baseColor: ligtBlackColor,

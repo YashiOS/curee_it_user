@@ -54,6 +54,7 @@ class _CartScreenState extends State<CartScreen> {
   bool payNow = true;
   bool imagePicked = false;
   File? _imageFile;
+  String placeOrderButton="Place Order";
  
 
   @override
@@ -61,6 +62,7 @@ class _CartScreenState extends State<CartScreen> {
     super.initState();
     fetchCartDetails();
     fetchAddresses();
+    PharmacyOpen();
   }
 
   void showPaymentDialog(BuildContext context) {
@@ -218,7 +220,34 @@ class _CartScreenState extends State<CartScreen> {
     }
   }
 
+   Future<bool> PharmacyOpen() async {
+    String latitude = "${Address.CurrentAddress!["userLat"]}";
+    String longitude = "${Address.CurrentAddress!["userLong"]}";
+    final String apiUrl = "$baseUrl/home/check-serviceability";
+    try {
+      final response = await http.post(Uri.parse(apiUrl),
+          body: {"userLat": latitude, "userLong": longitude});
+      final data = jsonDecode(response.body);
+      if (data["serviceable"] == true) {
+        
+        return true;
+      } else {
+        if (mounted) {
+          setState(() {
+          placeOrderButton = "Pharmacy closed";
+          });
+        }
+
+        return false;
+      }
+    } catch (e) {
+      print("Error in checking is pharmacy is open $e");
+      return false;
+    }
+  }
+
   Future<void> fetchCartDetails() async {
+
  setState(() {
    
  });
@@ -1208,6 +1237,18 @@ class _CartScreenState extends State<CartScreen> {
                                                                         );
                                                                         return;
                                                                       }
+                                                                      if(placeOrderButton=="Pharmacy closed"){
+                                                                         ScaffoldMessenger.of(context)
+                                                                            .showSnackBar(
+                                                                          SnackBar(
+                                                                              backgroundColor: ligtBlackColor,
+                                                                              content: Text(
+                                                                                'Pharmacy is currently closed',
+                                                                                style: GoogleFonts.mulish(color: whiteColor),
+                                                                              )),
+                                                                        );
+                                                                        return;
+                                                                      }
                                                                       Navigator.of(context).push(MaterialPageRoute(
                                                                           builder: (context) => MedicineAvailabilityScreen(
                                                                                 prescriptionImage: _imageFile,
@@ -1302,7 +1343,7 @@ class _CartScreenState extends State<CartScreen> {
                                                                           Center(
                                                                         child:
                                                                             Text(
-                                                                          "Place Order",
+                                                                          "$placeOrderButton",
                                                                           style:
                                                                               GoogleFonts.mulish(
                                                                             color: payNow

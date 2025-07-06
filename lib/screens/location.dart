@@ -1,10 +1,12 @@
 import 'dart:convert';
 import 'package:cureeit_user_app/BaseUrl.dart';
+import 'package:cureeit_user_app/LocalStorageCubit/store_user_cubit.dart';
 import 'package:cureeit_user_app/current_address/google_maps_screen.dart';
 import 'package:cureeit_user_app/selected_Address/currentAddress.dart';
 import 'package:cureeit_user_app/user/user.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
@@ -70,6 +72,17 @@ class _LocationScreenState extends State<LocationScreen> {
     Address.CurrentAddress = address;
 
     setState(() {});
+     context.read<StoreUserCubit>().saveUserAddress(
+              address:
+                 address['address'],
+              floor:address['floor'],
+              landmark:address['landmark'] ,
+              type:address['type'],
+              userId:address['_id'] ,
+              userLat:address['userLat'] ,
+              userlong:address['userLong'],
+            );
+
   }
 
   @override
