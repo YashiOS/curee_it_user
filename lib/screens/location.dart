@@ -68,11 +68,12 @@ class _LocationScreenState extends State<LocationScreen> {
       });
   }
 
-  void UpdateAddress(Map<String, dynamic> address) {
+  void UpdateAddress(Map<String, dynamic> address, int index) {
     Address.CurrentAddress = address;
 
     setState(() {});
      context.read<StoreUserCubit>().saveUserAddress(
+      index:index ,
               address:
                  address['address'],
               floor:address['floor'],
@@ -220,7 +221,7 @@ class _LocationScreenState extends State<LocationScreen> {
                             return GestureDetector(
                               onTap: () {
                               
-                                UpdateAddress(address);
+                                UpdateAddress(address,index);
                 
                                 setState(() {
                                   Address.selectedIndex = index;

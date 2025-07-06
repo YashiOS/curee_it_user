@@ -127,7 +127,7 @@ Future<void> startPayment(String orderId, String paymentSessionId,String total, 
       avlId:avlId ,
       shippingAddress:shippingAddress ,
       shippingCost:shippingCost ,
-      environment: CFEnvironment.SANDBOX,
+      environment: CFEnvironment.PRODUCTION,
       orderId: orderId,
       paymentSessionId: paymentSessionId,
     );
@@ -1217,6 +1217,7 @@ Future<void> getPaymentSessionID(double shippingCost,String shippingAddress,Stri
                                 padding: EdgeInsets.all(width * 0.04),
                                 child: Column(
                                   children: [
+                                    if(orderTrackingDetails["status"] != "Delivered")
                                     GestureDetector(
                                       onTap: () async {
                                         if (orderTrackingDetails[

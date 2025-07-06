@@ -62,6 +62,7 @@ class _AddressesScreenState extends State<AddressesScreen> {
 
     });
      context.read<StoreUserCubit>().saveUserAddress(
+      index: index,
               address:
                  address['address'],
               floor:address['floor'],

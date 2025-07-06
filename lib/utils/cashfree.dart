@@ -124,7 +124,7 @@ class CashfreePaymentService {
       } else {
         print("Payment not successful. Status: $paymentStatus");
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Payment failed or pending: $paymentStatus")),
+          SnackBar(content: Text("Payment failed")),
         );
       }
     } else {
@@ -156,7 +156,7 @@ class CashfreePaymentService {
         cfPaymentGatewayService.doPayment(cfWebCheckout);
       }
     } on CFException catch (e) {
-      print(e.message);
+      print("****ERROR HERE******${e.message}");
     }
   }
 
@@ -168,7 +168,7 @@ class CashfreePaymentService {
           .setPaymentSessionId(paymentSessionId)
           .build();
     } on CFException catch (e) {
-      print(e.message);
+      print("****ERROR HERE 2******${e.message}");
     }
     return null;
   }

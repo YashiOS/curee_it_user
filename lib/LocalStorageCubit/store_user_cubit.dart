@@ -16,8 +16,10 @@ class StoreUserCubit extends Cubit<StoreUserState> {
     required String userLat,
     required String userlong,
     required String type,
+    required int? index,
   }) {
     _myBox.put('userAddress', {
+      "index":index,
       "userId": userId,
       "address": address,
       "landmark": landmark,

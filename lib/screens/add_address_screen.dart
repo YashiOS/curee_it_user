@@ -62,6 +62,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
       if (response.statusCode == 200) {
         Fluttertoast.showToast(msg: "Address Added");
         context.read<StoreUserCubit>().saveUserAddress(
+          index: null,
               address:
                   "${_line1Controller.text}, ${_line2Controller.text}".trim(),
               floor: _floorController.text.trim(),

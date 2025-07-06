@@ -1194,8 +1194,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Future<void> fetchAddresses() async {
     if (!mounted) return;
     print("***************FECTH ADDRESS CALLED*****************");
-    if (Address.CurrentAddress != null && Address.CurrentAddress == {}) {
-      String fullAddress = Address.CurrentAddress!["address"];
+    if (Address.CurrentAddress != null && Address.CurrentAddress != {}) {
+      String fullAddress = Address.CurrentAddress!["address"]; 
 
       setState(() {
         localAddress = fullAddress;
@@ -1205,9 +1205,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       return;
     }
     final address = context.read<StoreUserCubit>().getUserAddress();
-    if (address != null && localAddress != address['address']) {
+    if (address != null) {
       Address.CurrentAddress = {
-        "address": address[address],
+        "address": address['address'],
         "landmark": address['landmark'],
         "floor": address['floor'],
         "userLat": address['userLat'],
@@ -1215,10 +1215,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         "type": address['type'],
         "_id": address['_id']
       };
+      print("***********CURRENT ADDRESS*******${Address.CurrentAddress!['address']}");
       // Show loading indicator while checking locati
       await checkLocation();
+      Address.selectedIndex = address['index'];
       localAddress = address['address'];
-      Address.selectedIndex = null;
+      
 
       return;
     }
