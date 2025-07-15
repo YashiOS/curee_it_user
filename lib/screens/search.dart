@@ -11,17 +11,22 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 class Search extends StatefulWidget {
-  const Search({super.key});
-
+  const Search({super.key, required this.SearchText});
+  final String SearchText;
   @override
   State<Search> createState() => _SearchState();
 }
 
 class _SearchState extends State<Search> {
   final TextEditingController _controller = TextEditingController();
+  late stt.SpeechToText _speech;
+  String _speechText = '';
+  bool _isListening = false;
   Timer? _debounce;
+  Timer? time;
   final FocusNode _focusNode = FocusNode();
   List<dynamic> _searchResults = [];
   bool _isLoading = false;
@@ -32,6 +37,7 @@ class _SearchState extends State<Search> {
   Timer? _UpdateDebouner;
   // Track quantities for each product
   Map<String, int> _quantityMap = {};
+
   // Function to call search API
   Future<void> _fetchSearchResults(String query) async {
     if (query.length < 3) {
@@ -95,14 +101,72 @@ class _SearchState extends State<Search> {
     });
   }
 
+  void _listen() async {
+    print("listning from search page");
+    
+    await _speech.stop();
+    await _speech.cancel();
+    if (!_isListening) {
+      print("in search page");
+      bool available = await _speech.initialize(
+        onStatus: (val) {
+          print("search page litninG status $val");
+          if (val == "notListening") {
+            time?.cancel();
+
+            time = Timer(Duration(seconds: 1), () async {
+              setState(() {
+                _isListening = false;
+              });
+              print("fetched search result");
+              await _fetchSearchResults(_speechText);
+              await _speech.stop();
+              await _speech.cancel();
+            });
+          }
+        },
+        onError: (val) => print('Error: $val'),
+      );
+      print("search page avilibility $available");
+      print(available);
+      if (available) {
+        setState(() {
+          _isListening = true;
+        });
+
+        _speech.listen(
+          onResult: (val) {
+            print(val.recognizedWords);
+            _speechText = val.recognizedWords;
+            _controller.text = _speechText; // 👈 sets the TextField value!
+            _controller.selection = TextSelection.fromPosition(
+              TextPosition(offset: _controller.text.length),
+            );
+          },
+        );
+      }
+    } else {
+      _isListening = false;
+      _speech.stop();
+    }
+  }
+
   @override
   void initState() {
     super.initState();
+    _speech = stt.SpeechToText();
     _controller.addListener(() {
       _onSearchChanged();
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
       FocusScope.of(context).requestFocus(_focusNode);
+      if (widget.SearchText != "" && widget.SearchText.length > 3) {
+        _fetchSearchResults(widget.SearchText);
+        _controller.text = widget.SearchText; // 👈 sets the TextField value!
+        _controller.selection = TextSelection.fromPosition(
+          TextPosition(offset: _controller.text.length),
+        );
+      }
     });
   }
 
@@ -168,6 +232,8 @@ class _SearchState extends State<Search> {
   void dispose() {
     _debounce?.cancel();
     _controller.dispose();
+    _speech.stop();
+    _speech.cancel();
     super.dispose();
   }
 
@@ -373,7 +439,7 @@ class _SearchState extends State<Search> {
                 children: [
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      padding: const EdgeInsets.only(left: 24, right: 12),
                       child: TextField(
                         focusNode: _focusNode,
                         autofocus: true,
@@ -381,6 +447,17 @@ class _SearchState extends State<Search> {
                         style: GoogleFonts.mulish(color: whiteColor),
                         controller: _controller,
                         decoration: InputDecoration(
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _isListening ? Icons.mic : Icons.mic_none,
+                              color: _isListening ? whiteColor : greyColor,
+                            ),
+                            onPressed: () {
+                              _listen();
+                              // Add your microphone functionality here
+                              // For example: start voice recording
+                            },
+                          ),
                           hintStyle: GoogleFonts.mulish(color: whiteColor),
                           border: InputBorder.none,
                         ),
@@ -414,8 +491,8 @@ class _SearchState extends State<Search> {
                             crossAxisSpacing:
                                 4, // Horizontal space between items
                             mainAxisSpacing: 4, // Vertical space between items
-                            childAspectRatio:width/(height*1),
-                                //0.463, // Width/height ratio for each item
+                            childAspectRatio: width / (height * 1),
+                            //0.463, // Width/height ratio for each item
                           ),
                           itemCount: _searchResults.length,
                           itemBuilder: (context, index) {
@@ -442,12 +519,12 @@ class _SearchState extends State<Search> {
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: LayoutBuilder(
-                                  builder: (context, constraints) {
+                                    builder: (context, constraints) {
                                   return Stack(
                                     children: [
                                       Container(
                                         color: scaffoldBlackColor,
-                                        padding: EdgeInsets.all(height*0.01),
+                                        padding: EdgeInsets.all(height * 0.01),
                                         child: Column(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
@@ -457,14 +534,14 @@ class _SearchState extends State<Search> {
                                               width: double.infinity,
                                               //height: 130,
                                               decoration: BoxDecoration(
-                                                
                                                 color: Colors.white,
                                                 borderRadius:
                                                     BorderRadius.circular(8),
                                               ),
                                               child: Center(
                                                 child: Container(
-                                                 height:height * 0.15, // 15% of screen height
+                                                  height: height *
+                                                      0.15, // 15% of screen height
                                                   width: 80,
                                                   child: Image.network(
                                                     (item["imageUrls"] !=
@@ -494,22 +571,23 @@ class _SearchState extends State<Search> {
                                                         MainAxisAlignment
                                                             .spaceBetween,
                                                     crossAxisAlignment:
-                                                        CrossAxisAlignment.start,
+                                                        CrossAxisAlignment
+                                                            .start,
                                                     children: [
                                                       SizedBox(
                                                         height: 3,
                                                       ),
                                                       Container(
-                                                        width:
-                                                            MediaQuery.of(context)
-                                                                    .size
-                                                                    .width *
-                                                                0.4,
+                                                        width: MediaQuery.of(
+                                                                    context)
+                                                                .size
+                                                                .width *
+                                                            0.4,
                                                         child: Text(
                                                           item['name'],
                                                           maxLines: 3,
-                                                          style:
-                                                              GoogleFonts.mulish(
+                                                          style: GoogleFonts
+                                                              .mulish(
                                                             fontSize: 13,
                                                             fontWeight:
                                                                 FontWeight.w400,
@@ -518,19 +596,19 @@ class _SearchState extends State<Search> {
                                                         ),
                                                       ),
                                                       Container(
-                                                        width:
-                                                            MediaQuery.of(context)
-                                                                    .size
-                                                                    .width *
-                                                                0.35,
+                                                        width: MediaQuery.of(
+                                                                    context)
+                                                                .size
+                                                                .width *
+                                                            0.35,
                                                         child: Text(
                                                           item['description'] ??
                                                               'Medicine information',
                                                           maxLines: 1,
                                                           overflow: TextOverflow
                                                               .ellipsis,
-                                                          style:
-                                                              GoogleFonts.mulish(
+                                                          style: GoogleFonts
+                                                              .mulish(
                                                             color: greyColor,
                                                             fontSize: 11,
                                                           ),
@@ -542,11 +620,13 @@ class _SearchState extends State<Search> {
                                                     mainAxisAlignment:
                                                         MainAxisAlignment.start,
                                                     crossAxisAlignment:
-                                                        CrossAxisAlignment.start,
+                                                        CrossAxisAlignment
+                                                            .start,
                                                     children: [
                                                       Text(
                                                         "₹${item['sellingPrice']}",
-                                                        style: GoogleFonts.mulish(
+                                                        style:
+                                                            GoogleFonts.mulish(
                                                           fontSize: 13,
                                                           fontWeight:
                                                               FontWeight.w500,
@@ -558,7 +638,8 @@ class _SearchState extends State<Search> {
                                                       ),
                                                       Text(
                                                         "₹${item['price']}",
-                                                        style: GoogleFonts.mulish(
+                                                        style:
+                                                            GoogleFonts.mulish(
                                                           fontSize: 12,
                                                           decoration:
                                                               TextDecoration
@@ -579,8 +660,9 @@ class _SearchState extends State<Search> {
                                         ),
                                       ),
                                       Positioned(
-                                        bottom:constraints.maxHeight * 0.38, // ~10% of screen height
-                                  
+                                        bottom: constraints.maxHeight *
+                                            0.38, // ~10% of screen height
+
                                         right: 1,
                                         child: GestureDetector(
                                           onTap: () {
@@ -604,7 +686,8 @@ class _SearchState extends State<Search> {
                                                   decoration: BoxDecoration(
                                                     color: greenColor,
                                                     borderRadius:
-                                                        BorderRadius.circular(8),
+                                                        BorderRadius.circular(
+                                                            8),
                                                     border: Border.all(
                                                         color: greenColor,
                                                         width: 1),
@@ -620,11 +703,13 @@ class _SearchState extends State<Search> {
                                                               EdgeInsets.zero,
                                                           constraints:
                                                               BoxConstraints(),
-                                                          icon: Icon(Icons.remove,
+                                                          icon: Icon(
+                                                              Icons.remove,
                                                               size:
                                                                   containerHeight *
                                                                       0.08,
-                                                              color: whiteColor),
+                                                              color:
+                                                                  whiteColor),
                                                           onPressed: () {
                                                             DidUpdateQuantity(
                                                                 index,
@@ -646,8 +731,9 @@ class _SearchState extends State<Search> {
                                                               )
                                                             : Text(
                                                                 '${CartManager.cartQuantities[productId]}',
-                                                                style: GoogleFonts
-                                                                    .mulish(
+                                                                style:
+                                                                    GoogleFonts
+                                                                        .mulish(
                                                                   color:
                                                                       whiteColor,
                                                                   fontWeight:
@@ -670,7 +756,8 @@ class _SearchState extends State<Search> {
                                                               size:
                                                                   containerHeight *
                                                                       0.08,
-                                                              color: whiteColor),
+                                                              color:
+                                                                  whiteColor),
                                                           onPressed: () {
                                                             DidUpdateQuantity(
                                                                 index,
@@ -688,13 +775,15 @@ class _SearchState extends State<Search> {
                                                   decoration: BoxDecoration(
                                                     color: ligtBlackColor,
                                                     borderRadius:
-                                                        BorderRadius.circular(8),
+                                                        BorderRadius.circular(
+                                                            8),
                                                     border: Border.all(
                                                         color: greenColor,
                                                         width: 1),
                                                   ),
                                                   child: Center(
-                                                    child: isAdding[productId] ==
+                                                    child: isAdding[
+                                                                productId] ==
                                                             true
                                                         ? Container(
                                                             height: 10,
@@ -712,7 +801,8 @@ class _SearchState extends State<Search> {
                                                               fontSize: 10,
                                                               color: greenColor,
                                                               fontWeight:
-                                                                  FontWeight.w600,
+                                                                  FontWeight
+                                                                      .w600,
                                                             ),
                                                           ),
                                                   ),
@@ -721,8 +811,7 @@ class _SearchState extends State<Search> {
                                       ),
                                     ],
                                   );
-                                  }
-                                ),
+                                }),
                               ),
                             );
                           },

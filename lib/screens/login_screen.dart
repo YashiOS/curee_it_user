@@ -165,10 +165,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   borderRadius: BorderRadius.circular(8),
                 )),
             onPressed: () {
-              exit(0); // Exit the app
+              Navigator.of(context).pop();
+              // Exit the appw   
             },
             child: Text(
-              "Exit",
+              "Continue",
               style: GoogleFonts.mulish(color: whiteColor),
             ),
           ),

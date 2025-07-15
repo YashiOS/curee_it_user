@@ -55,6 +55,8 @@ class _CartScreenState extends State<CartScreen> {
   bool imagePicked = false;
   File? _imageFile;
   String placeOrderButton="Place Order";
+  bool fetchingCart=false;
+
  
 
   @override
@@ -140,6 +142,7 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   void checkPrescriptionRequirements() {
+    print("check prescription is called");
     bool hasPrescriptionItems =
         cartItems.any((item) => item["prescription_required"] == "Yes");
 
@@ -152,6 +155,7 @@ class _CartScreenState extends State<CartScreen> {
         _imageFile = null;
       }
     });
+    print("done with check prescription");
   }
 
   void removeItemFromCart(String productId) {
@@ -234,7 +238,7 @@ class _CartScreenState extends State<CartScreen> {
       } else {
         if (mounted) {
           setState(() {
-          placeOrderButton = "Pharmacy closed";
+          placeOrderButton = data["reason"];
           });
         }
 
@@ -247,10 +251,12 @@ class _CartScreenState extends State<CartScreen> {
   }
 
   Future<void> fetchCartDetails() async {
+    setState(() {
+         fetchingCart=true;
+    });
+ 
 
- setState(() {
-   
- });
+
   
     var cartApiUrl = Uri.parse("$baseUrl/cart/cartDetails");
     final String? userId = User.userId; // Replace with the actual userId
@@ -289,6 +295,7 @@ class _CartScreenState extends State<CartScreen> {
                 payNow = false;
                 setState(() {
                   requiresPrescription = true;
+                  fetchingCart=false;
                 });
               }
 
@@ -1174,9 +1181,9 @@ class _CartScreenState extends State<CartScreen> {
                                                                                 color: whiteColor,
                                                                               ),
                                                                             ),
-                                                                            if(HandlingUpdate.isUpdating)
+                                                                            if(fetchingCart)
                                                                             const SizedBox(height: 2),
-                                                                            if(HandlingUpdate.isUpdating)
+                                                                            if(fetchingCart)
                                                                             Shimmer.fromColors(
                                                                               baseColor: ligtBlackColor,
                                                                               highlightColor: greenColor,
@@ -1225,7 +1232,7 @@ class _CartScreenState extends State<CartScreen> {
                                                                         return;
                                                                       }
                                                                       if (payNow ==
-                                                                          false) {
+                                                                          false  ||fetchingCart) {
                                                                         ScaffoldMessenger.of(context)
                                                                             .showSnackBar(
                                                                           SnackBar(

@@ -36,6 +36,7 @@ import 'package:permission_handler/permission_handler.dart' as perm;
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -105,12 +106,15 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   Timer? _ongoingOrdersTimer;
   bool _isFetchingOngoingOrders = false;
   bool fetching_time = true;
- String estTime = "0";
+  String estTime = "0";
   int _currentPage = 0;
   final PageController _pageController = PageController();
   Timer? _debounceTimer;
+  bool _isListening = false;
+  late stt.SpeechToText speechHome;
 
   bool _isInitialized = false;
+
   // To store product quantities
 
   void _showLocationDeniedDialog() {
@@ -139,10 +143,10 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                   borderRadius: BorderRadius.circular(8),
                 )),
             onPressed: () {
-              exit(0); // Exit the app
+              _checkLocationStatus(); // Exit the app
             },
             child: Text(
-              "Exit",
+              "Re-Try",
               style: GoogleFonts.mulish(color: whiteColor),
             ),
           ),
@@ -184,7 +188,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   void _startOngoingOrdersPolling() {
-    print("Hitting every 10 sec");
     // Cancel any existing timer
     _ongoingOrdersTimer?.cancel();
 
@@ -249,6 +252,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
+    speechHome = stt.SpeechToText();
     _controller = AnimationController(
       duration: const Duration(milliseconds: 900),
       vsync: this,
@@ -281,6 +285,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   @override
   void dispose() {
     timer.cancel();
+    speechHome.stop();
+    speechHome.cancel();
     _animationTimer?.cancel();
     _controller.dispose();
     _scrollController.removeListener(_scrollListener);
@@ -1195,7 +1201,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     if (!mounted) return;
     print("***************FECTH ADDRESS CALLED*****************");
     if (Address.CurrentAddress != null && Address.CurrentAddress != {}) {
-      String fullAddress = Address.CurrentAddress!["address"]; 
+      String fullAddress = Address.CurrentAddress!["address"];
 
       setState(() {
         localAddress = fullAddress;
@@ -1215,12 +1221,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         "type": address['type'],
         "_id": address['_id']
       };
-      print("***********CURRENT ADDRESS*******${Address.CurrentAddress!['address']}");
+      print(
+          "***********CURRENT ADDRESS*******${Address.CurrentAddress!['address']}");
       // Show loading indicator while checking locati
       await checkLocation();
       Address.selectedIndex = address['index'];
       localAddress = address['address'];
-      
 
       return;
     }
@@ -1322,13 +1328,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
           body: {"userLat": latitude, "userLong": longitude});
       final data = jsonDecode(response.body);
       if (data["serviceable"] == true) {
-       
         return true;
       } else {
         if (mounted) {
-           setState(() {
-          estTime = "Pharmacy closed";
-           fetching_time = false;
+          setState(() {
+            estTime = data["reason"];
+            fetching_time = false;
           });
         }
 
@@ -1341,12 +1346,12 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   }
 
   Future<void> getEstTime(String lat, String long) async {
-     print("*****************EST TIME CALLED********************");
+    print("*****************EST TIME CALLED********************");
     if (!mounted) return;
 
     final pharmacyOpen = await PharmacyOpen();
     if (pharmacyOpen == false) return;
-   
+
     final String apiUrl = "$baseUrl/home/getEstTime";
     try {
       final response = await http.post(Uri.parse(apiUrl),
@@ -1356,7 +1361,8 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         setState(() {
-          estTime ="in ${(responseData["estimatedTimeMinutes"]).toString()} minutes";
+          estTime =
+              "in ${(responseData["estimatedTimeMinutes"]).toString()} minutes";
           print("EST TIME IS $estTime");
           fetching_time = false;
         });
@@ -1471,6 +1477,49 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
         ),
       ],
     );
+  }
+
+  void _listen() async {
+    String searchQuery = '';
+    print("listning from hOME page");
+    if (!_isListening) {
+      print("in HOME page");
+      bool available = await speechHome.initialize(
+        onStatus: (val) async{
+          print("Home page litning status $val");
+          if (val == "done") {
+            setState(() {
+              _isListening = false;
+            });
+            if (searchQuery.length >= 3) {
+              print("disposing...");
+             await speechHome.stop();
+             await speechHome.cancel();
+             print("naviagting..");
+              Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => Search(SearchText: searchQuery)));
+            }
+          }
+        },
+        onError: (val) => print('Error: $val'),
+      );
+      print("IM AVILABLE OR NOT IN HOME");
+      print(available);
+      if (available) {
+        setState(() {
+          _isListening = true;
+        });
+        speechHome.listen(
+          onResult: (val) {
+            print(val.recognizedWords);
+            searchQuery = val.recognizedWords;
+          },
+        );
+      }
+    } else {
+      _isListening = false;
+      speechHome.stop();
+    }
   }
 
   @override
@@ -1776,7 +1825,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                             "On the way" => "Order Enroute",
                                             _ => "Order Status",
                                           };
-                                          print(AvailId);
+
                                           return GestureDetector(
                                             onTap: () {
                                               Navigator.of(context).push(
@@ -1909,7 +1958,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                               await Navigator.push(
                                   context,
                                   MaterialPageRoute(
-                                      builder: (context) => Search()));
+                                      builder: (context) => Search(
+                                            SearchText: "",
+                                          )));
                               setState(() {});
                               fetchCartDetails();
                             }
@@ -1950,7 +2001,9 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                             color: Colors.white, size: 18),
                                       ),
                                       Container(
-                                        width: 250,
+                                        width:
+                                            MediaQuery.of(context).size.width *
+                                                0.65,
                                         child: Padding(
                                           padding: const EdgeInsets.only(
                                               left: 5, right: 26),
@@ -1995,6 +2048,21 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                             ),
                                           ),
                                         ),
+                                      ),
+                                      IconButton(
+                                        icon: Icon(
+                                          _isListening
+                                              ? Icons.mic
+                                              : Icons.mic_none,
+                                          color: _isListening
+                                              ? whiteColor
+                                              : greyColor,
+                                        ),
+                                        onPressed: () {
+                                          _listen();
+                                          // Add your microphone functionality here
+                                          // For example: start voice recording
+                                        },
                                       ),
                                     ],
                                   ),

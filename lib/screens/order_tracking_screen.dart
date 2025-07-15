@@ -1,9 +1,13 @@
 import 'dart:convert';
 import 'dart:async';
+import 'dart:ui';
+
 import 'package:cureeit_user_app/BaseUrl.dart';
 import 'package:cureeit_user_app/cards/cart_card.dart';
 import 'package:cureeit_user_app/cards/order_accepted_card.dart';
 import 'package:cureeit_user_app/cartManager/cartManager.dart';
+import 'package:cureeit_user_app/current_address/map_style.dart';
+import 'package:cureeit_user_app/current_address/tracking_map_style.dart';
 import 'package:cureeit_user_app/screens/Order_SuccessScreen.dart';
 import 'package:cureeit_user_app/screens/base_screen.dart';
 import 'package:cureeit_user_app/screens/loading.dart';
@@ -14,7 +18,9 @@ import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cashfree_pg_sdk/utils/cfenums.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:loading_indicator/loading_indicator.dart';
@@ -32,12 +38,27 @@ class OrderTrackingScreen extends StatefulWidget {
 }
 
 class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
-  bool paymentStart=false;
+  bool paymentStart = false;
   var orderTrackingDetails;
+  final String apiKey = 'AIzaSyANsLBcGOUyOEFZpqpoLFOqc4MRNSDpng8';
   var paymentOrderData;
   List acceptedProducts = [];
   bool HittingApi = false;
   bool _isInitLoading = true;
+  Set<Polyline> polylines = {};
+  late BitmapDescriptor bikeIcon;
+  late BitmapDescriptor homeIcon;
+  late BitmapDescriptor shopIcon;
+  late BitmapDescriptor vendarIcon;
+ 
+  double? vendorLat;
+  double? vendorLng;
+  double? dropLat;
+  double? dropLng;
+  double? partnerLat;
+  double? partnerLng;
+
+
 
   Future<void> createCheckout(String total, double shippingCost,
       String shippingAddress, String transactionId, String avlId) async {
@@ -120,28 +141,34 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     return formattedDate;
   }
 
-Future<void> startPayment(String orderId, String paymentSessionId,String total, double shippingCost,String shippingAddress, String avlId,BuildContext context) async {
+  Future<void> startPayment(
+      String orderId,
+      String paymentSessionId,
+      String total,
+      double shippingCost,
+      String shippingAddress,
+      String avlId,
+      BuildContext context) async {
     final cashFreePayment = CashfreePaymentService(
       context: context,
       total: total,
-      avlId:avlId ,
-      shippingAddress:shippingAddress ,
-      shippingCost:shippingCost ,
+      avlId: avlId,
+      shippingAddress: shippingAddress,
+      shippingCost: shippingCost,
       environment: CFEnvironment.PRODUCTION,
       orderId: orderId,
       paymentSessionId: paymentSessionId,
     );
-    
+
     await cashFreePayment.initializeCashfree();
     await cashFreePayment.webCheckout();
-     setState(() {
-      paymentStart=false;
-  });
-
+    setState(() {
+      paymentStart = false;
+    });
   }
 
-
   Future<void> fetchOrderTracking() async {
+    print("**************FETCH ORDER TRACKING****************************");
     String orderId = widget.orderId;
     var url = Uri.parse(
       '$baseUrl/order/orderTracking',
@@ -151,27 +178,47 @@ Future<void> startPayment(String orderId, String paymentSessionId,String total, 
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({'availableId': orderId}),
     );
-    print("BODY");
-    print(response.body);
+
     if (response.statusCode == 200) {
-      setState(() {
-        _isInitLoading = false;
-      });
       final responseBody = jsonDecode(response.body);
       // 🔐 only once
       final data = responseBody;
-
+      print(data);
       setState(() {
         if (data["data"].isNotEmpty) {
           _isInitLoading = false;
           orderTrackingDetails = Map<String, dynamic>.from(data["data"][0]);
-          print("ORDER STATUS");
-          print(orderTrackingDetails["status"]);
           if (orderTrackingDetails["status"] == "Available") {
             acceptedProducts = orderTrackingDetails["acceptedProducts"];
           }
         }
       });
+
+      if (orderTrackingDetails["status"] == "On the way" ||
+          orderTrackingDetails["status"] == "Order Placed" ||
+          orderTrackingDetails["status"] == "Packing") {
+        vendorLat =
+            orderTrackingDetails['vendorPickupDetails']?['lat'] ?? 22.54056;
+        vendorLng =
+            orderTrackingDetails['vendorPickupDetails']?['long'] ?? 88.39583;
+        dropLat =
+            orderTrackingDetails['dropDetails']?['address']?['lat'] ?? 0.0;
+        dropLng =
+            orderTrackingDetails['dropDetails']?['address']?['lng'] ?? 0.0;
+        partnerLat = orderTrackingDetails['porterAPIResponse']?['partner_info']
+                ?['location']?['lat'] ??
+            vendorLat;
+        partnerLng = orderTrackingDetails['porterAPIResponse']?['partner_info']
+                ?['location']?['long'] ??
+            vendorLng;
+        await loadCustomIcon();
+        await getDirections(dropLat!, dropLng!, partnerLat!, partnerLng!);
+        
+
+        setState(() {
+          _isInitLoading = false;
+        });
+      }
     } else {
       setState(() {
         _isInitLoading = false;
@@ -180,6 +227,7 @@ Future<void> startPayment(String orderId, String paymentSessionId,String total, 
       print('Failed to load tracking details');
     }
     if (HittingApi == false) {
+      print("STARTED HITTING API");
       _hittingApi();
     }
     setState(() {
@@ -187,44 +235,50 @@ Future<void> startPayment(String orderId, String paymentSessionId,String total, 
     });
   }
 
-Future<void> getPaymentSessionID(double shippingCost,String shippingAddress,String avlId,BuildContext context) async {
-  var url = Uri.parse('$baseUrl/cashfree/getPaymentSessionID');
-  final totalAmount = orderTrackingDetails["finalTotal"];
-  final availableID = orderTrackingDetails["availableID"];
-  setState(() {
-      paymentStart=true;
-  });
-
-  var response = await http.post(
-    url,
-    headers: {'Content-Type': 'application/json'},
-    body: jsonEncode({'userId': User.userId, 'availableID': availableID,'totalAmount': totalAmount}),
-  );
-
-  if (response.statusCode == 200) {
-    final data = jsonDecode(response.body);
-
-    final paymentSessionId = data["payment_session_id"];
-    final orderId = data["order_id"];
-
+  Future<void> getPaymentSessionID(double shippingCost, String shippingAddress,
+      String avlId, BuildContext context) async {
+    var url = Uri.parse('$baseUrl/cashfree/getPaymentSessionID');
+    final totalAmount = orderTrackingDetails["finalTotal"];
+    final availableID = orderTrackingDetails["availableID"];
     setState(() {
-      paymentOrderData = {
-        "payment_session_id": paymentSessionId,
-        "order_id": orderId,
-      };
+      paymentStart = true;
     });
 
-    print(paymentSessionId);
-    await startPayment(orderId, paymentSessionId,totalAmount,shippingCost,shippingAddress,avlId,context);
-  } else {
-    print('Failed to load paymentOrderData details');
-  }
-}
+    var response = await http.post(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'userId': User.userId,
+        'availableID': availableID,
+        'totalAmount': totalAmount
+      }),
+    );
 
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+
+      final paymentSessionId = data["payment_session_id"];
+      final orderId = data["order_id"];
+
+      setState(() {
+        paymentOrderData = {
+          "payment_session_id": paymentSessionId,
+          "order_id": orderId,
+        };
+      });
+
+      print(paymentSessionId);
+      await startPayment(orderId, paymentSessionId, totalAmount, shippingCost,
+          shippingAddress, avlId, context);
+    } else {
+      print('Failed to load paymentOrderData details');
+    }
+  }
 
   @override
   void initState() {
     super.initState();
+
     fetchOrderTracking();
   }
 
@@ -245,9 +299,9 @@ Future<void> getPaymentSessionID(double shippingCost,String shippingAddress,Stri
 
   void _hittingApi() {
     HittingApi = true;
-    _timerStart = Timer.periodic(Duration(seconds: 10), (timer) {
+    _timerStart = Timer.periodic(Duration(seconds: 10), (timer) async {
       fetchOrderTracking();
-      print("Hitting api every 10 sec");
+      print("fecting order tracking called...");
     });
 
     if (orderTrackingDetails["status"] == "Delivered") {
@@ -364,7 +418,6 @@ Future<void> getPaymentSessionID(double shippingCost,String shippingAddress,Stri
                     ),
                     Row(
                       children: [
-                        
                         SizedBox(
                           width: 5,
                         ),
@@ -497,7 +550,8 @@ Future<void> getPaymentSessionID(double shippingCost,String shippingAddress,Stri
               Text(
                 title,
                 style: GoogleFonts.mulish(
-                  fontSize: MediaQuery.of(context).size.width * 0.04, // ~17 on 375px width
+                  fontSize: MediaQuery.of(context).size.width *
+                      0.04, // ~17 on 375px width
 
                   fontWeight: FontWeight.w700,
                   color: whiteColor,
@@ -609,6 +663,103 @@ Future<void> getPaymentSessionID(double shippingCost,String shippingAddress,Stri
       default:
         return 'lib/images/ordered.png'; // default image
     }
+  }
+  
+  Future<void> loadCustomIcon() async {
+      homeIcon = await BitmapDescriptor.asset(
+        const ImageConfiguration(size: Size(30, 30)),
+        'lib/images/map_home.png');
+
+    
+    bikeIcon = await BitmapDescriptor.asset(
+      const ImageConfiguration(size: Size(88, 38)),
+      'lib/images/onTheWay.png',
+    );
+    shopIcon = await BitmapDescriptor.asset(
+        const ImageConfiguration(size: Size(30, 30)),
+        'lib/images/map_shop.png');
+    if (orderTrackingDetails['status'] == "On the way") {
+      vendarIcon = bikeIcon;
+    } else {
+      vendarIcon = shopIcon;
+    }
+  }
+
+  Future<void> getDirections(double originLat, double originLng, double destLat,
+      double destLng) async {
+    print(
+        'Getting directions from ($originLat,$originLng) to ($destLat,$destLng)');
+
+    try {
+      final String url = 'https://maps.googleapis.com/maps/api/directions/json?'
+          'origin=$originLat,$originLng&'
+          'destination=$destLat,$destLng&'
+          'key=$apiKey';
+
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        final jsonData = json.decode(response.body);
+        print('Directions API response: $jsonData');
+
+        if (jsonData['routes'] != null && jsonData['routes'].isNotEmpty) {
+          final points = jsonData['routes'][0]['overview_polyline']['points'];
+          final List<LatLng> polylineCoordinates = _decodePoly(points);
+
+          print('Decoded ${polylineCoordinates.length} points for polyline');
+
+          setState(() {
+            polylines = {
+              Polyline(
+                polylineId: PolylineId('route'),
+                points: polylineCoordinates,
+                width: 3,
+                color: greenColor,
+                geodesic: true,
+              ),
+            };
+          });
+        } else {
+          print('No routes found in response');
+        }
+      } else {
+        print('Directions API error: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error getting directions: $e');
+    }
+  }
+
+  List<LatLng> _decodePoly(String encoded) {
+    List<LatLng> poly = [];
+    int index = 0, len = encoded.length;
+    int lat = 0, lng = 0;
+
+    while (index < len) {
+      int b, shift = 0, result = 0;
+      do {
+        b = encoded.codeUnitAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      int dlat = ((result & 1) != 0) ? ~(result >> 1) : (result >> 1);
+      lat += dlat;
+
+      shift = 0;
+      result = 0;
+      do {
+        b = encoded.codeUnitAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      int dlng = ((result & 1) != 0) ? ~(result >> 1) : (result >> 1);
+      lng += dlng;
+
+      poly.add(
+        LatLng(lat / 1E5, lng / 1E5),
+      );
+    }
+    return poly;
   }
 
   @override
@@ -788,7 +939,8 @@ Future<void> getPaymentSessionID(double shippingCost,String shippingAddress,Stri
                 ),
                 GestureDetector(
                   onTap: () {
-                getPaymentSessionID(shippingCost,Address.CurrentAddress!["address"],avlId,context);
+                    getPaymentSessionID(shippingCost,
+                        Address.CurrentAddress!["address"], avlId, context);
                   },
                   child: Container(
                     height: 36,
@@ -804,22 +956,23 @@ Future<void> getPaymentSessionID(double shippingCost,String shippingAddress,Stri
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Center(
-                      child:paymentStart?Container(
-                        height: 10,
-                        width: 10,
-                        
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: whiteColor,
-                        ),
-                      ) :Text(
-                        "Confirm and Pay",
-                        style: GoogleFonts.mulish(
-                          color: whiteColor,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
+                      child: paymentStart
+                          ? Container(
+                              height: 10,
+                              width: 10,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: whiteColor,
+                              ),
+                            )
+                          : Text(
+                              "Confirm and Pay",
+                              style: GoogleFonts.mulish(
+                                color: whiteColor,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
                     ),
                   ),
                 ),
@@ -991,8 +1144,27 @@ Future<void> getPaymentSessionID(double shippingCost,String shippingAddress,Stri
               ),
       );
     }
+    final double vendorLat =
+        orderTrackingDetails['vendorPickupDetails']?['lat'] ?? 22.54056;
+    final double vendorLng =
+        orderTrackingDetails['vendorPickupDetails']?['long'] ?? 88.39583;
+    final double dropLat =
+        orderTrackingDetails['dropDetails']?['address']?['lat'] ?? 0.0;
+    final double dropLng =
+        orderTrackingDetails['dropDetails']?['address']?['lng'] ?? 0.0;
+    final double partnerLat = orderTrackingDetails['porterAPIResponse']
+            ?['partner_info']?['location']?['lat'] ??
+        vendorLat;
+    final double partnerLng = orderTrackingDetails['porterAPIResponse']
+            ?['partner_info']?['location']?['long'] ??
+        vendorLng;
+    print(vendorLat);
+    print(vendorLng);
+    print(partnerLat);
+    print(partnerLng);
 
     return Scaffold(
+     
       backgroundColor: scaffoldBlackColor,
       body: _isInitLoading
           ? Center(
@@ -1000,114 +1172,110 @@ Future<void> getPaymentSessionID(double shippingCost,String shippingAddress,Stri
                 color: whiteColor,
               ),
             )
-          : Column(
+          : Stack(
               children: [
-                SizedBox(height: height * 0.03),
-                Container(
-                  margin: EdgeInsets.all(width * 0.04),
-                  padding: EdgeInsets.all(width * 0.03),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      Align(
-                        alignment: Alignment.topRight,
-                        child: GestureDetector(
-                          onTap: () {
-                            _stopTimer();
-                            if (widget.NavigatingFrom == "order_place") {
-                              Navigator.of(context)
-                                  .pushReplacement(MaterialPageRoute(
-                                      builder: (context) => BaseScreen(
-                                            Navigatedfrom: "",
-                                          )));
-                            }
-                            if (widget.NavigatingFrom == "Order History") {
-                              Navigator.of(context).pop();
-                            }
-                            if (widget.NavigatingFrom ==
-                                "Order_SuccessScreen") {
-                              Navigator.of(context)
-                                  .pushReplacement(MaterialPageRoute(
-                                      builder: (context) => BaseScreen(
-                                            Navigatedfrom:
-                                                "orderTrackingScreen",
-                                          )));
-                            }
-                            if (widget.NavigatingFrom == "home") {
-                              Navigator.of(context).pop();
-                            }
-
-                            //Navigator.pop(context);
-                          },
-                          child: Icon(
-                            Icons.close,
-                            color: whiteColor,
-                            size: width * 0.06,
-                          ),
-                        ),
-                      ),
-                      SizedBox(height: 70),
-                      Container(
-                        height: height * 0.39,
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Container(
-                              height: 80,
-                              child: ClipRRect(
-                                child: Image.asset(
-                                  orderTrackingDetails["status"] ==
-                                          "Order Placed"
-                                      ? 'lib/images/ordered.png'
-                                      : orderTrackingDetails["status"] ==
-                                              "Packing"
-                                          ? 'lib/images/packing.png'
-                                          : orderTrackingDetails["status"] ==
-                                                  "On the way"
-                                              ? 'lib/images/onTheWay.png'
-                                              : orderTrackingDetails[
-                                                          "status"] ==
-                                                      "Delivered"
-                                                  ? 'lib/images/DELIVERED.png'
-                                                  : 'lib/images/ordered.png', // Default image
-
-                                  height: 80,
+                Column(
+                  children: [
+                    Container(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Container(
+                            height: height * 0.71,
+                            child: 
+                                GoogleMap(
+                                  
+                                  style: TrackingMapStyle,
+                                  initialCameraPosition: CameraPosition(
+                                    target: LatLng(dropLat, dropLng),
+                                    zoom: 16,
+                                  ),
+                                  zoomControlsEnabled: false,
+                                  polylines: polylines,
+                                  markers: {
+                                    Marker(
+                                      markerId: MarkerId('Home'),
+                                      icon: homeIcon,
+                                      position: LatLng(dropLat, dropLng),
+                                      infoWindow: InfoWindow(
+                                        title: 'Home',
+                                        
+                                      )
+                                      
+                                    ),
+                                    Marker(
+                                        markerId: MarkerId('delivery_boy'),
+                                        icon: vendarIcon,
+                                        position:
+                                            LatLng(partnerLat, partnerLng),
+                                            infoWindow: InfoWindow(
+                                        title: 'Medkaro',
+                                        
+                                      )
+                                        ),
+                                        
+                                  },
                                 ),
-                              ),
-                            ),
-                            SizedBox(
-                              height: 20,
-                            ),
-                            Text(
-                              orderTrackingDetails["status"] == "Order Placed"
-                                  ? "Ordered"
-                                  : orderTrackingDetails["status"] == "Packing"
-                                      ? "Packing"
-                                      : orderTrackingDetails["status"] ==
-                                              "On the way"
-                                          ? "Enroute"
-                                          : orderTrackingDetails["status"] ==
-                                                  "Delivered"
-                                              ? "Delivered"
-                                              : "Order status unavailable",
-                              style: GoogleFonts.mulish(
-                                  fontSize: 26,
-                                  fontWeight: FontWeight.bold,
-                                  color: whiteColor),
-                            ),
-                          ],
-                        ),
+                               
+                              
+                          ),
+                        ],
                       ),
-                    ],
-                  ),
+                    ),
+                    
+                  ],
                 ),
-                if (orderTrackingDetails["status"] != "In Review")
-                  SizedBox(
-                    height: 90,
+                /*Positioned(
+                  top: 60,
+                  right: 40,
+                  child: GestureDetector(
+                    onTap: () {
+                      _stopTimer();
+                      if (widget.NavigatingFrom == "order_place") {
+                        Navigator.of(context).pushReplacement(MaterialPageRoute(
+                            builder: (context) => BaseScreen(
+                                  Navigatedfrom: "",
+                                )));
+                      }
+                      if (widget.NavigatingFrom == "Order History") {
+                        Navigator.of(context).pop();
+                      }
+                      if (widget.NavigatingFrom == "Order_SuccessScreen") {
+                        Navigator.of(context).pushReplacement(MaterialPageRoute(
+                            builder: (context) => BaseScreen(
+                                  Navigatedfrom: "orderTrackingScreen",
+                                )));
+                      }
+                      if (widget.NavigatingFrom == "home") {
+                        Navigator.of(context).pop();
+                      }
+                    },
+                    child: Icon(
+                      Icons.close,
+                      color: scaffoldBlackColor,
+                      size: width * 0.06,
+                    ),
                   ),
+                ),*/
                 if (orderTrackingDetails["status"] != "In Review")
-                  Expanded(
+                Positioned(bottom: height*0.33,
+                right: 50,
+                  child:Container(
+                    padding: EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: greenColor,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                   
+                  child: Text("Arriving in 7 min",style: GoogleFonts.mulish(color: whiteColor,fontWeight: FontWeight.w700),),
+                ) ,),
+                if (orderTrackingDetails["status"] != "In Review")
+                  Positioned(
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
                     child: Container(
+                      height: height * 0.3, // Adjust this value as needed
                       padding: EdgeInsets.all(width * 0.04),
                       decoration: BoxDecoration(
                         color: ligtBlackColor,
@@ -1123,7 +1291,6 @@ Future<void> getPaymentSessionID(double shippingCost,String shippingAddress,Stri
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           Container(
                             width: 320,
@@ -1217,47 +1384,49 @@ Future<void> getPaymentSessionID(double shippingCost,String shippingAddress,Stri
                                 padding: EdgeInsets.all(width * 0.04),
                                 child: Column(
                                   children: [
-                                    if(orderTrackingDetails["status"] != "Delivered")
-                                    GestureDetector(
-                                      onTap: () async {
-                                        if (orderTrackingDetails[
-                                                        "porterAPIResponse"]
-                                                    ["deliveryBoyNumber"] !=
-                                                null &&
-                                            orderTrackingDetails[
-                                                        "porterAPIResponse"]
-                                                    ["deliveryBoyNumber"] !=
-                                                "") {
-                                          final phone = orderTrackingDetails[
-                                                  'porterAPIResponse']
-                                              ?['deliveryBoyNumber'];
-                                          if (phone != null &&
-                                              phone.toString().isNotEmpty) {
-                                            final Uri launchUri = Uri(
-                                              scheme: 'tel',
-                                              path: phone.toString(),
-                                            );
-                                            if (await canLaunchUrl(launchUri)) {
-                                              await launchUrl(launchUri);
-                                            } else {
-                                              // handle error
-                                              print(
-                                                  'Could not launch $launchUri');
+                                    if (orderTrackingDetails["status"] !=
+                                        "Delivered")
+                                      GestureDetector(
+                                        onTap: () async {
+                                          if (orderTrackingDetails[
+                                                          "porterAPIResponse"]
+                                                      ["deliveryBoyNumber"] !=
+                                                  null &&
+                                              orderTrackingDetails[
+                                                          "porterAPIResponse"]
+                                                      ["deliveryBoyNumber"] !=
+                                                  "") {
+                                            final phone = orderTrackingDetails[
+                                                    'porterAPIResponse']
+                                                ?['deliveryBoyNumber'];
+                                            if (phone != null &&
+                                                phone.toString().isNotEmpty) {
+                                              final Uri launchUri = Uri(
+                                                scheme: 'tel',
+                                                path: phone.toString(),
+                                              );
+                                              if (await canLaunchUrl(
+                                                  launchUri)) {
+                                                await launchUrl(launchUri);
+                                              } else {
+                                                // handle error
+                                                print(
+                                                    'Could not launch $launchUri');
+                                              }
                                             }
                                           }
-                                        }
-                                      },
-                                      child: OrderDetail(
-                                        icon: Icons.phone,
-                                        title:
-                                            "${orderTrackingDetails['porterAPIResponse']?['partner_info']?["name"] ?? "Searching for delivery partner"}",
-                                        subtitle: orderTrackingDetails[
-                                                    'porterAPIResponse']
-                                                ?['deliveryBoyNumber'] ??
-                                            "+91 ",
-                                        width: width,
+                                        },
+                                        child: OrderDetail(
+                                          icon: Icons.phone,
+                                          title:
+                                              "${orderTrackingDetails['porterAPIResponse']?['partner_info']?["name"] ?? "Searching for delivery partner"}",
+                                          subtitle: orderTrackingDetails[
+                                                      'porterAPIResponse']
+                                                  ?['deliveryBoyNumber'] ??
+                                              "+91 ",
+                                          width: width,
+                                        ),
                                       ),
-                                    ),
                                     SizedBox(
                                       height: 16,
                                     ),
@@ -1282,7 +1451,7 @@ Future<void> getPaymentSessionID(double shippingCost,String shippingAddress,Stri
                                         icon: Icons.receipt_outlined,
                                         title: "Bill Details",
                                         subtitle:
-                                            "₹${orderTrackingDetails["finalTotal"]??0.0}",
+                                            "₹${orderTrackingDetails["finalTotal"] ?? 0.0}",
                                         width: width,
                                       ),
                                     ),
