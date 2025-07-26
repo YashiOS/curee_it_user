@@ -38,6 +38,7 @@ class OrderTrackingScreen extends StatefulWidget {
 }
 
 class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
+  late GoogleMapController _mapController;
   bool paymentStart = false;
   var orderTrackingDetails;
   final String apiKey = 'AIzaSyANsLBcGOUyOEFZpqpoLFOqc4MRNSDpng8';
@@ -50,15 +51,13 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
   late BitmapDescriptor homeIcon;
   late BitmapDescriptor shopIcon;
   late BitmapDescriptor vendarIcon;
- 
+
   double? vendorLat;
   double? vendorLng;
   double? dropLat;
   double? dropLng;
   double? partnerLat;
   double? partnerLng;
-
-
 
   Future<void> createCheckout(String total, double shippingCost,
       String shippingAddress, String transactionId, String avlId) async {
@@ -212,8 +211,10 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                 ?['location']?['long'] ??
             vendorLng;
         await loadCustomIcon();
+   
+
+       
         await getDirections(dropLat!, dropLng!, partnerLat!, partnerLng!);
-        
 
         setState(() {
           _isInitLoading = false;
@@ -664,13 +665,12 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
         return 'lib/images/ordered.png'; // default image
     }
   }
-  
+
   Future<void> loadCustomIcon() async {
-      homeIcon = await BitmapDescriptor.asset(
+    homeIcon = await BitmapDescriptor.asset(
         const ImageConfiguration(size: Size(30, 30)),
         'lib/images/map_home.png');
 
-    
     bikeIcon = await BitmapDescriptor.asset(
       const ImageConfiguration(size: Size(88, 38)),
       'lib/images/onTheWay.png',
@@ -767,6 +767,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     final size = MediaQuery.of(context).size;
     final width = size.width;
     final height = size.height;
+
     if (_isInitLoading) {
       return Center(
           child: CircularProgressIndicator(
@@ -1164,7 +1165,6 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     print(partnerLng);
 
     return Scaffold(
-     
       backgroundColor: scaffoldBlackColor,
       body: _isInitLoading
           ? Center(
@@ -1182,51 +1182,39 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                         children: [
                           Container(
                             height: height * 0.71,
-                            child: 
-                                GoogleMap(
-                                  style: TrackingMapStyle,
-                                  initialCameraPosition: CameraPosition(
-                                    target: LatLng(dropLat, dropLng),
-                                    zoom: 16,
-                                  ),
-                                  zoomControlsEnabled: false,
-                                  polylines: polylines,
-                                  markers: {
-                                    Marker(
-                                      markerId: MarkerId('Home'),
-                                      icon: homeIcon,
-                                      position: LatLng(dropLat, dropLng),
-                                      infoWindow: InfoWindow(
-                                        title: '',
-                                        onTap: (){
+                            child: GoogleMap(
+                              onMapCreated: (controller) {
+                                
+                                _mapController = controller;
+                              },
+                              // Update on pan/zoom
 
-                                        }
-                                        
-                                        
-                                      )
-                                      
-                                    ),
-                                    Marker(
-                                        markerId: MarkerId('delivery_boy'),
-                                        icon: vendarIcon,
-                                        position:
-                                            LatLng(partnerLat, partnerLng),
-                                            infoWindow: InfoWindow(
-                                        title: '',
-                                        onTap: (){}
-                                        
-                                      )
-                                        ),
-                                        
-                                  },
-                                ),
-                               
-                              
+                              style: TrackingMapStyle,
+                              initialCameraPosition: CameraPosition(
+                                target: LatLng(dropLat, dropLng),
+                                zoom: 16,
+                              ),
+                              zoomControlsEnabled: false,
+                              polylines: polylines,
+                              markers: {
+                                Marker(
+                                    markerId: MarkerId('Home'),
+                                    icon: homeIcon,
+                                    position: LatLng(dropLat, dropLng),
+                                    infoWindow:
+                                        InfoWindow(title: '', onTap: () {})),
+                                Marker(
+                                    markerId: MarkerId('delivery_boy'),
+                                    icon: vendarIcon,
+                                    position: LatLng(partnerLat, partnerLng),
+                                    infoWindow:
+                                        InfoWindow(title: '', onTap: () {})),
+                              },
+                            ),
                           ),
                         ],
                       ),
                     ),
-                    
                   ],
                 ),
                 /*Positioned(
@@ -1261,18 +1249,24 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                     ),
                   ),
                 ),*/
+
                 if (orderTrackingDetails["status"] != "In Review")
-                Positioned(bottom: height*0.33,
-                right: width*0.33,
-                  child:Container(
-                    padding: EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: greenColor,
-                      borderRadius: BorderRadius.circular(8),
+                  Positioned(
+                    bottom: height * 0.33,
+                    right: width * 0.33,
+                    child: Container(
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                        color: greenColor,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        "Arriving in 7 min",
+                        style: GoogleFonts.mulish(
+                            color: whiteColor, fontWeight: FontWeight.w700),
+                      ),
                     ),
-                   
-                  child: Text("Arriving in 7 min",style: GoogleFonts.mulish(color: whiteColor,fontWeight: FontWeight.w700),),
-                ) ,),
+                  ),
                 if (orderTrackingDetails["status"] != "In Review")
                   Positioned(
                     bottom: 0,
@@ -1473,6 +1467,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     );
   }
 }
+
 class CustomInfoWindow extends StatelessWidget {
   final String title;
   final String address;
@@ -1491,7 +1486,7 @@ class CustomInfoWindow extends StatelessWidget {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     final width = size.width;
-    
+
     return Container(
       width: width * 0.8,
       padding: EdgeInsets.all(12),
