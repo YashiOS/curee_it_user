@@ -241,7 +241,6 @@ class _CartScreenState extends State<CartScreen> {
           placeOrderButton = data["reason"];
           });
         }
-
         return false;
       }
     } catch (e) {
@@ -254,10 +253,7 @@ class _CartScreenState extends State<CartScreen> {
     setState(() {
          fetchingCart=true;
     });
- 
 
-
-  
     var cartApiUrl = Uri.parse("$baseUrl/cart/cartDetails");
     final String? userId = User.userId; // Replace with the actual userId
 

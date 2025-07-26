@@ -1184,7 +1184,6 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                             height: height * 0.71,
                             child: 
                                 GoogleMap(
-                                  
                                   style: TrackingMapStyle,
                                   initialCameraPosition: CameraPosition(
                                     target: LatLng(dropLat, dropLng),
@@ -1198,7 +1197,11 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                                       icon: homeIcon,
                                       position: LatLng(dropLat, dropLng),
                                       infoWindow: InfoWindow(
-                                        title: 'Home',
+                                        title: '',
+                                        onTap: (){
+
+                                        }
+                                        
                                         
                                       )
                                       
@@ -1209,7 +1212,8 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                                         position:
                                             LatLng(partnerLat, partnerLng),
                                             infoWindow: InfoWindow(
-                                        title: 'Medkaro',
+                                        title: '',
+                                        onTap: (){}
                                         
                                       )
                                         ),
@@ -1259,7 +1263,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                 ),*/
                 if (orderTrackingDetails["status"] != "In Review")
                 Positioned(bottom: height*0.33,
-                right: 50,
+                right: width*0.33,
                   child:Container(
                     padding: EdgeInsets.all(10),
                     decoration: BoxDecoration(
@@ -1466,6 +1470,85 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                   ),
               ],
             ),
+    );
+  }
+}
+class CustomInfoWindow extends StatelessWidget {
+  final String title;
+  final String address;
+  final String? phoneNumber;
+  final VoidCallback? onCallPressed;
+
+  const CustomInfoWindow({
+    Key? key,
+    required this.title,
+    required this.address,
+    this.phoneNumber,
+    this.onCallPressed,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final width = size.width;
+    
+    return Container(
+      width: width * 0.8,
+      padding: EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: ligtBlackColor,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.2),
+            blurRadius: 10,
+            offset: Offset(0, 5),
+          ),
+        ],
+        border: Border.all(color: greenColor, width: 1),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                title,
+                style: GoogleFonts.mulish(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  color: whiteColor,
+                ),
+              ),
+              if (onCallPressed != null && phoneNumber != null)
+                IconButton(
+                  icon: Icon(Icons.call, color: greenColor, size: 20),
+                  onPressed: onCallPressed,
+                ),
+            ],
+          ),
+          SizedBox(height: 8),
+          Text(
+            address,
+            style: GoogleFonts.mulish(
+              fontSize: 14,
+              color: greyColor,
+            ),
+          ),
+          if (phoneNumber != null) ...[
+            SizedBox(height: 8),
+            Text(
+              "Contact: $phoneNumber",
+              style: GoogleFonts.mulish(
+                fontSize: 14,
+                color: whiteColor,
+              ),
+            ),
+          ],
+        ],
+      ),
     );
   }
 }

@@ -24,15 +24,11 @@ import 'package:cureeit_user_app/screens/cart_screen.dart';
 import 'package:cureeit_user_app/screens/item_detail_screen.dart';
 import 'package:cureeit_user_app/screens/profile_screen.dart';
 import 'package:cureeit_user_app/screens/search.dart';
-import 'package:cureeit_user_app/selected_Address/currentAddress.dart';
-import 'package:cureeit_user_app/utils/theme.dart';
-import 'package:flutter/material.dart';
+
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
-import 'package:loading_indicator/loading_indicator.dart';
-import 'package:location/location.dart' as loc;
 
-import 'package:permission_handler/permission_handler.dart' as perm;
+import 'package:location/location.dart' as loc;
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
@@ -96,11 +92,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
   double defaultLng = 75.7873;
   bool _isFetchingCart = false;
   PlaceFromCoordinates placeFromCoordinates = PlaceFromCoordinates();
-  late Animation<Offset> _slideTransition;
+
   final ScrollController _scrollController = ScrollController();
   double _lastScrollOffset = 0.0;
   bool _isScrollingDown = false;
-  double _bottomWidgetHeight = 76; // Height of your bottom widget
+
   late AnimationController _animationController;
   late Animation<double> _animation;
   Timer? _ongoingOrdersTimer;
@@ -287,6 +283,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     timer.cancel();
     speechHome.stop();
     speechHome.cancel();
+
     _animationTimer?.cancel();
     _controller.dispose();
     _scrollController.removeListener(_scrollListener);
@@ -1481,30 +1478,31 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
 
   void _listen() async {
     String searchQuery = '';
-    print("listning from hOME page");
+
     if (!_isListening) {
-      print("in HOME page");
       bool available = await speechHome.initialize(
-        onStatus: (val) async{
-          print("Home page litning status $val");
+        onStatus: (val) async {
           if (val == "done") {
             setState(() {
               _isListening = false;
             });
             if (searchQuery.length >= 3) {
-              print("disposing...");
-             await speechHome.stop();
-             await speechHome.cancel();
-             print("naviagting..");
-              Navigator.of(context).push(MaterialPageRoute(
-                  builder: (context) => Search(SearchText: searchQuery)));
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                speechHome.stop().then((_) {
+                  if (mounted) {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => Search(SearchText: searchQuery)));
+                  }
+                });
+              });
             }
           }
         },
         onError: (val) => print('Error: $val'),
       );
-      print("IM AVILABLE OR NOT IN HOME");
-      print(available);
+
       if (available) {
         setState(() {
           _isListening = true;
@@ -1646,7 +1644,11 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                                   color: estTime == 0
                                                       ? greyColor
                                                       : whiteColor,
-                                                  fontSize: 24,
+                                                  fontSize:
+                                                      MediaQuery.of(context)
+                                                              .size
+                                                              .width *
+                                                          0.055,
                                                   fontWeight: FontWeight.bold),
                                             ),
                                   localAddress == ""

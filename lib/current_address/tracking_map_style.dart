@@ -1,46 +1,85 @@
-const String TrackingMapStyle = '''
+const String TrackingMapStyle= '''
 [
   {
     "elementType": "geometry",
     "stylers": [
-      { "color": "#1b1b1b" }
+      { "color": "#fdfcfb" }
     ]
   },
   {
-    "featureType": "road",
-    "elementType": "geometry",
+    "elementType": "labels.icon",
     "stylers": [
-      { "color": "#2c2c2c" }
+      { "visibility": "off" }
     ]
   },
   {
-    "featureType": "building",
-    "elementType": "geometry",
+    "elementType": "labels.text.fill",
     "stylers": [
-      { "color": "#1b1b1b" }
+      { "color": "#333333" }
+    ]
+  },
+  {
+    "elementType": "labels.text.stroke",
+    "stylers": [
+      { "color": "#ffffff" }
+    ]
+  },
+  {
+    "featureType": "administrative.land_parcel",
+    "stylers": [
+      { "visibility": "off" }
     ]
   },
   {
     "featureType": "poi",
-    "elementType": "labels",
     "stylers": [
       { "visibility": "off" }
     ]
   },
   {
     "featureType": "poi.business",
-    "elementType": "labels",
     "stylers": [
       { "visibility": "off" }
     ]
   },
   {
     "featureType": "poi.park",
-    "elementType": "geometry",
     "stylers": [
       { "visibility": "off" }
     ]
+  },
+  {
+    "featureType": "road",
+    "elementType": "geometry",
+    "stylers": [
+      { "color": "#f4f4f4" }
+    ]
+  },
+  {
+    "featureType": "road.highway",
+    "elementType": "geometry",
+    "stylers": [
+      { "color": "#e0e0e0" }
+    ]
+  },
+  {
+    "featureType": "road.arterial",
+    "stylers": [
+      { "color": "#f4f4f4" }
+    ]
+  },
+  {
+    "featureType": "transit",
+    "stylers": [
+      { "visibility": "off" }
+    ]
+  },
+  {
+    "featureType": "water",
+    "elementType": "geometry",
+    "stylers": [
+      { "color": "#d6e4f0" }
+    ]
   }
 ]
-
 ''';
