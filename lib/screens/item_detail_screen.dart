@@ -633,7 +633,7 @@ _debounceTimer=Timer(Duration(seconds: 1), ()async{
                             margin: EdgeInsets.only(left: 24),
                             height: 18,
                             child: Text(
-                              "Description",
+                              "Instruction",
                               style: GoogleFonts.mulish(color: greyColor),
                             )),
                       if (product["usageInstruction"] != null &&

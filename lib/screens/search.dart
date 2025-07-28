@@ -14,8 +14,8 @@ import 'dart:convert';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 class Search extends StatefulWidget {
-  const Search({super.key, required this.SearchText});
-  final String SearchText;
+  const Search({super.key, required this.Mic_on});
+  final bool Mic_on;
   @override
   State<Search> createState() => _SearchState();
 }
@@ -102,16 +102,13 @@ class _SearchState extends State<Search> {
   }
 
   void _listen() async {
-    print("listning from search page");
     
-    await _speech.stop();
-    await _speech.cancel();
     if (!_isListening) {
       print("in search page");
       bool available = await _speech.initialize(
         onStatus: (val) {
           print("search page litninG status $val");
-          if (val == "notListening") {
+          if (val == "notListening"||val=="done") {
             time?.cancel();
 
             time = Timer(Duration(seconds: 1), () async {
@@ -120,15 +117,15 @@ class _SearchState extends State<Search> {
               });
               print("fetched search result");
               await _fetchSearchResults(_speechText);
-              await _speech.stop();
-              await _speech.cancel();
+               _speech.cancel();
+               _speech.stop();
+
             });
           }
         },
         onError: (val) => print('Error: $val'),
       );
-      print("search page avilibility $available");
-      print(available);
+      
       if (available) {
         setState(() {
           _isListening = true;
@@ -159,13 +156,11 @@ class _SearchState extends State<Search> {
       _onSearchChanged();
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      FocusScope.of(context).requestFocus(_focusNode);
-      if (widget.SearchText != "" && widget.SearchText.length > 3) {
-        _fetchSearchResults(widget.SearchText);
-        _controller.text = widget.SearchText; // 👈 sets the TextField value!
-        _controller.selection = TextSelection.fromPosition(
-          TextPosition(offset: _controller.text.length),
-        );
+      
+      if (widget.Mic_on) {
+        _listen();
+        print("Listning from init state method");
+        
       }
     });
   }
@@ -442,7 +437,7 @@ class _SearchState extends State<Search> {
                       padding: const EdgeInsets.only(left: 24, right: 12),
                       child: TextField(
                         focusNode: _focusNode,
-                        autofocus: true,
+                        autofocus: !widget.Mic_on,
                         cursorColor: whiteColor,
                         style: GoogleFonts.mulish(color: whiteColor),
                         controller: _controller,
@@ -450,7 +445,7 @@ class _SearchState extends State<Search> {
                           suffixIcon: IconButton(
                             icon: Icon(
                               _isListening ? Icons.mic : Icons.mic_none,
-                              color: _isListening ? whiteColor : greyColor,
+                              color: _isListening ? greenColor : whiteColor,
                             ),
                             onPressed: () {
                               _listen();

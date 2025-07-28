@@ -1476,7 +1476,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
     );
   }
 
-  void _listen() async {
+  /* void _listen() async {
     String searchQuery = '';
 
     if (!_isListening) {
@@ -1518,7 +1518,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       _isListening = false;
       speechHome.stop();
     }
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -1961,7 +1961,7 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                   context,
                                   MaterialPageRoute(
                                       builder: (context) => Search(
-                                            SearchText: "",
+                                            Mic_on: false,
                                           )));
                               setState(() {});
                               fetchCartDetails();
@@ -2056,14 +2056,16 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                           _isListening
                                               ? Icons.mic
                                               : Icons.mic_none,
-                                          color: _isListening
-                                              ? whiteColor
-                                              : greyColor,
+                                          color: whiteColor
+                                             
                                         ),
                                         onPressed: () {
-                                          _listen();
-                                          // Add your microphone functionality here
-                                          // For example: start voice recording
+                                          Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                  builder: (_) => Search(
+                                                        Mic_on: true,
+                                                      )));
                                         },
                                       ),
                                     ],
