@@ -70,6 +70,7 @@ class _MedicineAvailabilityScreenState extends State<MedicineAvailabilityScreen>
           "userLong": Address.CurrentAddress?["userLong"]?.toString() ?? "0.0",
         }),
       );
+      print("PLACED ORDER");
       print(response.statusCode);
  print(response.body);
       if (response.statusCode == 200) {

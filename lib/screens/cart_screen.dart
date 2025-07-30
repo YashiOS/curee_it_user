@@ -56,6 +56,7 @@ class _CartScreenState extends State<CartScreen> {
   File? _imageFile;
   String placeOrderButton="Place Order";
   bool fetchingCart=false;
+  bool Servisable=true;
 
  
 
@@ -232,12 +233,15 @@ class _CartScreenState extends State<CartScreen> {
       final response = await http.post(Uri.parse(apiUrl),
           body: {"userLat": latitude, "userLong": longitude});
       final data = jsonDecode(response.body);
+       print("is it servisable");
+        print(data["serviceable"]);
       if (data["serviceable"] == true) {
-        
+       
         return true;
       } else {
         if (mounted) {
           setState(() {
+            Servisable=false;
           placeOrderButton = data["reason"];
           });
         }
@@ -1240,13 +1244,13 @@ class _CartScreenState extends State<CartScreen> {
                                                                         );
                                                                         return;
                                                                       }
-                                                                      if(placeOrderButton=="Pharmacy closed"){
+                                                                      if(Servisable==false){
                                                                          ScaffoldMessenger.of(context)
                                                                             .showSnackBar(
                                                                           SnackBar(
                                                                               backgroundColor: ligtBlackColor,
                                                                               content: Text(
-                                                                                'Pharmacy is currently closed',
+                                                                                '$placeOrderButton',
                                                                                 style: GoogleFonts.mulish(color: whiteColor),
                                                                               )),
                                                                         );
