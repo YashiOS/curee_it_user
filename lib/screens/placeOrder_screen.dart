@@ -59,6 +59,7 @@ class _MedicineAvailabilityScreenState extends State<MedicineAvailabilityScreen>
         List<int> imageBytes = await widget.prescriptionImage!.readAsBytes();
         base64Image = base64Encode(imageBytes);
       }
+      
 
       final response = await http.post(
         Uri.parse('$baseUrl/order/itemAvailability'),

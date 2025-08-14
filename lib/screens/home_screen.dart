@@ -1076,113 +1076,129 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                     ),
                   ),
                   SizedBox(height: 16),
-                  ListView.builder(
-                    shrinkWrap: true,
-                    itemCount: addresses.length,
-                    itemBuilder: (context, index) {
-                      var address = addresses[index];
-                      final selectAdd = address!["address"];
-                      final selectedLat = address!["userLat"];
-                      final selectedLong = address!["userLong"];
-                      final selectedType = address!["type"];
-                      final selectedLandMark = address!["landmark"] ?? "";
-                      final selectedFloor = address!["floor"] ?? "0";
-                      bool isSelected = Address.selectedIndex == index;
+                  SingleChildScrollView(
+                    child: Container(
+                      height: 300,
+                      child: ListView.builder(
+                        shrinkWrap: true,
+                        itemCount: addresses.length,
+                        itemBuilder: (context, index) {
+                          var address = addresses[index];
+                          final selectAdd = address!["address"];
+                          final selectedLat = address!["userLat"];
+                          final selectedLong = address!["userLong"];
+                          final selectedType = address!["type"];
+                          final selectedLandMark = address!["landmark"] ?? "";
+                          final selectedFloor = address!["floor"] ?? "0";
+                          bool isSelected = Address.selectedIndex == index;
 
-                      return GestureDetector(
-                        onTap: () async {
-                          Address.CurrentAddress = {
-                            "address": selectAdd,
-                            "landmark": selectedLandMark,
-                            "floor": selectedFloor,
-                            "userLat": selectedLat,
-                            "userLong": selectedLong,
-                            "type": selectedType,
-                            "_id": ""
-                          };
-                          setState(() {
-                            Address.selectedIndex = index;
-                          });
-                          setState(() {
-                            localAddress = selectAdd;
-                          });
+                          return GestureDetector(
+                            onTap: () async {
+                              Address.CurrentAddress = {
+                                "address": selectAdd,
+                                "landmark": selectedLandMark,
+                                "floor": selectedFloor,
+                                "userLat": selectedLat,
+                                "userLong": selectedLong,
+                                "type": selectedType,
+                                "_id": ""
+                              };
 
-                          Navigator.pop(context);
+                              setState(() {
+                                Address.selectedIndex = index;
+                                localAddress = selectAdd;
+                              });
+                          
+                              context.read<StoreUserCubit>().saveUserAddress(
+                                    index: index,
+                                    address: address['address'],
+                                    floor: address['floor'],
+                                    landmark: address['landmark'],
+                                    type: address['type'],
+                                    userId: address['_id'],
+                                    userLat: address['userLat'],
+                                    userlong: address['userLong'],
+                                  );
+                              Navigator.pop(context);
 
-                          // Show loading indicator while checking location
-                          setState(() {
-                            isInRadius = null; // Reset while checking
-                          });
+                              // Show loading indicator while checking location
+                              setState(() {
+                                isInRadius = null; // Reset while checking
+                              });
 
-                          await checkLocation(); // Wait for location check to complete
+                              await checkLocation(); // Wait for location check to complete
 
-                          // Update UI based on location availability
-                          if (mounted) {
-                            setState(() {
-                              // isInRadius will be updated by checkLocation()
-                            });
-                          }
+                              // Update UI based on location availability
+                              if (mounted) {
+                                setState(() {
+                                  // isInRadius will be updated by checkLocation()
+                                });
+                              }
+                            },
+                            child: Container(
+                              padding: EdgeInsets.only(left: 25, right: 16),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(8),
+                                color: ligtBlackColor,
+                              ),
+                              margin: EdgeInsets.only(bottom: 16),
+                              height: 75,
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: [
+                                  Container(
+                                    height: 16,
+                                    width: 16,
+                                    child: Image.asset(
+                                      "lib/images/hugeicons_location.png",
+                                    ),
+                                  ),
+                                  SizedBox(width: 16),
+                                  Expanded(
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          address['address'] ?? '',
+                                          style: GoogleFonts.mulish(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.w500,
+                                            color: whiteColor,
+                                          ),
+                                        ),
+                                        SizedBox(height: 2),
+                                        Text(
+                                          address['type'] ?? '',
+                                          style: GoogleFonts.mulish(
+                                            fontSize: 13,
+                                            fontWeight: FontWeight.w300,
+                                            color: whiteColor,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  Container(
+                                    width: 16,
+                                    height: 16,
+                                    margin: EdgeInsets.only(left: 8),
+                                    decoration: BoxDecoration(
+                                      color: isSelected
+                                          ? greenColor
+                                          : scaffoldBlackColor,
+                                      shape: BoxShape.circle,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
                         },
-                        child: Container(
-                          padding: EdgeInsets.only(left: 25, right: 16),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(8),
-                            color: ligtBlackColor,
-                          ),
-                          margin: EdgeInsets.only(bottom: 16),
-                          height: 75,
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Container(
-                                height: 16,
-                                width: 16,
-                                child: Image.asset(
-                                  "lib/images/hugeicons_location.png",
-                                ),
-                              ),
-                              SizedBox(width: 16),
-                              Expanded(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      address['address'] ?? '',
-                                      style: GoogleFonts.mulish(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w500,
-                                        color: whiteColor,
-                                      ),
-                                    ),
-                                    SizedBox(height: 2),
-                                    Text(
-                                      address['type'] ?? '',
-                                      style: GoogleFonts.mulish(
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w300,
-                                        color: whiteColor,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              Container(
-                                width: 16,
-                                height: 16,
-                                margin: EdgeInsets.only(left: 8),
-                                decoration: BoxDecoration(
-                                  color: isSelected
-                                      ? greenColor
-                                      : scaffoldBlackColor,
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
+                      ),
+                    ),
                   ),
                   SizedBox(height: 8),
                 ],
@@ -1475,50 +1491,6 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
       ],
     );
   }
-
-  /* void _listen() async {
-    String searchQuery = '';
-
-    if (!_isListening) {
-      bool available = await speechHome.initialize(
-        onStatus: (val) async {
-          if (val == "done") {
-            setState(() {
-              _isListening = false;
-            });
-            if (searchQuery.length >= 3) {
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                speechHome.stop().then((_) {
-                  if (mounted) {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (_) => Search(SearchText: searchQuery)));
-                  }
-                });
-              });
-            }
-          }
-        },
-        onError: (val) => print('Error: $val'),
-      );
-
-      if (available) {
-        setState(() {
-          _isListening = true;
-        });
-        speechHome.listen(
-          onResult: (val) {
-            print(val.recognizedWords);
-            searchQuery = val.recognizedWords;
-          },
-        );
-      }
-    } else {
-      _isListening = false;
-      speechHome.stop();
-    }
-  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -2002,71 +1974,69 @@ class _HomeScreenState extends State<HomeScreen> with TickerProviderStateMixin {
                                         child: Icon(Icons.search,
                                             color: Colors.white, size: 18),
                                       ),
-                                      Container(
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.65,
-                                        child: Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 5, right: 26),
-                                          child: AnimatedSwitcher(
-                                            duration:
-                                                Duration(milliseconds: 300),
-                                            transitionBuilder:
-                                                (child, animation) {
-                                              final inAnimation = Tween<Offset>(
-                                                begin:
-                                                    Offset(0, 1), // from bottom
-                                                end: Offset.zero, // to center
-                                              ).animate(animation);
+                                      Expanded(
+                                        child: Container(
+                                          child: Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 5, right: 26),
+                                            child: AnimatedSwitcher(
+                                              duration:
+                                                  Duration(milliseconds: 300),
+                                              transitionBuilder:
+                                                  (child, animation) {
+                                                final inAnimation =
+                                                    Tween<Offset>(
+                                                  begin: Offset(
+                                                      0, 1), // from bottom
+                                                  end: Offset.zero, // to center
+                                                ).animate(animation);
 
-                                              final outAnimation =
-                                                  Tween<Offset>(
-                                                begin: Offset(
-                                                    0, -1), // from center
-                                                end: Offset.zero, //, // to top
-                                              ).animate(animation);
+                                                final outAnimation =
+                                                    Tween<Offset>(
+                                                  begin: Offset(
+                                                      0, -1), // from center
+                                                  end:
+                                                      Offset.zero, //, // to top
+                                                ).animate(animation);
 
-                                              return SlideTransition(
-                                                position: child.key ==
-                                                        ValueKey(
-                                                            hints[currentIndex])
-                                                    ? inAnimation // incoming child
-                                                    : outAnimation, // outgoing child
-                                                child: child,
-                                              );
-                                            },
-                                            child: Align(
-                                              key: ValueKey<String>(
-                                                  hints[currentIndex]),
-                                              alignment: Alignment.centerLeft,
-                                              child: Text(
-                                                currentHint ?? "",
-                                                style: GoogleFonts.mulish(
-                                                  color: greyColor,
-                                                  fontSize: 14,
+                                                return SlideTransition(
+                                                  position: child.key ==
+                                                          ValueKey(hints[
+                                                              currentIndex])
+                                                      ? inAnimation // incoming child
+                                                      : outAnimation, // outgoing child
+                                                  child: child,
+                                                );
+                                              },
+                                              child: Align(
+                                                key: ValueKey<String>(
+                                                    hints[currentIndex]),
+                                                alignment: Alignment.centerLeft,
+                                                child: Text(
+                                                  currentHint ?? "",
+                                                  style: GoogleFonts.mulish(
+                                                    color: greyColor,
+                                                    fontSize: 14,
+                                                  ),
                                                 ),
                                               ),
                                             ),
                                           ),
                                         ),
                                       ),
-                                      IconButton(
-                                        icon: Icon(
-                                          _isListening
-                                              ? Icons.mic
-                                              : Icons.mic_none,
-                                          color: whiteColor
-                                             
-                                        ),
-                                        onPressed: () {
-                                          Navigator.push(
-                                              context,
+                                      GestureDetector(
+                                        onTap: () {
+                                          Navigator.of(context).push(
                                               MaterialPageRoute(
-                                                  builder: (_) => Search(
-                                                        Mic_on: true,
-                                                      )));
+                                                  builder: (context) =>
+                                                      Search(Mic_on: true)));
                                         },
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(
+                                              left: 0, right: 16),
+                                          child: Icon(Icons.mic,
+                                              color: Colors.white, size: 18),
+                                        ),
                                       ),
                                     ],
                                   ),

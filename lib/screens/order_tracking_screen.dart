@@ -151,7 +151,6 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     final cashFreePayment = CashfreePaymentService(
       context: context,
       total: total,
-      avlId: avlId,
       shippingAddress: shippingAddress,
       shippingCost: shippingCost,
       environment: CFEnvironment.PRODUCTION,

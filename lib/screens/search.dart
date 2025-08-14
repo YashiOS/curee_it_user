@@ -434,7 +434,7 @@ class _SearchState extends State<Search> {
                 children: [
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.only(left: 24, right: 12),
+                      padding: const EdgeInsets.only(left: 24, right: 10),
                       child: TextField(
                         focusNode: _focusNode,
                         autofocus: !widget.Mic_on,
@@ -444,6 +444,7 @@ class _SearchState extends State<Search> {
                         decoration: InputDecoration(
                           suffixIcon: IconButton(
                             icon: Icon(
+                              size: 18,
                               _isListening ? Icons.mic : Icons.mic_none,
                               color: _isListening ? greenColor : whiteColor,
                             ),

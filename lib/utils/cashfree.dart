@@ -25,11 +25,11 @@ class CashfreePaymentService {
   late String orderId;
   late String paymentSessionId;
   late double shippingCost;
-  late String avlId;
+ 
 
   CashfreePaymentService({
     required this.context,
-    required this.avlId,
+    
     required this.shippingAddress,
     required this.shippingCost,
     required this.total,
@@ -39,7 +39,7 @@ class CashfreePaymentService {
   });
 
    Future<void> createCheckout(String total, double shippingCost,
-      String shippingAddress, String transactionId, String avlId,) async {
+      String shippingAddress, String transactionId,) async {
     ;
 
     try {
@@ -58,7 +58,7 @@ class CashfreePaymentService {
         ..body = jsonEncode({
           "userId": User.userId,
           "shippingAddress": shippingAddress,
-          "availableId": avlId,
+          
           "userLat": Address.CurrentAddress?["userLat"] ?? 0.0,
           "userLong": Address.CurrentAddress?["userLong"] ?? 0.0
         });
@@ -111,7 +111,7 @@ class CashfreePaymentService {
     var response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'availableID': avlId, 'orderId': orderId}),
+      body: jsonEncode({ 'orderId': orderId}),
     );
 
     if (response.statusCode == 200) {
@@ -120,7 +120,7 @@ class CashfreePaymentService {
 
       print("Payment status: $paymentStatus");
       if (paymentStatus == true) {
-        createCheckout(total, shippingCost, shippingAddress, paymentSessionId, avlId);
+        createCheckout(total, shippingCost, shippingAddress, paymentSessionId);
       } else {
         print("Payment not successful. Status: $paymentStatus");
         ScaffoldMessenger.of(context).showSnackBar(
