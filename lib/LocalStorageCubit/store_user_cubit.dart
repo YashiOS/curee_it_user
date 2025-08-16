@@ -71,4 +71,14 @@ class StoreUserCubit extends Cubit<StoreUserState> {
   bool isUserDataAvailable() {
     return _myBox.containsKey('user');
   }
+
+  void SaveAvilabeId(String id){
+    _myBox.put('avilabeId',id);
+  }
+  String? getAvilabeId() {
+    return _myBox.get('avilabeId');
+  }
+  void clearAvilabeId() {
+    _myBox.delete('avilabeId');
+  }
 }

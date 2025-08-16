@@ -1,11 +1,15 @@
 import 'dart:io';
 
 import 'package:cureeit_user_app/BaseUrl.dart';
+import 'package:cureeit_user_app/LocalStorageCubit/store_user_cubit.dart';
 import 'package:cureeit_user_app/cards/cart_card.dart';
 import 'package:cureeit_user_app/cartManager/cartManager.dart';
+import 'package:cureeit_user_app/screens/Order_SuccessScreen.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:cureeit_user_app/screens/addresses_screen.dart';
 import 'package:cureeit_user_app/screens/base_screen.dart';
+import 'package:cureeit_user_app/screens/loading.dart';
 import 'package:cureeit_user_app/screens/placeOrder_screen.dart';
 
 import 'package:cureeit_user_app/selected_Address/currentAddress.dart';
@@ -66,9 +70,9 @@ class _CartScreenState extends State<CartScreen> {
   bool sendingPrescription = false;
   String prescriptionStatus = "";
   Timer? pollingTimer;
-Timer? countdownTimer;
-int countdown = 30; // UI timer (30 sec)
-int elapsedSeconds = 0;
+  Timer? countdownTimer;
+  int countdown = 30; // UI timer (30 sec)
+  int elapsedSeconds = 0;
 
   @override
   void initState() {
@@ -76,6 +80,17 @@ int elapsedSeconds = 0;
     fetchCartDetails();
     fetchAddresses();
     PharmacyOpen();
+    checkAvilableid();
+  }
+
+  void checkAvilableid() {
+    String? availableId = context.read<StoreUserCubit>().getAvilabeId();
+    if (availableId != null) {
+      startPolling(availableId);
+      print("Available ID from StoreUserCubit: $AvilId");
+    } else {
+      print("No Available ID found in StoreUserCubit");
+    }
   }
 
   void showPaymentDialog(BuildContext context) {
@@ -262,7 +277,7 @@ int elapsedSeconds = 0;
   }
 
   Future<String> checkPrescriptionStatus(String AvilabeId) async {
-    prescriptionStatus="Sending";
+    prescriptionStatus = "Sending";
     var url = Uri.parse(
       '$baseUrl/order/orderTracking',
     );
@@ -282,21 +297,19 @@ int elapsedSeconds = 0;
         prescriptionStatus = data[0]["status"];
       });
 
-
-      if(prescriptionStatus=="In Verification"){
-         setState(() {
-          placeOrderButton = "Veryfing Your Prescription";
-      
+      if (prescriptionStatus == "In Verification") {
+        setState(() {
+          placeOrderButton = "Veryfing Your Prescription in $countdown seconds";
         });
-      } 
-      if(prescriptionStatus=="Accepted"){
+      }
+      if (prescriptionStatus == "Accepted") {
         setState(() {
           placeOrderButton = "Confirm and Pay";
-          payNow=true;
+          payNow = true;
         });
       }
       return prescriptionStatus;
-    }else{
+    } else {
       print('Failed to load prescription status');
       return "Error";
     }
@@ -326,9 +339,10 @@ int elapsedSeconds = 0;
     if (response.statusCode == 200) {
       final data = jsonDecode(response.body);
       String AvilableId = data["data"]["availableID"];
+      context.read<StoreUserCubit>().SaveAvilabeId(AvilableId);
 
       startPolling(AvilableId);
-    startCountdownTimer();
+      startCountdownTimer();
 
       print("Prescription sent successfully");
     } else {
@@ -337,54 +351,55 @@ int elapsedSeconds = 0;
     }
   }
 
-  
-void startPolling(String availableId) {
-  // Clear any old timers
-  pollingTimer?.cancel();
+  void startPolling(String availableId) {
+    // Clear any old timers
+    pollingTimer?.cancel();
 
-  pollingTimer = Timer.periodic(Duration(seconds: 5), (timer) async {
-    elapsedSeconds += 5;
+    pollingTimer = Timer.periodic(Duration(seconds: 5), (timer) async {
+      elapsedSeconds += 5;
 
-    // Stop after 10 minutes
-    if (elapsedSeconds >= 600) {
-      timer.cancel();
-      countdownTimer?.cancel();
-      print("Polling stopped after 10 minutes.");
-      return;
-    }
+      // Stop after 10 minutes
+      if (elapsedSeconds >= 1200) {
+        timer.cancel();
+        countdownTimer?.cancel();
+        print("Polling stopped after 10 minutes.");
+        return;
+      }
 
-    print("Checking prescription status...");
-    String status = await checkPrescriptionStatus(availableId);
+      print("Checking prescription status...");
+      String status = await checkPrescriptionStatus(availableId);
 
-    if (status == "Accepted") {
+      if (status == "Accepted") {
+        print("Prescription is now AVAILABLE!");
+        timer.cancel();
+        countdownTimer?.cancel();
+      }
+    });
+  }
 
-      print("Prescription is now AVAILABLE!");
-      timer.cancel();
-      countdownTimer?.cancel();
-    }
-  });
-}
+  void startCountdownTimer() {
+    countdownTimer?.cancel();
 
-void startCountdownTimer() {
-  countdownTimer?.cancel();
+    countdownTimer = Timer.periodic(Duration(seconds: 1), (timer) {
+      if (prescriptionStatus == "Accepted") {
+        timer.cancel();
+      }
+      
+      setState(() {
+        countdown--;
+      });
+      if (countdown <= 0) {
+        countdown = 30; // reset back to 30
+      }
+      // Notify UI here using setState or Cubit/Bloc update
+      print("Countdown: $countdown");
+    });
+  }
 
-  countdownTimer = Timer.periodic(Duration(seconds: 1), (timer) {
-    if(prescriptionStatus=="Accepted"){
-      timer.cancel();
-    }
-    countdown--;
-    if (countdown <= 0) {
-      countdown = 30; // reset back to 30
-    }
-    // Notify UI here using setState or Cubit/Bloc update
-    print("Countdown: $countdown");
-  });
-}
-
-void stopAllTimers() {
-  pollingTimer?.cancel();
-  countdownTimer?.cancel();
-}
+  void stopAllTimers() {
+    pollingTimer?.cancel();
+    countdownTimer?.cancel();
+  }
 
   Future<void> fetchCartDetails() async {
     setState(() {
@@ -425,6 +440,7 @@ void stopAllTimers() {
 
             if (productDetails != null) {
               if (cartItem["prescription_required"] == "Yes") {
+                placeOrderButton = "Upload Prescription";
                 payNow = false;
                 setState(() {
                   requiresPrescription = true;
@@ -765,7 +781,7 @@ void stopAllTimers() {
         setState(() {
           _secondsRemaining--;
         });
-         placeOrderButton = "Sending Prescription in $_secondsRemaining seconds";
+        placeOrderButton = "Sending Prescription in $_secondsRemaining seconds";
         print(_secondsRemaining);
 
         if (_secondsRemaining <= 0) {
@@ -794,7 +810,11 @@ void stopAllTimers() {
     var response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'userId': User.userId, 'totalAmount': totalAmount}),
+      body: jsonEncode({
+        'userId': User.userId,
+        'totalAmount': totalAmount,
+        'avilableID': availableID
+      }),
     );
     print(response.body);
     if (response.statusCode == 200) {
@@ -826,12 +846,15 @@ void stopAllTimers() {
       String shippingAddress,
       String avlId,
       BuildContext context) async {
+    String? availableId = context.read<StoreUserCubit>().getAvilabeId();
+
     final cashFreePayment = CashfreePaymentService(
+      availableID: availableId!,
       context: context,
       total: total,
       shippingAddress: shippingAddress,
       shippingCost: shippingCost,
-      environment: CFEnvironment.PRODUCTION,
+      environment: CFEnvironment.SANDBOX,
       orderId: orderId,
       paymentSessionId: paymentSessionId,
     );
@@ -844,6 +867,76 @@ void stopAllTimers() {
           .clear(); //removing cart item from backend , not using await so it will be done in background ,so user does not have to wait
       cartItems.clear();
     });
+  }
+
+  Future<void> createCheckout(String total, double shippingCost,
+      String shippingAddress, String transactionId, String avlId) async {
+    ;
+    try {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => LoadingScreen(),
+          fullscreenDialog: true,
+        ),
+      );
+      var url = Uri.parse('$baseUrl/order/createCheckout');
+      var request = http.Request('POST', url)
+        ..headers.addAll({
+          'Content-Type': 'application/json',
+        })
+        ..body = jsonEncode({
+          "userId": User.userId,
+          "shippingAddress": shippingAddress,
+          "availableId": avlId,
+          "userLat": Address.CurrentAddress?["userLat"] ?? 0.0,
+          "userLong": Address.CurrentAddress?["userLong"] ?? 0.0,
+          "paymentDetails": {
+            "gateway": "Paytm",
+            "transactionId": transactionId,
+            "status": "Paid"
+          }
+        });
+
+      var response = await http.Client().send(request);
+
+      if (response.statusCode == 200) {
+        var responseBody = await response.stream.bytesToString();
+        Map<String, dynamic> responseData = jsonDecode(responseBody);
+
+        if (responseData['success'] == true) {
+          CartManager.cartQuantities.clear();
+          Navigator.pop(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => OrderSuccessScreen(
+                orderId: responseData['data']['availableID'],
+              ),
+            ),
+          );
+        }
+      } else {
+        var responseBody = await response.stream.bytesToString();
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              "Failed to Create Order",
+              style: GoogleFonts.mulish(),
+            ),
+            backgroundColor: greenColor,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            duration: Duration(seconds: 2),
+          ),
+        );
+        throw Exception('Failed to Create Order --> $responseBody');
+      }
+    } catch (error) {
+      print('Error in Creating Order: $error');
+    }
   }
 
   @override
@@ -939,632 +1032,595 @@ void stopAllTimers() {
                       ),
                     )
                   : Container(
-                    padding: EdgeInsets.only(
-                        bottom: widget.isNavigated ? 20 : 100),
-                    color: scaffoldBlackColor,
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 0.0, horizontal: 18),
-                      child: Stack(
-                        children: [
-                          ListView(
-                            children: [
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment:
-                                    CrossAxisAlignment.center,
-                                spacing: 5,
-                                children: [
-                                  GestureDetector(
-                                    onTap: () async {
-                                      await Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                  AddressesScreen(
-                                                    userId: User.userId!,
-                                                  )));
-                                      setState(() {});
-                                    },
-                                    child: Container(
-                                      width: double.infinity,
-                                      padding: const EdgeInsets.only(
-                                          left: 16,
-                                          right: 16,
-                                          top: 10,
-                                          bottom: 10),
-                                      margin: EdgeInsets.only(
-                                          top: 28, bottom: 10),
-                                      decoration: BoxDecoration(
-                                        color: ligtBlackColor,
-                                        borderRadius:
-                                            BorderRadius.circular(8),
-                                      ),
-                                      child: Row(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          Expanded(
-                                            child: Column(
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  "Delivering to",
-                                                  style: GoogleFonts.mulish(
-                                                    color: Colors.white,
-                                                    fontSize: 14,
-                                                    fontWeight:
-                                                        FontWeight.w600,
-                                                  ),
-                                                ),
-                                                SizedBox(height: 4),
-                                                Text(
-                                                  "${Address.CurrentAddress!["address"]}",
-                                                  style: GoogleFonts.mulish(
-                                                    color: greyColor,
-                                                    fontSize: 13,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          Container(
-                                            width: 16,
-                                            height: 16,
-                                            margin: EdgeInsets.only(
-                                                left:
-                                                    8), // Space before trailing widget
-                                            decoration: BoxDecoration(
-                                              color: greenColor,
-                                              shape: BoxShape.circle,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  if (requiresPrescription)
+                      padding: EdgeInsets.only(
+                          bottom: widget.isNavigated ? 20 : 100),
+                      color: scaffoldBlackColor,
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 0.0, horizontal: 18),
+                        child: Stack(
+                          children: [
+                            ListView(
+                              children: [
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  spacing: 5,
+                                  children: [
                                     GestureDetector(
-                                      onTap: () {
-                                        showUploadPrescriptionBottomSheet(
-                                            context);
+                                      onTap: () async {
+                                        await Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    AddressesScreen(
+                                                      userId: User.userId!,
+                                                    )));
+                                        setState(() {});
                                       },
                                       child: Container(
-                                        margin: EdgeInsets.only(bottom: 10),
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 16),
-                                        height: 56,
+                                        width: double.infinity,
+                                        padding: const EdgeInsets.only(
+                                            left: 16,
+                                            right: 16,
+                                            top: 10,
+                                            bottom: 10),
+                                        margin: EdgeInsets.only(
+                                            top: 28, bottom: 10),
                                         decoration: BoxDecoration(
-                                          color:
-                                              ligtBlackColor, // or any color you want
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                        ),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment
-                                                  .spaceBetween,
-                                          children: [
-                                            Text(
-                                              'Upload Prescription',
-                                              style: GoogleFonts.mulish(
-                                                color: Colors.white,
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                            Container(
-                                              width: 16,
-                                              height: 16,
-                                              decoration: BoxDecoration(
-                                                color: imagePicked
-                                                    ? greenColor
-                                                    : scaffoldBlackColor,
-                                                shape: BoxShape.circle,
-                                              ),
-                                            )
-                                          ],
-                                        ),
-                                      ),
-                                    )
-                                  else
-                                    SizedBox.shrink(),
-                                  if (requiresPrescription)
-                                    GestureDetector(
-                                      onTap: () {},
-                                      child: Container(
-                                        margin: EdgeInsets.only(bottom: 10),
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 16),
-                                        height: 75,
-                                        decoration: BoxDecoration(
-                                          color:
-                                              ligtBlackColor, // or any color you want
+                                          color: ligtBlackColor,
                                           borderRadius:
                                               BorderRadius.circular(8),
                                         ),
                                         child: Row(
                                           crossAxisAlignment:
                                               CrossAxisAlignment.center,
-                                          mainAxisAlignment:
-                                              MainAxisAlignment
-                                                  .spaceBetween,
                                           children: [
-                                            Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
-                                              children: [
-                                                Text(
-                                                  'Continue without Prescription',
-                                                  style: GoogleFonts.mulish(
-                                                    color: greyColor,
-                                                    fontSize: 16,
-                                                    fontWeight:
-                                                        FontWeight.w500,
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    "Delivering to",
+                                                    style: GoogleFonts.mulish(
+                                                      color: Colors.white,
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                    ),
                                                   ),
-                                                ),
-                                                Text(
-                                                  'We will call you to confirm your order',
-                                                  style: GoogleFonts.mulish(
-                                                    color: greyColor,
-                                                    fontSize: 13,
-                                                    fontWeight:
-                                                        FontWeight.w300,
+                                                  SizedBox(height: 4),
+                                                  Text(
+                                                    "${Address.CurrentAddress!["address"]}",
+                                                    style: GoogleFonts.mulish(
+                                                      color: greyColor,
+                                                      fontSize: 13,
+                                                    ),
                                                   ),
-                                                ),
-                                              ],
+                                                ],
+                                              ),
                                             ),
                                             Container(
                                               width: 16,
                                               height: 16,
+                                              margin: EdgeInsets.only(
+                                                  left:
+                                                      8), // Space before trailing widget
                                               decoration: BoxDecoration(
-                                                color: ligtBlackColor,
+                                                color: greenColor,
                                                 shape: BoxShape.circle,
                                               ),
-                                            )
+                                            ),
                                           ],
                                         ),
                                       ),
-                                    )
-                                  else
-                                    SizedBox.shrink(),
-                                  Container(
-                                    width:
-                                        MediaQuery.of(context).size.width,
-                                    decoration: BoxDecoration(
-                                        color: ligtBlackColor,
-                                        borderRadius:
-                                            BorderRadius.circular(8)),
-                                    child: Stack(
-                                      children: [
-                                        isLoading
-                                            ? Center(
-                                                child: Padding(
-                                                padding:
-                                                    const EdgeInsets.all(
-                                                        12.0),
-                                                child:
-                                                    CircularProgressIndicator(
-                                                  color: whiteColor,
+                                    ),
+                                    if (requiresPrescription)
+                                      GestureDetector(
+                                        onTap: () {
+                                          showUploadPrescriptionBottomSheet(
+                                              context);
+                                        },
+                                        child: Container(
+                                          margin: EdgeInsets.only(bottom: 10),
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 16),
+                                          height: 56,
+                                          decoration: BoxDecoration(
+                                            color:
+                                                ligtBlackColor, // or any color you want
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                'Upload Prescription',
+                                                style: GoogleFonts.mulish(
+                                                  color: Colors.white,
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w500,
                                                 ),
-                                              ))
-                                            : cartItems.isEmpty
-                                                ? SizedBox(
-                                                    width: MediaQuery.of(
-                                                            context)
-                                                        .size
-                                                        .width,
-                                                    child: Column(
-                                                      mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .center,
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .center,
-                                                      children: [
-                                                        Padding(
-                                                          padding:
-                                                              const EdgeInsets
-                                                                  .symmetric(
-                                                                  vertical:
-                                                                      16.0),
-                                                          child: Text(
-                                                            "No Items in Cart",
-                                                            style: GoogleFonts.mulish(
-                                                                fontSize: MediaQuery.of(context)
-                                                                        .size
-                                                                        .width *
-                                                                    0.07,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                color: Color(
-                                                                    0xFFFFFFFF)),
-                                                          ),
-                                                        ),
-                                                      ],
+                                              ),
+                                              Container(
+                                                width: 16,
+                                                height: 16,
+                                                decoration: BoxDecoration(
+                                                  color: imagePicked
+                                                      ? greenColor
+                                                      : scaffoldBlackColor,
+                                                  shape: BoxShape.circle,
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      )
+                                    else
+                                      SizedBox.shrink(),
+                                    if (requiresPrescription)
+                                      GestureDetector(
+                                        onTap: () {},
+                                        child: Container(
+                                          margin: EdgeInsets.only(bottom: 10),
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 16),
+                                          height: 75,
+                                          decoration: BoxDecoration(
+                                            color:
+                                                ligtBlackColor, // or any color you want
+                                            borderRadius:
+                                                BorderRadius.circular(8),
+                                          ),
+                                          child: Row(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.center,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    'Continue without Prescription',
+                                                    style: GoogleFonts.mulish(
+                                                      color: greyColor,
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w500,
                                                     ),
-                                                  )
-                                                : Column(
-                                                    children: [
-                                                      Column(
+                                                  ),
+                                                  Text(
+                                                    'We will call you to confirm your order',
+                                                    style: GoogleFonts.mulish(
+                                                      color: greyColor,
+                                                      fontSize: 13,
+                                                      fontWeight:
+                                                          FontWeight.w300,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              Container(
+                                                width: 16,
+                                                height: 16,
+                                                decoration: BoxDecoration(
+                                                  color: ligtBlackColor,
+                                                  shape: BoxShape.circle,
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      )
+                                    else
+                                      SizedBox.shrink(),
+                                    Container(
+                                      width: MediaQuery.of(context).size.width,
+                                      decoration: BoxDecoration(
+                                          color: ligtBlackColor,
+                                          borderRadius:
+                                              BorderRadius.circular(8)),
+                                      child: Stack(
+                                        children: [
+                                          isLoading
+                                              ? Center(
+                                                  child: Padding(
+                                                  padding: const EdgeInsets.all(
+                                                      12.0),
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                    color: whiteColor,
+                                                  ),
+                                                ))
+                                              : cartItems.isEmpty
+                                                  ? SizedBox(
+                                                      width:
+                                                          MediaQuery.of(context)
+                                                              .size
+                                                              .width,
+                                                      child: Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .center,
                                                         children: [
-                                                          Column(
-                                                            children: cartItems
-                                                                .map((item) => CartCard(
-                                                                    productPrice: (item["productPrice"] ?? 0).toDouble(),
-                                                                    reBuild: reBuild,
-                                                                    productName: item['name'],
-                                                                    packLabel: item['packagingDetail'] ?? " ",
-                                                                    quantity: item['quantity'] ?? 1,
-                                                                    productId: item['productId'],
-                                                                    sellingPrice: (item['sellingPrice'] ?? 0).toDouble(),
-                                                                    onUpdate: fetchCartDetails,
-                                                                    onRemove: () async {
-                                                                      removeItemFromCart(
-                                                                          item['productId']);
-                                                                      fetchCartDetails();
-                                                                    },
-                                                                    isDeleting: ItemDeleting,
-                                                                    productImages: item['imageUrls'] ?? ''))
-                                                                .toList(),
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .symmetric(
+                                                                    vertical:
+                                                                        16.0),
+                                                            child: Text(
+                                                              "No Items in Cart",
+                                                              style: GoogleFonts.mulish(
+                                                                  fontSize: MediaQuery.of(
+                                                                              context)
+                                                                          .size
+                                                                          .width *
+                                                                      0.07,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                  color: Color(
+                                                                      0xFFFFFFFF)),
+                                                            ),
                                                           ),
                                                         ],
                                                       ),
-                                                      Padding(
-                                                        padding:
-                                                            EdgeInsets.only(
-                                                          right: MediaQuery.of(
-                                                                      context)
-                                                                  .size
-                                                                  .width *
-                                                              0.055,
-                                                          left: MediaQuery.of(
-                                                                      context)
-                                                                  .size
-                                                                  .width *
-                                                              0.055,
-                                                          top: screenHeight *
-                                                              0.035, // ≈28 for height ≈ 800
-                                                          bottom:
-                                                              screenHeight *
-                                                                  0.035, // ≈14
-                                                        ),
-                                                        child: Column(
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          spacing: 10,
+                                                    )
+                                                  : Column(
+                                                      children: [
+                                                        Column(
                                                           children: [
-                                                            Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .spaceBetween,
-                                                              children: [
-                                                                Text(
-                                                                  "Item Total",
-                                                                  style: GoogleFonts
-                                                                      .mulish(
-                                                                    fontWeight:
-                                                                        FontWeight.w300,
-                                                                    fontSize:
-                                                                        14,
-                                                                    color:
-                                                                        whiteColor,
-                                                                  ),
-                                                                ),
-                                                                Container(
-                                                                  child:
-                                                                      Row(
-                                                                    children: [
-                                                                      Text(
-                                                                        "₹${totalProductPrice.toStringAsFixed(2)}",
-                                                                        style: GoogleFonts.mulish(
-                                                                            fontWeight: FontWeight.w300,
-                                                                            fontSize: 12,
-                                                                            color: greyColor,
-                                                                            decoration: TextDecoration.lineThrough,
-                                                                            decorationColor: greyColor),
-                                                                      ),
-                                                                      SizedBox(
-                                                                        width:
-                                                                            5,
-                                                                      ),
-                                                                      Text(
-                                                                        "₹${totalSellingPrice.toStringAsFixed(2)}",
-                                                                        style: GoogleFonts.mulish(
-                                                                            fontWeight: FontWeight.w400,
-                                                                            fontSize: 14,
-                                                                            color: whiteColor),
-                                                                      )
-                                                                    ],
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .spaceBetween,
-                                                              children: [
-                                                                Row(
-                                                                  spacing:
-                                                                      screenWidth *
-                                                                          0.05,
-                                                                  children: [
-                                                                    Text(
-                                                                      "Delivery Fee",
-                                                                      style:
-                                                                          GoogleFonts.mulish(
-                                                                        fontWeight:
-                                                                            FontWeight.w400,
-                                                                        fontSize:
-                                                                            12,
-                                                                        color:
-                                                                            greyColor,
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                                Text(
-                                                                  "₹${deliveryServiceFees}",
-                                                                  style: GoogleFonts
-                                                                      .mulish(
-                                                                    fontWeight:
-                                                                        FontWeight.w400,
-                                                                    fontSize:
-                                                                        12,
-                                                                    color:
-                                                                        greyColor,
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
-                                                            Row(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .spaceBetween,
-                                                              children: [
-                                                                Row(
-                                                                  spacing:
-                                                                      screenWidth *
-                                                                          0.05,
-                                                                  children: [
-                                                                    Text(
-                                                                      "GST and Platform Fees",
-                                                                      style:
-                                                                          GoogleFonts.mulish(
-                                                                        fontWeight:
-                                                                            FontWeight.w400,
-                                                                        fontSize:
-                                                                            12,
-                                                                        color:
-                                                                            greyColor,
-                                                                      ),
-                                                                    ),
-                                                                  ],
-                                                                ),
-                                                                Text(
-                                                                  "₹${taxServices}",
-                                                                  style: GoogleFonts
-                                                                      .mulish(
-                                                                    fontWeight:
-                                                                        FontWeight.w400,
-                                                                    fontSize:
-                                                                        12,
-                                                                    color:
-                                                                        greyColor,
-                                                                  ),
-                                                                ),
-                                                              ],
-                                                            ),
                                                             Column(
-                                                              mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .start,
-                                                              children: [
-                                                                Row(
-                                                                    mainAxisAlignment:
-                                                                        MainAxisAlignment.spaceBetween,
-                                                                    children: [
-                                                                      Column(
-                                                                        crossAxisAlignment:
-                                                                            CrossAxisAlignment.start,
-                                                                        children: [
-                                                                          Text(
-                                                                            "To Pay",
-                                                                            style: GoogleFonts.mulish(
-                                                                              fontWeight: FontWeight.bold,
-                                                                              fontSize: 16,
-                                                                              color: whiteColor,
-                                                                            ),
-                                                                          ),
-                                                                          if (fetchingCart)
-                                                                            const SizedBox(height: 2),
-                                                                          if (fetchingCart)
-                                                                            Shimmer.fromColors(
-                                                                              baseColor: ligtBlackColor,
-                                                                              highlightColor: greenColor,
-                                                                              child: Container(
-                                                                                decoration: BoxDecoration(
-                                                                                  borderRadius: BorderRadius.circular(5),
-                                                                                  color: greenColor,
-                                                                                ),
-                                                                                width: 50, // or adjust as needed to match "To Pay" width
-                                                                                height: 4,
-                                                                              ),
-                                                                            ),
-                                                                        ],
-                                                                      ),
-                                                                      Text(
-                                                                        "₹${totalWholeAmount.toStringAsFixed(2)}",
-                                                                        style:
-                                                                            GoogleFonts.mulish(
-                                                                          fontWeight: FontWeight.w700,
-                                                                          fontSize: 15,
-                                                                          color: whiteColor,
-                                                                        ),
-                                                                      ),
-                                                                    ]),
-                                                                SizedBox(
-                                                                  height:
-                                                                      25,
-                                                                ),
-                                                                GestureDetector(
-                                                                  onTap:
-                                                                      () async {
-                                                                    if (addresses.length ==
-                                                                        0) {
-                                                                      ScaffoldMessenger.of(context)
-                                                                          .showSnackBar(
-                                                                        SnackBar(
-                                                                            backgroundColor: ligtBlackColor,
-                                                                            content: Text(
-                                                                              'add your address first',
-                                                                              style: GoogleFonts.mulish(color: whiteColor),
-                                                                            )),
-                                                                      );
-                                                                      return;
-                                                                    }
-                                                                    if (payNow ==
-                                                                            false ||
-                                                                        fetchingCart) {
-                                                                      ScaffoldMessenger.of(context)
-                                                                          .showSnackBar(
-                                                                        SnackBar(
-                                                                            backgroundColor: ligtBlackColor,
-                                                                            content: Text(
-                                                                              'Upload Prescription',
-                                                                              style: GoogleFonts.mulish(color: whiteColor),
-                                                                            )),
-                                                                      );
-                                                                      return;
-                                                                    }
-                                                                    if (Servisable ==
-                                                                        false) {
-                                                                      ScaffoldMessenger.of(context)
-                                                                          .showSnackBar(
-                                                                        SnackBar(
-                                                                            backgroundColor: ligtBlackColor,
-                                                                            content: Text(
-                                                                              '$placeOrderButton',
-                                                                              style: GoogleFonts.mulish(color: whiteColor),
-                                                                            )),
-                                                                      );
-                                                                      return;
-                                                                    }
-                                                                    //Navigator.of(context).push(MaterialPageRoute(
-                                                                    //builder: (context) => MedicineAvailabilityScreen(
-                                                                    //   prescriptionImage: _imageFile,
-                                                                    //
-                                                                    // )));
-                                                                    await getPaymentSessionID(
-                                                                        deliveryServiceFees,
-                                                                        Address.CurrentAddress!["address"],
-                                                                        AvilId,
-                                                                        context);
-                  
-                                                                    //showPaymentDialog(context);
-                                                                    /*
-                                                                    
-                                                                    RazorpayPayment
-                                                                        razorpayPayment =
-                                                                        RazorpayPayment(
-                                                                      onSuccess:
-                                                                          (PaymentSuccessResponse
-                                                                              response) {
-                                                                        createCheckout(
-                                                                          (totalWholeAmount).toStringAsFixed(2),
-                                                                          deliveryServiceFees,
-                                                                          "${Address.CurrentAddress!["address"]}",
-                                                                          response.paymentId.toString(),
-                                                                        );
+                                                              children: cartItems
+                                                                  .map((item) => CartCard(
+                                                                      productPrice: (item["productPrice"] ?? 0).toDouble(),
+                                                                      reBuild: reBuild,
+                                                                      productName: item['name'],
+                                                                      packLabel: item['packagingDetail'] ?? " ",
+                                                                      quantity: item['quantity'] ?? 1,
+                                                                      productId: item['productId'],
+                                                                      sellingPrice: (item['sellingPrice'] ?? 0).toDouble(),
+                                                                      onUpdate: fetchCartDetails,
+                                                                      onRemove: () async {
+                                                                        removeItemFromCart(
+                                                                            item['productId']);
+                                                                        fetchCartDetails();
                                                                       },
-                                                                      onFailure:
-                                                                          (PaymentFailureResponse
-                                                                              response) {
-                                                                        // Handle payment failure
-                                                                        print(
-                                                                            'Payment Failed: ${response.message}');
-                                                                        ScaffoldMessenger.of(context)
-                                                                            .showSnackBar(SnackBar(
-                                                                          content:
-                                                                              Text('Payment Failed'),
-                                                                        ));
-                                                                      },
-                                                                    );
-                                      
-                                                                    razorpayPayment
-                                                                        .initiatePayment(
-                                                                      totalWholeAmount, // Amount in paise (e.g., 50000 = 500 INR)
-                                                                      'CUREEIT MEDICOS PRIVATE LIMITED', // Product Name
-                                                                      'Please do the payment', // Description
-                                                                      '8890170172',
-                                                                      'accounts@cureeit.com',
-                                                                    );*/
-                                                                  },
-                                                                  child:
-                                                                      Container(
-                                                                    height:
-                                                                        36,
-                                                                    width: double
-                                                                        .infinity,
-                                                                    alignment:
-                                                                        Alignment.center,
-                                                                    decoration:
-                                                                        BoxDecoration(
-                                                                      color: payNow
-                                                                          ? greenColor
-                                                                          : ligtBlackColor,
-                                                                      border:
-                                                                          Border.all(
-                                                                        color:
-                                                                            greenColor,
-                                                                        width:
-                                                                            1,
-                                                                      ),
-                                                                      // Setting the background color to primary color
-                                                                      borderRadius:
-                                                                          BorderRadius.circular(8), // Setting the border radius to 10
-                                                                    ),
-                                                                    child:
-                                                                        Center(
-                                                                      child:
-                                                                          Text(
-                                                                        "$placeOrderButton",
-                                                                        style:
-                                                                            GoogleFonts.mulish(
-                                                                          color: payNow ? whiteColor : greenColor,
-                                                                          fontSize: 12,
-                                                                          fontWeight: FontWeight.w700,
-                                                                        ),
-                                                                      ),
-                                                                    ),
-                                                                  ),
-                                                                ),
-                                                              ],
+                                                                      isDeleting: ItemDeleting,
+                                                                      productImages: item['imageUrls'] ?? ''))
+                                                                  .toList(),
                                                             ),
                                                           ],
                                                         ),
-                                                      )
-                                                    ],
-                                                  ),
-                                      ],
+                                                        Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                            right: MediaQuery.of(
+                                                                        context)
+                                                                    .size
+                                                                    .width *
+                                                                0.055,
+                                                            left: MediaQuery.of(
+                                                                        context)
+                                                                    .size
+                                                                    .width *
+                                                                0.055,
+                                                            top: screenHeight *
+                                                                0.035, // ≈28 for height ≈ 800
+                                                            bottom:
+                                                                screenHeight *
+                                                                    0.035, // ≈14
+                                                          ),
+                                                          child: Column(
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
+                                                            spacing: 10,
+                                                            children: [
+                                                              Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceBetween,
+                                                                children: [
+                                                                  Text(
+                                                                    "Item Total",
+                                                                    style: GoogleFonts
+                                                                        .mulish(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w300,
+                                                                      fontSize:
+                                                                          14,
+                                                                      color:
+                                                                          whiteColor,
+                                                                    ),
+                                                                  ),
+                                                                  Container(
+                                                                    child: Row(
+                                                                      children: [
+                                                                        Text(
+                                                                          "₹${totalProductPrice.toStringAsFixed(2)}",
+                                                                          style: GoogleFonts.mulish(
+                                                                              fontWeight: FontWeight.w300,
+                                                                              fontSize: 12,
+                                                                              color: greyColor,
+                                                                              decoration: TextDecoration.lineThrough,
+                                                                              decorationColor: greyColor),
+                                                                        ),
+                                                                        SizedBox(
+                                                                          width:
+                                                                              5,
+                                                                        ),
+                                                                        Text(
+                                                                          "₹${totalSellingPrice.toStringAsFixed(2)}",
+                                                                          style: GoogleFonts.mulish(
+                                                                              fontWeight: FontWeight.w400,
+                                                                              fontSize: 14,
+                                                                              color: whiteColor),
+                                                                        )
+                                                                      ],
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceBetween,
+                                                                children: [
+                                                                  Row(
+                                                                    spacing:
+                                                                        screenWidth *
+                                                                            0.05,
+                                                                    children: [
+                                                                      Text(
+                                                                        "Delivery Fee",
+                                                                        style: GoogleFonts
+                                                                            .mulish(
+                                                                          fontWeight:
+                                                                              FontWeight.w400,
+                                                                          fontSize:
+                                                                              12,
+                                                                          color:
+                                                                              greyColor,
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                  Text(
+                                                                    "₹${deliveryServiceFees}",
+                                                                    style: GoogleFonts
+                                                                        .mulish(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w400,
+                                                                      fontSize:
+                                                                          12,
+                                                                      color:
+                                                                          greyColor,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              Row(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .spaceBetween,
+                                                                children: [
+                                                                  Row(
+                                                                    spacing:
+                                                                        screenWidth *
+                                                                            0.05,
+                                                                    children: [
+                                                                      Text(
+                                                                        "GST and Platform Fees",
+                                                                        style: GoogleFonts
+                                                                            .mulish(
+                                                                          fontWeight:
+                                                                              FontWeight.w400,
+                                                                          fontSize:
+                                                                              12,
+                                                                          color:
+                                                                              greyColor,
+                                                                        ),
+                                                                      ),
+                                                                    ],
+                                                                  ),
+                                                                  Text(
+                                                                    "₹${taxServices}",
+                                                                    style: GoogleFonts
+                                                                        .mulish(
+                                                                      fontWeight:
+                                                                          FontWeight
+                                                                              .w400,
+                                                                      fontSize:
+                                                                          12,
+                                                                      color:
+                                                                          greyColor,
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                              Column(
+                                                                mainAxisAlignment:
+                                                                    MainAxisAlignment
+                                                                        .start,
+                                                                children: [
+                                                                  Row(
+                                                                      mainAxisAlignment:
+                                                                          MainAxisAlignment
+                                                                              .spaceBetween,
+                                                                      children: [
+                                                                        Column(
+                                                                          crossAxisAlignment:
+                                                                              CrossAxisAlignment.start,
+                                                                          children: [
+                                                                            Text(
+                                                                              "To Pay",
+                                                                              style: GoogleFonts.mulish(
+                                                                                fontWeight: FontWeight.bold,
+                                                                                fontSize: 16,
+                                                                                color: whiteColor,
+                                                                              ),
+                                                                            ),
+                                                                            if (fetchingCart)
+                                                                              const SizedBox(height: 2),
+                                                                            if (fetchingCart)
+                                                                              Shimmer.fromColors(
+                                                                                baseColor: ligtBlackColor,
+                                                                                highlightColor: greenColor,
+                                                                                child: Container(
+                                                                                  decoration: BoxDecoration(
+                                                                                    borderRadius: BorderRadius.circular(5),
+                                                                                    color: greenColor,
+                                                                                  ),
+                                                                                  width: 50, // or adjust as needed to match "To Pay" width
+                                                                                  height: 4,
+                                                                                ),
+                                                                              ),
+                                                                          ],
+                                                                        ),
+                                                                        Text(
+                                                                          "₹${totalWholeAmount.toStringAsFixed(2)}",
+                                                                          style:
+                                                                              GoogleFonts.mulish(
+                                                                            fontWeight:
+                                                                                FontWeight.w700,
+                                                                            fontSize:
+                                                                                15,
+                                                                            color:
+                                                                                whiteColor,
+                                                                          ),
+                                                                        ),
+                                                                      ]),
+                                                                  SizedBox(
+                                                                    height: 25,
+                                                                  ),
+                                                                  GestureDetector(
+                                                                    onTap:
+                                                                        () async {
+                                                                      if (addresses
+                                                                              .length ==
+                                                                          0) {
+                                                                        ScaffoldMessenger.of(context)
+                                                                            .showSnackBar(
+                                                                          SnackBar(
+                                                                              backgroundColor: ligtBlackColor,
+                                                                              content: Text(
+                                                                                'add your address first',
+                                                                                style: GoogleFonts.mulish(color: whiteColor),
+                                                                              )),
+                                                                        );
+                                                                        return;
+                                                                      }
+                                                                      if (payNow ==
+                                                                              false ||
+                                                                          fetchingCart) {
+                                                                        ScaffoldMessenger.of(context)
+                                                                            .showSnackBar(
+                                                                          SnackBar(
+                                                                              backgroundColor: ligtBlackColor,
+                                                                              content: Text(
+                                                                                '$placeOrderButton',
+                                                                                style: GoogleFonts.mulish(color: whiteColor),
+                                                                              )),
+                                                                        );
+                                                                        return;
+                                                                      }
+                                                                      if (Servisable ==
+                                                                          false) {
+                                                                        ScaffoldMessenger.of(context)
+                                                                            .showSnackBar(
+                                                                          SnackBar(
+                                                                              backgroundColor: ligtBlackColor,
+                                                                              content: Text(
+                                                                                '$placeOrderButton',
+                                                                                style: GoogleFonts.mulish(color: whiteColor),
+                                                                              )),
+                                                                        );
+                                                                        return;
+                                                                      }
+                                                                       double shippingCost=deliveryServiceFees;
+                                                                       String shippingAddress = Address.CurrentAddress!["address"];
+                                                                       String avlId =context.read<StoreUserCubit>().getAvilabeId() ?? "";
+
+                                                                      getPaymentSessionID(shippingCost, shippingAddress, avlId, context);
+                                                                    },
+                                                                    child:
+                                                                        Container(
+                                                                      height:
+                                                                          36,
+                                                                      width: double
+                                                                          .infinity,
+                                                                      alignment:
+                                                                          Alignment
+                                                                              .center,
+                                                                      decoration:
+                                                                          BoxDecoration(
+                                                                        color: payNow
+                                                                            ? greenColor
+                                                                            : ligtBlackColor,
+                                                                        border:
+                                                                            Border.all(
+                                                                          color:
+                                                                              greenColor,
+                                                                          width:
+                                                                              1,
+                                                                        ),
+                                                                        // Setting the background color to primary color
+                                                                        borderRadius:
+                                                                            BorderRadius.circular(8), // Setting the border radius to 10
+                                                                      ),
+                                                                      child:
+                                                                          Center(
+                                                                        child:
+                                                                            Text(
+                                                                          "$placeOrderButton",
+                                                                          style:
+                                                                              GoogleFonts.mulish(
+                                                                            color: payNow
+                                                                                ? whiteColor
+                                                                                : greenColor,
+                                                                            fontSize:
+                                                                                12,
+                                                                            fontWeight:
+                                                                                FontWeight.w700,
+                                                                          ),
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                ],
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        )
+                                                      ],
+                                                    ),
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ],
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
         ),
         if (isDeleting) const BubbleLoadingOverlay(),
       ],

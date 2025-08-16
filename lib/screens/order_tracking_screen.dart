@@ -140,30 +140,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     return formattedDate;
   }
 
-  Future<void> startPayment(
-      String orderId,
-      String paymentSessionId,
-      String total,
-      double shippingCost,
-      String shippingAddress,
-      String avlId,
-      BuildContext context) async {
-    final cashFreePayment = CashfreePaymentService(
-      context: context,
-      total: total,
-      shippingAddress: shippingAddress,
-      shippingCost: shippingCost,
-      environment: CFEnvironment.PRODUCTION,
-      orderId: orderId,
-      paymentSessionId: paymentSessionId,
-    );
-
-    await cashFreePayment.initializeCashfree();
-    await cashFreePayment.webCheckout();
-    setState(() {
-      paymentStart = false;
-    });
-  }
+  
 
   Future<void> fetchOrderTracking() async {
     print("**************FETCH ORDER TRACKING****************************");
@@ -235,45 +212,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     });
   }
 
-  Future<void> getPaymentSessionID(double shippingCost, String shippingAddress,
-      String avlId, BuildContext context) async {
-    var url = Uri.parse('$baseUrl/cashfree/getPaymentSessionID');
-    final totalAmount = orderTrackingDetails["finalTotal"];
-    final availableID = orderTrackingDetails["availableID"];
-    setState(() {
-      paymentStart = true;
-    });
-
-    var response = await http.post(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'userId': User.userId,
-        'availableID': availableID,
-        'totalAmount': totalAmount
-      }),
-    );
-
-    if (response.statusCode == 200) {
-      final data = jsonDecode(response.body);
-
-      final paymentSessionId = data["payment_session_id"];
-      final orderId = data["order_id"];
-
-      setState(() {
-        paymentOrderData = {
-          "payment_session_id": paymentSessionId,
-          "order_id": orderId,
-        };
-      });
-
-      print(paymentSessionId);
-      await startPayment(orderId, paymentSessionId, totalAmount, shippingCost,
-          shippingAddress, avlId, context);
-    } else {
-      print('Failed to load paymentOrderData details');
-    }
-  }
+ 
 
   @override
   void initState() {
@@ -939,8 +878,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                 ),
                 GestureDetector(
                   onTap: () {
-                    getPaymentSessionID(shippingCost,
-                        Address.CurrentAddress!["address"], avlId, context);
+                  
                   },
                   child: Container(
                     height: 36,

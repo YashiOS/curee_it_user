@@ -21,6 +21,7 @@ class CashfreePaymentService {
   final BuildContext context;
   late CFEnvironment environment;
   late String total;
+  late String availableID;
    late String shippingAddress;
   late String orderId;
   late String paymentSessionId;
@@ -29,7 +30,7 @@ class CashfreePaymentService {
 
   CashfreePaymentService({
     required this.context,
-    
+    required this.availableID,
     required this.shippingAddress,
     required this.shippingCost,
     required this.total,
@@ -103,7 +104,7 @@ class CashfreePaymentService {
     }
   }
 
-  void verifyPayment(String orderId) async {
+  void verifyPayment(String orderId,) async {
    print("Verifying payment for order: $orderId");
 
   try {
@@ -111,7 +112,7 @@ class CashfreePaymentService {
     var response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({ 'orderId': orderId}),
+      body: jsonEncode({ 'orderId': orderId,'availableID':availableID}),
     );
 
     if (response.statusCode == 200) {
