@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:cureeit_user_app/BaseUrl.dart';
+import 'package:cureeit_user_app/LocalStorageCubit/store_user_cubit.dart';
 import 'package:cureeit_user_app/cartManager/cartManager.dart';
 import 'package:cureeit_user_app/screens/Order_SuccessScreen.dart';
 import 'package:cureeit_user_app/screens/loading.dart';
@@ -7,6 +8,7 @@ import 'package:cureeit_user_app/selected_Address/currentAddress.dart';
 import 'package:cureeit_user_app/user/user.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cferrorresponse/cferrorresponse.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpayment/cfwebcheckoutpayment.dart';
 import 'package:flutter_cashfree_pg_sdk/api/cfpaymentgateway/cfpaymentgatewayservice.dart';
@@ -59,21 +61,24 @@ class CashfreePaymentService {
         ..body = jsonEncode({
           "userId": User.userId,
           "shippingAddress": shippingAddress,
-          
-          "userLat": Address.CurrentAddress?["userLat"] ?? 0.0,
-          "userLong": Address.CurrentAddress?["userLong"] ?? 0.0
+          "availableId":availableID,
+          "userLat": 26.849360569751255,//Address.CurrentAddress?["userLat"] ?? //0.0,, 
+          "userLong":75.81019337116403 //Address.CurrentAddress?["userLong"] ?? //0.0
         });
 
       var response = await http.Client().send(request);
-
+    print("Response status: ${response.statusCode}");
+  
       if (response.statusCode == 200) {
-
+      context.read<StoreUserCubit>().clearAvilabeId();
+          CartManager.cartQuantities.clear();
+            Navigator.pop(context);
+            print("Order created successfully");
         var responseBody = await response.stream.bytesToString();
         Map<String, dynamic> responseData = jsonDecode(responseBody);
 
-        if (responseData['success'] == true) {
-          CartManager.cartQuantities.clear();
-            Navigator.pop(context);
+    
+            
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -84,7 +89,7 @@ class CashfreePaymentService {
           );
          
         
-        }
+        
       } else {
         var responseBody = await response.stream.bytesToString();
        

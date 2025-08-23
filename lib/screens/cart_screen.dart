@@ -86,6 +86,7 @@ class _CartScreenState extends State<CartScreen> {
   void checkAvilableid() {
     String? availableId = context.read<StoreUserCubit>().getAvilabeId();
     if (availableId != null) {
+      startCountdownTimer();
       startPolling(availableId);
       print("Available ID from StoreUserCubit: $AvilId");
     } else {
@@ -298,9 +299,9 @@ class _CartScreenState extends State<CartScreen> {
       });
 
       if (prescriptionStatus == "In Verification") {
-        setState(() {
+       
           placeOrderButton = "Veryfing Your Prescription in $countdown seconds";
-        });
+       
       }
       if (prescriptionStatus == "Accepted") {
         setState(() {
@@ -340,9 +341,9 @@ class _CartScreenState extends State<CartScreen> {
       final data = jsonDecode(response.body);
       String AvilableId = data["data"]["availableID"];
       context.read<StoreUserCubit>().SaveAvilabeId(AvilableId);
-
+startCountdownTimer();
       startPolling(AvilableId);
-      startCountdownTimer();
+      
 
       print("Prescription sent successfully");
     } else {
@@ -386,6 +387,9 @@ class _CartScreenState extends State<CartScreen> {
       }
       
       setState(() {
+       
+          placeOrderButton = "Veryfing Your Prescription in $countdown seconds";
+     
         countdown--;
       });
       if (countdown <= 0) {
@@ -806,6 +810,9 @@ class _CartScreenState extends State<CartScreen> {
     setState(() {
       paymentStart = true;
     });
+    print("Available ID IN GET PAYMENTSESSIONID: $availableID");
+    print("Total Amount IN GET PAYMENTSESSIONID: $totalAmount");
+    print("UserID IN GET PAYMENTSESSIONID: ${User.userId}");
 
     var response = await http.post(
       url,
@@ -813,7 +820,7 @@ class _CartScreenState extends State<CartScreen> {
       body: jsonEncode({
         'userId': User.userId,
         'totalAmount': totalAmount,
-        'avilableID': availableID
+        'availableID': availableID
       }),
     );
     print(response.body);
@@ -861,83 +868,10 @@ class _CartScreenState extends State<CartScreen> {
 
     await cashFreePayment.initializeCashfree();
     await cashFreePayment.webCheckout();
-    setState(() {
-      paymentStart = false;
-      CartManager.cartQuantities
-          .clear(); //removing cart item from backend , not using await so it will be done in background ,so user does not have to wait
-      cartItems.clear();
-    });
+  
   }
 
-  Future<void> createCheckout(String total, double shippingCost,
-      String shippingAddress, String transactionId, String avlId) async {
-    ;
-    try {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => LoadingScreen(),
-          fullscreenDialog: true,
-        ),
-      );
-      var url = Uri.parse('$baseUrl/order/createCheckout');
-      var request = http.Request('POST', url)
-        ..headers.addAll({
-          'Content-Type': 'application/json',
-        })
-        ..body = jsonEncode({
-          "userId": User.userId,
-          "shippingAddress": shippingAddress,
-          "availableId": avlId,
-          "userLat": Address.CurrentAddress?["userLat"] ?? 0.0,
-          "userLong": Address.CurrentAddress?["userLong"] ?? 0.0,
-          "paymentDetails": {
-            "gateway": "Paytm",
-            "transactionId": transactionId,
-            "status": "Paid"
-          }
-        });
 
-      var response = await http.Client().send(request);
-
-      if (response.statusCode == 200) {
-        var responseBody = await response.stream.bytesToString();
-        Map<String, dynamic> responseData = jsonDecode(responseBody);
-
-        if (responseData['success'] == true) {
-          CartManager.cartQuantities.clear();
-          Navigator.pop(context);
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => OrderSuccessScreen(
-                orderId: responseData['data']['availableID'],
-              ),
-            ),
-          );
-        }
-      } else {
-        var responseBody = await response.stream.bytesToString();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              "Failed to Create Order",
-              style: GoogleFonts.mulish(),
-            ),
-            backgroundColor: greenColor,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            duration: Duration(seconds: 2),
-          ),
-        );
-        throw Exception('Failed to Create Order --> $responseBody');
-      }
-    } catch (error) {
-      print('Error in Creating Order: $error');
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -1556,7 +1490,7 @@ class _CartScreenState extends State<CartScreen> {
                                                                        double shippingCost=deliveryServiceFees;
                                                                        String shippingAddress = Address.CurrentAddress!["address"];
                                                                        String avlId =context.read<StoreUserCubit>().getAvilabeId() ?? "";
-
+                                                                       
                                                                       getPaymentSessionID(shippingCost, shippingAddress, avlId, context);
                                                                     },
                                                                     child:
