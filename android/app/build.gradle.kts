@@ -28,7 +28,7 @@ android {
 
     defaultConfig {
         applicationId = "com.cureeit.medkaro"
-        minSdk = 23
+        minSdk = flutter.minSdkVersion
         targetSdk = 34
         versionCode = 4
         versionName = flutter.versionName

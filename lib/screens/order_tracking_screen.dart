@@ -25,6 +25,8 @@ import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:loading_indicator/loading_indicator.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:web_socket_channel/io.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
 class OrderTrackingScreen extends StatefulWidget {
   OrderTrackingScreen(
@@ -44,21 +46,23 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
   final String apiKey = 'AIzaSyANsLBcGOUyOEFZpqpoLFOqc4MRNSDpng8';
   var paymentOrderData;
   List acceptedProducts = [];
+  bool webSockteConnected = false;
+  String orderId="";
   bool HittingApi = false;
   bool _isInitLoading = true;
   Set<Polyline> polylines = {};
-  late BitmapDescriptor bikeIcon;
-  late BitmapDescriptor homeIcon;
-  late BitmapDescriptor shopIcon;
-  late BitmapDescriptor vendarIcon;
+  late BitmapDescriptor bikeIcon = BitmapDescriptor.defaultMarker;
+  late BitmapDescriptor homeIcon = BitmapDescriptor.defaultMarker;
+  late BitmapDescriptor shopIcon = BitmapDescriptor.defaultMarker;
 
+  WebSocketChannel? _channel;
   double? vendorLat;
   double? vendorLng;
   double? dropLat;
   double? dropLng;
   double? partnerLat;
   double? partnerLng;
-
+  List<String> messages = [];
   Future<void> createCheckout(String total, double shippingCost,
       String shippingAddress, String transactionId, String avlId) async {
     ;
@@ -140,25 +144,23 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     return formattedDate;
   }
 
-  
-
   Future<void> fetchOrderTracking() async {
     print("**************FETCH ORDER TRACKING****************************");
-    String orderId = widget.orderId;
+    String avildId = widget.orderId;
     var url = Uri.parse(
       '$baseUrl/order/orderTracking',
     );
     var response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'availableId': orderId}),
+      body: jsonEncode({'availableId': avildId}),
     );
 
     if (response.statusCode == 200) {
       final responseBody = jsonDecode(response.body);
       // 🔐 only once
       final data = responseBody;
-      print(data);
+
       setState(() {
         if (data["data"].isNotEmpty) {
           _isInitLoading = false;
@@ -168,29 +170,36 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
           }
         }
       });
-
+       orderId=orderTrackingDetails["orderId"]; 
       if (orderTrackingDetails["status"] == "On the way" ||
           orderTrackingDetails["status"] == "Order Placed" ||
-          orderTrackingDetails["status"] == "Packing") {
-        vendorLat =
-            orderTrackingDetails['vendorPickupDetails']?['lat'] ?? 22.54056;
-        vendorLng =
-            orderTrackingDetails['vendorPickupDetails']?['long'] ?? 88.39583;
-        dropLat =
-            orderTrackingDetails['dropDetails']?['address']?['lat'] ?? 0.0;
-        dropLng =
-            orderTrackingDetails['dropDetails']?['address']?['lng'] ?? 0.0;
-        partnerLat = orderTrackingDetails['porterAPIResponse']?['partner_info']
-                ?['location']?['lat'] ??
-            vendorLat;
-        partnerLng = orderTrackingDetails['porterAPIResponse']?['partner_info']
-                ?['location']?['long'] ??
-            vendorLng;
+          orderTrackingDetails["status"] == "Packing" ||
+          orderTrackingDetails["status"] == "Delivery Accepted" ||
+          orderTrackingDetails["status"] ==
+              "Delivery Partner arrived at darkstore") {
+        vendorLat =double.parse( orderTrackingDetails['vendorPickupDetails']?['lat']);
+           
+        vendorLng =double.parse( orderTrackingDetails['vendorPickupDetails']?['long']);
+           
+        dropLat =orderTrackingDetails['dropDetails']?['address']?['lat'];
+            
+        dropLng =orderTrackingDetails['dropDetails']?['address']?['lng'];
+         
+        // partnerLat = orderTrackingDetails['porterAPIResponse']?['partner_info']
+        //         ?['location']?['lat'] ??
+        //     vendorLat;
+        // partnerLng = orderTrackingDetails['porterAPIResponse']?['partner_info']
+        //         ?['location']?['long'] ??
+      
         await loadCustomIcon();
-   
+        if (webSockteConnected==false) {
+          webSockteConnected = true;
+          connectWebSocket();
+        }
 
-       
-        await getDirections(dropLat!, dropLng!, partnerLat!, partnerLng!);
+        if (orderTrackingDetails["status"] == "On the way") {
+          await getDirections(dropLat!, dropLng!, partnerLat!, partnerLng!);
+        }
 
         setState(() {
           _isInitLoading = false;
@@ -204,15 +213,12 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
       print('Failed to load tracking details');
     }
     if (HittingApi == false) {
-      print("STARTED HITTING API");
       _hittingApi();
     }
     setState(() {
       _isInitLoading = false;
     });
   }
-
- 
 
   @override
   void initState() {
@@ -236,11 +242,48 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     super.dispose();
   }
 
+  Future<void> connectWebSocket() async {
+    _channel = await IOWebSocketChannel.connect("ws://api.medkaro.in");
+  print("connecting to webSocket");
+    
+    _channel!.stream.listen(
+      (message) {
+        setState(() {
+          final data = jsonDecode(message); // 🔹 decode JSON string into Map
+
+          if (data['type'] == 'locationUpdated') {
+           
+            setState(() {
+               partnerLat = (data['lat'] as num?)?.toDouble() ?? 0.0;
+            partnerLng = (data['long'] as num?)?.toDouble() ?? 0.0;
+            });
+
+            print("📍 Updated location: $partnerLat , $partnerLng");
+          }
+
+          print("✅ Partner Location: $partnerLat, $partnerLng");
+
+          ;
+        });
+        print("📩 Message from server: $partnerLat");
+      },
+      onError: (error) {
+        print("❌ WebSocket error: $error");
+      },
+      onDone: () {
+        print("🔌 WebSocket connection closed");
+      },
+    );
+
+    // 🔹 Send your join message after connecting
+    print(widget.orderId);
+    _channel!.sink.add('{"type":"joinOrderRoom","orderId":"${orderId}"}');
+  }
+
   void _hittingApi() {
     HittingApi = true;
-    _timerStart = Timer.periodic(Duration(seconds: 10), (timer) async {
+    _timerStart = Timer.periodic(Duration(seconds: 5), (timer) async {
       fetchOrderTracking();
-      print("fecting order tracking called...");
     });
 
     if (orderTrackingDetails["status"] == "Delivered") {
@@ -616,11 +659,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     shopIcon = await BitmapDescriptor.asset(
         const ImageConfiguration(size: Size(30, 30)),
         'lib/images/map_shop.png');
-    if (orderTrackingDetails['status'] == "On the way") {
-      vendarIcon = bikeIcon;
-    } else {
-      vendarIcon = shopIcon;
-    }
+    
   }
 
   Future<void> getDirections(double originLat, double originLng, double destLat,
@@ -712,212 +751,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
         color: whiteColor,
       ));
     }
-    if (orderTrackingDetails["status"] == "Available") {
-      final finalTotal = double.parse(orderTrackingDetails["finalTotal"]);
-      final shippingCostRaw = orderTrackingDetails["shippingCost"];
-      final shippingCost = (shippingCostRaw is int)
-          ? shippingCostRaw.toDouble()
-          : double.tryParse(shippingCostRaw.toString()) ?? 0.0;
 
-      final avlId = orderTrackingDetails["availableID"];
-      return Scaffold(
-        backgroundColor: scaffoldBlackColor,
-        appBar: AppBar(
-          scrolledUnderElevation: 0,
-          elevation: 0,
-          automaticallyImplyLeading: false,
-          backgroundColor: ligtBlackColor,
-          title: Text(
-            'Order Accepted',
-            style: GoogleFonts.mulish(color: Colors.white),
-          ),
-          centerTitle: true,
-        ),
-        body: Container(
-            margin: EdgeInsets.all(16),
-            width: MediaQuery.of(context).size.width,
-            decoration: BoxDecoration(
-              color: ligtBlackColor,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                ListView.builder(
-                    physics: NeverScrollableScrollPhysics(),
-                    shrinkWrap: true,
-                    itemCount: acceptedProducts.length,
-                    itemBuilder: (context, index) {
-                      final marketerName =
-                          acceptedProducts[index]["productMarketer"];
-                      final productid = acceptedProducts[index]["productId"];
-                      final productname =
-                          acceptedProducts[index]["productName"];
-
-// productPrice might be a String, so convert safely:
-                      final productStr =
-                          acceptedProducts[index]["productPrice"].toString();
-                      final productPrice = double.tryParse(productStr) ?? 0.0;
-
-// quantity might be int or String, ensure int:
-                      final quantityRaw = acceptedProducts[index]["quantity"];
-                      final quent = quantityRaw is int
-                          ? quantityRaw
-                          : int.tryParse(quantityRaw.toString()) ?? 1;
-
-// sellingPrice might be String or double, convert safely:
-                      final sellingPriceStr =
-                          acceptedProducts[index]["sellingPrice"].toString();
-                      final sellingPrice =
-                          double.tryParse(sellingPriceStr) ?? 0.0;
-
-                      return OrderAcceptedCard(
-                        marketeproductMarketer: marketerName,
-                        productId: productid,
-                        productName: productname,
-                        productPrice: productPrice,
-                        quantity: quent,
-                        sellingPrice: sellingPrice,
-                      );
-                    }),
-                Container(
-                  padding: EdgeInsets.only(right: 25, left: 25, bottom: 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Item Total",
-                        style: GoogleFonts.mulish(
-                          fontWeight: FontWeight.w300,
-                          fontSize: 14,
-                          color: whiteColor,
-                        ),
-                      ),
-                      Text(
-                        "₹${orderTrackingDetails["totalAmount"]}",
-                        style: GoogleFonts.mulish(
-                          fontWeight: FontWeight.w400,
-                          fontSize: 14,
-                          color: whiteColor,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.only(right: 25, left: 25, bottom: 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "Delivery Fee",
-                        style: GoogleFonts.mulish(
-                          fontWeight: FontWeight.w300,
-                          fontSize: 12,
-                          color: greyColor,
-                        ),
-                      ),
-                      Text(
-                        "₹${orderTrackingDetails["shippingCost"]}",
-                        style: GoogleFonts.mulish(
-                          fontWeight: FontWeight.w400,
-                          fontSize: 12,
-                          color: greyColor,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.only(right: 25, left: 25, bottom: 10),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "GST and Platform Fees",
-                        style: GoogleFonts.mulish(
-                          fontWeight: FontWeight.w300,
-                          fontSize: 12,
-                          color: greyColor,
-                        ),
-                      ),
-                      Text(
-                        "₹${orderTrackingDetails["gstServiceCharge"]}",
-                        style: GoogleFonts.mulish(
-                          fontWeight: FontWeight.w400,
-                          fontSize: 12,
-                          color: greyColor,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Container(
-                  padding: EdgeInsets.only(right: 25, left: 25, bottom: 20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        "To Pay",
-                        style: GoogleFonts.mulish(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: whiteColor),
-                      ),
-                      Text(
-                        "₹${double.parse(orderTrackingDetails["finalTotal"]).toStringAsFixed(2)}",
-                        style: GoogleFonts.mulish(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 15,
-                          color: whiteColor,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () {
-                  
-                  },
-                  child: Container(
-                    height: 36,
-                    margin: EdgeInsets.all(25),
-                    width: double.infinity,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: greenColor,
-                      border: Border.all(
-                        color: greenColor,
-                        width: 1,
-                      ),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Center(
-                      child: paymentStart
-                          ? Container(
-                              height: 10,
-                              width: 10,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: whiteColor,
-                              ),
-                            )
-                          : Text(
-                              "Confirm and Pay",
-                              style: GoogleFonts.mulish(
-                                color: whiteColor,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                    ),
-                  ),
-                ),
-              ],
-            )),
-      );
-    }
     if (orderTrackingDetails["status"] == "Not Available" ||
         orderTrackingDetails["status"] == "Rejected") {
       return Scaffold(
@@ -978,128 +812,20 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
       );
     }
 
-    if (orderTrackingDetails["status"] == "In Review") {
-      return Scaffold(
-        appBar: AppBar(
-          elevation: 0,
-          scrolledUnderElevation: 0,
-          centerTitle: true,
-          backgroundColor: ligtBlackColor,
-          shape: ContinuousRectangleBorder(
-            borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(10),
-              bottomRight: Radius.circular(10),
-            ),
-          ),
-          title: Text(
-            "Status",
-            style: GoogleFonts.mulish(
-              fontWeight: FontWeight.w400,
-              fontSize: 22.69,
-              color: whiteColor,
-            ),
-          ),
-          leading: GestureDetector(
-            onTap: () {
-              Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => BaseScreen(Navigatedfrom: "")));
-            },
-            child: Padding(
-              padding: const EdgeInsets.only(left: 24.0),
-              child: Padding(
-                padding: const EdgeInsets.only(left: 4.0),
-                child: Row(
-                  spacing: 4,
-                  children: [
-                    SvgPicture.asset(
-                      colorFilter:
-                          ColorFilter.mode(Colors.white, BlendMode.srcIn),
-                      "lib/images/back.svg",
-                      width: 24, // optional
-                      height: 24, // optional
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ),
-        backgroundColor: scaffoldBlackColor,
-        body: _isInitLoading
-            ? Center(
-                child: CircularProgressIndicator(
-                  color: whiteColor,
-                ),
-              )
-            : Container(
-                width: double.infinity,
-                margin: EdgeInsets.all(30),
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Container(
-                            height: 80,
-                            child: SvgPicture.asset(
-                              "lib/images/veryfing.svg",
-                            ),
-                          ),
-                          SizedBox(height: 20),
-                          Container(
-                            margin: EdgeInsets.all(5),
-                            child: Text(
-                              'Verifying',
-                              style: GoogleFonts.mulish(
-                                fontSize: 26,
-                                fontWeight: FontWeight.bold,
-                                color: whiteColor,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      Container(
-                        height: 60,
-                        width: 60,
-                        child: LoadingIndicator(
-                          indicatorType: Indicator.ballPulse, // Bottom loader
-                          colors: [whiteColor],
-                          strokeWidth: 2,
-                          backgroundColor: scaffoldBlackColor,
-                          pathBackgroundColor: Colors.black,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-      );
-    }
-    final double vendorLat =
+    final dynamic vendorLat =
         orderTrackingDetails['vendorPickupDetails']?['lat'] ?? 22.54056;
-    final double vendorLng =
+    final dynamic vendorLng =
         orderTrackingDetails['vendorPickupDetails']?['long'] ?? 88.39583;
-    final double dropLat =
+    final dynamic dropLat =
         orderTrackingDetails['dropDetails']?['address']?['lat'] ?? 0.0;
-    final double dropLng =
+    final dynamic dropLng =
         orderTrackingDetails['dropDetails']?['address']?['lng'] ?? 0.0;
-    final double partnerLat = orderTrackingDetails['porterAPIResponse']
-            ?['partner_info']?['location']?['lat'] ??
-        vendorLat;
-    final double partnerLng = orderTrackingDetails['porterAPIResponse']
-            ?['partner_info']?['location']?['long'] ??
-        vendorLng;
+
     print(vendorLat);
     print(vendorLng);
     print(partnerLat);
     print(partnerLng);
+    print(widget.orderId);
 
     return Scaffold(
       backgroundColor: scaffoldBlackColor,
@@ -1121,7 +847,6 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                             height: height * 0.71,
                             child: GoogleMap(
                               onMapCreated: (controller) {
-                                
                                 _mapController = controller;
                               },
                               // Update on pan/zoom
@@ -1141,9 +866,26 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                                     infoWindow:
                                         InfoWindow(title: '', onTap: () {})),
                                 Marker(
-                                    markerId: MarkerId('delivery_boy'),
-                                    icon: vendarIcon,
-                                    position: LatLng(partnerLat, partnerLng),
+                                    markerId: MarkerId('DarkStore'),
+                                    icon: shopIcon,
+                                    position: LatLng(
+                                      double.tryParse(vendorLat) ??
+                                          0.0,
+                                      double.tryParse(vendorLng) ??
+                                          0.0,
+                                    ),
+                                    infoWindow:
+                                        InfoWindow(title: '', onTap: () {})),
+                                if(orderTrackingDetails["status"]=="Delivery Accepted")
+                                         Marker(
+                                    markerId: MarkerId('Delivery Partner'),
+                                    icon: bikeIcon,
+                                    position: LatLng(
+                                      double.tryParse(partnerLat.toString()) ??
+                                          0.0,
+                                      double.tryParse(partnerLng.toString()) ??
+                                          0.0,
+                                    ),
                                     infoWindow:
                                         InfoWindow(title: '', onTap: () {})),
                               },
@@ -1245,7 +987,9 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                                           orderTrackingDetails["status"] ==
                                               "On the way" ||
                                           orderTrackingDetails["status"] ==
-                                              "Delivered"
+                                              "Delivered" ||
+                                               orderTrackingDetails["status"] ==
+                                              "Delivery Accepted"
                                       ? false
                                       : true,
                                 ),
@@ -1268,7 +1012,8 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                                           orderTrackingDetails["status"] ==
                                               "On the way" ||
                                           orderTrackingDetails["status"] ==
-                                              "Delivered"
+                                              "Delivered"|| orderTrackingDetails["status"] ==
+                                              "Delivery Accepted"
                                       ? false
                                       : true,
                                 ),
