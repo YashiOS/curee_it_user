@@ -47,7 +47,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
   var paymentOrderData;
   List acceptedProducts = [];
   bool webSockteConnected = false;
-  String orderId="";
+  String orderId = "";
   bool HittingApi = false;
   bool _isInitLoading = true;
   Set<Polyline> polylines = {};
@@ -170,29 +170,31 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
           }
         }
       });
-       orderId=orderTrackingDetails["orderId"]; 
+      orderId = orderTrackingDetails["orderId"];
       if (orderTrackingDetails["status"] == "On the way" ||
           orderTrackingDetails["status"] == "Order Placed" ||
           orderTrackingDetails["status"] == "Packing" ||
           orderTrackingDetails["status"] == "Delivery Accepted" ||
           orderTrackingDetails["status"] ==
               "Delivery Partner arrived at darkstore") {
-        vendorLat =double.parse( orderTrackingDetails['vendorPickupDetails']?['lat']);
-           
-        vendorLng =double.parse( orderTrackingDetails['vendorPickupDetails']?['long']);
-           
-        dropLat =orderTrackingDetails['dropDetails']?['address']?['lat'];
-            
-        dropLng =orderTrackingDetails['dropDetails']?['address']?['lng'];
-         
+        vendorLat =
+            double.parse(orderTrackingDetails['vendorPickupDetails']?['lat']);
+
+        vendorLng =
+            double.parse(orderTrackingDetails['vendorPickupDetails']?['long']);
+
+        dropLat = orderTrackingDetails['dropDetails']?['address']?['lat'];
+
+        dropLng = orderTrackingDetails['dropDetails']?['address']?['lng'];
+
         // partnerLat = orderTrackingDetails['porterAPIResponse']?['partner_info']
         //         ?['location']?['lat'] ??
         //     vendorLat;
         // partnerLng = orderTrackingDetails['porterAPIResponse']?['partner_info']
         //         ?['location']?['long'] ??
-      
+
         await loadCustomIcon();
-        if (webSockteConnected==false) {
+        if (webSockteConnected == false) {
           webSockteConnected = true;
           connectWebSocket();
         }
@@ -244,18 +246,17 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
 
   Future<void> connectWebSocket() async {
     _channel = await IOWebSocketChannel.connect("ws://api.medkaro.in");
-  print("connecting to webSocket");
-    
+    print("connecting to webSocket");
+
     _channel!.stream.listen(
       (message) {
         setState(() {
           final data = jsonDecode(message); // 🔹 decode JSON string into Map
 
           if (data['type'] == 'locationUpdated') {
-           
             setState(() {
-               partnerLat = (data['lat'] as num?)?.toDouble() ?? 0.0;
-            partnerLng = (data['long'] as num?)?.toDouble() ?? 0.0;
+              partnerLat = (data['lat'] as num?)?.toDouble() ?? 0.0;
+              partnerLng = (data['long'] as num?)?.toDouble() ?? 0.0;
             });
 
             print("📍 Updated location: $partnerLat , $partnerLng");
@@ -659,7 +660,6 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     shopIcon = await BitmapDescriptor.asset(
         const ImageConfiguration(size: Size(30, 30)),
         'lib/images/map_shop.png');
-    
   }
 
   Future<void> getDirections(double originLat, double originLng, double destLat,
@@ -826,6 +826,12 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     print(partnerLat);
     print(partnerLng);
     print(widget.orderId);
+    double lat = (vendorLat is String)
+        ? double.tryParse(vendorLat) ?? 0.0
+        : (vendorLat ?? 0.0).toDouble();
+    double lng = (vendorLng is String)
+        ? double.tryParse(vendorLng) ?? 0.0
+        : (vendorLng ?? 0.0).toDouble();
 
     return Scaffold(
       backgroundColor: scaffoldBlackColor,
@@ -868,26 +874,24 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                                 Marker(
                                     markerId: MarkerId('DarkStore'),
                                     icon: shopIcon,
-                                    position: LatLng(
-                                      double.tryParse(vendorLat) ??
-                                          0.0,
-                                      double.tryParse(vendorLng) ??
-                                          0.0,
-                                    ),
+                                    position: LatLng(lat, lng),
                                     infoWindow:
                                         InfoWindow(title: '', onTap: () {})),
-                                if(orderTrackingDetails["status"]=="Delivery Accepted")
-                                         Marker(
-                                    markerId: MarkerId('Delivery Partner'),
-                                    icon: bikeIcon,
-                                    position: LatLng(
-                                      double.tryParse(partnerLat.toString()) ??
-                                          0.0,
-                                      double.tryParse(partnerLng.toString()) ??
-                                          0.0,
-                                    ),
-                                    infoWindow:
-                                        InfoWindow(title: '', onTap: () {})),
+                                if (orderTrackingDetails["status"] ==
+                                    "Delivery Accepted")
+                                  Marker(
+                                      markerId: MarkerId('Delivery Partner'),
+                                      icon: bikeIcon,
+                                      position: LatLng(
+                                        double.tryParse(
+                                                partnerLat.toString()) ??
+                                            0.0,
+                                        double.tryParse(
+                                                partnerLng.toString()) ??
+                                            0.0,
+                                      ),
+                                      infoWindow:
+                                          InfoWindow(title: '', onTap: () {})),
                               },
                             ),
                           ),
@@ -988,7 +992,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                                               "On the way" ||
                                           orderTrackingDetails["status"] ==
                                               "Delivered" ||
-                                               orderTrackingDetails["status"] ==
+                                          orderTrackingDetails["status"] ==
                                               "Delivery Accepted"
                                       ? false
                                       : true,
@@ -1012,7 +1016,8 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                                           orderTrackingDetails["status"] ==
                                               "On the way" ||
                                           orderTrackingDetails["status"] ==
-                                              "Delivered"|| orderTrackingDetails["status"] ==
+                                              "Delivered" ||
+                                          orderTrackingDetails["status"] ==
                                               "Delivery Accepted"
                                       ? false
                                       : true,
