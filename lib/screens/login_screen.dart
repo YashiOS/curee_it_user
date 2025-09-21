@@ -3,21 +3,14 @@ import 'package:cureeit_user_app/BaseUrl.dart';
 import 'package:cureeit_user_app/firebase_notifications.dart';
 import 'package:cureeit_user_app/screens/policies_screen.dart';
 import 'package:cureeit_user_app/screens/terms_of_service_screen.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/gestures.dart';
-import 'package:location/location.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'dart:io'; // For exiting the app
 import 'package:location/location.dart' as loc;
-import 'package:permission_handler/permission_handler.dart' as perm;
-
 import 'package:cureeit_user_app/screens/otp_screen.dart';
 import 'package:cureeit_user_app/screens/register_screen.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
-import 'package:url_launcher/url_launcher.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -48,10 +41,6 @@ class _LoginScreenState extends State<LoginScreen> {
           "fcmToken":fcmToken.fcmtoken
         }),
       );
-    
-     
-      final Map<String, dynamic> responseBody = json.decode(response.body);
-     
 
       if (response.statusCode == 200) {
         setState(() {

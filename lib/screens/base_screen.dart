@@ -65,7 +65,10 @@ class _BaseScreenState extends State<BaseScreen> {
                     body: Stack(
                       children: [
                         TabBarView(children: [
-                          Center(child: HomeScreen()),
+                          Center(child: HomeScreen(
+                            latitude: "100.0",
+                            longitude: "100.0",
+                          )),
                           Center(child: OrdersScreen()),
                           Center(
                               child: CartScreen(
@@ -146,10 +149,16 @@ class _BaseScreenState extends State<BaseScreen> {
               }
               if (state is ServiceIsNotAvilable) {
                 return Scaffold(
-                  body: HomeScreen(),
+                  body: HomeScreen(
+                    latitude: "100.0",
+                    longitude: "100.0",
+                  ),
                 );
               } else {
-                return Scaffold(body: HomeScreen());
+                return Scaffold(body: HomeScreen(
+                  latitude: "100.0",
+                    longitude: "100.0",
+                ));
               }
             },
           )),
