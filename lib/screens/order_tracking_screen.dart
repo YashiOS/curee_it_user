@@ -3,7 +3,7 @@ import 'dart:async';
 import 'dart:ui';
 
 import 'package:cureeit_user_app/BaseUrl.dart';
-import 'package:cureeit_user_app/cards/cart_card.dart';
+import 'package:cureeit_user_app/screens/cart/presentation/widget/cart_card.dart';
 import 'package:cureeit_user_app/cards/order_accepted_card.dart';
 import 'package:cureeit_user_app/cartManager/cartManager.dart';
 import 'package:cureeit_user_app/current_address/map_style.dart';

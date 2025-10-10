@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:cureeit_user_app/BaseUrl.dart';
 import 'package:cureeit_user_app/cartManager/cartManager.dart';
-import 'package:cureeit_user_app/screens/cart_screen.dart';
+import 'package:cureeit_user_app/screens/cart/presentation/cart_screen.dart';
 import 'package:cureeit_user_app/screens/search.dart';
 import 'package:cureeit_user_app/user/user.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
@@ -41,7 +41,7 @@ class _ItemDetailScreenState extends State<ItemDetailScreen> {
   void initState() {
     print('INIT STATE CALLED');
     super.initState();
-    checkIfFav();
+   
     productDetails = fetchProductDetails(widget.productId);
     _controller.addListener(() {
       if (_controller.page?.toInt() != _currentPage) {
@@ -181,79 +181,8 @@ _debounceTimer=Timer(Duration(seconds: 1), ()async{
    
   }
 
-  Future<void> checkIfFav() async {
-    try {
-      const url = '$baseUrl/product/getfavouritesList';
-
-      var request = http.Request('GET', Uri.parse(url))
-        ..headers.addAll({
-          'Content-Type': 'application/json',
-        })
-        ..body = jsonEncode({'userId': User.userId});
-
-      var response = await http.Client().send(request);
-
-      if (response.statusCode == 200) {
-        var responseBody = await response.stream.bytesToString();
-        Map<String, dynamic> responseData = jsonDecode(responseBody);
-        if (responseData['status'] == 200) {
-          List<dynamic> favouritesList =
-              responseData['data']['favouritesItem'] ?? [];
-
-          setState(() {
-            // Check if the productId is in the favourites list
-            isFav = favouritesList.contains(widget.productId);
-            if (isFav) {
-              addingToFav = false;
-            }
-          });
-        } else {
-          print(
-              "Failed to fetch favourites: ${response.stream.bytesToString()}");
-        }
-      } else {
-        print("Failed to fetch favourites: ${response.stream.bytesToString()}");
-      }
-    } catch (error) {
-      print("Error fetching favourites: $error");
-    }
-  }
-
-  Future<void> addToFavourites() async {
-    setState(() {
-      addingToFav = true;
-    });
-
-    final String apiUrl = "$baseUrl/product/favourites";
-
-    try {
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        headers: {"Content-Type": "application/json"},
-        body: jsonEncode({
-          "productId": widget.productId,
-          "userId": User.userId,
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        final responseData = jsonDecode(response.body);
-        if (responseData['status'] == 200) {
-          checkIfFav();
-          setState(() {
-            addingToFav = false;
-          });
-
-          Fluttertoast.showToast(msg: "Item added to Favourites");
-        } else {
-          setState(() {
-            addingToFav = false;
-          });
-        }
-      } else {}
-    } catch (error) {}
-    checkIfFav();
-  }
+ 
+ 
 
   Future<void> addToCart() async {
     //setState(() {

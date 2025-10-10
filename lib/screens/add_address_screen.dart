@@ -1,7 +1,7 @@
 import 'package:cureeit_user_app/BaseUrl.dart';
 import 'package:cureeit_user_app/LocalStorageCubit/store_user_cubit.dart';
 import 'package:cureeit_user_app/screens/base_screen.dart';
-import 'package:cureeit_user_app/screens/home_screen.dart';
+import 'package:cureeit_user_app/screens/home/presentation/home_screen.dart';
 import 'package:cureeit_user_app/selected_Address/currentAddress.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';

@@ -1,9 +1,9 @@
 import 'package:cureeit_user_app/screens/home/presentation/widget/products_cart.dart';
 import 'package:flutter/material.dart';
-import '../../domain/entities/service.dart';
+import '../../domain/entities/productEntities.dart';
 
 class ProductGrid extends StatelessWidget {
-  final List<Service> services;
+  final List<ProductEntity> services;
 
   const ProductGrid({super.key, required this.services});
 
@@ -22,10 +22,10 @@ class ProductGrid extends StatelessWidget {
             margin: const EdgeInsets.only(bottom: 16),
             child: Row(
               children: [
-                Expanded(child: ProductCard(service: services[firstIndex])),
+                Expanded(child: ProductCard(product: services[firstIndex])),
                 const SizedBox(width: 16),
                 secondIndex < services.length
-                    ? Expanded(child: ProductCard(service: services[secondIndex]))
+                    ? Expanded(child: ProductCard(product: services[secondIndex]))
                     : const Expanded(child: SizedBox()),
               ],
             ),

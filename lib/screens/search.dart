@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:cureeit_user_app/BaseUrl.dart';
 import 'package:cureeit_user_app/cartManager/cartManager.dart';
-import 'package:cureeit_user_app/screens/cart_screen.dart';
+import 'package:cureeit_user_app/screens/cart/presentation/cart_screen.dart';
 import 'package:cureeit_user_app/screens/item_detail_screen.dart';
 import 'package:cureeit_user_app/user/user.dart';
 import 'package:flutter/material.dart';

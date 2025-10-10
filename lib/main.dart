@@ -1,10 +1,9 @@
 import 'package:cureeit_user_app/LocalStorageCubit/store_user_cubit.dart';
 import 'package:cureeit_user_app/cubit/service_avilable_cubit.dart';
 import 'package:cureeit_user_app/firebase_notifications.dart';
+import 'package:cureeit_user_app/screens/login/presentation/login_screen.dart' show LoginScreen;
 
-import 'package:cureeit_user_app/screens/login_screen.dart';
 import 'package:cureeit_user_app/screens/update_screen.dart';
-
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -25,7 +24,7 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
 );
   await Hive.initFlutter();
-  myBox = await Hive.openBox("Mybox");
+  myBox= await Hive.openBox("Mybox");
   await PushNotificationService().initNotifications();
  
   runApp(
@@ -76,6 +75,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
   void _decideStartScreen() async {
 
     final isAvailable = context.read<StoreUserCubit>().isUserDataAvailable();
+   
 
     setState(() {
       _home = isAvailable

@@ -84,6 +84,7 @@ Future<void> _checkForUpdate() async {
         });
         _showUpdateDialog();
       } else {
+        print("naviagte to home screen");
         setState(() {
           _isCheckingUpdate = false;
         });
