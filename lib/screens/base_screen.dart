@@ -1,4 +1,3 @@
-
 import 'dart:io';
 
 import 'package:cureeit_user_app/LocalStorageCubit/store_user_cubit.dart';
@@ -61,7 +60,7 @@ class _BaseScreenState extends ConsumerState<BaseScreen> {
           // ✅ If location not available → show HomeScreen only
           if (serviceState.currentLocationAvailable == false) {
             return Scaffold(
-              backgroundColor: ligtBlackColor,
+              backgroundColor: lightWhiteColor,
               body: HomeScreen(
                 latitude: "100.0",
                 longitude: "100.0",
@@ -71,7 +70,7 @@ class _BaseScreenState extends ConsumerState<BaseScreen> {
 
           // ✅ Else show full app with bottom navigation
           return Scaffold(
-            backgroundColor: ligtBlackColor,
+            backgroundColor: lightWhiteColor,
             body: Stack(
               children: [
                 TabBarView(
@@ -94,27 +93,34 @@ class _BaseScreenState extends ConsumerState<BaseScreen> {
                           bottom: Platform.isIOS ? 10.0 : 0.0,
                         ),
                         decoration: BoxDecoration(
-                          color: scaffoldBlackColor,
-                          border: Border.all(color: scaffoldBlackColor),
+                          color: scaffoldWhiteColor,
+                          border: Border.all(color: scaffoldWhiteColor),
                         ),
                         child: AnimatedBuilder(
                           animation: tabController,
                           builder: (context, _) {
                             return TabBar(
+                              indicatorColor: greenColor,
+
                               controller: tabController,
-                              unselectedLabelColor: greyColor,
-                              labelColor: whiteColor,
-                              indicatorColor: whiteColor,
-                              labelStyle: GoogleFonts.mulish(fontSize: 12),
+                              labelColor: greenColor, // selected text & icon
+                              unselectedLabelColor:
+                                  greyColor, // unselected text & icon
+                              labelStyle: GoogleFonts.mulish(
+                                fontWeight: FontWeight.bold, // selected bold
+                                fontSize: 14,
+                              ),
+                              unselectedLabelStyle: GoogleFonts.mulish(
+                                fontWeight: FontWeight.bold, // slightly bold
+                                fontSize: 14,
+                              ),
                               tabs: [
                                 Tab(
                                   icon: Image.asset(
                                     "lib/images/Home.png",
                                     height: 24,
                                     width: 24,
-                                    color: tabController.index == 0
-                                        ? whiteColor
-                                        : greyColor,
+                                    color: tabController.index == 0 ? greenColor : greyColor, 
                                   ),
                                   text: "Home",
                                 ),
@@ -123,13 +129,11 @@ class _BaseScreenState extends ConsumerState<BaseScreen> {
                                     "lib/images/Order Again.png",
                                     height: 24,
                                     width: 24,
-                                    color: tabController.index == 1
-                                        ? whiteColor
-                                        : greyColor,
+                                   color: tabController.index == 1 ? greenColor : greyColor, 
                                   ),
                                   text: "Order Again",
                                 ),
-                                const Tab(
+                                Tab(
                                   icon: Icon(Icons.shopping_cart_outlined),
                                   text: "Cart",
                                 ),

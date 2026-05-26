@@ -107,7 +107,7 @@ class _LoginScreenState extends ConsumerState<RegisterScreen> {
       resizeToAvoidBottomInset: true,
       body: SingleChildScrollView(
         child: Container(
-          color: scaffoldBlackColor,
+          color:  scaffoldWhiteColor,
           width: screenWidth,
           height: screenHeight,
           child: Stack(
@@ -123,13 +123,14 @@ class _LoginScreenState extends ConsumerState<RegisterScreen> {
                   children: [
                     Image.asset(
                       "lib/images/MEDKARO.png",
+                     
                       height: screenHeight * 0.06,
                       width: screenWidth * 0.5,
                     ),
                     Text(
                       "10-minute medicine delivery",
                       style: GoogleFonts.mulish(
-                        color: whiteColor,
+                        color: blackColor,
                         fontSize: screenHeight * 0.022,
                       ),
                     ),
@@ -148,12 +149,12 @@ class _LoginScreenState extends ConsumerState<RegisterScreen> {
                             child: TextField(
                               cursorColor: greenColor,
                               controller: _nameController,
-                              style: GoogleFonts.mulish(color: whiteColor),
+                              style: GoogleFonts.mulish(color: blackColor),
                               decoration: InputDecoration(
                                 counterText: "",
                                 hintText: "Name",
                                 hintStyle: TextStyle(
-                                    color: whiteColor,
+                                    color: blackColor,
                                     fontWeight: FontWeight.w100),
                                 border: InputBorder.none,
                               ),
@@ -176,7 +177,7 @@ class _LoginScreenState extends ConsumerState<RegisterScreen> {
                               backgroundColor:
                                   isButtonEnabled && !registerState.isLoading
                                       ? greenColor
-                                      : scaffoldBlackColor,
+                                      :  scaffoldWhiteColor,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
                                 side: BorderSide(color: greenColor, width: 1),
@@ -187,7 +188,7 @@ class _LoginScreenState extends ConsumerState<RegisterScreen> {
                                     height: 10,
                                     width: 10,
                                     child: CircularProgressIndicator(
-                                      color: whiteColor,
+                                      color: blackColor,
                                       strokeWidth: 2,
                                     ),
                                   )
@@ -195,7 +196,7 @@ class _LoginScreenState extends ConsumerState<RegisterScreen> {
                                     "Next",
                                     style: GoogleFonts.mulish(
                                       color: isButtonEnabled
-                                          ? whiteColor
+                                          ? blackColor
                                           : greenColor,
                                       fontSize: screenHeight * 0.018,
                                       fontWeight: FontWeight.bold,

@@ -40,7 +40,7 @@ class _AddressesScreenState extends State<AddressesScreen> {
       ..headers.addAll({
         'Content-Type': 'application/json',
       })
-      ..body = jsonEncode({'userId': widget.userId});
+       ..body = jsonEncode({'userId': widget.userId});
 
     var response = await http.Client().send(request);
 
@@ -80,13 +80,13 @@ class _AddressesScreenState extends State<AddressesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: scaffoldBlackColor,
+      backgroundColor:  scaffoldWhiteColor,
       appBar: AppBar(
         scrolledUnderElevation: 0,
             elevation: 0,
            
             centerTitle: true,
-            backgroundColor: ligtBlackColor,
+            backgroundColor: lightWhiteColor,
             shape: ContinuousRectangleBorder(
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(10),
@@ -98,7 +98,7 @@ class _AddressesScreenState extends State<AddressesScreen> {
               style: GoogleFonts.mulish(
                 fontWeight: FontWeight.w400,
                 fontSize: 22.69,
-                color: whiteColor,
+                color: blackColor,
               ),
             ),
             leading: GestureDetector(
@@ -178,7 +178,7 @@ class _AddressesScreenState extends State<AddressesScreen> {
                         padding:
                             EdgeInsets.symmetric(vertical: 10, horizontal: 16),
                         decoration: BoxDecoration(
-                          color:ligtBlackColor,
+                          color:lightWhiteColor,
                           borderRadius: BorderRadius.circular(8),
                          
                         ),
@@ -187,7 +187,7 @@ class _AddressesScreenState extends State<AddressesScreen> {
                           style: GoogleFonts.mulish(
                             fontSize: 16,
                             fontWeight: FontWeight.w400,
-                            color: whiteColor,
+                            color: blackColor,
                           ),
                         ),
                       ),

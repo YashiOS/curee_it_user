@@ -51,14 +51,14 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
       'userLong': widget.userLong.toString(),
       'type': _typeController.text.trim(),
     };
-
+    print("$addressData");
     try {
       final response = await http.post(
         Uri.parse(url),
         headers: {'Content-Type': 'application/json'},
         body: json.encode(addressData),
       );
-
+     print("response is : ${response.body}");
       if (response.statusCode == 200) {
         Fluttertoast.showToast(msg: "Address Added");
         context.read<StoreUserCubit>().saveUserAddress(
@@ -106,7 +106,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
   InputDecoration _inputDecoration(String hint) {
     return InputDecoration(
         hintText: hint,
-        hintStyle: GoogleFonts.mulish(color: whiteColor),
+        hintStyle: GoogleFonts.mulish(color: blackColor),
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         border: InputBorder.none);
@@ -137,7 +137,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
             horizontal: MediaQuery.of(context).size.width * 0.085,
             vertical: MediaQuery.of(context).size.height * 0.03),
         decoration: const BoxDecoration(
-          color: scaffoldBlackColor,
+          color:  scaffoldWhiteColor,
           borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
         ),
         child: Column(
@@ -148,7 +148,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
               alignment: Alignment.topRight,
               child: GestureDetector(
                 onTap: () => Navigator.pop(context),
-                child: const Icon(Icons.close, size: 30, color: whiteColor),
+                child: const Icon(Icons.close, size: 30, color: blackColor),
               ),
             ),
             Text(
@@ -156,7 +156,7 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
               style: GoogleFonts.mulish(
                 fontSize: MediaQuery.of(context).size.width * 0.055,
                 fontWeight: FontWeight.bold,
-                color: whiteColor,
+                color: blackColor,
               ),
             ),
             SizedBox(
@@ -176,10 +176,10 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
               margin: EdgeInsets.only(bottom: 10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
-                color: ligtBlackColor,
+                color: lightWhiteColor,
               ),
               child: TextField(
-                style: GoogleFonts.mulish(color: whiteColor),
+                style: GoogleFonts.mulish(color: blackColor),
                 cursorColor: greenColor,
                 controller: _line1Controller,
                 decoration: _inputDecoration("Flat/House No., Street, Area"),
@@ -190,10 +190,10 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
               margin: EdgeInsets.only(bottom: 10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
-                color: ligtBlackColor,
+                color: lightWhiteColor,
               ),
               child: TextField(
-                style: GoogleFonts.mulish(color: whiteColor),
+                style: GoogleFonts.mulish(color: blackColor),
                 cursorColor: greenColor,
                 controller: _line2Controller,
                 decoration: _inputDecoration("City, State, Pincode"),
@@ -204,10 +204,10 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
               margin: EdgeInsets.only(bottom: 10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
-                color: ligtBlackColor,
+                color: lightWhiteColor,
               ),
               child: TextField(
-                style: GoogleFonts.mulish(color: whiteColor),
+                style: GoogleFonts.mulish(color: blackColor),
                 cursorColor: greenColor,
                 controller: _typeController,
                 decoration: _inputDecoration("Type (e.g., Home, Office)"),
@@ -219,10 +219,10 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
               margin: EdgeInsets.only(bottom: 10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
-                color: ligtBlackColor,
+                color: lightWhiteColor,
               ),
               child: TextField(
-                style: GoogleFonts.mulish(color: whiteColor),
+                style: GoogleFonts.mulish(color: blackColor),
                 cursorColor: greenColor,
                 controller: _landmarkController,
                 decoration: _inputDecoration("Landmark (Optional)"),
@@ -233,10 +233,10 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
               margin: EdgeInsets.only(bottom: 10),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(8),
-                color: ligtBlackColor,
+                color: lightWhiteColor,
               ),
               child: TextField(
-                style: GoogleFonts.mulish(color: whiteColor),
+                style: GoogleFonts.mulish(color: blackColor),
                 cursorColor: greenColor,
                 controller: _floorController,
                 decoration: _inputDecoration("Floor (Optional)"),
@@ -256,14 +256,14 @@ class _AddAddressScreenState extends State<AddAddressScreen> {
                 decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8),
                     border: Border.all(color: greenColor, width: 1),
-                    color: isButtonEnabled ? greenColor : scaffoldBlackColor),
+                    color: isButtonEnabled ? greenColor :  scaffoldWhiteColor),
                 child: Center(
                   child: addingAddress
                       ? Container(
                           height: 10,
                           width: 10,
                           child: CircularProgressIndicator(
-                            color: whiteColor,
+                            color: blackColor,
                             strokeWidth: 2,
                           ))
                       : Text(

@@ -1,4 +1,5 @@
 import java.util.Properties
+import java.io.File
 import java.io.FileInputStream
 
 plugins {
@@ -13,16 +14,22 @@ android {
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "27.0.12077973"
 
-    val keyProperties = Properties().apply {
-        load(FileInputStream(rootProject.file("key.properties")))
+    // --- OPTIONAL: only used if key.properties exists ---
+    val keyPropertiesFile: File = rootProject.file("key.properties")
+    val keyProperties = Properties()
+    if (keyPropertiesFile.exists()) {
+        keyProperties.load(FileInputStream(keyPropertiesFile))
     }
 
     signingConfigs {
-        create("release") {
-            storeFile = file(keyProperties["storeFile"] as String)
-            storePassword = keyProperties["storePassword"] as String
-            keyAlias = keyProperties["keyAlias"] as String
-            keyPassword = keyProperties["keyPassword"] as String
+        // Create "release" ONLY if key.properties exists
+        if (keyPropertiesFile.exists()) {
+            create("release") {
+                storeFile = file(keyProperties["storeFile"] as String)
+                storePassword = keyProperties["storePassword"] as String
+                keyAlias = keyProperties["keyAlias"] as String
+                keyPassword = keyProperties["keyPassword"] as String
+            }
         }
     }
 
@@ -36,9 +43,17 @@ android {
 
     buildTypes {
         getByName("release") {
-            signingConfig = signingConfigs.getByName("release")
+            // 🔥 If release signing is not defined, fall back to debug for local builds
+            signingConfig = signingConfigs.findByName("release")
+                ?: signingConfigs.getByName("debug")
+
             isMinifyEnabled = false
             isShrinkResources = false
+        }
+
+        // debug is normal, no changes needed
+        getByName("debug") {
+            // uses default debug signing
         }
     }
 

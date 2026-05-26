@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:cureeit_user_app/BaseUrl.dart';
 import 'package:cureeit_user_app/cartManager/cartManager.dart';
 import 'package:cureeit_user_app/screens/cart/presentation/cart_screen.dart';
@@ -102,13 +103,12 @@ class _SearchState extends State<Search> {
   }
 
   void _listen() async {
-    
     if (!_isListening) {
       print("in search page");
       bool available = await _speech.initialize(
         onStatus: (val) {
           print("search page litninG status $val");
-          if (val == "notListening"||val=="done") {
+          if (val == "notListening" || val == "done") {
             time?.cancel();
 
             time = Timer(Duration(seconds: 1), () async {
@@ -117,15 +117,14 @@ class _SearchState extends State<Search> {
               });
               print("fetched search result");
               await _fetchSearchResults(_speechText);
-               _speech.cancel();
-               _speech.stop();
-
+              _speech.cancel();
+              _speech.stop();
             });
           }
         },
         onError: (val) => print('Error: $val'),
       );
-      
+
       if (available) {
         setState(() {
           _isListening = true;
@@ -156,11 +155,9 @@ class _SearchState extends State<Search> {
       _onSearchChanged();
     });
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      
       if (widget.Mic_on) {
         _listen();
         print("Listning from init state method");
-        
       }
     });
   }
@@ -370,14 +367,14 @@ class _SearchState extends State<Search> {
               },
               child: Icon(
                 Icons.shopping_cart_outlined,
-                color: whiteColor,
+                color: blackColor,
               ),
               backgroundColor: greenColor,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8)),
             )
           : null,
-      backgroundColor: scaffoldBlackColor,
+      backgroundColor: homepageWhite,
       appBar: AppBar(
         scrolledUnderElevation: 0,
         elevation: 0,
@@ -391,9 +388,9 @@ class _SearchState extends State<Search> {
         title: Text(
           "Search",
           style: GoogleFonts.mulish(
-              color: whiteColor, fontSize: 22.69, fontWeight: FontWeight.w400),
+              color: blackColor, fontSize: 22.69, fontWeight: FontWeight.w400),
         ),
-        backgroundColor: ligtBlackColor,
+        backgroundColor: homepageWhite,
         leading: GestureDetector(
           onTap: () {
             Navigator.pop(context);
@@ -407,7 +404,7 @@ class _SearchState extends State<Search> {
                 children: [
                   SvgPicture.asset(
                     colorFilter:
-                        ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                        ColorFilter.mode(blackColor, BlendMode.srcIn),
                     "lib/images/back.svg",
                     width: 24, // optional
                     height: 24, // optional
@@ -427,7 +424,11 @@ class _SearchState extends State<Search> {
             Container(
               height: 43,
               decoration: BoxDecoration(
-                color: ligtBlackColor,
+                border: Border.all(
+                  color: Colors.grey.shade300, // light grey border
+                  width: 1.5, // you can use 0.5 for extra subtle
+                ),
+                color: lightWhiteColor,
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Row(
@@ -438,15 +439,15 @@ class _SearchState extends State<Search> {
                       child: TextField(
                         focusNode: _focusNode,
                         autofocus: !widget.Mic_on,
-                        cursorColor: whiteColor,
-                        style: GoogleFonts.mulish(color: whiteColor),
+                        cursorColor: blackColor,
+                        style: GoogleFonts.mulish(color: blackColor),
                         controller: _controller,
                         decoration: InputDecoration(
                           suffixIcon: IconButton(
                             icon: Icon(
                               size: 18,
                               _isListening ? Icons.mic : Icons.mic_none,
-                              color: _isListening ? greenColor : whiteColor,
+                              color: _isListening ? greenColor : blackColor,
                             ),
                             onPressed: () {
                               _listen();
@@ -454,7 +455,7 @@ class _SearchState extends State<Search> {
                               // For example: start voice recording
                             },
                           ),
-                          hintStyle: GoogleFonts.mulish(color: whiteColor),
+                          hintStyle: GoogleFonts.mulish(color: blackColor),
                           border: InputBorder.none,
                         ),
                       ),
@@ -468,7 +469,7 @@ class _SearchState extends State<Search> {
               child: _isLoading
                   ? Center(
                       child: CircularProgressIndicator(
-                      color: whiteColor,
+                      color: blackColor,
                     ))
                   : _searchResults.isEmpty
                       ? Center(
@@ -509,9 +510,15 @@ class _SearchState extends State<Search> {
                                 );
                               },
                               child: Card(
-                                color: scaffoldBlackColor,
+                                elevation: 0,
+                                color: homepageWhite,
                                 margin: EdgeInsets.symmetric(vertical: 8),
                                 shape: RoundedRectangleBorder(
+                                  side: BorderSide(
+                                    color: Colors
+                                        .grey.shade300, // Fine grey border
+                                    width: 1, // Thin border
+                                  ),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: LayoutBuilder(
@@ -519,7 +526,8 @@ class _SearchState extends State<Search> {
                                   return Stack(
                                     children: [
                                       Container(
-                                        color: scaffoldBlackColor,
+                                        color: homepageWhite,
+                                       
                                         padding: EdgeInsets.all(height * 0.01),
                                         child: Column(
                                           crossAxisAlignment:
@@ -537,7 +545,7 @@ class _SearchState extends State<Search> {
                                               child: Center(
                                                 child: Container(
                                                   height: height *
-                                                      0.15, // 15% of screen height
+                                                      0.16, // 15% of screen height
                                                   width: 80,
                                                   child: Image.network(
                                                     (item["imageUrls"] !=
@@ -581,13 +589,13 @@ class _SearchState extends State<Search> {
                                                             0.4,
                                                         child: Text(
                                                           item['name'],
-                                                          maxLines: 3,
+                                                          maxLines: 2,
                                                           style: GoogleFonts
                                                               .mulish(
                                                             fontSize: 13,
                                                             fontWeight:
                                                                 FontWeight.w400,
-                                                            color: whiteColor,
+                                                            color: blackColor,
                                                           ),
                                                         ),
                                                       ),
@@ -623,10 +631,10 @@ class _SearchState extends State<Search> {
                                                         "₹${item['sellingPrice']}",
                                                         style:
                                                             GoogleFonts.mulish(
-                                                          fontSize: 13,
+                                                          fontSize: 12,
                                                           fontWeight:
                                                               FontWeight.w500,
-                                                          color: whiteColor,
+                                                          color: blackColor,
                                                         ),
                                                       ),
                                                       SizedBox(
@@ -636,7 +644,7 @@ class _SearchState extends State<Search> {
                                                         "₹${item['price']}",
                                                         style:
                                                             GoogleFonts.mulish(
-                                                          fontSize: 12,
+                                                          fontSize: 10,
                                                           decoration:
                                                               TextDecoration
                                                                   .lineThrough,
@@ -705,7 +713,7 @@ class _SearchState extends State<Search> {
                                                                   containerHeight *
                                                                       0.08,
                                                               color:
-                                                                  whiteColor),
+                                                                  blackColor),
                                                           onPressed: () {
                                                             DidUpdateQuantity(
                                                                 index,
@@ -723,7 +731,7 @@ class _SearchState extends State<Search> {
                                                                 width: 10,
                                                                 child: CircularProgressIndicator(
                                                                     color:
-                                                                        whiteColor),
+                                                                        blackColor),
                                                               )
                                                             : Text(
                                                                 '${CartManager.cartQuantities[productId]}',
@@ -731,7 +739,7 @@ class _SearchState extends State<Search> {
                                                                     GoogleFonts
                                                                         .mulish(
                                                                   color:
-                                                                      whiteColor,
+                                                                      blackColor,
                                                                   fontWeight:
                                                                       FontWeight
                                                                           .bold,
@@ -753,7 +761,7 @@ class _SearchState extends State<Search> {
                                                                   containerHeight *
                                                                       0.08,
                                                               color:
-                                                                  whiteColor),
+                                                                  blackColor),
                                                           onPressed: () {
                                                             DidUpdateQuantity(
                                                                 index,
@@ -769,7 +777,7 @@ class _SearchState extends State<Search> {
                                                   width: 50,
                                                   height: 29,
                                                   decoration: BoxDecoration(
-                                                    color: ligtBlackColor,
+                                                    color: lightWhiteColor,
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             8),
@@ -786,7 +794,7 @@ class _SearchState extends State<Search> {
                                                             width: 10,
                                                             child:
                                                                 CircularProgressIndicator(
-                                                              color: whiteColor,
+                                                              color: blackColor,
                                                               strokeWidth: 2,
                                                             ),
                                                           )

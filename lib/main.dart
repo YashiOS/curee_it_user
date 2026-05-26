@@ -98,8 +98,8 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
       },
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        appBarTheme: AppBarTheme(color: ligtBlackColor),
-        scaffoldBackgroundColor: scaffoldBlackColor,
+        appBarTheme: AppBarTheme(color: lightWhiteColor),
+        scaffoldBackgroundColor:  scaffoldWhiteColor,
         useMaterial3: true,
       ),
       home:_home ?? _buildLoadingScreen()
@@ -110,7 +110,7 @@ class _MyAppState extends State<MyApp> with WidgetsBindingObserver {
 
   Widget _buildLoadingScreen() {
     return Scaffold(
-      backgroundColor: scaffoldBlackColor,
+      backgroundColor:  scaffoldWhiteColor,
       body: Center(
         child: CircularProgressIndicator(
           color:greenColor,

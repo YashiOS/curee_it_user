@@ -51,7 +51,7 @@ class _OtpFormState extends State<OtpForm> {
             alignment: Alignment.center,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(8),
-              color: ligtBlackColor,
+              color: textFieldFillColor,
             ),
             height: 50,
             width: 50,
@@ -74,7 +74,7 @@ class _OtpFormState extends State<OtpForm> {
               style: GoogleFonts.mulish(
                 fontSize: 20,
                 fontWeight: FontWeight.w600,
-                color: whiteColor,
+                color: blackColor,
               ),
               textAlign: TextAlign.center,
               textAlignVertical: TextAlignVertical.center,

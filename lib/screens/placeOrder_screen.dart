@@ -154,20 +154,20 @@ class _MedicineAvailabilityScreenState extends State<MedicineAvailabilityScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: scaffoldBlackColor,
+        backgroundColor:  scaffoldWhiteColor,
         
         appBar: AppBar(
           scrolledUnderElevation: 0,
             elevation: 0,
           automaticallyImplyLeading: false,
-          backgroundColor: ligtBlackColor,
+          backgroundColor: lightWhiteColor,
           centerTitle: true,
           title: Text(
             "Placing Order",
             style: GoogleFonts.mulish(
               fontWeight: FontWeight.w400,
               fontSize: 22.69,
-              color: whiteColor,
+              color: blackColor,
             ),
           ),
           
@@ -182,9 +182,9 @@ class _MedicineAvailabilityScreenState extends State<MedicineAvailabilityScreen>
                   width: 100,
                   child: LoadingIndicator(
                     indicatorType: Indicator.ballPulse, // Example
-                    colors: [whiteColor],
+                    colors: [blackColor],
                     strokeWidth: 2,
-                    backgroundColor: scaffoldBlackColor,
+                    backgroundColor:  scaffoldWhiteColor,
                     pathBackgroundColor: Colors.black,
                   ),
                 ),

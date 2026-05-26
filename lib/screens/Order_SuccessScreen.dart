@@ -30,7 +30,7 @@ class _OrderSuccessScreenState extends State<OrderSuccessScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: scaffoldBlackColor,
+      backgroundColor:  scaffoldWhiteColor,
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,

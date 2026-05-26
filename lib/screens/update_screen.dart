@@ -200,7 +200,7 @@ Future<void> _showUpdateDialog() async {
       context: context,
    
       builder: (context) => Dialog(
-        backgroundColor: ligtBlackColor,
+        backgroundColor: lightWhiteColor,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
         ),
@@ -259,7 +259,7 @@ Future<void> _showUpdateDialog() async {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: scaffoldBlackColor,
+      backgroundColor:  scaffoldWhiteColor,
       body: Container(),
     );
   }

@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:cureeit_user_app/BaseUrl.dart';
 import 'package:cureeit_user_app/LocalStorageCubit/store_user_cubit.dart';
 import 'package:cureeit_user_app/screens/location.dart';
@@ -34,7 +33,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     showDialog(
       context: context,
       builder: (context) => Dialog(
-        backgroundColor: ligtBlackColor, // Dark background
+        backgroundColor: lightWhiteColor, // Dark background
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(8),
         ),
@@ -49,7 +48,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 style: TextStyle(
                   fontSize: 17.02,
                   fontFamily: 'Mulish',
-                  color: Colors.white,
+                  color: blackColor,
                   fontWeight: FontWeight.w400,
                 ),
               ),
@@ -64,7 +63,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: const Text(
                       "Cancel",
                       style: TextStyle(
-                        color: Colors.white,
+                        color: blackColor,
                         fontSize: 17.13,
                         fontFamily: 'Mulish',
                       ),
@@ -125,7 +124,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: scaffoldBlackColor,
+        backgroundColor: lightWhiteColor,
         appBar: AppBar(
           scrolledUnderElevation: 0,
           elevation: 0,
@@ -136,14 +135,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
               bottomRight: Radius.circular(10),
             ),
           ),
-          backgroundColor: ligtBlackColor,
+          backgroundColor: lightWhiteColor,
           leadingWidth: 100,
           title: Text(
             "Settings",
             style: GoogleFonts.mulish(
                 fontWeight: FontWeight.w400,
                 fontSize: 22.69,
-                color: whiteColor),
+                color: blackColor),
           ),
           leading: GestureDetector(
             onTap: () {
@@ -158,7 +157,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     SvgPicture.asset(
                       colorFilter:
-                          ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                          ColorFilter.mode(blackColor, BlendMode.srcIn),
                       "lib/images/back.svg",
                       width: 24, // optional
                       height: 24, // optional
@@ -173,7 +172,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           padding: const EdgeInsets.symmetric(
             horizontal: 20,
           ),
-          color: scaffoldBlackColor,
+          color: lightWhiteColor,
           child: Column(
             children: [
               SizedBox(
@@ -182,8 +181,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Container(
                 padding: const EdgeInsets.only(top: 24, bottom: 24, left: 16),
                 decoration: BoxDecoration(
-                  color: ligtBlackColor, // dark background
+                  color: lightWhiteColor, // dark background
                   borderRadius: BorderRadius.circular(8),
+                  border: Border.all(
+                    color: Colors.grey.shade300, // light grey border
+                    width: 1,
+                  ),
                 ),
                 child: Row(
                   children: [
@@ -205,7 +208,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Text(
                           "${name ?? User.name}",
                           style: GoogleFonts.mulish(
-                            color: whiteColor,
+                            color: blackColor,
                             fontSize: 18,
                             fontWeight: FontWeight.w400,
                           ),
@@ -214,7 +217,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Text(
                           "${phoneNumber ?? User.phoneNumber}",
                           style: GoogleFonts.mulish(
-                            color: whiteColor,
+                            color: blackColor,
                             fontWeight: FontWeight.w300,
                             fontSize: 12,
                           ),
@@ -235,7 +238,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: Container(
                   padding: const EdgeInsets.only(top: 16, bottom: 16, left: 16),
                   decoration: BoxDecoration(
-                    color: ligtBlackColor, // dark background
+                    border: Border.all(
+                      color: Colors.grey.shade300, // light grey border
+                      width: 1,
+                    ),
+                    color: lightWhiteColor, // dark background
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
@@ -246,7 +253,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         child: const Center(
                           child: Icon(
                             Icons.location_on, // Location icon
-                            color: whiteColor,
+                            color: blackColor,
                             size: 28,
                           ),
                         ),
@@ -260,7 +267,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           Text(
                             "Address",
                             style: GoogleFonts.mulish(
-                              color: whiteColor,
+                              color: blackColor,
                               fontSize: 18,
                               fontWeight: FontWeight.w400,
                             ),
@@ -269,7 +276,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           Text(
                             "Edit and add new addresses",
                             style: GoogleFonts.mulish(
-                              color: whiteColor,
+                              color: blackColor,
                               fontWeight: FontWeight.w300,
                               fontSize: 12,
                             ),
@@ -291,11 +298,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       borderRadius:
                           BorderRadius.vertical(top: Radius.circular(20)),
                     ),
-                    backgroundColor: ligtBlackColor,
+                    backgroundColor: lightWhiteColor,
                     builder: (context) {
                       return Padding(
-                        padding: const EdgeInsets.only(left: 16,right: 16,top: 16,bottom: 24),
-                        
+                        padding: const EdgeInsets.only(
+                            left: 16, right: 16, top: 16, bottom: 24),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.center,
                           mainAxisSize: MainAxisSize.min,
@@ -306,9 +313,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               decoration: BoxDecoration(
                                 color: greyColor,
                                 borderRadius: BorderRadius.circular(2),
+                                border: Border.all(
+                                  color:
+                                      Colors.grey.shade300, // light grey border
+                                  width: 1,
+                                ),
                               ),
                             ),
-                           
                             SizedBox(height: 16),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -322,23 +333,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     }
                                   },
                                   child: Container(
-                                     height: 40,
-                                   width: 90,
-                                   
+                                    height: 40,
+                                    width: 90,
                                     decoration: BoxDecoration(
-                                      color: greenColor, // Optional: change or remove for transparent
+                                      color:
+                                          greenColor, // Optional: change or remove for transparent
                                       borderRadius: BorderRadius.circular(12),
-                                      
                                     ),
                                     child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
-                                        Icon(Icons.phone, color: whiteColor,size: 16,),
+                                        Icon(
+                                          Icons.phone,
+                                          color: homepageWhite,
+                                          size: 16,
+                                        ),
                                         SizedBox(width: 10),
                                         Text(
                                           "Call",
                                           style: GoogleFonts.mulish(
-                                            color: whiteColor,
+                                            color: homepageWhite,
                                             fontSize: 16,
                                             fontWeight: FontWeight.w600,
                                           ),
@@ -357,22 +372,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                     }
                                   },
                                   child: Container(
-                                   height: 40,
-                                   width: 90,
+                                    height: 40,
+                                    width: 90,
                                     decoration: BoxDecoration(
                                       color: greenColor, // Optional background
                                       borderRadius: BorderRadius.circular(12),
-                                      
                                     ),
                                     child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
-                                        Icon(Icons.email, color: whiteColor,size: 16,),
+                                        Icon(
+                                          Icons.email,
+                                          color: homepageWhite,
+                                          size: 16,
+                                        ),
                                         SizedBox(width: 12),
                                         Text(
                                           "Email",
                                           style: GoogleFonts.mulish(
-                                            color: whiteColor,
+                                            color: homepageWhite,
                                             fontSize: 16,
                                             fontWeight: FontWeight.w600,
                                           ),
@@ -402,7 +421,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: Container(
                   padding: const EdgeInsets.only(top: 16, bottom: 16, left: 16),
                   decoration: BoxDecoration(
-                    color: ligtBlackColor,
+                    border: Border.all(
+                      color: Colors.grey.shade300, // light grey border
+                      width: 1,
+                    ),
+                    color: lightWhiteColor,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
@@ -412,8 +435,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         height: 36,
                         child: const Center(
                           child: Icon(
-                            Icons.headphones_outlined, // Updated icon for support
-                            color: whiteColor,
+                            Icons
+                                .headphones_outlined, // Updated icon for support
+                            color: blackColor,
                             size: 28,
                           ),
                         ),
@@ -427,13 +451,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           Text(
                             "Help", // Updated title
                             style: GoogleFonts.mulish(
-                              color: whiteColor,
+                              color: blackColor,
                               fontSize: 18,
                               fontWeight: FontWeight.w400,
                             ),
                           ),
                           SizedBox(height: 2),
-                          
                         ],
                       ),
                     ],
@@ -450,7 +473,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 child: Container(
                   padding: const EdgeInsets.only(top: 16, bottom: 16, left: 16),
                   decoration: BoxDecoration(
-                    color: ligtBlackColor, // dark background
+                    border: Border.all(
+                      color: Colors.grey.shade300, // light grey border
+                      width: 1,
+                    ),
+                    color: lightWhiteColor, // dark background
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
@@ -462,7 +489,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         child: const Center(
                           child: Icon(
                             Icons.logout, // Location icon
-                            color: whiteColor,
+                            color: blackColor,
                             size: 28,
                           ),
                         ),

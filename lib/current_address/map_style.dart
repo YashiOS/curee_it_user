@@ -1,10 +1,10 @@
-const String darkMapStyle = '''
+const String LightMapStyle = '''
 [
   {
     "elementType": "geometry",
     "stylers": [
       {
-        "color": "#242f3e"
+        "color": "#f4f4f4"
       }
     ]
   },
@@ -12,7 +12,7 @@ const String darkMapStyle = '''
     "elementType": "labels.text.fill",
     "stylers": [
       {
-        "color": "#746855"
+        "color": "#757575"
       }
     ]
   },
@@ -20,16 +20,29 @@ const String darkMapStyle = '''
     "elementType": "labels.text.stroke",
     "stylers": [
       {
-        "color": "#242f3e"
+        "color": "#ffffff"
       }
     ]
   },
+
+  /* Administrative / locality labels */
   {
     "featureType": "administrative.locality",
     "elementType": "labels.text.fill",
     "stylers": [
       {
-        "color": "#d59563"
+        "color": "#424242"
+      }
+    ]
+  },
+
+  /* POIs */
+  {
+    "featureType": "poi",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#ffffff"
       }
     ]
   },
@@ -38,43 +51,55 @@ const String darkMapStyle = '''
     "elementType": "labels.text.fill",
     "stylers": [
       {
+        "color": "#9e9e9e"
+      }
+    ]
+  },
+  {
+    "featureType": "poi.business",
+    "stylers": [
+      {
+        "visibility": "off"
+      }
+    ]
+  },
+
+  /* Parks */
+  {
+    "featureType": "poi.park",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#e4f2e8"
+      }
+    ]
+  },
+  {
+    "featureType": "poi.park",
+    "elementType": "labels.text.fill",
+    "stylers": [
+      {
+        "color": "#7cb342"
+      }
+    ]
+  },
+
+  /* Roads - base */
+  {
+    "featureType": "road",
+    "elementType": "geometry",
+    "stylers": [
+      {
         "color": "#ffffff"
       }
     ]
   },
   {
-    "featureType": "poi.park",
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#263c3f"
-      }
-    ]
-  },
-  {
-    "featureType": "poi.park",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#6b9a76"
-      }
-    ]
-  },
-  {
-    "featureType": "road",
-    "elementType": "geometry",
-    "stylers": [
-      {
-        "color": "#38414e"
-      }
-    ]
-  },
-  {
     "featureType": "road",
     "elementType": "geometry.stroke",
     "stylers": [
       {
-        "color": "#212a37"
+        "color": "#e0e0e0"
       }
     ]
   },
@@ -83,16 +108,40 @@ const String darkMapStyle = '''
     "elementType": "labels.text.fill",
     "stylers": [
       {
-        "color": "#9ca5b3"
+        "color": "#9e9e9e"
       }
     ]
   },
+
+  /* Local roads */
+  {
+    "featureType": "road.local",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#ffffff"
+      }
+    ]
+  },
+
+  /* Arterial roads */
+  {
+    "featureType": "road.arterial",
+    "elementType": "geometry",
+    "stylers": [
+      {
+        "color": "#fdf3e7"   // slight warm tint like Swiggy
+      }
+    ]
+  },
+
+  /* Highways */
   {
     "featureType": "road.highway",
     "elementType": "geometry",
     "stylers": [
       {
-        "color": "#746855"
+        "color": "#ffd7a2"   // highlighted highway
       }
     ]
   },
@@ -101,7 +150,7 @@ const String darkMapStyle = '''
     "elementType": "geometry.stroke",
     "stylers": [
       {
-        "color": "#1f2835"
+        "color": "#f5b971"
       }
     ]
   },
@@ -110,34 +159,28 @@ const String darkMapStyle = '''
     "elementType": "labels.text.fill",
     "stylers": [
       {
-        "color": "#f3d19c"
+        "color": "#ff8f00"
       }
     ]
   },
+
+  /* Transit (usually subtle or hidden) */
   {
     "featureType": "transit",
-    "elementType": "geometry",
     "stylers": [
       {
-        "color": "#2f3948"
+        "visibility": "off"
       }
     ]
   },
-  {
-    "featureType": "transit.station",
-    "elementType": "labels.text.fill",
-    "stylers": [
-      {
-        "color": "#d59563"
-      }
-    ]
-  },
+
+  /* Water */
   {
     "featureType": "water",
     "elementType": "geometry",
     "stylers": [
       {
-        "color": "#17263c"
+        "color": "#d6e8ff"
       }
     ]
   },
@@ -146,47 +189,18 @@ const String darkMapStyle = '''
     "elementType": "labels.text.fill",
     "stylers": [
       {
-        "color": "#515c6d"
+        "color": "#90a4ae"
       }
     ]
   },
+
+  /* Buildings (landmarks) */
   {
-    "featureType": "water",
-    "elementType": "labels.text.stroke",
-    "stylers": [
-      {
-        "color": "#17263c"
-      }
-    ]
-  },
-  // Add these building-specific styles
-  {
-    "featureType": "building",
+    "featureType": "poi.attraction",
     "elementType": "geometry",
     "stylers": [
       {
-        "color": "#242f3e"  // Dark color for building sides
-      }
-    ]
-  },
-  {
-    "featureType": "building",
-    "elementType": "geometry.fill",
-    "stylers": [
-      {
-        "color": "#6a6a6a"  // Grey color for building roofs
-      },
-      {
-        "lightness": 50
-      }
-    ]
-  },
-  {
-    "featureType": "building",
-    "elementType": "labels",
-    "stylers": [
-      {
-        "visibility": "off"  // Hide building labels if needed
+        "color": "#f0f0f0"
       }
     ]
   }

@@ -25,12 +25,12 @@ class OrdersScreen extends ConsumerWidget {
     });
 
     return Scaffold(
-      backgroundColor: scaffoldBlackColor,
+      backgroundColor:WhiteColor,
       appBar: AppBar(
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: true,
-        backgroundColor: ligtBlackColor,
+        backgroundColor: WhiteColor,
         shape: const ContinuousRectangleBorder(
           borderRadius: BorderRadius.only(
             bottomLeft: Radius.circular(10),
@@ -40,9 +40,9 @@ class OrdersScreen extends ConsumerWidget {
         title: Text(
           "Order Again",
           style: GoogleFonts.mulish(
-            fontWeight: FontWeight.w400,
+            fontWeight: FontWeight.w500,
             fontSize: 22.69,
-            color: whiteColor,
+            color: blackColor,
           ),
         ),
         leading: GestureDetector(
@@ -89,41 +89,34 @@ class OrdersScreen extends ConsumerWidget {
               : Container(
                   margin: EdgeInsets.only(
                     top: 12,
-                    bottom: MediaQuery.of(context).size.height * 0.03,
+                    bottom: MediaQuery.of(context).size.height * 0.11,
                   ),
+                  
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.height,
-                  color: scaffoldBlackColor,
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                      top: 6.0,
-                      left: 18,
-                      right: 18,
-                      bottom: 60,
-                    ),
-                    child: ListView.builder(
-                      itemCount: orderState.allOrders.length,
-                      itemBuilder: (context, index) {
-                        final order = orderState.allOrders[index];
-                        return GestureDetector(
-                          onTap: () async {
-                            await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => OrderTrackingScreen(
-                                  NavigatingFrom: "Order History",
-                                  orderId: order.availableId,
-                                ),
+                  color: textFieldFillColor,
+                  child: ListView.builder(
+                    itemCount: orderState.allOrders.length,
+                    itemBuilder: (context, index) {
+                      final order = orderState.allOrders[index];
+                      return GestureDetector(
+                        onTap: () async {
+                          await Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => OrderTrackingScreen(
+                                NavigatingFrom: "Order History",
+                                orderId: order.availableId,
                               ),
-                            );                         
-                          },
-                          child: OrderCard(
-                            AvailorderId: order.availableId,                         
-                            orderData:order,
-                          ),
-                        );
-                      },
-                    ),
+                            ),
+                          );                         
+                        },
+                        child: OrderCard(
+                          AvailorderId: order.availableId,                         
+                          orderData:order,
+                        ),
+                      );
+                    },
                   ),
                 ),
     );

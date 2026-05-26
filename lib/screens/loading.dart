@@ -20,10 +20,10 @@ class _LoadingScreenState extends State<LoadingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: scaffoldBlackColor,
+      backgroundColor:  scaffoldWhiteColor,
       body: Center(
         child: CircularProgressIndicator(
-          color: whiteColor,
+          color: blackColor,
         )
       ),
     );

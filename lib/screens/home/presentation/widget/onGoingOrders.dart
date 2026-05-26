@@ -1,4 +1,5 @@
 import 'package:cureeit_user_app/screens/home/domain/entities/orderEntity.dart';
+import 'package:cureeit_user_app/screens/order_tracking_screen.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -38,11 +39,15 @@ class _OngoingOrdersSectionState extends State<OngoingOrdersSection> {
 
     return Container(
       height: 84,
-      margin: const EdgeInsets.only(top: 8),
-      decoration: BoxDecoration(
-        color: ligtBlackColor,
-        borderRadius: BorderRadius.circular(8),
-      ),
+     decoration: BoxDecoration(
+  color: lightGreenColor,
+  borderRadius: BorderRadius.circular(8),
+  border: Border.all(
+    color: Colors.lightGreen.withOpacity(0.1), // or use your custom light green color
+    width: 1,
+  ),
+),
+
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -70,7 +75,15 @@ class _OngoingOrdersSectionState extends State<OngoingOrdersSection> {
 
                 return GestureDetector(
                   onTap: () {
-                    // TODO: Navigate to order tracking screen
+                    Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => OrderTrackingScreen(
+                                NavigatingFrom: "Order History",
+                                orderId: order.availableId,
+                              ),
+                            ),
+                          );              
                   },
                   child: Container(
                     padding: const EdgeInsets.only(
@@ -85,7 +98,7 @@ class _OngoingOrdersSectionState extends State<OngoingOrdersSection> {
                             Text(
                               status,
                               style: GoogleFonts.mulish(
-                                color: whiteColor,
+                                color: blackColor,
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
                               ),
@@ -132,7 +145,7 @@ class _OngoingOrdersSectionState extends State<OngoingOrdersSection> {
                 width: 4,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: _currentPage == index ? Colors.white : Colors.grey,
+                  color: _currentPage == index ? Colors.grey :Colors.white ,
                   shape: BoxShape.circle,
                 ),
               );

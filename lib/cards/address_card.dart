@@ -24,7 +24,7 @@ class AddressCard extends StatelessWidget {
           ),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
-            color: ligtBlackColor,
+            color: lightWhiteColor,
           ),
           margin: EdgeInsets.only(bottom: 16),
           child: Center(
@@ -39,7 +39,7 @@ class AddressCard extends StatelessWidget {
                   Container(
                     // Space between icon and text
                     decoration: BoxDecoration(
-                      color: ligtBlackColor,
+                      color: lightWhiteColor,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Container(
@@ -62,7 +62,7 @@ class AddressCard extends StatelessWidget {
                           style: GoogleFonts.mulish(
                             fontSize: 15,
                             fontWeight: FontWeight.w500,
-                            color: whiteColor,
+                            color: blackColor,
                           ),
                         ),
                         SizedBox(height: 2), // Space between title and subtitle
@@ -71,7 +71,7 @@ class AddressCard extends StatelessWidget {
                           style: GoogleFonts.mulish(
                             fontSize: 13,
                             fontWeight: FontWeight.w300,
-                            color: whiteColor,
+                            color: blackColor,
                           ),
                         ),
                       ],
@@ -85,7 +85,7 @@ class AddressCard extends StatelessWidget {
                     margin:
                         EdgeInsets.only(left: 8), // Space before trailing widget
                     decoration: BoxDecoration(
-                      color: isSelected ? greenColor : scaffoldBlackColor,
+                      color: isSelected ? greenColor :  scaffoldWhiteColor,
                       shape: BoxShape.circle,
                     ),
                   ),
@@ -101,7 +101,7 @@ class AddressCard extends StatelessWidget {
         child: Container(
           padding: EdgeInsets.symmetric(vertical: 15, horizontal: 10),
           decoration: BoxDecoration(
-            color: ligtBlackColor,
+            color: lightWhiteColor,
             borderRadius: BorderRadius.circular(8),
           ),
           child: Row(
@@ -118,7 +118,7 @@ class AddressCard extends StatelessWidget {
                       Text(
                         address['type'],
                         style: GoogleFonts.mulish(
-                          color: whiteColor,
+                          color: blackColor,
                           fontSize: 17,
                           fontWeight: FontWeight.w600,
                         ),
@@ -128,7 +128,7 @@ class AddressCard extends StatelessWidget {
                         child: Text(
                           address['address'],
                           style: GoogleFonts.mulish(
-                            color: whiteColor,
+                            color: blackColor,
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
                           ),
@@ -145,7 +145,7 @@ class AddressCard extends StatelessWidget {
                     margin: EdgeInsets.only(
                         left: 8), // Space before trailing widget
                     decoration: BoxDecoration(
-                      color:isSelected? greenColor:scaffoldBlackColor,
+                      color:isSelected? greenColor: scaffoldWhiteColor,
                       shape: BoxShape.circle,
                     ),
                   ),

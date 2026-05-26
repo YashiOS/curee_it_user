@@ -45,7 +45,7 @@ class _PoliciesScreenState extends State<PoliciesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: scaffoldBlackColor,
+      backgroundColor:  scaffoldWhiteColor,
       appBar: AppBar(
         scrolledUnderElevation: 0,
         elevation: 0,
@@ -59,9 +59,9 @@ class _PoliciesScreenState extends State<PoliciesScreen> {
         title: Text(
           "Policies",
           style: GoogleFonts.mulish(
-              color: whiteColor, fontSize: 22.69, fontWeight: FontWeight.w400),
+              color: blackColor, fontSize: 22.69, fontWeight: FontWeight.w400),
         ),
-        backgroundColor: ligtBlackColor,
+        backgroundColor: lightWhiteColor,
         leading: GestureDetector(
           onTap: () {
             Navigator.pop(context);

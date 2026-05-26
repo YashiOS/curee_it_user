@@ -76,7 +76,7 @@ class _OrderCardState extends State<OrderAcceptedCard> {
                         style: GoogleFonts.mulish(
                           fontWeight: FontWeight.w700,
                           fontSize: 13,
-                          color: whiteColor,
+                          color: blackColor,
                         ),
                       ),
                       Text(
@@ -120,7 +120,7 @@ class _OrderCardState extends State<OrderAcceptedCard> {
                           style: GoogleFonts.mulish(
                             fontWeight: FontWeight.bold,
                             fontSize: 12,
-                            color: whiteColor,
+                            color: blackColor,
                           ),
                         ),
                       ],
@@ -152,7 +152,7 @@ class _OrderCardState extends State<OrderAcceptedCard> {
                             style: GoogleFonts.mulish(
                               fontWeight: FontWeight.w300,
                               fontSize: 13.78,
-                              color: whiteColor,
+                              color: blackColor,
                             ),
                           ),
                         ],

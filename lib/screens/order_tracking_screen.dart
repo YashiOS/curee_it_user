@@ -313,7 +313,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor: scaffoldBlackColor,
+      backgroundColor:  scaffoldWhiteColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
       ),
@@ -334,7 +334,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                 width: width * 0.15,
                 height: height * 0.006,
                 decoration: BoxDecoration(
-                  color: whiteColor,
+                  color: blackColor,
                   borderRadius: BorderRadius.circular(width * 0.02),
                 ),
               ),
@@ -345,7 +345,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                   "${orderTrackingDetails["orderId"] ?? ""}",
                   style: GoogleFonts.mulish(
                     fontSize: 13.78,
-                    color: whiteColor,
+                    color: blackColor,
                   ),
                   textAlign: TextAlign.start,
                 ),
@@ -356,7 +356,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                   Text(
                     formatDate(orderTrackingDetails['createdAt'] ?? ""),
                     style: GoogleFonts.mulish(
-                        fontSize: width * 0.035, color: whiteColor),
+                        fontSize: width * 0.035, color: blackColor),
                   ),
                 ],
               ),
@@ -394,7 +394,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                             style: GoogleFonts.mulish(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w300,
-                                color: whiteColor),
+                                color: blackColor),
                           ),
                         ],
                       ),
@@ -409,7 +409,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                           style: GoogleFonts.mulish(
                               fontSize: 14,
                               fontWeight: FontWeight.w400,
-                              color: whiteColor),
+                              color: blackColor),
                         ),
                       ],
                     ),
@@ -479,7 +479,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                       style: GoogleFonts.mulish(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
-                        color: whiteColor,
+                        color: blackColor,
                       ),
                     ),
                     Text(
@@ -487,7 +487,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                       style: GoogleFonts.mulish(
                           fontWeight: FontWeight.bold,
                           fontSize: 15,
-                          color: whiteColor),
+                          color: blackColor),
                     ),
                   ],
                 ),
@@ -511,18 +511,18 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
         Container(
           padding: EdgeInsets.all(width * 0.025),
           decoration: BoxDecoration(
-            color: ligtBlackColor,
+            color: lightWhiteColor,
             shape: BoxShape.circle,
           ),
           child: title == "Delivery"
               ? Container(
                   height: 24,
                   width: 24,
-                  child: Image.asset("lib/images/Home.png", color: whiteColor))
+                  child: Image.asset("lib/images/Home.png", color: blackColor))
               : Icon(
                   icon,
                   size: width * 0.06,
-                  color: whiteColor,
+                  color: blackColor,
                 ),
         ),
         SizedBox(width: width * 0.04),
@@ -537,7 +537,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                       0.04, // ~17 on 375px width
 
                   fontWeight: FontWeight.w700,
-                  color: whiteColor,
+                  color: blackColor,
                 ),
               ),
               Text(
@@ -567,7 +567,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
       label,
       style: GoogleFonts.mulish(
         fontWeight: FontWeight.w600,
-        color: isInactive ? greyColor : whiteColor,
+        color: isInactive ? greyColor : blackColor,
         fontSize: size * 0.03,
       ),
     );
@@ -588,7 +588,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
       margin: EdgeInsets.symmetric(vertical: height * 0.01),
       padding: EdgeInsets.only(top: width * 0.03, bottom: width * 0.03),
       decoration: BoxDecoration(
-        color: scaffoldBlackColor,
+        color:  scaffoldWhiteColor,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -602,7 +602,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                   style: GoogleFonts.mulish(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
-                      color: whiteColor),
+                      color: blackColor),
                 ),
                 SizedBox(height: height * 0.005),
                 Text(
@@ -619,7 +619,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
           Text(
             "₹ ${total.toStringAsFixed(2)}",
             style: GoogleFonts.mulish(
-              color: whiteColor,
+              color: blackColor,
               fontSize: width * 0.04,
               fontWeight: FontWeight.bold,
             ),
@@ -748,18 +748,18 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     if (_isInitLoading) {
       return Center(
           child: CircularProgressIndicator(
-        color: whiteColor,
+        color: blackColor,
       ));
     }
 
     if (orderTrackingDetails["status"] == "Not Available" ||
         orderTrackingDetails["status"] == "Rejected") {
       return Scaffold(
-        backgroundColor: scaffoldBlackColor,
+        backgroundColor:  scaffoldWhiteColor,
         body: _isInitLoading
             ? Center(
                 child: CircularProgressIndicator(
-                  color: whiteColor,
+                  color: blackColor,
                 ),
               )
             : Container(
@@ -799,7 +799,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                               style: GoogleFonts.mulish(
                                 fontSize: 26,
                                 fontWeight: FontWeight.bold,
-                                color: whiteColor,
+                                color: blackColor,
                               ),
                             ),
                           ),
@@ -834,11 +834,11 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
         : (vendorLng ?? 0.0).toDouble();
 
     return Scaffold(
-      backgroundColor: scaffoldBlackColor,
+      backgroundColor:  scaffoldWhiteColor,
       body: _isInitLoading
           ? Center(
               child: CircularProgressIndicator(
-                color: whiteColor,
+                color: blackColor,
               ),
             )
           : Stack(
@@ -927,7 +927,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                     },
                     child: Icon(
                       Icons.close,
-                      color: scaffoldBlackColor,
+                      color:  scaffoldWhiteColor,
                       size: width * 0.06,
                     ),
                   ),
@@ -946,7 +946,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                       child: Text(
                         "Arriving in 7 min",
                         style: GoogleFonts.mulish(
-                            color: whiteColor, fontWeight: FontWeight.w700),
+                            color: homepageWhite, fontWeight: FontWeight.w700),
                       ),
                     ),
                   ),
@@ -959,7 +959,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                       height: height * 0.3, // Adjust this value as needed
                       padding: EdgeInsets.all(width * 0.04),
                       decoration: BoxDecoration(
-                        color: ligtBlackColor,
+                        color: lightWhiteColor,
                         borderRadius:
                             BorderRadius.vertical(top: Radius.circular(8)),
                         boxShadow: [
@@ -1002,7 +1002,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                                     margin: EdgeInsets.only(top: 7),
                                     child: Divider(
                                       thickness: 1,
-                                      color: ligtBlackColor,
+                                      color: lightWhiteColor,
                                     ),
                                   ),
                                 ),
@@ -1027,7 +1027,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                                     margin: EdgeInsets.only(top: 7),
                                     child: Divider(
                                       thickness: 1,
-                                      color: ligtBlackColor,
+                                      color: lightWhiteColor,
                                     ),
                                   ),
                                 ),
@@ -1047,7 +1047,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                                   child: Container(
                                     margin: EdgeInsets.only(top: 7),
                                     child: Divider(
-                                        thickness: 1, color: ligtBlackColor),
+                                        thickness: 1, color: lightWhiteColor),
                                   ),
                                 ),
                                 DeliveryStatus(
@@ -1178,7 +1178,7 @@ class CustomInfoWindow extends StatelessWidget {
       width: width * 0.8,
       padding: EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: ligtBlackColor,
+        color: lightWhiteColor,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
@@ -1201,7 +1201,7 @@ class CustomInfoWindow extends StatelessWidget {
                 style: GoogleFonts.mulish(
                   fontSize: 16,
                   fontWeight: FontWeight.bold,
-                  color: whiteColor,
+                  color: blackColor,
                 ),
               ),
               if (onCallPressed != null && phoneNumber != null)
@@ -1225,7 +1225,7 @@ class CustomInfoWindow extends StatelessWidget {
               "Contact: $phoneNumber",
               style: GoogleFonts.mulish(
                 fontSize: 14,
-                color: whiteColor,
+                color: blackColor,
               ),
             ),
           ],

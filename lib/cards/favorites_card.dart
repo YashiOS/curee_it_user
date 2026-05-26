@@ -202,7 +202,7 @@ class _FavoritesCardState extends State<FavoritesCard> {
                       horizontal: MediaQuery.of(context).size.width * 0.04,
                       vertical: 10),
                   decoration: BoxDecoration(
-                    color: ligtBlackColor,
+                    color: lightWhiteColor,
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
@@ -227,21 +227,21 @@ class _FavoritesCardState extends State<FavoritesCard> {
                                           return child;
                                         return Center(
                                           child: CircularProgressIndicator(
-                                              color: whiteColor),
+                                              color: blackColor),
                                         );
                                       },
                                       errorBuilder:
                                           (context, error, stackTrace) {
                                         return Center(
                                           child: Icon(Icons.error,
-                                              color: whiteColor),
+                                              color: blackColor),
                                         );
                                       },
                                     )
                                   : Icon(
                                       Icons.image,
                                       size: iconSize,
-                                      color: whiteColor,
+                                      color: blackColor,
                                     ),
                             ),
                           ),
@@ -262,7 +262,7 @@ class _FavoritesCardState extends State<FavoritesCard> {
                                     style: GoogleFonts.mulish(
                                       fontWeight: FontWeight.w600,
                                       fontSize: constraints.maxWidth * 0.045,
-                                      color: whiteColor,
+                                      color: blackColor,
                                     ),
                                   ),
                                 ),
@@ -282,7 +282,7 @@ class _FavoritesCardState extends State<FavoritesCard> {
                                         ? Container(
                                             width: 15,
                                             height: 15,
-                                            child: CircularProgressIndicator(color: whiteColor,strokeWidth: 2,)
+                                            child: CircularProgressIndicator(color: blackColor,strokeWidth: 2,)
                                           )
                                         : Text(
                                             "Add to cart",
@@ -290,7 +290,7 @@ class _FavoritesCardState extends State<FavoritesCard> {
                                               fontWeight: FontWeight.w900,
                                               fontSize:
                                                   constraints.maxWidth * 0.03,
-                                              color: whiteColor,
+                                              color: blackColor,
                                             ),
                                           ),
                                   ),

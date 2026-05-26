@@ -39,9 +39,11 @@ class OrderCard extends ConsumerWidget {
       padding: const EdgeInsets.only(top: 16),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+        margin: EdgeInsets.only(left: 18,right: 18),
         decoration: BoxDecoration(
+          
           borderRadius: BorderRadius.circular(8),
-          color: ligtBlackColor,
+          color: lightWhiteColor,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -60,8 +62,8 @@ class OrderCard extends ConsumerWidget {
                         maxLines: 1,
                         style: GoogleFonts.mulish(
                           fontSize: 17.02,
-                          fontWeight: FontWeight.w500,
-                          color: whiteColor,
+                          fontWeight: FontWeight.w600,
+                          color: blackColor,
                         ),
                       ),
                     ),
@@ -81,7 +83,7 @@ class OrderCard extends ConsumerWidget {
                     style: GoogleFonts.mulish(
                       fontWeight: FontWeight.w500,
                       fontSize: 17,
-                      color: whiteColor,
+                      color: blackColor,
                     ),
                   ),
               ],
@@ -125,10 +127,10 @@ class OrderCard extends ConsumerWidget {
                               orderStatus == "" ||
                               orderStatus == "Available"
                           ? greenColor
-                          : ligtBlackColor,
+                          : lightWhiteColor,
                       border: orderStatus != "Delivered"
                           ? Border.all(color: greenColor, width: 1)
-                          : Border.all(color: Colors.transparent, width: 0),
+                          : Border.all(color: Colors.white, width: 0),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -140,7 +142,7 @@ class OrderCard extends ConsumerWidget {
                         color: orderStatus == "Delivered" ||
                                 orderStatus == "" ||
                                 orderStatus == "Available"
-                            ? whiteColor
+                            ? Colors.white
                             : greenColor,
                       ),
                     ),

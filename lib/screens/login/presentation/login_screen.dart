@@ -133,7 +133,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       resizeToAvoidBottomInset: false,
       body: SingleChildScrollView(
         child: Container(
-          color: scaffoldBlackColor,
+          color:  WhiteColor,
           width: screenWidth,
           height: screenHeight,
           child: Stack(
@@ -155,7 +155,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     Text(
                       "10-minute medicine delivery",
                       style: GoogleFonts.mulish(
-                        color: whiteColor,
+                        color: blackColor,
+                        fontWeight: FontWeight.w500,
                         fontSize: screenHeight * 0.022,
                       ),
                     ),
@@ -163,7 +164,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                     Container(
                       width: screenWidth * 0.85,
                       decoration: BoxDecoration(
-                        color: const Color(0xFF1A1A1A),
+                        color: textFieldFillColor,
                         borderRadius: BorderRadius.circular(8),
                       ),
                       padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
@@ -172,7 +173,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           Text(
                             "+91 ",
                             style: GoogleFonts.mulish(
-                              color: whiteColor, 
+                              color: blackColor, 
                               fontSize: 16
                             ),
                           ),
@@ -180,7 +181,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             child: TextField(
                               cursorColor: greenColor,
                               controller: _controller,
-                              style: GoogleFonts.mulish(color: whiteColor),
+                              style: GoogleFonts.mulish(color: blackColor),
                               keyboardType: TextInputType.phone,
                               maxLength: 10,
                               decoration: InputDecoration(
@@ -210,7 +211,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             style: TextButton.styleFrom(
                               backgroundColor: _isButtonEnabled
                                   ? greenColor
-                                  : scaffoldBlackColor,
+                                  :  WhiteColor,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
                                 side: BorderSide(
@@ -224,7 +225,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                     height: 10,
                                     width: 10,
                                     child: CircularProgressIndicator(
-                                      color: whiteColor,
+                                      color: lightWhiteColor,
                                       strokeWidth: 2,
                                     ),
                                   )
@@ -232,7 +233,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                     "Next",
                                     style: GoogleFonts.mulish(
                                       color: _isButtonEnabled
-                                          ? whiteColor
+                                          ? lightWhiteColor
                                           : greenColor,
                                       fontSize: screenHeight * 0.018,
                                       fontWeight: FontWeight.bold,
@@ -248,7 +249,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         Expanded(
                           child: RichText(
                             text: TextSpan(
-                              style: TextStyle(color: whiteColor, fontSize: 12),
+                              style: TextStyle(color: blackColor, fontSize: 12),
                               children: [
                                 TextSpan(
                                   text: "By clicking next, I accept the ",

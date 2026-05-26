@@ -169,7 +169,7 @@ class _OtpScreenContentState extends ConsumerState<_OtpScreenContent> {
     return Container(
       width: screenWidth,
       height: screenHeight,
-      color: scaffoldBlackColor,
+      color:  WhiteColor,
       child: Stack(
         children: [
           Padding(
@@ -189,9 +189,9 @@ class _OtpScreenContentState extends ConsumerState<_OtpScreenContent> {
                 Text(
                   "10-minute medicine delivery",
                   style: GoogleFonts.mulish(
-                    color: whiteColor,
+                    color: blackColor,
                     fontSize: screenHeight * 0.022,
-                    fontWeight: FontWeight.w400,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
                 SizedBox(height: screenHeight * 0.12),
@@ -210,9 +210,9 @@ class _OtpScreenContentState extends ConsumerState<_OtpScreenContent> {
                       child: TextButton(
                         onPressed: state.isLoading ? null : _submitOtp,
                         style: TextButton.styleFrom(
-                          backgroundColor: otpEntered && !state.isLoading
+                          backgroundColor: otpEntered
                               ? greenColor
-                              : scaffoldBlackColor,
+                              :  WhiteColor,
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                             side: BorderSide(
@@ -226,14 +226,14 @@ class _OtpScreenContentState extends ConsumerState<_OtpScreenContent> {
                                 height: 10,
                                 width: 10,
                                 child: const CircularProgressIndicator(
-                                  color: whiteColor,
+                                  color: lightWhiteColor,
                                   strokeWidth: 2,
                                 ),
                               )
                             : Text(
                                 "Next",
                                 style: GoogleFonts.mulish(
-                                  color: otpEntered ? whiteColor : greenColor,
+                                  color: otpEntered ?lightWhiteColor : greenColor,
                                   fontSize: screenHeight * 0.018,
                                   fontWeight: FontWeight.bold,
                                 ),

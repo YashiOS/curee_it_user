@@ -1,4 +1,5 @@
 import 'package:cureeit_user_app/screens/home/domain/entities/addressEntity.dart';
+import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -13,7 +14,7 @@ class AddressSelectorBottomSheet {
       isScrollControlled: true,
       isDismissible: false,
       enableDrag: false,
-      backgroundColor: Colors.black,
+      backgroundColor:  scaffoldWhiteColor,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -60,7 +61,7 @@ class _AddressSelectorContentState extends State<AddressSelectorContent> {
           Text(
             "Select Delivery Location",
             style: GoogleFonts.mulish(
-              color: Colors.white,
+              color: blackColor,
               fontSize: 17,
               fontWeight: FontWeight.w600,
             ),
@@ -87,13 +88,18 @@ class _AddressSelectorContentState extends State<AddressSelectorContent> {
                     padding: const EdgeInsets.only(left: 25, right: 16),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(8),
-                      color: Colors.grey[900],
+                      color:  scaffoldWhiteColor,
+                      border: Border.all(
+                        color: Colors.grey.shade300, // light grey
+                        width: 2, // adjust thickness if you want
+                      ),
                     ),
                     margin: const EdgeInsets.only(bottom: 16),
                     height: 75,
                     child: Row(
                       children: [
-                        const Icon(Icons.location_on, color: Colors.greenAccent),
+                        const Icon(Icons.location_on,
+                            color: Colors.greenAccent),
                         const SizedBox(width: 16),
                         Expanded(
                           child: Column(
@@ -105,7 +111,7 @@ class _AddressSelectorContentState extends State<AddressSelectorContent> {
                                 style: GoogleFonts.mulish(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w500,
-                                  color: Colors.white,
+                                  color: blackColor,
                                 ),
                               ),
                               const SizedBox(height: 2),
@@ -114,7 +120,7 @@ class _AddressSelectorContentState extends State<AddressSelectorContent> {
                                 style: GoogleFonts.mulish(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w300,
-                                  color: Colors.white,
+                                  color: greyColor,
                                 ),
                               ),
                             ],
@@ -125,7 +131,7 @@ class _AddressSelectorContentState extends State<AddressSelectorContent> {
                           height: 16,
                           margin: const EdgeInsets.only(left: 8),
                           decoration: BoxDecoration(
-                            color: isSelected ? Colors.green : Colors.black,
+                            color: isSelected ? greenColor : Colors.black,
                             shape: BoxShape.circle,
                           ),
                         ),

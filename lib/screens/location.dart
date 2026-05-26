@@ -89,12 +89,12 @@ class _LocationScreenState extends State<LocationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: ligtBlackColor,
+        backgroundColor: lightWhiteColor,
         appBar: AppBar(
           scrolledUnderElevation: 0,
             elevation: 0,
           centerTitle: true,
-          backgroundColor: ligtBlackColor,
+          backgroundColor: lightWhiteColor,
           shape: ContinuousRectangleBorder(
             borderRadius: BorderRadius.only(
               bottomLeft: Radius.circular(10),
@@ -106,7 +106,7 @@ class _LocationScreenState extends State<LocationScreen> {
             style: GoogleFonts.mulish(
                 fontWeight: FontWeight.w400,
                 fontSize: 22.69,
-                color: whiteColor),
+                color: blackColor),
           ),
           leading: GestureDetector(
             onTap: () {
@@ -120,7 +120,7 @@ class _LocationScreenState extends State<LocationScreen> {
                   spacing: 4,
                   children: [SvgPicture.asset(
                     colorFilter:
-                        ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                        ColorFilter.mode(blackColor, BlendMode.srcIn),
                     "lib/images/back.svg",
                     width: 24, // optional
                     height: 24, // optional
@@ -132,7 +132,7 @@ class _LocationScreenState extends State<LocationScreen> {
         ),
         body: Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-          color: scaffoldBlackColor,
+          color:  scaffoldWhiteColor,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -147,7 +147,7 @@ class _LocationScreenState extends State<LocationScreen> {
                 child: Container(
                   padding: const EdgeInsets.only(top: 8, bottom: 8, left: 8),
                   decoration: BoxDecoration(
-                    color: ligtBlackColor, // dark background
+                    color: lightWhiteColor, // dark background
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
@@ -167,7 +167,7 @@ class _LocationScreenState extends State<LocationScreen> {
                         child: Text(
                           "Search for your location",
                           style: GoogleFonts.mulish(
-                            color: whiteColor,
+                            color: blackColor,
                             fontWeight: FontWeight.w300,
                             fontSize: 17,
                           ),
@@ -188,7 +188,7 @@ class _LocationScreenState extends State<LocationScreen> {
                   style: GoogleFonts.mulish(
                     fontSize: 18,
                     fontWeight: FontWeight.w500,
-                    color: whiteColor,
+                    color: blackColor,
                   ),
                 ),
               ),
@@ -200,7 +200,7 @@ class _LocationScreenState extends State<LocationScreen> {
                   
                   child:fetchingAddress?Center(
                     child: CircularProgressIndicator(
-                      color: whiteColor,
+                      color: blackColor,
                     ),
                   ): addresses.isEmpty
                       ? Center(
@@ -237,7 +237,7 @@ class _LocationScreenState extends State<LocationScreen> {
                                       ),
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(8),
-                                        color: ligtBlackColor,
+                                        color: lightWhiteColor,
                                       ),
                                       margin: EdgeInsets.only(bottom: 16),
                                       child: Container(
@@ -253,7 +253,7 @@ class _LocationScreenState extends State<LocationScreen> {
                                             Container(
                                               // Space between icon and text
                                               decoration: BoxDecoration(
-                                                color: ligtBlackColor,
+                                                color: lightWhiteColor,
                                                 borderRadius:
                                                     BorderRadius.circular(8),
                                               ),
@@ -279,7 +279,7 @@ class _LocationScreenState extends State<LocationScreen> {
                                                       fontSize: 15,
                                                       fontWeight:
                                                           FontWeight.w500,
-                                                      color: whiteColor,
+                                                      color: blackColor,
                                                     ),
                                                   ),
                                                   SizedBox(
@@ -291,7 +291,7 @@ class _LocationScreenState extends State<LocationScreen> {
                                                       fontSize: 13,
                                                       fontWeight:
                                                           FontWeight.w300,
-                                                      color: whiteColor,
+                                                      color: blackColor,
                                                     ),
                                                   ),
                                                 ],
@@ -308,7 +308,7 @@ class _LocationScreenState extends State<LocationScreen> {
                                               decoration: BoxDecoration(
                                                 color: isSelected
                                                     ? greenColor
-                                                    : scaffoldBlackColor,
+                                                    :  scaffoldWhiteColor,
                                                 shape: BoxShape.circle,
                                               ),
                                             ),

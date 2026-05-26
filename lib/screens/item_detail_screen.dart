@@ -303,7 +303,7 @@ _debounceTimer=Timer(Duration(seconds: 1), ()async{
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: scaffoldBlackColor,
+      backgroundColor:  scaffoldWhiteColor,
       appBar: AppBar(
         scrolledUnderElevation: 0,
         elevation: 0,
@@ -317,9 +317,9 @@ _debounceTimer=Timer(Duration(seconds: 1), ()async{
         title: Text(
           "Medicine Details",
           style: GoogleFonts.mulish(
-              color: whiteColor, fontSize: 22.69, fontWeight: FontWeight.w400),
+              color: blackColor, fontSize: 22.69, fontWeight: FontWeight.w400),
         ),
-        backgroundColor: ligtBlackColor,
+        backgroundColor: lightWhiteColor,
         leading: GestureDetector(
           onTap: () {
             Navigator.pop(context);
@@ -350,7 +350,7 @@ _debounceTimer=Timer(Duration(seconds: 1), ()async{
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(
                   child: CircularProgressIndicator(
-                color: whiteColor,
+                color: blackColor,
               ));
             } else if (snapshot.hasError) {
               return Center(child: Text('Error: ${snapshot.error}'));
@@ -362,7 +362,7 @@ _debounceTimer=Timer(Duration(seconds: 1), ()async{
                   margin:
                       EdgeInsets.only(top: 24, right: 24, left: 24, bottom: 24),
                   decoration: BoxDecoration(
-                      color: ligtBlackColor,
+                      color: lightWhiteColor,
                       borderRadius: BorderRadius.circular(8)),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -384,7 +384,7 @@ _debounceTimer=Timer(Duration(seconds: 1), ()async{
                                 height: 203,
                                 margin: EdgeInsets.all(24),
                                 decoration: BoxDecoration(
-                                  color: whiteColor,
+                                  color: blackColor,
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 padding: EdgeInsets.only(bottom: 40),
@@ -410,14 +410,14 @@ _debounceTimer=Timer(Duration(seconds: 1), ()async{
                                                       return const Center(
                                                           child:
                                                               CircularProgressIndicator(
-                                                        color: whiteColor,
+                                                        color: blackColor,
                                                       ));
                                                     },
                                                     errorBuilder: (context, error,
                                                         stackTrace) {
                                                       return const Center(
                                                           child: Icon(Icons.error,
-                                                              color: whiteColor));
+                                                              color: blackColor));
                                                     },
                                                   ),
                                                 )
@@ -451,7 +451,7 @@ _debounceTimer=Timer(Duration(seconds: 1), ()async{
                               decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(8),
                                   color: _currentPage == index
-                                      ? whiteColor
+                                      ? blackColor
                                       : greyColor),
                             );
                           })),
@@ -469,7 +469,7 @@ _debounceTimer=Timer(Duration(seconds: 1), ()async{
                                     fontSize:
                                         MediaQuery.of(context).size.height *
                                             0.026,
-                                    color: whiteColor),
+                                    color: blackColor),
                               ),
                             ),
                           ],
@@ -485,7 +485,7 @@ _debounceTimer=Timer(Duration(seconds: 1), ()async{
                           style: GoogleFonts.mulish(
                             fontWeight: FontWeight.w300,
                             fontSize: 16,
-                            color: whiteColor,
+                            color: blackColor,
                           ),
                         ),
                       ),
@@ -494,7 +494,7 @@ _debounceTimer=Timer(Duration(seconds: 1), ()async{
                           height: 15,
                           child: Text(
                             "${product['marketer'] ?? 'Manufacturer not available'}",
-                            style: GoogleFonts.mulish(color: whiteColor),
+                            style: GoogleFonts.mulish(color: blackColor),
                           )),
                       SizedBox(
                         height: 20,
@@ -520,7 +520,7 @@ _debounceTimer=Timer(Duration(seconds: 1), ()async{
                             height: 18,
                             child: Text(
                               "${product['saltComposition'] ?? 'N/A'}",
-                              style: GoogleFonts.mulish(color: whiteColor),
+                              style: GoogleFonts.mulish(color: blackColor),
                             )),
                       if (product["saltComposition"] != null &&
                           product["saltComposition"] != "")
@@ -548,7 +548,7 @@ _debounceTimer=Timer(Duration(seconds: 1), ()async{
                             height: 18,
                             child: Text(
                               "${product['mainUse'] ?? ''}",
-                              style: GoogleFonts.mulish(color: whiteColor),
+                              style: GoogleFonts.mulish(color: blackColor),
                             )),
                       if (product["mainUse"] != null &&
                           product["mainUse"] != "")
@@ -572,7 +572,7 @@ _debounceTimer=Timer(Duration(seconds: 1), ()async{
                           margin: EdgeInsets.only(left: 24, top: 5, right: 24),
                           child: Text(
                             "${product['usageInstruction'] ?? ''}",
-                            style: GoogleFonts.mulish(color: whiteColor),
+                            style: GoogleFonts.mulish(color: blackColor),
                           ),
                         ),
                       Container(
@@ -603,7 +603,7 @@ _debounceTimer=Timer(Duration(seconds: 1), ()async{
                                       fontSize:
                                           MediaQuery.of(context).size.height *
                                               0.018,
-                                      color: whiteColor,
+                                      color: blackColor,
                                     ),
                                   ),
                                 ],
@@ -640,7 +640,7 @@ _debounceTimer=Timer(Duration(seconds: 1), ()async{
                                                   icon: Icon(
                                                     Icons.remove,
                                                     size: 20,
-                                                    color: whiteColor,
+                                                    color: blackColor,
                                                   ),
                                                   onPressed: () {
                                                     DidUpdateQuantity(
@@ -653,7 +653,7 @@ _debounceTimer=Timer(Duration(seconds: 1), ()async{
                                                         height: 10,
                                                         child:
                                                             CircularProgressIndicator(
-                                                          color: whiteColor,
+                                                          color: blackColor,
                                                           strokeWidth: 2,
                                                         ),
                                                       )
@@ -661,7 +661,7 @@ _debounceTimer=Timer(Duration(seconds: 1), ()async{
                                                         '${CartManager.cartQuantities[widget.productId] ?? 0}',
                                                         style:
                                                             GoogleFonts.mulish(
-                                                          color: whiteColor,
+                                                          color: blackColor,
                                                           fontWeight:
                                                               FontWeight.bold,
                                                           fontSize: 13,
@@ -673,7 +673,7 @@ _debounceTimer=Timer(Duration(seconds: 1), ()async{
                                                   icon: Icon(
                                                     Icons.add,
                                                     size: 20,
-                                                    color: whiteColor,
+                                                    color: blackColor,
                                                   ),
                                                   onPressed: () {
                                                     DidUpdateQuantity(
@@ -708,7 +708,7 @@ _debounceTimer=Timer(Duration(seconds: 1), ()async{
                                               ),
                                               child: Icon(
                                                 Icons.shopping_cart_outlined,
-                                                color: whiteColor,
+                                                color: blackColor,
                                               ),
                                             ),
                                           ),
@@ -722,7 +722,7 @@ _debounceTimer=Timer(Duration(seconds: 1), ()async{
                                         width: 156,
                                         height: 36,
                                         decoration: BoxDecoration(
-                                            color: ligtBlackColor,
+                                            color: lightWhiteColor,
                                             border: Border.all(
                                               color: greenColor,
                                               width: 1,
@@ -739,7 +739,7 @@ _debounceTimer=Timer(Duration(seconds: 1), ()async{
                                                 width: 10,
                                                 child:
                                                     CircularProgressIndicator(
-                                                  color: whiteColor,
+                                                  color: blackColor,
                                                   strokeWidth: 2,
                                                 ))
                                             : Text(

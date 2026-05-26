@@ -30,21 +30,28 @@ class ProductCard extends ConsumerWidget {
             quantity: 0,
             name: "",
             imageUrls: [],
-           productMarketer: "",
+            productMarketer: "",
             productPrice: 0,
             sellingPrice: 0,
           ),
         )
         .quantity;
 
-    final containerHeight = height * 0.45; 
+    final containerHeight = height * 0.45;
 
     return Container(
       width: 147,
       height: 202,
       decoration: BoxDecoration(
-        color: ligtBlackColor,
+        color: homepageWhite,
         borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.25), // light shadow
+            blurRadius: 6, // softness
+            offset: Offset(0, 2), // slight downward shadow
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -68,7 +75,7 @@ class ProductCard extends ConsumerWidget {
                 width: double.infinity,
                 height: 109,
                 decoration: BoxDecoration(
-                  color: whiteColor,
+                  color: scaffoldWhiteColor,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: product.imageMediaUrls[0] != null &&
@@ -77,13 +84,13 @@ class ProductCard extends ConsumerWidget {
                         product.imageMediaUrls[0],
                         fit: BoxFit.contain,
                         errorBuilder: (context, error, stackTrace) => Icon(
-                          Icons.image_not_supported,
+                          Icons.image,
                           size: containerHeight * 0.1,
                           color: Colors.grey.shade400,
                         ),
                       )
                     : Icon(
-                        Icons.image_not_supported,
+                        Icons.image,
                         size: containerHeight * 0.1,
                         color: Colors.grey.shade400,
                       ),
@@ -102,7 +109,8 @@ class ProductCard extends ConsumerWidget {
               overflow: TextOverflow.ellipsis,
               style: GoogleFonts.mulish(
                 fontSize: containerHeight * 0.04,
-                color: whiteColor,
+                fontWeight: FontWeight.w700,
+                color: blackColor,
               ),
             ),
           ),
@@ -120,7 +128,7 @@ class ProductCard extends ConsumerWidget {
                     Text(
                       "₹${product.discountedPrice}",
                       style: GoogleFonts.mulish(
-                        color: whiteColor,
+                        color: blackColor,
                         fontWeight: FontWeight.bold,
                         fontSize: 14,
                       ),
@@ -140,7 +148,7 @@ class ProductCard extends ConsumerWidget {
                   width: 50,
                   height: 29,
                   decoration: BoxDecoration(
-                    color: ligtBlackColor,
+                    color: lightWhiteColor,
                     border: Border.all(color: greenColor, width: 1),
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -160,22 +168,24 @@ class ProductCard extends ConsumerWidget {
                                   icon: Icon(
                                     Icons.remove,
                                     size: containerHeight * 0.06,
-                                    color: whiteColor,
+                                    color: scaffoldWhiteColor,
                                   ),
                                   onPressed: () {
-                                    final value=quantity-1;
+                                    final value = quantity - 1;
                                     print(value);
-                                    if(value==0){
-                                      cartNotifier.removeFromCart(userId, product.productId);
+                                    if (value == 0) {
+                                      cartNotifier.removeFromCart(
+                                          userId, product.productId);
                                       return;
                                     }
-                                    cartNotifier.updateCartQuantity(userId,product.productId, value);
+                                    cartNotifier.updateCartQuantity(
+                                        userId, product.productId, value);
                                   },
                                 ),
                                 Text(
                                   '$quantity',
                                   style: GoogleFonts.mulish(
-                                    color: whiteColor,
+                                    color: scaffoldWhiteColor,
                                     fontWeight: FontWeight.bold,
                                     fontSize: containerHeight * 0.05,
                                   ),
@@ -186,11 +196,12 @@ class ProductCard extends ConsumerWidget {
                                   icon: Icon(
                                     Icons.add,
                                     size: containerHeight * 0.06,
-                                    color: whiteColor,
+                                    color: scaffoldWhiteColor,
                                   ),
                                   onPressed: () {
-                                    final value=quantity+1;
-                                    cartNotifier.updateCartQuantity(userId,product.productId, value);
+                                    final value = quantity + 1;
+                                    cartNotifier.updateCartQuantity(
+                                        userId, product.productId, value);
                                   },
                                 ),
                               ],

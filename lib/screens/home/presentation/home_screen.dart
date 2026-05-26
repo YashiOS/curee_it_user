@@ -13,6 +13,8 @@ import 'package:cureeit_user_app/screens/location.dart';
 import 'package:cureeit_user_app/screens/otp/domain/entities/userEntity.dart';
 import 'package:cureeit_user_app/screens/otp/presentation/provider/otpProvider.dart';
 import 'package:cureeit_user_app/screens/profile_screen.dart';
+import 'package:cureeit_user_app/screens/search.dart';
+import 'package:cureeit_user_app/screens/search_screen.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -132,21 +134,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        backgroundColor: ligtBlackColor,
+        backgroundColor: lightWhiteColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         title: Text(
           "Location Required",
-          style: GoogleFonts.mulish(color: whiteColor),
+          style: GoogleFonts.mulish(color: blackColor),
         ),
         content: Text(
           "Please enable location to use this app.",
-          style: GoogleFonts.mulish(color: whiteColor),
+          style: GoogleFonts.mulish(color: blackColor),
         ),
         actions: [
           TextButton(
             style: TextButton.styleFrom(
               backgroundColor: Color(0xFFBE404F),
-              foregroundColor: whiteColor,
+              foregroundColor: blackColor,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
@@ -154,7 +156,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
             onPressed: () {
               startApp(); // Exit the app
             },
-            child: Text("Re-Try", style: GoogleFonts.mulish(color: whiteColor)),
+            child: Text("Re-Try", style: GoogleFonts.mulish(color: blackColor)),
           ),
         ],
       ),
@@ -220,7 +222,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final cartItem = ref.watch(cartNotifierProvider).cartItems;
 
     return Scaffold(
-      backgroundColor: scaffoldBlackColor,
+      backgroundColor:WhiteColor,
       key: _scaffoldKey,
       body: Stack(
         children: [
@@ -247,7 +249,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               slivers: [
                 // Header section
                 SliverAppBar(
-                  backgroundColor: scaffoldBlackColor,
+                  backgroundColor:  homepageWhite,
                   expandedHeight: 60,
                   floating: false,
                   pinned: false,
@@ -263,7 +265,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       child: Container(
                         height: 75,
                         decoration: BoxDecoration(
-                          color: scaffoldBlackColor,
+                          color:  homepageWhite,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Row(
@@ -282,9 +284,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                         "lib/images/final_medkaro_logo.png"),
                                   ),
                                   Text(
-                                    "${orderState.estimatedTime}",
+                                    "In 8 Minutes",//"${orderState.estimatedTime}",
                                     style: GoogleFonts.mulish(
-                                      color: whiteColor,
+                                      color: blackColor,
                                       fontSize:
                                           MediaQuery.of(context).size.width *
                                               0.055,
@@ -310,7 +312,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                 child: Text(
                                                   "${addressState.currentAddress?.type} :",
                                                   style: TextStyle(
-                                                    color: Colors.white,
+                                                    color: blackColor,
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: 17,
                                                   ),
@@ -323,8 +325,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                   overflow:
                                                       TextOverflow.ellipsis,
                                                   style: GoogleFonts.mulish(
-                                                    color: whiteColor,
-                                                    fontWeight: FontWeight.w300,
+                                                    color: blackColor,
+                                                    fontWeight: FontWeight.w400,
                                                     fontSize: 15,
                                                   ),
                                                 ),
@@ -372,7 +374,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 if (orderState.currentLocationAvailable == true &&
                     orderState.ongoingOrders.isNotEmpty)
                   SliverAppBar(
-                    backgroundColor: scaffoldBlackColor,
+                    backgroundColor:  WhiteColor,
                     floating: true,
                     scrolledUnderElevation: 0,
                     elevation: 0,
@@ -388,21 +390,27 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   scrolledUnderElevation: 0,
                   elevation: 0,
                   expandedHeight: null,
-                  backgroundColor: scaffoldBlackColor,
+                  backgroundColor:  WhiteColor,
                   pinned: true,
                   flexibleSpace: Container(
                     child: Column(
                       children: [
                         GestureDetector(
                           onTap: () {
-                            // Navigate to search screen
+                            Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => Search(Mic_on:false ),
+                            ),
+                          );    
                           },
                           child: Container(
                             margin: const EdgeInsets.only(top: 14),
                             height: 43,
                             decoration: BoxDecoration(
-                              color: ligtBlackColor,
+                              color:  textFieldFillColor,
                               borderRadius: BorderRadius.circular(8),
+                             
                             ),
                             clipBehavior: Clip.hardEdge,
                             child: Row(
@@ -412,7 +420,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                 const Padding(
                                   padding: EdgeInsets.only(left: 16, right: 5),
                                   child: Icon(Icons.search,
-                                      color: Colors.white, size: 18),
+                                      color: blackColor, size: 18),
                                 ),
                                 Expanded(
                                   child: Padding(
@@ -464,7 +472,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                     padding:
                                         EdgeInsets.only(left: 0, right: 16),
                                     child: Icon(Icons.mic,
-                                        color: Colors.white, size: 18),
+                                        color: greenColor, size: 18),
                                   ),
                                 ),
                               ],
@@ -473,7 +481,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         ),
                         Container(
                           padding: const EdgeInsets.only(top: 5, bottom: 5),
-                          color: scaffoldBlackColor,
+                          color:  homepageWhite,
                           child: Align(
                             alignment: Alignment.bottomLeft,
                             child: Text(
@@ -483,8 +491,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                               style: GoogleFonts.mulish(
                                 fontSize:
                                     MediaQuery.of(context).size.width * 0.038,
-                                fontWeight: FontWeight.w600,
-                                color: whiteColor,
+                                fontWeight: FontWeight.bold,
+                                color: blackColor,
                               ),
                             ),
                           ),
@@ -512,13 +520,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 if (orderState.currentLocationAvailable != null &&
                     orderState.currentLocationAvailable == true)
                   SliverPadding(
-                    padding:
-                         EdgeInsets.only(bottom:cartItem.length>0?135: 56), // adjust as needed
+                    padding: EdgeInsets.only(
+                        bottom:
+                            cartItem.length > 0 ? 135 : 56), // adjust as needed
                     sliver: servicesAsync.when(
                       data: (services) => ProductGrid(services: services),
                       loading: () => const SliverFillRemaining(
                         child: Center(
-                          child: CircularProgressIndicator(color: Colors.white),
+                          child: CircularProgressIndicator(color: blackColor),
                         ),
                       ),
                       error: (err, _) => SliverFillRemaining(
@@ -543,22 +552,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.height * 0.10,
                 decoration: BoxDecoration(
-                  color: scaffoldBlackColor,
+                  color:  scaffoldWhiteColor,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.white.withOpacity(0.1),
+                      color: Colors.black.withOpacity(0.1),
                       offset: Offset(0, -2),
                       blurRadius: 6,
                       spreadRadius: 1,
                     ),
                     BoxShadow(
-                      color: Colors.white.withOpacity(0.1),
+                      color: Colors.black.withOpacity(0.1),
                       offset: Offset(-2, 0),
                       blurRadius: 6,
                       spreadRadius: 1,
                     ),
                     BoxShadow(
-                      color: Colors.white.withOpacity(0.1),
+                      color: Colors.black.withOpacity(0.1),
                       offset: Offset(2, 0),
                       blurRadius: 6,
                       spreadRadius: 1,
@@ -612,7 +621,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                   Text(
                                     "|  ₹ 999",
                                     style: GoogleFonts.mulish(
-                                      color: whiteColor,
+                                      color: blackColor,
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -634,7 +643,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                 child: Text(
                                   'View Cart',
                                   style: GoogleFonts.mulish(
-                                    color: whiteColor,
+                                    color:  scaffoldWhiteColor,
                                     fontSize: 13,
                                     fontWeight: FontWeight.bold,
                                   ),

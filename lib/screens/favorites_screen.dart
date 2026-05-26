@@ -58,7 +58,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       appBar: AppBar(
         scrolledUnderElevation: 0,
             elevation: 0,
-        backgroundColor: ligtBlackColor,
+        backgroundColor: lightWhiteColor,
         leadingWidth: 200,
         toolbarHeight: 60,
         leading: Padding(
@@ -73,7 +73,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                     fontWeight: FontWeight.w600,
                     fontSize: MediaQuery.of(context).size.width * 0.06,
                     
-                    color: whiteColor),
+                    color: blackColor),
               ),
             ],
           ),
@@ -82,16 +82,16 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
       body: Container(
         padding:EdgeInsets.only(top: 24,bottom: 40,left: 20,right: 20),
         margin: EdgeInsets.only(bottom: 20),
-        color: scaffoldBlackColor,
+        color:  scaffoldWhiteColor,
         child: FutureBuilder<List<String>>(
           future: favoritesFuture, // use stored future
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return Container(
-                color: scaffoldBlackColor,
+                color:  scaffoldWhiteColor,
                 child: Center(
                     child: CircularProgressIndicator(
-                  color: whiteColor,
+                  color: blackColor,
                 )),
               );
             } else if (snapshot.hasError) {

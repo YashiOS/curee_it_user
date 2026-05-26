@@ -79,11 +79,11 @@ print(value.longitude);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: scaffoldBlackColor,
+      backgroundColor:  scaffoldWhiteColor,
       appBar: AppBar(
         scrolledUnderElevation: 0,
             elevation: 0,
-        backgroundColor: scaffoldBlackColor,
+        backgroundColor:  scaffoldWhiteColor,
         centerTitle: true,
         shape: ContinuousRectangleBorder(
           borderRadius: BorderRadius.only(
@@ -94,7 +94,7 @@ print(value.longitude);
         title: Text(
           "Select Location",
           style: GoogleFonts.mulish(
-              color: whiteColor, fontSize: 22.69, fontWeight: FontWeight.w400),
+              color: blackColor, fontSize: 22.69, fontWeight: FontWeight.w400),
         ),
         leading: Padding(
           padding: const EdgeInsets.only(left: 24.0),
@@ -109,7 +109,7 @@ print(value.longitude);
                 children: [
                   SvgPicture.asset(
                     colorFilter:
-                        ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                        ColorFilter.mode(blackColor, BlendMode.srcIn),
                     "lib/images/back.svg",
                     width: 24, // optional
                     height: 24, // optional
@@ -123,7 +123,7 @@ print(value.longitude);
       body: isLoading
           ? Center(
               child: CircularProgressIndicator(
-                color: whiteColor,
+                color: blackColor,
               ),
             )
           : Stack(
@@ -132,7 +132,7 @@ print(value.longitude);
                   width: double.infinity,
                   height: double.infinity,
                   child: GoogleMap(
-                    style: darkMapStyle,
+                    style: LightMapStyle,
                     onMapCreated: (GoogleMapController controller) {
                       _mapController = controller;
                     },
@@ -179,7 +179,7 @@ print(value.longitude);
                         padding:
                             EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                         decoration: BoxDecoration(
-                          color: ligtBlackColor,
+                          color: lightWhiteColor,
                           borderRadius: BorderRadius.circular(8),
                           boxShadow: [
                             BoxShadow(
@@ -194,7 +194,7 @@ print(value.longitude);
                             Text(
                               "Order will be delivered here",
                               style: GoogleFonts.mulish(
-                                color: whiteColor,
+                                color: blackColor,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -203,7 +203,7 @@ print(value.longitude);
                             Text(
                               "Place the pin to your exact location",
                               style: GoogleFonts.mulish(
-                                color: whiteColor,
+                                color: blackColor,
                                 fontSize: 12.6,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -214,7 +214,7 @@ print(value.longitude);
                       ),
                       CustomPaint(
                         painter: TrianglePainter(
-                          color: ligtBlackColor,
+                          color: lightWhiteColor,
                         ),
                         size: Size(20, 10),
                       ),
@@ -244,7 +244,7 @@ print(value.longitude);
                                 vertical: 8.0, horizontal: 18),
                             child: Container(
                               decoration: BoxDecoration(
-                                  color: ligtBlackColor,
+                                  color: lightWhiteColor,
                                   borderRadius: BorderRadius.circular(8)),
                               padding: const EdgeInsets.symmetric(
                                   vertical: 4.0, horizontal: 18),
@@ -252,13 +252,13 @@ print(value.longitude);
                                 controller: searchPlaceController,
                                 cursorColor: greenColor,
                                 style: GoogleFonts.mulish(
-                                    color: whiteColor,
+                                    color: blackColor,
                                     fontSize: 16,
                                     fontWeight: FontWeight.w600),
                                 decoration: InputDecoration(
                                     border: InputBorder.none,
                                     helperStyle: GoogleFonts.mulish(
-                                        color: whiteColor,
+                                        color: blackColor,
                                         fontSize: 16,
                                         fontWeight: FontWeight.w600),
                                     hintText: "Search ...",
@@ -291,7 +291,7 @@ print(value.longitude);
                               child: Container(
                                 height: 300,
                                 decoration: BoxDecoration(
-                                    color: ligtBlackColor,
+                                    color: lightWhiteColor,
                                     borderRadius: BorderRadius.circular(8)),
                                 child: Column(
                                   mainAxisSize: MainAxisSize.min,
@@ -341,14 +341,14 @@ print(value.longitude);
                                               },
                                               leading: Icon(
                                                 Icons.location_on_outlined,
-                                                color: whiteColor,
+                                                color: blackColor,
                                               ),
                                               title: Text(
                                                 getPlaces.predictions![index]
                                                     .description
                                                     .toString(),
                                                 style: GoogleFonts.mulish(
-                                                    color: whiteColor),
+                                                    color: blackColor),
                                               ),
                                             );
                                           }),
@@ -417,7 +417,7 @@ print(value.longitude);
                             Container(
                               width: MediaQuery.of(context).size.width,
                               decoration: BoxDecoration(
-                                  color: ligtBlackColor,
+                                  color: lightWhiteColor,
                                   border: currentLocationFething
                                       ? Border(
                                           top: BorderSide(
@@ -439,7 +439,7 @@ print(value.longitude);
                                               .results?[0].formattedAddress ??
                                           "Loading...",
                                       style: GoogleFonts.mulish(
-                                          color: whiteColor,
+                                          color: blackColor,
                                           fontSize: 12,
                                           fontWeight: FontWeight.w600),
                                     ),

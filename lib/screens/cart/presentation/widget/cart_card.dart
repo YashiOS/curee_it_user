@@ -24,6 +24,12 @@ class CartCard extends ConsumerWidget {
     required this.productPrice,
   });
 
+  String capitalizeFirst(String text) {
+  if (text.isEmpty) return text;
+  return text[0].toUpperCase() + text.substring(1).toLowerCase();
+}
+
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final cartNotifier = ref.read(cartNotifierProvider.notifier);
@@ -65,17 +71,17 @@ class CartCard extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          productName,
+                          capitalizeFirst(productName),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.mulish(
                             fontWeight: FontWeight.w700,
                             fontSize: 13,
-                            color: whiteColor,
+                            color: blackColor,
                           ),
                         ),
                         Text(
-                          packLabel,
+                          capitalizeFirst(packLabel),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: GoogleFonts.mulish(
@@ -137,7 +143,7 @@ class CartCard extends ConsumerWidget {
                           style: GoogleFonts.mulish(
                             fontWeight: FontWeight.bold,
                             fontSize: 12,
-                            color: whiteColor,
+                            color: homepageWhite,
                           ),
                         ),
                         GestureDetector(
@@ -179,7 +185,7 @@ class CartCard extends ConsumerWidget {
                           Text(
                             "₹$productPrice",
                             style: GoogleFonts.mulish(
-                                color: greyColor,
+                                color: const Color.fromARGB(255, 0, 0, 0),
                                 decoration: TextDecoration.lineThrough,
                                 fontSize: 10,
                                 decorationColor: greyColor),
@@ -187,9 +193,10 @@ class CartCard extends ConsumerWidget {
                           Text(
                             "₹$sellingPrice",
                             style: GoogleFonts.mulish(
-                              fontWeight: FontWeight.w300,
-                              fontSize: 13.78,
-                              color: whiteColor,
+                              
+                               fontWeight: FontWeight.w700,
+                              fontSize: 13,
+                              color: blackColor,
                             ),
                           ),
                         ],

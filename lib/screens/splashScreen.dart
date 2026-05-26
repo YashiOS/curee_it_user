@@ -68,7 +68,7 @@ class _SplashScreenState extends State<Splashscreen>
     final screenWidth = MediaQuery.of(context).size.width;
 
     return Scaffold(
-      backgroundColor: scaffoldBlackColor,
+      backgroundColor:  scaffoldWhiteColor,
       body: Center( 
         child: ScaleTransition(
           scale: _scaleAnimation,
