@@ -54,6 +54,12 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
 
         currentLocationFething = false;
       });
+    }).onError((error, stackTrace) {
+      print("Get Address Error $error");
+      setState(() {
+        isLoading = false;
+        currentLocationFething = false;
+      });
     });
   }
 
@@ -73,6 +79,7 @@ print(value.longitude);
       });
     }).onError((error, stackTrace) {
       print("Location Error $error");
+      getAddress();
     });
   }
 

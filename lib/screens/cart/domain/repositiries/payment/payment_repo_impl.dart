@@ -85,4 +85,33 @@ class PaymentRepoImpl implements PaymentRepository {
           'Failed to create checkout: ${response.statusCode} ${response.body}');
     }
   }
+
+  @override
+  Future<NonPrescriptionOrderData> initiateNonPrescriptionOrder({
+    required String userId,
+    required String shippingAddress,
+    required dynamic userLat,
+    required dynamic userLong,
+  }) async {
+    final body = {
+      "userId": userId,
+      "shippingAddress": shippingAddress,
+      "userLat": userLat,
+      "userLong": userLong,
+    };
+
+    final response =
+        await apiService.post('/cart/initiateNonPrescriptionOrder', body: body);
+    print(response.body);
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return NonPrescriptionOrderData(
+        availableId: data['availableID'] ?? '',
+        finalTotal: double.tryParse(data['finalTotal']?.toString() ?? '') ?? 0.0,
+      );
+    } else {
+      throw Exception(
+          'Failed to initiate non-prescription order: ${response.statusCode} ${response.body}');
+    }
+  }
 }

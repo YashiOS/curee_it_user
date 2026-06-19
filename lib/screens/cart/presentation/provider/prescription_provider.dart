@@ -99,6 +99,7 @@ class PrescriptionNotifier extends StateNotifier<PrescriptionState> {
       // update state with response
       state = state.copyWith(availableId: availableId);
       startCountdownTimer();
+      print('Available ID is ${availableId}');
       startPolling(availableId);
       print("Prescription sent successfully. AvailableId: $availableId");
       return availableId;

@@ -15,7 +15,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       appBar: AppBar(
         scrolledUnderElevation: 0,
             elevation: 0,
-        backgroundColor: Colors.grey.shade100.withOpacity(0.5),
+        backgroundColor: WhiteColor,
         leadingWidth: 100,
         leading: Padding(
           padding: const EdgeInsets.only(left: 12.0),
@@ -44,7 +44,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         ),
       ),
       body: Container(
-        color: Colors.grey.shade100.withOpacity(0.5),
+        color: blackColor,
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
         child: Padding(
@@ -65,7 +65,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Container(
                 padding: EdgeInsets.symmetric(vertical: 10, horizontal: 12),
                 decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: blackColor,
                     borderRadius: BorderRadius.circular(10)),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -90,7 +90,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               Container(
                 padding: EdgeInsets.symmetric(vertical: 10, horizontal: 12),
                 decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Colors.black,
                     borderRadius: BorderRadius.circular(10)),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,

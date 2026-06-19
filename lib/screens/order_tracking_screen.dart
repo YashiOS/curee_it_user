@@ -134,6 +134,13 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     }
   }
 
+  double? _toDouble(dynamic value) {
+    if (value == null) return null;
+    if (value is num) return value.toDouble();
+    if (value is String) return double.tryParse(value);
+    return null;
+  }
+
   String formatDate(String isoDate) {
     // Parse the ISO 8601 string into a DateTime object
     DateTime dateTime = DateTime.parse(isoDate);
@@ -158,7 +165,6 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
 
     if (response.statusCode == 200) {
       final responseBody = jsonDecode(response.body);
-      // 🔐 only once
       final data = responseBody;
 
       setState(() {
@@ -177,15 +183,17 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
           orderTrackingDetails["status"] == "Delivery Accepted" ||
           orderTrackingDetails["status"] ==
               "Delivery Partner arrived at darkstore") {
-        vendorLat =
-            double.parse(orderTrackingDetails['vendorPickupDetails']?['lat']);
+        vendorLat = _toDouble(
+            orderTrackingDetails['vendorPickupDetails']?['lat']);
 
-        vendorLng =
-            double.parse(orderTrackingDetails['vendorPickupDetails']?['long']);
+        vendorLng = _toDouble(
+            orderTrackingDetails['vendorPickupDetails']?['long']);
 
-        dropLat = orderTrackingDetails['dropDetails']?['address']?['lat'];
+        dropLat = _toDouble(
+            orderTrackingDetails['dropDetails']?['address']?['lat']);
 
-        dropLng = orderTrackingDetails['dropDetails']?['address']?['lng'];
+        dropLng = _toDouble(
+            orderTrackingDetails['dropDetails']?['address']?['lng']);
 
         // partnerLat = orderTrackingDetails['porterAPIResponse']?['partner_info']
         //         ?['location']?['lat'] ??
@@ -245,7 +253,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
   }
 
   Future<void> connectWebSocket() async {
-    _channel = await IOWebSocketChannel.connect("ws://api.medkaro.in");
+    _channel = await IOWebSocketChannel.connect("ws://api.siccnow.com");
     print("connecting to webSocket");
 
     _channel!.stream.listen(
@@ -900,39 +908,39 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                     ),
                   ],
                 ),
-                /*Positioned(
-                  top: 60,
-                  right: 40,
+                Positioned(
+                  top: 50,
+                  left: 20,
                   child: GestureDetector(
                     onTap: () {
-                      _stopTimer();
-                      if (widget.NavigatingFrom == "order_place") {
-                        Navigator.of(context).pushReplacement(MaterialPageRoute(
-                            builder: (context) => BaseScreen(
-                                  Navigatedfrom: "",
-                                )));
-                      }
-                      if (widget.NavigatingFrom == "Order History") {
-                        Navigator.of(context).pop();
-                      }
-                      if (widget.NavigatingFrom == "Order_SuccessScreen") {
-                        Navigator.of(context).pushReplacement(MaterialPageRoute(
-                            builder: (context) => BaseScreen(
-                                  Navigatedfrom: "orderTrackingScreen",
-                                )));
-                      }
-                      if (widget.NavigatingFrom == "home") {
-                        Navigator.of(context).pop();
-                      }
+                      Navigator.of(context, rootNavigator: true)
+                          .pushReplacement(
+                        MaterialPageRoute(
+                          builder: (_) => BaseScreen(Navigatedfrom: ""),
+                        ),
+                      );
                     },
-                    child: Icon(
-                      Icons.close,
-                      color:  scaffoldWhiteColor,
-                      size: width * 0.06,
+                    child: Container(
+                      padding: EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: scaffoldWhiteColor,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 4,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        Icons.arrow_back,
+                        color: blackColor,
+                        size: width * 0.06,
+                      ),
                     ),
                   ),
-                ),*/
-
+                ),
                 if (orderTrackingDetails["status"] != "In Review")
                   Positioned(
                     bottom: height * 0.33,

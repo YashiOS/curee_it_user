@@ -20,7 +20,7 @@ class OtpRepositoryImpl extends OtpRepository {
     print("DATA FROM OTP API : ${response.body}");
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-
+    
       return User.fromJson(data);
     }
     throw Exception('Failed to Verify OTP');

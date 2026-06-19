@@ -34,28 +34,24 @@ class _LocationScreenState extends State<LocationScreen> {
       fetchingAddress=true;
     });
     var url = Uri.parse(
-      '$baseUrl/address/savedAddress',
+      '$baseUrl/address/savedAddress?userId=${User.userId}',
     );
 
-    // Create the GET request with the userId as query parameter
-    var request = http.Request('GET', url)
-      ..headers.addAll({
-        'Content-Type': 'application/json',
-      })
-      ..body = jsonEncode({'userId': User.userId});
-
-    var response = await http.Client().send(request);
+    print('userID is ${User.userId}');
+    var response = await http.get(url, headers: {
+      'Content-Type': 'application/json',
+    });
 
     if (response.statusCode == 200) {
-      final data = json.decode(await response.stream.bytesToString());
+      final data = json.decode(response.body);
       final fetchAddress = data["data"]["address"];
       setState(() {
         fetchingAddress=false;
       });
-      if (fetchAddress != null || fetchAddress.isNotEmpty) {
+      if (fetchAddress != null && fetchAddress.isNotEmpty) {
         addresses = data['data']['address'];
         setState(() {});
-       
+
       }
     } else {
        setState(() {
@@ -89,16 +85,16 @@ class _LocationScreenState extends State<LocationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: lightWhiteColor,
+        backgroundColor: Colors.black,
         appBar: AppBar(
           scrolledUnderElevation: 0,
             elevation: 0,
           centerTitle: true,
-          backgroundColor: lightWhiteColor,
+          backgroundColor: blackColor,
           shape: ContinuousRectangleBorder(
             borderRadius: BorderRadius.only(
-              bottomLeft: Radius.circular(10),
-              bottomRight: Radius.circular(10),
+              bottomLeft: Radius.circular(0),
+              bottomRight: Radius.circular(0),
             ),
           ),
           title: Text(
@@ -106,7 +102,7 @@ class _LocationScreenState extends State<LocationScreen> {
             style: GoogleFonts.mulish(
                 fontWeight: FontWeight.w400,
                 fontSize: 22.69,
-                color: blackColor),
+                color: WhiteColor),
           ),
           leading: GestureDetector(
             onTap: () {
@@ -120,7 +116,7 @@ class _LocationScreenState extends State<LocationScreen> {
                   spacing: 4,
                   children: [SvgPicture.asset(
                     colorFilter:
-                        ColorFilter.mode(blackColor, BlendMode.srcIn),
+                        ColorFilter.mode(WhiteColor, BlendMode.srcIn),
                     "lib/images/back.svg",
                     width: 24, // optional
                     height: 24, // optional
@@ -132,7 +128,7 @@ class _LocationScreenState extends State<LocationScreen> {
         ),
         body: Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-          color:  scaffoldWhiteColor,
+          color:  Colors.black,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -241,7 +237,6 @@ class _LocationScreenState extends State<LocationScreen> {
                                       ),
                                       margin: EdgeInsets.only(bottom: 16),
                                       child: Container(
-                                        height: 75,
                                         padding: EdgeInsets.symmetric(
                                             vertical:
                                                 8), // Match ListTile's vertical padding

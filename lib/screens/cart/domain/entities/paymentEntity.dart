@@ -12,3 +12,10 @@ class PaymentOrderData {
     );
   }
 }
+
+class NonPrescriptionOrderData {
+  final String availableId;
+  final double finalTotal;
+
+  NonPrescriptionOrderData({required this.availableId, required this.finalTotal});
+}

@@ -6,7 +6,6 @@ import 'package:cureeit_user_app/screens/cart/presentation/widget/upload_prescri
 import 'package:cureeit_user_app/screens/home/presentation/providers/address_provider.dart';
 import 'package:cureeit_user_app/screens/home/presentation/providers/cart_provider.dart';
 
-import 'package:cureeit_user_app/screens/base_screen.dart';
 import 'package:cureeit_user_app/screens/otp/presentation/provider/otpProvider.dart';
 
 import 'package:cureeit_user_app/utils/theme.dart';
@@ -21,12 +20,30 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:shimmer/shimmer.dart';
 
-class CartScreen extends ConsumerWidget {
+class CartScreen extends ConsumerStatefulWidget {
   final isNavigated;
   const CartScreen({super.key, required this.isNavigated});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<CartScreen> createState() => _CartScreenState();
+}
+
+class _CartScreenState extends ConsumerState<CartScreen> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final userId = ref.read(OtpNotifierProvider).user?.userId;
+      if (userId != null) {
+        ref.read(cartNotifierProvider.notifier).fetchCart(userId);
+      }
+    });
+  }
+
+  bool get isNavigated => widget.isNavigated;
+
+  @override
+  Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     final prescriptionState = ref.watch(prescriptionProvider);
@@ -37,16 +54,16 @@ class CartScreen extends ConsumerWidget {
     return Stack(
       children: [
         Scaffold(
-          backgroundColor: textFieldFillColor,
+          backgroundColor: Colors.black,
           appBar: AppBar(
             scrolledUnderElevation: 0,
             elevation: 0,
             centerTitle: true,
-            backgroundColor: WhiteColor,
+            backgroundColor: blackColor,
             shape: ContinuousRectangleBorder(
               borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(10),
-                bottomRight: Radius.circular(10),
+                bottomLeft: Radius.circular(0),
+                bottomRight: Radius.circular(0),
               ),
             ),
             title: Text(
@@ -54,7 +71,7 @@ class CartScreen extends ConsumerWidget {
               style: GoogleFonts.mulish(
                 fontWeight: FontWeight.w500,
                 fontSize: 22.69,
-                color: blackColor,
+                color: WhiteColor,
               ),
             ),
             leading: GestureDetector(
@@ -63,10 +80,7 @@ class CartScreen extends ConsumerWidget {
                   Navigator.pop(context);
                   return;
                 }
-                Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => BaseScreen(Navigatedfrom: "")));
+                DefaultTabController.of(context).animateTo(0);
               },
               child: Padding(
                 padding: const EdgeInsets.only(left: 24.0),
@@ -77,7 +91,7 @@ class CartScreen extends ConsumerWidget {
                     children: [
                       SvgPicture.asset(
                         colorFilter:
-                            ColorFilter.mode(blackColor, BlendMode.srcIn),
+                            ColorFilter.mode(WhiteColor, BlendMode.srcIn),
                         "lib/images/back.svg",
                         width: 24, // optional
                         height: 24, // optional
@@ -98,11 +112,11 @@ class CartScreen extends ConsumerWidget {
                     children: [
                       GestureDetector(
                         onTap: () {
-                          Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      BaseScreen(Navigatedfrom: "")));
+                          if (isNavigated) {
+                            Navigator.pop(context);
+                          } else {
+                            DefaultTabController.of(context).animateTo(0);
+                          }
                         },
                         child: Center(
                           child: Container(
@@ -116,7 +130,7 @@ class CartScreen extends ConsumerWidget {
                 )
               : Container(
                   padding: EdgeInsets.only(bottom: isNavigated ? 20 : 100),
-                  color: textFieldFillColor,
+                  color: Colors.black,
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.height,
                   child: Stack(
@@ -137,7 +151,7 @@ class CartScreen extends ConsumerWidget {
                                   margin: EdgeInsets.only(
                                       top: 28, bottom: 10, left: 18, right: 18),
                                   decoration: BoxDecoration(
-                                    color: WhiteColor,
+                                    color: blackColor,
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Row(
@@ -152,18 +166,18 @@ class CartScreen extends ConsumerWidget {
                                             Text(
                                               "Delivering to",
                                               style: GoogleFonts.mulish(
-                                                color: blackColor,
+                                                color: WhiteColor,
                                                 fontSize: 14,
                                                 fontWeight: FontWeight.w600,
                                               ),
                                             ),
                                             SizedBox(height: 4),
                                             Text(
-                                              "${addressState.currentAddress!.address}",
+                                              "${addressState.currentAddress?.address ?? 'Unknown'}",
                                               style: GoogleFonts.mulish(
                                                 color: greyColor,
                                                 fontWeight: FontWeight.w600,
-                                                fontSize: 13,
+                                                fontSize: 14,
                                               ),
                                             ),
                                           ],
@@ -207,7 +221,7 @@ class CartScreen extends ConsumerWidget {
                                     height: 56,
                                     decoration: BoxDecoration(
                                       color:
-                                          WhiteColor, // or any color you want
+                                          blackColor, // or any color you want
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Row(
@@ -251,7 +265,7 @@ class CartScreen extends ConsumerWidget {
                                     height: 75,
                                     decoration: BoxDecoration(
                                       color:
-                                          WhiteColor, // or any color you want
+                                          WhiteColor, 
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Row(
@@ -303,7 +317,7 @@ class CartScreen extends ConsumerWidget {
                                     bottom: 10, left: 18, right: 18),
                                 width: MediaQuery.of(context).size.width,
                                 decoration: BoxDecoration(
-                                    color: WhiteColor,
+                                    color: blackColor,
                                     borderRadius: BorderRadius.circular(8)),
                                 child: Stack(
                                   children: [
@@ -372,7 +386,7 @@ class CartScreen extends ConsumerWidget {
                                   margin: EdgeInsets.only(
                                       bottom: 10, left: 18, right: 18),
                                   decoration: BoxDecoration(
-                                    color: WhiteColor, // or any color you want
+                                    color: blackColor, // or any color you want
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                   child: Padding(
@@ -399,7 +413,7 @@ class CartScreen extends ConsumerWidget {
                                               style: GoogleFonts.mulish(
                                                 fontWeight: FontWeight.w300,
                                                 fontSize: 14,
-                                                color: blackColor,
+                                                color: WhiteColor,
                                               ),
                                             ),
                                             Container(
@@ -408,7 +422,7 @@ class CartScreen extends ConsumerWidget {
                                                 style: GoogleFonts.mulish(
                                                     fontWeight: FontWeight.w400,
                                                     fontSize: 14,
-                                                    color: blackColor),
+                                                    color: WhiteColor),
                                               ),
                                             ),
                                           ],
@@ -501,7 +515,7 @@ class CartScreen extends ConsumerWidget {
                                                           fontWeight:
                                                               FontWeight.bold,
                                                           fontSize: 16,
-                                                          color: blackColor,
+                                                          color: WhiteColor,
                                                         ),
                                                       ),
                                                       if (cartState.isLoading)
@@ -535,80 +549,93 @@ class CartScreen extends ConsumerWidget {
                                                       fontWeight:
                                                           FontWeight.w700,
                                                       fontSize: 15,
-                                                      color: blackColor,
+                                                      color: WhiteColor,
                                                     ),
                                                   ),
                                                 ]),
                                             SizedBox(
                                               height: 22,
                                             ),
-                                            GestureDetector(
-                                              onTap: () async {
-                                                final total =
-                                                    cartState.finalTotal;
-                                                final userId =
-                                                    userState.user!.userId;
-                                                final shippingCost =
-                                                    cartState.deliveryFee;
-                                                final shippingAddress =
-                                                    addressState.currentAddress!
-                                                        .address;
-                                                final availableId =
-                                                    prescriptionState
-                                                        .AvailableId;
-                                                final userLat = addressState
-                                                    .currentAddress!.userLat;
-                                                final userLong = addressState
-                                                    .currentAddress!.userLong;
-                                                await ref
-                                                    .read(paymentProvider
-                                                        .notifier)
-                                                    .getPaymentSessionAndStart(
-                                                        total: total,
-                                                        userId: userId,
-                                                        shippingCost:
-                                                            shippingCost,
-                                                        shippingAddress:
-                                                            shippingAddress,
-                                                        availableId:
-                                                            availableId,
-                                                        context: context,
-                                                        userLat: userLat,
-                                                        userLong: userLong);
-                                              },
-                                              child: Container(
-                                                height: 36,
-                                                width: double.infinity,
-                                                alignment: Alignment.center,
-                                                decoration: BoxDecoration(
-                                                  color:
-                                                      prescriptionState.payNow
+                                            Builder(
+                                              builder: (context) {
+                                                final canPay = !cartState.prescription_required || prescriptionState.payNow;
+                                                final isPaymentLoading = ref.watch(paymentProvider).loading;
+                                                return GestureDetector(
+                                                  onTap: () async {
+                                                    if (!canPay || isPaymentLoading) return;
+                                                    if (userState.user == null) return;
+                                                    final userId = userState.user!.userId;
+                                                    final shippingAddress = addressState.currentAddress?.address ?? '';
+                                                    final userLat = addressState.currentAddress?.userLat ?? '';
+                                                    final userLong = addressState.currentAddress?.userLong ?? '';
+
+                                                    if (!cartState.prescription_required) {
+                                                      await ref
+                                                          .read(paymentProvider.notifier)
+                                                          .initiateNonPrescriptionOrder(
+                                                              userId: userId,
+                                                              shippingAddress: shippingAddress,
+                                                              userLat: userLat,
+                                                              userLong: userLong,
+                                                              context: context);
+                                                    } else {
+                                                      final total = cartState.finalTotal;
+                                                      final shippingCost = cartState.deliveryFee;
+                                                      final availableId = prescriptionState.AvailableId;
+                                                      await ref
+                                                          .read(paymentProvider.notifier)
+                                                          .getPaymentSessionAndStart(
+                                                              total: total,
+                                                              userId: userId,
+                                                              shippingCost: shippingCost,
+                                                              shippingAddress: shippingAddress,
+                                                              availableId: availableId,
+                                                              context: context,
+                                                              userLat: userLat,
+                                                              userLong: userLong);
+                                                    }
+                                                  },
+                                                  child: Container(
+                                                    height: 36,
+                                                    width: double.infinity,
+                                                    alignment: Alignment.center,
+                                                    decoration: BoxDecoration(
+                                                      color: canPay
                                                           ? greenColor
                                                           : lightWhiteColor,
-                                                  border: Border.all(
-                                                    color: greenColor,
-                                                    width: 1,
-                                                  ),
-                                                  // Setting the background color to primary color
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          8), // Setting the border radius to 10
-                                                ),
-                                                child: Center(
-                                                  child: Text(
-                                                    "Confirm And Pay",
-                                                    style: GoogleFonts.mulish(
-                                                      color: prescriptionState
-                                                              .payNow
-                                                          ? blackColor
-                                                          : greenColor,
-                                                      fontSize: 12,
-                                                      fontWeight:
-                                                          FontWeight.w700,
+                                                      border: Border.all(
+                                                        color: greenColor,
+                                                        width: 1,
+                                                      ),
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              8),
+                                                    ),
+                                                    child: Center(
+                                                      child: isPaymentLoading
+                                                          ? const SizedBox(
+                                                              height: 18,
+                                                              width: 18,
+                                                              child: CircularProgressIndicator(
+                                                                color: Colors.white,
+                                                                strokeWidth: 2,
+                                                              ),
+                                                            )
+                                                          : Text(
+                                                              "Confirm And Pay",
+                                                              style: GoogleFonts.mulish(
+                                                                color: canPay
+                                                                    ? blackColor
+                                                                    : greenColor,
+                                                                fontSize: 12,
+                                                                fontWeight:
+                                                                    FontWeight.w700,
+                                                              ),
+                                                            ),
                                                     ),
                                                   ),
-                                                ),
-                                              ),
+                                                );
+                                              },
                                             ),
                                           ],
                                         ),

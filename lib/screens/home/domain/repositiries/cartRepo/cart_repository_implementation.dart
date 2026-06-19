@@ -15,9 +15,7 @@ class CartRepositoryImpl implements CartRepository {
         await apiService.post('/cart/cartDetails', body: {"userId": userId});
     final data = jsonDecode(response.body);
 
- 
     if (response.statusCode == 200) {
-
       return CartResponseEntity.fromJson(data);
     } else {
       throw Exception("Failed To fetch cart");

@@ -22,4 +22,11 @@ abstract class PaymentRepository {
     required dynamic userLat,
     required dynamic userLong,
   });
+
+  Future<NonPrescriptionOrderData> initiateNonPrescriptionOrder({
+    required String userId,
+    required String shippingAddress,
+    required dynamic userLat,
+    required dynamic userLong,
+  });
 }

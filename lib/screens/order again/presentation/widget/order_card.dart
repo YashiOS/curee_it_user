@@ -43,7 +43,7 @@ class OrderCard extends ConsumerWidget {
         decoration: BoxDecoration(
           
           borderRadius: BorderRadius.circular(8),
-          color: lightWhiteColor,
+          color: blackColor,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -63,7 +63,7 @@ class OrderCard extends ConsumerWidget {
                         style: GoogleFonts.mulish(
                           fontSize: 17.02,
                           fontWeight: FontWeight.w600,
-                          color: blackColor,
+                          color: WhiteColor,
                         ),
                       ),
                     ),
@@ -83,7 +83,7 @@ class OrderCard extends ConsumerWidget {
                     style: GoogleFonts.mulish(
                       fontWeight: FontWeight.w500,
                       fontSize: 17,
-                      color: blackColor,
+                      color: WhiteColor,
                     ),
                   ),
               ],
@@ -127,10 +127,10 @@ class OrderCard extends ConsumerWidget {
                               orderStatus == "" ||
                               orderStatus == "Available"
                           ? greenColor
-                          : lightWhiteColor,
+                          : blackColor,
                       border: orderStatus != "Delivered"
                           ? Border.all(color: greenColor, width: 1)
-                          : Border.all(color: Colors.white, width: 0),
+                          : Border.all(color: Colors.black, width: 0),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -142,7 +142,7 @@ class OrderCard extends ConsumerWidget {
                         color: orderStatus == "Delivered" ||
                                 orderStatus == "" ||
                                 orderStatus == "Available"
-                            ? Colors.white
+                            ? blackColor
                             : greenColor,
                       ),
                     ),

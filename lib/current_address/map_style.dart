@@ -24,8 +24,6 @@ const String LightMapStyle = '''
       }
     ]
   },
-
-  /* Administrative / locality labels */
   {
     "featureType": "administrative.locality",
     "elementType": "labels.text.fill",
@@ -35,8 +33,6 @@ const String LightMapStyle = '''
       }
     ]
   },
-
-  /* POIs */
   {
     "featureType": "poi",
     "elementType": "geometry",
@@ -63,8 +59,6 @@ const String LightMapStyle = '''
       }
     ]
   },
-
-  /* Parks */
   {
     "featureType": "poi.park",
     "elementType": "geometry",
@@ -83,8 +77,6 @@ const String LightMapStyle = '''
       }
     ]
   },
-
-  /* Roads - base */
   {
     "featureType": "road",
     "elementType": "geometry",
@@ -112,8 +104,6 @@ const String LightMapStyle = '''
       }
     ]
   },
-
-  /* Local roads */
   {
     "featureType": "road.local",
     "elementType": "geometry",
@@ -123,25 +113,21 @@ const String LightMapStyle = '''
       }
     ]
   },
-
-  /* Arterial roads */
   {
     "featureType": "road.arterial",
     "elementType": "geometry",
     "stylers": [
       {
-        "color": "#fdf3e7"   // slight warm tint like Swiggy
+        "color": "#fdf3e7"
       }
     ]
   },
-
-  /* Highways */
   {
     "featureType": "road.highway",
     "elementType": "geometry",
     "stylers": [
       {
-        "color": "#ffd7a2"   // highlighted highway
+        "color": "#ffd7a2"
       }
     ]
   },
@@ -163,8 +149,6 @@ const String LightMapStyle = '''
       }
     ]
   },
-
-  /* Transit (usually subtle or hidden) */
   {
     "featureType": "transit",
     "stylers": [
@@ -173,8 +157,6 @@ const String LightMapStyle = '''
       }
     ]
   },
-
-  /* Water */
   {
     "featureType": "water",
     "elementType": "geometry",
@@ -193,8 +175,6 @@ const String LightMapStyle = '''
       }
     ]
   },
-
-  /* Buildings (landmarks) */
   {
     "featureType": "poi.attraction",
     "elementType": "geometry",

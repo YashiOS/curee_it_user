@@ -169,7 +169,7 @@ class _OtpScreenContentState extends ConsumerState<_OtpScreenContent> {
     return Container(
       width: screenWidth,
       height: screenHeight,
-      color:  WhiteColor,
+      color:  Colors.black,
       child: Stack(
         children: [
           Padding(
@@ -182,20 +182,12 @@ class _OtpScreenContentState extends ConsumerState<_OtpScreenContent> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Image.asset(
-                  "lib/images/MEDKARO.png",
-                  height: screenHeight * 0.06,
-                  width: screenWidth * 0.5,
+                  "lib/images/siccLog.png",
+                  height: screenHeight * 0.25,
+                  width: screenWidth,
+                  alignment: Alignment.centerLeft,
+                  fit: BoxFit.contain,
                 ),
-                Text(
-                  "10-minute medicine delivery",
-                  style: GoogleFonts.mulish(
-                    color: blackColor,
-                    fontSize: screenHeight * 0.022,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                SizedBox(height: screenHeight * 0.12),
-
                 OtpForm(
                   onOtpEntered: _handleOtpEntered,
                   onOtpChanged: _handleOtpChanged,

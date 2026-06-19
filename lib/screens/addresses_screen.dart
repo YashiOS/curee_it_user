@@ -45,6 +45,7 @@ class _AddressesScreenState extends State<AddressesScreen> {
     var response = await http.Client().send(request);
 
     if (response.statusCode == 200) {
+      print('Fetch addresses response is ${response}');
       final data = json.decode(await response.stream.bytesToString());
       setState(() {
         addresses = data['data']['address'];

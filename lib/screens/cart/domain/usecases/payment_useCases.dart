@@ -42,4 +42,18 @@ class PaymentUsecases {
       userLong: userLong,
     );
   }
+
+  Future<NonPrescriptionOrderData> initiateNonPrescriptionOrder({
+    required String userId,
+    required String shippingAddress,
+    required dynamic userLat,
+    required dynamic userLong,
+  }) {
+    return repository.initiateNonPrescriptionOrder(
+      userId: userId,
+      shippingAddress: shippingAddress,
+      userLat: userLat,
+      userLong: userLong,
+    );
+  }
 }

@@ -16,6 +16,7 @@ class BaseScreen extends ConsumerStatefulWidget {
   const BaseScreen({super.key, required this.Navigatedfrom});
   final String Navigatedfrom;
 
+
   @override
   ConsumerState<BaseScreen> createState() => _BaseScreenState();
 }
@@ -33,16 +34,14 @@ class _BaseScreenState extends ConsumerState<BaseScreen> {
   @override
   void initState() {
     super.initState();
-    if (widget.Navigatedfrom == "from_main") {
-      final cubit = context.read<StoreUserCubit>();
+    final cubit = context.read<StoreUserCubit>();
 
-      if (cubit.isUserDataAvailable()) {
-        userData = cubit.getUserData();
-        print("User data fetched: $userData");
-        storeDataGlobaly();
-      } else {
-        print("No user data found in Hive.");
-      }
+    if (cubit.isUserDataAvailable()) {
+      userData = cubit.getUserData();
+      print("User data fetched: $userData");
+      storeDataGlobaly();
+    } else {
+      print("No user data found in Hive.");
     }
   }
 
@@ -60,7 +59,7 @@ class _BaseScreenState extends ConsumerState<BaseScreen> {
           // ✅ If location not available → show HomeScreen only
           if (serviceState.currentLocationAvailable == false) {
             return Scaffold(
-              backgroundColor: lightWhiteColor,
+              backgroundColor: lightBlackColor,
               body: HomeScreen(
                 latitude: "100.0",
                 longitude: "100.0",
@@ -70,7 +69,7 @@ class _BaseScreenState extends ConsumerState<BaseScreen> {
 
           // ✅ Else show full app with bottom navigation
           return Scaffold(
-            backgroundColor: lightWhiteColor,
+            backgroundColor: Colors.black,
             body: Stack(
               children: [
                 TabBarView(
@@ -93,53 +92,58 @@ class _BaseScreenState extends ConsumerState<BaseScreen> {
                           bottom: Platform.isIOS ? 10.0 : 0.0,
                         ),
                         decoration: BoxDecoration(
-                          color: scaffoldWhiteColor,
-                          border: Border.all(color: scaffoldWhiteColor),
+                          color: Colors.black,
+                          border: Border.all(color: Colors.black),
                         ),
-                        child: AnimatedBuilder(
-                          animation: tabController,
-                          builder: (context, _) {
-                            return TabBar(
-                              indicatorColor: greenColor,
+                        child: TabBar(
+                          indicatorColor: greenColor,
 
-                              controller: tabController,
-                              labelColor: greenColor, // selected text & icon
-                              unselectedLabelColor:
-                                  greyColor, // unselected text & icon
-                              labelStyle: GoogleFonts.mulish(
-                                fontWeight: FontWeight.bold, // selected bold
-                                fontSize: 14,
+                          controller: tabController,
+                          labelColor: greenColor, // selected text & icon
+                          unselectedLabelColor:
+                              greyColor, // unselected text & icon
+                          labelStyle: GoogleFonts.mulish(
+                            fontWeight: FontWeight.bold, // selected bold
+                            fontSize: 14,
+                          ),
+                          unselectedLabelStyle: GoogleFonts.mulish(
+                            fontWeight: FontWeight.bold, // slightly bold
+                            fontSize: 14,
+                          ),
+                          tabs: [
+                            Tab(
+                              icon: AnimatedBuilder(
+                                animation: tabController,
+                                builder: (context, _) => Image.asset(
+                                  "lib/images/Home.png",
+                                  height: 24,
+                                  width: 24,
+                                  color: tabController.index == 0
+                                      ? greenColor
+                                      : greyColor,
+                                ),
                               ),
-                              unselectedLabelStyle: GoogleFonts.mulish(
-                                fontWeight: FontWeight.bold, // slightly bold
-                                fontSize: 14,
+                              text: "Home",
+                            ),
+                            Tab(
+                              icon: AnimatedBuilder(
+                                animation: tabController,
+                                builder: (context, _) => Image.asset(
+                                  "lib/images/Order Again.png",
+                                  height: 24,
+                                  width: 24,
+                                  color: tabController.index == 1
+                                      ? greenColor
+                                      : greyColor,
+                                ),
                               ),
-                              tabs: [
-                                Tab(
-                                  icon: Image.asset(
-                                    "lib/images/Home.png",
-                                    height: 24,
-                                    width: 24,
-                                    color: tabController.index == 0 ? greenColor : greyColor, 
-                                  ),
-                                  text: "Home",
-                                ),
-                                Tab(
-                                  icon: Image.asset(
-                                    "lib/images/Order Again.png",
-                                    height: 24,
-                                    width: 24,
-                                   color: tabController.index == 1 ? greenColor : greyColor, 
-                                  ),
-                                  text: "Order Again",
-                                ),
-                                Tab(
-                                  icon: Icon(Icons.shopping_cart_outlined),
-                                  text: "Cart",
-                                ),
-                              ],
-                            );
-                          },
+                              text: "Order Again",
+                            ),
+                            Tab(
+                              icon: Icon(Icons.shopping_cart_outlined),
+                              text: "Cart",
+                            ),
+                          ],
                         ),
                       ),
                     ],

@@ -333,7 +333,7 @@ _debounceTimer=Timer(Duration(seconds: 1), ()async{
                 children: [
                   SvgPicture.asset(
                     colorFilter:
-                        ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                        ColorFilter.mode(blackColor, BlendMode.srcIn),
                     "lib/images/back.svg",
                     width: 24, // optional
                     height: 24, // optional

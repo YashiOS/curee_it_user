@@ -12,7 +12,7 @@ class PrescriptionRepoImpl implements PrescriptionRepo {
       String userId, List<String> prescriptions) async {
     final body = {
       "userId": userId,
-      "prescriptionPhotos": prescriptions, // base64 list
+      "prescriptionPhotos": prescriptions,
     };
 
     final response =

@@ -17,6 +17,15 @@ class UploadPrescriptionBottomSheet extends ConsumerWidget {
     final prescriptionState = ref.watch(prescriptionProvider);
     final notifier = ref.read(prescriptionProvider.notifier);
 
+    ref.listen<PrescriptionState>(prescriptionProvider, (previous, next) {
+      if (next.prescriptionStatus == "Accepted") {
+        final modalRoute = ModalRoute.of(context);
+        if (modalRoute != null && modalRoute.isCurrent) {
+          Navigator.of(context).pop();
+        }
+      }
+    });
+
     return Container(
       decoration: BoxDecoration(
         color: lightWhiteColor,

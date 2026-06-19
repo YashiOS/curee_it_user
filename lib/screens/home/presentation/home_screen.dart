@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:cureeit_user_app/current_address/google_maps_screen.dart';
+import 'package:cureeit_user_app/current_address/location_permission_helper.dart';
 import 'package:cureeit_user_app/screens/home/domain/entities/orderEntity.dart';
 import 'package:cureeit_user_app/screens/home/presentation/providers/address_provider.dart';
 import 'package:cureeit_user_app/screens/home/presentation/providers/cart_provider.dart';
@@ -91,6 +91,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     }
   }
 
+  double _toDouble(dynamic value) {
+    if (value is num) return value.toDouble();
+    return double.tryParse(value?.toString() ?? '') ?? 0.0;
+  }
+
   void fetchAddresses(User? user) async {
     await ref
         .read(addressNotifierProvider.notifier)
@@ -98,22 +103,30 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     final addresses = ref.read(addressNotifierProvider).addresses;
 
     if (addresses.isEmpty) {
-      Navigator.of(
-        context,
-      ).push(MaterialPageRoute(builder: (context) => GoogleMapsScreen()));
+      // No saved address yet — fall back to the device's current location
+      // so the home screen can still check serviceability and show products.
+      try {
+        final position = await determinePosition();
+        ref
+            .read(orderNotifierProvider.notifier)
+            .checkLocation(position.latitude, position.longitude);
+      } catch (e) {
+        ref
+            .read(orderNotifierProvider.notifier)
+            .checkLocation(double.parse(widget.latitude), double.parse(widget.longitude));
+      }
     } else if (addresses.length == 1) {
       await ref
           .read(addressNotifierProvider.notifier)
           .setCurrentAddress(addresses[0], 0);
-      ref
-          .read(orderNotifierProvider.notifier)
-          .checkLocation(addresses[0].userLat, addresses[0].userLong);
+      ref.read(orderNotifierProvider.notifier).checkLocation(
+          _toDouble(addresses[0].userLat), _toDouble(addresses[0].userLong));
     } else {
       await ref.read(addressNotifierProvider.notifier).getCurrentAddress();
       final address = ref.read(addressNotifierProvider).currentAddress;
       if (address != null) {
         ref.read(orderNotifierProvider.notifier).checkLocation(
-            double.parse(address.userLat), double.parse(address.userLong));
+            _toDouble(address.userLat), _toDouble(address.userLong));
       }
       if (address == null) {
         AddressSelectorBottomSheet.show(context, addresses,
@@ -121,9 +134,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           await ref
               .read(addressNotifierProvider.notifier)
               .setCurrentAddress(address, index);
-          ref
-              .read(orderNotifierProvider.notifier)
-              .checkLocation(addresses[0].userLat, addresses[0].userLong);
+          ref.read(orderNotifierProvider.notifier).checkLocation(
+              _toDouble(address.userLat), _toDouble(address.userLong));
         });
       }
     }
@@ -215,14 +227,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
 
   @override
   Widget build(BuildContext context) {
-    final servicesAsync =
-        ref.watch(servicesProvider((widget.latitude, widget.longitude)));
     final orderState = ref.watch(orderNotifierProvider);
     final addressState = ref.watch(addressNotifierProvider);
     final cartItem = ref.watch(cartNotifierProvider).cartItems;
 
+    final currentAddress = addressState.currentAddress;
+    final lat = currentAddress != null
+        ? currentAddress.userLat.toString()
+        : widget.latitude;
+    final lng = currentAddress != null
+        ? currentAddress.userLong.toString()
+        : widget.longitude;
+    final servicesAsync = ref.watch(servicesProvider((lat, lng)));
+
     return Scaffold(
-      backgroundColor:WhiteColor,
+      backgroundColor:Colors.black,
       key: _scaffoldKey,
       body: Stack(
         children: [
@@ -249,8 +268,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
               slivers: [
                 // Header section
                 SliverAppBar(
-                  backgroundColor:  homepageWhite,
-                  expandedHeight: 60,
+                  backgroundColor:  Colors.black,
+                  expandedHeight: 90,
                   floating: false,
                   pinned: false,
                   flexibleSpace: FlexibleSpaceBar(
@@ -261,11 +280,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                           MaterialPageRoute(
                               builder: (context) => const LocationScreen()),
                         );
+                        await ref
+                            .read(addressNotifierProvider.notifier)
+                            .getCurrentAddress();
+                        final selected =
+                            ref.read(addressNotifierProvider).currentAddress;
+                        if (selected != null) {
+                          ref.read(orderNotifierProvider.notifier).checkLocation(
+                              _toDouble(selected.userLat),
+                              _toDouble(selected.userLong));
+                        }
                       },
                       child: Container(
-                        height: 75,
+                        height: 90,
                         decoration: BoxDecoration(
-                          color:  homepageWhite,
+                          color:  Colors.black,
                           borderRadius: BorderRadius.circular(8),
                         ),
                         child: Row(
@@ -273,20 +302,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Container(
-                              height: 80,
+                              height: 90,
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Container(
-                                    width: 70,
+                                    width: 80,
+                                    height: 35,
                                     child: Image.asset(
-                                        "lib/images/final_medkaro_logo.png"),
+                                        "lib/images/siccLog.png"),
                                   ),
                                   Text(
-                                    "In 8 Minutes",//"${orderState.estimatedTime}",
+                                    "Delivering in ${orderState.estimatedTime} mins",
                                     style: GoogleFonts.mulish(
-                                      color: blackColor,
+                                      color: WhiteColor,
                                       fontSize:
                                           MediaQuery.of(context).size.width *
                                               0.055,
@@ -312,7 +343,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                 child: Text(
                                                   "${addressState.currentAddress?.type} :",
                                                   style: TextStyle(
-                                                    color: blackColor,
+                                                    color: WhiteColor,
                                                     fontWeight: FontWeight.bold,
                                                     fontSize: 17,
                                                   ),
@@ -325,7 +356,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                                   overflow:
                                                       TextOverflow.ellipsis,
                                                   style: GoogleFonts.mulish(
-                                                    color: blackColor,
+                                                    color: WhiteColor,
                                                     fontWeight: FontWeight.w400,
                                                     fontSize: 15,
                                                   ),
@@ -374,7 +405,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                 if (orderState.currentLocationAvailable == true &&
                     orderState.ongoingOrders.isNotEmpty)
                   SliverAppBar(
-                    backgroundColor:  WhiteColor,
+                    backgroundColor:  Colors.transparent,
                     floating: true,
                     scrolledUnderElevation: 0,
                     elevation: 0,
@@ -390,7 +421,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   scrolledUnderElevation: 0,
                   elevation: 0,
                   expandedHeight: null,
-                  backgroundColor:  WhiteColor,
+                  backgroundColor:  Colors.black,
                   pinned: true,
                   flexibleSpace: Container(
                     child: Column(
@@ -481,18 +512,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                         ),
                         Container(
                           padding: const EdgeInsets.only(top: 5, bottom: 5),
-                          color:  homepageWhite,
+                          color:  Colors.black,
                           child: Align(
                             alignment: Alignment.bottomLeft,
                             child: Text(
                               orderState.currentLocationAvailable == true
                                   ? "Frequently Bought"
-                                  : "",
+                                  : "Unknown",
                               style: GoogleFonts.mulish(
                                 fontSize:
                                     MediaQuery.of(context).size.width * 0.038,
                                 fontWeight: FontWeight.bold,
-                                color: blackColor,
+                                color: WhiteColor,
                               ),
                             ),
                           ),
@@ -517,8 +548,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                       ),
                     ),
                   ),
-                if (orderState.currentLocationAvailable != null &&
-                    orderState.currentLocationAvailable == true)
+                // if (orderState.currentLocationAvailable != null &&
+                //     orderState.currentLocationAvailable == true)
                   SliverPadding(
                     padding: EdgeInsets.only(
                         bottom:
@@ -547,12 +578,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
           if (cartItem.length > 0)
             Positioned(
               right: 0,
-              bottom: 76,
+              bottom: 75,
               child: Container(
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.height * 0.10,
                 decoration: BoxDecoration(
-                  color:  scaffoldWhiteColor,
+                  color:  Colors.black,
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.1),
@@ -603,10 +634,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                   ),
                                   border: Border.all(
                                     width: 2,
-                                    color: greyColor,
+                                    color: blackColor,
                                   ),
                                 ),
-                                child: Icon(Icons.image),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(10),
+                                  child: Image.asset("lib/images/siccLog.png", fit: BoxFit.contain),
+                                ),
                               ),
                               Row(
                                 children: [
@@ -619,9 +653,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                     ),
                                   ),
                                   Text(
-                                    "|  ₹ 999",
+                                    '|  ₹${ref.watch(cartNotifierProvider).finalTotal}',
                                     style: GoogleFonts.mulish(
-                                      color: blackColor,
+                                      color: WhiteColor,
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold,
                                     ),
@@ -631,7 +665,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                             ],
                           ),
                           GestureDetector(
-                            onTap: () async {},
+                            onTap: () {
+                              DefaultTabController.of(context).animateTo(2);
+                            },
                             child: Container(
                               width: 90,
                               height: 40,

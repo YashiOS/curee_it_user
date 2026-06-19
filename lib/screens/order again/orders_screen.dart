@@ -25,12 +25,12 @@ class OrdersScreen extends ConsumerWidget {
     });
 
     return Scaffold(
-      backgroundColor:WhiteColor,
+      backgroundColor:Colors.black,
       appBar: AppBar(
         elevation: 0,
         scrolledUnderElevation: 0,
         centerTitle: true,
-        backgroundColor: WhiteColor,
+        backgroundColor: blackColor,
         shape: const ContinuousRectangleBorder(
           borderRadius: BorderRadius.only(
             bottomLeft: Radius.circular(10),
@@ -42,7 +42,7 @@ class OrdersScreen extends ConsumerWidget {
           style: GoogleFonts.mulish(
             fontWeight: FontWeight.w500,
             fontSize: 22.69,
-            color: blackColor,
+            color: WhiteColor,
           ),
         ),
         leading: GestureDetector(
@@ -82,7 +82,7 @@ class OrdersScreen extends ConsumerWidget {
                     style: GoogleFonts.mulish(
                       fontWeight: FontWeight.w500,
                       fontSize: 20,
-                      color: greyColor,
+                      color: WhiteColor.withOpacity(0.5),
                     ),
                   ),
                 )
@@ -94,7 +94,7 @@ class OrdersScreen extends ConsumerWidget {
                   
                   width: MediaQuery.of(context).size.width,
                   height: MediaQuery.of(context).size.height,
-                  color: textFieldFillColor,
+                  color: Colors.black,
                   child: ListView.builder(
                     itemCount: orderState.allOrders.length,
                     itemBuilder: (context, index) {

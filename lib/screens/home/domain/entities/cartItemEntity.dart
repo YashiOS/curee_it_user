@@ -54,16 +54,16 @@ class CartItemEntity {
     required this.productPrice,
   });
 
-  factory CartItemEntity.fromJson(Map<String, dynamic> json) {
-    return CartItemEntity(
-      prescription: json['prescription_required']??'N/A',
-      productId: json['productId'] ?? '',
-      quantity: json['quantity'] ?? '0',
-      name: json['productName'] ?? '',
-      sellingPrice:json['sellingPrice'] ,
-      productMarketer: json['productMarketer'] ?? '',
-      imageUrls: List<String>.from(json['imageUrls'] ?? []),
-      productPrice: (json['productPrice'] as num).toDouble(),
-    );
-  }
+ factory CartItemEntity.fromJson(Map<String, dynamic> json) {
+  return CartItemEntity(
+    prescription: json['prescription_required'] ?? 'N/A',
+    productId: json['productId'] ?? '',
+    quantity: (json['quantity'] as num?)?.toInt() ?? 0,
+    name: json['productName'] ?? '',
+    sellingPrice: (json['sellingPrice'] as num?)?.toDouble() ?? 0.0,
+    productMarketer: json['productMarketer'] ?? '',
+    imageUrls: List<String>.from(json['imageUrls'] ?? []),
+    productPrice: (json['productPrice'] as num?)?.toDouble() ?? 0.0,
+  );
+}
 }

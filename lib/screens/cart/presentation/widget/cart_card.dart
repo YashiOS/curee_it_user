@@ -77,7 +77,7 @@ class CartCard extends ConsumerWidget {
                           style: GoogleFonts.mulish(
                             fontWeight: FontWeight.w700,
                             fontSize: 13,
-                            color: blackColor,
+                            color: WhiteColor,
                           ),
                         ),
                         Text(
@@ -185,10 +185,10 @@ class CartCard extends ConsumerWidget {
                           Text(
                             "₹$productPrice",
                             style: GoogleFonts.mulish(
-                                color: const Color.fromARGB(255, 0, 0, 0),
+                                color: greyColor,
                                 decoration: TextDecoration.lineThrough,
                                 fontSize: 10,
-                                decorationColor: greyColor),
+                                decorationColor: Colors.white),
                           ),
                           Text(
                             "₹$sellingPrice",
@@ -196,7 +196,7 @@ class CartCard extends ConsumerWidget {
                               
                                fontWeight: FontWeight.w700,
                               fontSize: 13,
-                              color: blackColor,
+                              color: WhiteColor,
                             ),
                           ),
                         ],

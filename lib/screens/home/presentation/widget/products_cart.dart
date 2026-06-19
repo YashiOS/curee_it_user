@@ -1,3 +1,4 @@
+import 'package:cureeit_user_app/screens/item_detail_screen.dart';
 import 'package:cureeit_user_app/screens/home/domain/entities/cartItemEntity.dart';
 import 'package:cureeit_user_app/screens/home/presentation/providers/cart_provider.dart';
 import 'package:cureeit_user_app/screens/otp/presentation/provider/otpProvider.dart';
@@ -43,11 +44,11 @@ class ProductCard extends ConsumerWidget {
       width: 147,
       height: 202,
       decoration: BoxDecoration(
-        color: homepageWhite,
+        color: blackColor,
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.25), // light shadow
+            color: Colors.white.withOpacity(0.25), // light shadow
             blurRadius: 6, // softness
             offset: Offset(0, 2), // slight downward shadow
           ),
@@ -62,14 +63,13 @@ class ProductCard extends ConsumerWidget {
             height: 109,
             child: GestureDetector(
               onTap: () async {
-                //await Navigator.push(
-                //context,
-                // MaterialPageRoute(
-                // builder: (context) =>
-                //   ItemDetailScreen(productId: product['productId']),
-                // ),
-                //);
-                //await fetchCartDetails();
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        ItemDetailScreen(productId: product.productId),
+                  ),
+                );
               },
               child: Container(
                 width: double.infinity,
@@ -108,9 +108,9 @@ class ProductCard extends ConsumerWidget {
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: GoogleFonts.mulish(
-                fontSize: containerHeight * 0.04,
+                fontSize: containerHeight * 0.03,
                 fontWeight: FontWeight.w700,
-                color: blackColor,
+                color: WhiteColor,
               ),
             ),
           ),
@@ -128,16 +128,16 @@ class ProductCard extends ConsumerWidget {
                     Text(
                       "₹${product.discountedPrice}",
                       style: GoogleFonts.mulish(
-                        color: blackColor,
+                        color: WhiteColor,
                         fontWeight: FontWeight.bold,
-                        fontSize: 14,
+                        fontSize: 12,
                       ),
                     ),
                     Text(
                       "₹${product.price}",
                       style: GoogleFonts.mulish(
-                        color: greyColor,
-                        fontSize: 12,
+                        color: greenColor,
+                        fontSize: 10,
                         decoration: TextDecoration.lineThrough,
                         decorationColor: greyColor,
                       ),
@@ -146,7 +146,7 @@ class ProductCard extends ConsumerWidget {
                 ),
                 Container(
                   width: 50,
-                  height: 29,
+                  height: 35,
                   decoration: BoxDecoration(
                     color: lightWhiteColor,
                     border: Border.all(color: greenColor, width: 1),

@@ -136,7 +136,6 @@ class Assets {
   static const String screensOrderDetailScreen = 'lib/screens/order_detail_screen.dart';
   static const String screensOrderSuccessScreen = 'lib/screens/Order_SuccessScreen.dart';
   static const String screensOrderTrackingScreen = 'lib/screens/order_tracking_screen.dart';
-  static const String screensOrderTrackingScreen 2 = 'lib/screens/order_tracking_screen 2.dart';
   static const String screensOrderdetailScreenNew = 'lib/screens/orderdetail_screen_new.dart';
   static const String screensOrdersScreen = 'lib/screens/orders_screen.dart';
   static const String screensOtpScreen = 'lib/screens/otp_screen.dart';

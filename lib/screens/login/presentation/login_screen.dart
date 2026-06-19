@@ -133,7 +133,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       resizeToAvoidBottomInset: false,
       body: SingleChildScrollView(
         child: Container(
-          color:  WhiteColor,
+          color:  Colors.black,
           width: screenWidth,
           height: screenHeight,
           child: Stack(
@@ -148,19 +148,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Image.asset(
-                      "lib/images/MEDKARO.png",
-                      height: screenHeight * 0.06,
-                      width: screenWidth * 0.5,
+                      "lib/images/siccLog.png",
+                      height: screenHeight * 0.25,
+                      width: screenWidth,
+                      fit: BoxFit.contain,
                     ),
-                    Text(
-                      "10-minute medicine delivery",
-                      style: GoogleFonts.mulish(
-                        color: blackColor,
-                        fontWeight: FontWeight.w500,
-                        fontSize: screenHeight * 0.022,
-                      ),
-                    ),
-                    SizedBox(height: screenHeight * 0.123),
                     Container(
                       width: screenWidth * 0.85,
                       decoration: BoxDecoration(

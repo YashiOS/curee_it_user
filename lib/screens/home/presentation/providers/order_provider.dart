@@ -71,7 +71,6 @@ class OrderNotifier extends StateNotifier<OrderState> {
 
   Future<void> checkLocation(double lat, double long) async {
     try {
-      
       final location = await useCase.checkLocation(lat, long);
       state = state.copyWith(currentLocationAvailable: location);
       final servicibility = await useCase.checkServiceability(lat, long);

@@ -72,7 +72,8 @@ class PaymentNotifier extends StateNotifier<PaymentState> {
       state = state.copyWith(loading: true, error: '');
       final finalTotal =double.parse(total);
 
-      // 1) Get session id + order id from backend
+      print('getPaymentSessionId → userId: $userId | totalAmount: $finalTotal | availableId: $availableId');
+
       final PaymentOrderData orderData = await usecases.getPaymentSessionId(
         userId: userId,
         totalAmount: finalTotal,
@@ -104,6 +105,11 @@ class PaymentNotifier extends StateNotifier<PaymentState> {
     } catch (e) {
       state = state.copyWith(loading: false, error: e.toString());
       print('getPaymentSessionAndStart error: $e');
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Payment error: ${e.toString()}')),
+        );
+      }
     }
   }
 
@@ -180,7 +186,7 @@ class PaymentNotifier extends StateNotifier<PaymentState> {
 
         print("Prescription data cleared after successful payment");
 
-        // navigate to success
+        if (!context.mounted) return;
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(
@@ -189,14 +195,66 @@ class PaymentNotifier extends StateNotifier<PaymentState> {
         );
       } else {
         state = state.copyWith(loading: false, error: 'Payment failed');
+        if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Payment verification failed')));
       }
     } catch (e) {
       state = state.copyWith(loading: false, error: e.toString());
       print('verifyAndCreateCheckout error: $e');
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text('Payment error')));
+    }
+  }
+
+  Future<void> initiateNonPrescriptionOrder({
+    required String userId,
+    required String shippingAddress,
+    required dynamic userLat,
+    required dynamic userLong,
+    required BuildContext context,
+  }) async {
+    try {
+      state = state.copyWith(loading: true, error: '');
+      final orderData = await usecases.initiateNonPrescriptionOrder(
+        userId: userId,
+        shippingAddress: shippingAddress,
+        userLat: userLat,
+        userLong: userLong,
+      );
+
+      final paymentData = await usecases.getPaymentSessionId(
+        userId: userId,
+        totalAmount: orderData.finalTotal,
+        availableId: orderData.availableId,
+      );
+      state = state.copyWith(
+        loading: false,
+        paymentSessionId: paymentData.paymentSessionId,
+        orderId: paymentData.orderId,
+        paymentStarted: true,
+      );
+
+      await _startCashfreePayment(
+        userId: userId,
+        context: context,
+        orderId: paymentData.orderId,
+        paymentSessionId: paymentData.paymentSessionId,
+        total: orderData.finalTotal,
+        shippingCost: 0,
+        shippingAddress: shippingAddress,
+        availableId: orderData.availableId,
+        userLat: userLat,
+        userLong: userLong,
+      );
+    } catch (e) {
+      state = state.copyWith(loading: false, error: e.toString());
+      print('initiateNonPrescriptionOrder error: $e');
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to place order: ${e.toString()}')),
+      );
     }
   }
 
