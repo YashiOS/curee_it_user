@@ -47,7 +47,6 @@ class OrderRepositoryImpl implements OrderRepository {
       "userLat": lat.toString(),
       "userLong": lng.toString(),
     });
-    print('Lat is ${lat}, long is ${lng}');
     final data = jsonDecode(response.body);
     if (data["serviceable"] == true) {
       return true;

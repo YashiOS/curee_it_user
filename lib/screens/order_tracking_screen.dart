@@ -152,7 +152,6 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
   }
 
   Future<void> fetchOrderTracking() async {
-    print("**************FETCH ORDER TRACKING****************************");
     String avildId = widget.orderId;
     var url = Uri.parse(
       '$baseUrl/order/orderTracking',
@@ -284,8 +283,6 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
       },
     );
 
-    // 🔹 Send your join message after connecting
-    print(widget.orderId);
     _channel!.sink.add('{"type":"joinOrderRoom","orderId":"${orderId}"}');
   }
 
@@ -321,12 +318,14 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      backgroundColor:  scaffoldWhiteColor,
+      backgroundColor:  blackColor,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(8)),
       ),
       builder: (context) {
-        return Padding(
+        return Container(
+          color: blackColor,
+          child: Padding(
           padding: EdgeInsets.only(
             bottom: MediaQuery.of(context).viewInsets.bottom,
             left: width * 0.08,
@@ -342,35 +341,52 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                 width: width * 0.15,
                 height: height * 0.006,
                 decoration: BoxDecoration(
-                  color: blackColor,
+                  color: WhiteColor,
                   borderRadius: BorderRadius.circular(width * 0.02),
                 ),
               ),
               SizedBox(height: height * 0.015),
               Container(
                 width: double.infinity,
-                child: Text(
+                child: 
+                Row(children: [
+                  Text("Order ID: ",
+                    style: GoogleFonts.mulish(
+                    fontSize: 14.78,
+                    fontWeight: FontWeight.bold,
+                    color: WhiteColor,
+                  ),
+                  textAlign: TextAlign.start,),
+                  Text(
                   "${orderTrackingDetails["orderId"] ?? ""}",
                   style: GoogleFonts.mulish(
                     fontSize: 13.78,
-                    color: blackColor,
+                    color: WhiteColor,
                   ),
                   textAlign: TextAlign.start,
                 ),
+                ]) 
               ),
               SizedBox(height: height * 0.005),
               Row(
                 children: [
+                  Text("Ordered at: ",
+                   style: GoogleFonts.mulish(
+                    fontSize: 14.78,
+                    fontWeight: FontWeight.bold,
+                    color: WhiteColor,
+                  ),
+                  textAlign: TextAlign.start),
                   Text(
                     formatDate(orderTrackingDetails['createdAt'] ?? ""),
                     style: GoogleFonts.mulish(
-                        fontSize: width * 0.035, color: blackColor),
+                        fontSize: width * 0.035, color: WhiteColor),
                   ),
                 ],
               ),
               ConstrainedBox(
                 constraints: BoxConstraints(
-                  maxHeight: height * 0.33,
+                  maxHeight: height,
                   minHeight: 0,
                 ),
                 child: ListView.builder(
@@ -387,7 +403,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                   },
                 ),
               ),
-              SizedBox(height: height * 0.015),
+              // SizedBox(height: height * 0.015),
               Padding(
                 padding: const EdgeInsets.only(top: 0, bottom: 0),
                 child: Row(
@@ -402,7 +418,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                             style: GoogleFonts.mulish(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w300,
-                                color: blackColor),
+                                color: WhiteColor),
                           ),
                         ],
                       ),
@@ -417,7 +433,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                           style: GoogleFonts.mulish(
                               fontSize: 14,
                               fontWeight: FontWeight.w400,
-                              color: blackColor),
+                              color: WhiteColor),
                         ),
                       ],
                     ),
@@ -487,7 +503,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                       style: GoogleFonts.mulish(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,
-                        color: blackColor,
+                        color: WhiteColor,
                       ),
                     ),
                     Text(
@@ -495,13 +511,14 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                       style: GoogleFonts.mulish(
                           fontWeight: FontWeight.bold,
                           fontSize: 15,
-                          color: blackColor),
+                          color: WhiteColor),
                     ),
                   ],
                 ),
               )
             ],
           ),
+          )
         );
       },
     );
@@ -545,7 +562,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                       0.04, // ~17 on 375px width
 
                   fontWeight: FontWeight.w700,
-                  color: blackColor,
+                  color: WhiteColor,
                 ),
               ),
               Text(
@@ -575,7 +592,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
       label,
       style: GoogleFonts.mulish(
         fontWeight: FontWeight.w600,
-        color: isInactive ? greyColor : blackColor,
+        color: isInactive ? greyColor : WhiteColor,
         fontSize: size * 0.03,
       ),
     );
@@ -594,9 +611,9 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
 
     return Container(
       margin: EdgeInsets.symmetric(vertical: height * 0.01),
-      padding: EdgeInsets.only(top: width * 0.03, bottom: width * 0.03),
+      padding: EdgeInsets.only(top: width * 0.00, bottom: width * 0.03),
       decoration: BoxDecoration(
-        color:  scaffoldWhiteColor,
+        color:  blackColor,
         borderRadius: BorderRadius.circular(8),
       ),
       child: Row(
@@ -610,7 +627,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                   style: GoogleFonts.mulish(
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
-                      color: blackColor),
+                      color: WhiteColor),
                 ),
                 SizedBox(height: height * 0.005),
                 Text(
@@ -627,7 +644,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
           Text(
             "₹ ${total.toStringAsFixed(2)}",
             style: GoogleFonts.mulish(
-              color: blackColor,
+              color: WhiteColor,
               fontSize: width * 0.04,
               fontWeight: FontWeight.bold,
             ),
@@ -763,7 +780,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     if (orderTrackingDetails["status"] == "Not Available" ||
         orderTrackingDetails["status"] == "Rejected") {
       return Scaffold(
-        backgroundColor:  scaffoldWhiteColor,
+        backgroundColor:  Colors.black,
         body: _isInitLoading
             ? Center(
                 child: CircularProgressIndicator(
@@ -807,7 +824,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                               style: GoogleFonts.mulish(
                                 fontSize: 26,
                                 fontWeight: FontWeight.bold,
-                                color: blackColor,
+                                color: WhiteColor,
                               ),
                             ),
                           ),
@@ -829,11 +846,6 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     final dynamic dropLng =
         orderTrackingDetails['dropDetails']?['address']?['lng'] ?? 0.0;
 
-    print(vendorLat);
-    print(vendorLng);
-    print(partnerLat);
-    print(partnerLng);
-    print(widget.orderId);
     double lat = (vendorLat is String)
         ? double.tryParse(vendorLat) ?? 0.0
         : (vendorLat ?? 0.0).toDouble();
@@ -842,7 +854,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
         : (vendorLng ?? 0.0).toDouble();
 
     return Scaffold(
-      backgroundColor:  scaffoldWhiteColor,
+      backgroundColor:  Colors.black,
       body: _isInitLoading
           ? Center(
               child: CircularProgressIndicator(
@@ -967,7 +979,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                       height: height * 0.3, // Adjust this value as needed
                       padding: EdgeInsets.all(width * 0.04),
                       decoration: BoxDecoration(
-                        color: lightWhiteColor,
+                        color: blackColor,
                         borderRadius:
                             BorderRadius.vertical(top: Radius.circular(8)),
                         boxShadow: [
@@ -1010,7 +1022,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                                     margin: EdgeInsets.only(top: 7),
                                     child: Divider(
                                       thickness: 1,
-                                      color: lightWhiteColor,
+                                      color: blackColor,
                                     ),
                                   ),
                                 ),
@@ -1035,7 +1047,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                                     margin: EdgeInsets.only(top: 7),
                                     child: Divider(
                                       thickness: 1,
-                                      color: lightWhiteColor,
+                                      color: blackColor,
                                     ),
                                   ),
                                 ),
@@ -1055,7 +1067,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                                   child: Container(
                                     margin: EdgeInsets.only(top: 7),
                                     child: Divider(
-                                        thickness: 1, color: lightWhiteColor),
+                                        thickness: 1, color: blackColor),
                                   ),
                                 ),
                                 DeliveryStatus(

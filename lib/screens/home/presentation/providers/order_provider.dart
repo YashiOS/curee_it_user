@@ -74,8 +74,6 @@ class OrderNotifier extends StateNotifier<OrderState> {
       final location = await useCase.checkLocation(lat, long);
       state = state.copyWith(currentLocationAvailable: location);
       final servicibility = await useCase.checkServiceability(lat, long);
-     print("AVILABLE IN THIS ADDRESS $location");
-     print("DARKSTORE IS OPEN $servicibility");
       if (location) {
         if (servicibility==true) {
           final estTime = await useCase.getEstimatedTime(lat, long);

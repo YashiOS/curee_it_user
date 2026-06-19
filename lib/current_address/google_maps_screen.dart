@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:cureeit_user_app/current_address/api_services.dart';
 import 'package:cureeit_user_app/current_address/location_permission_helper.dart';
 import 'package:cureeit_user_app/current_address/map_style.dart';
@@ -22,6 +24,7 @@ class GoogleMapsScreen extends StatefulWidget {
 
 class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
   GoogleMapController? _mapController;
+  final Completer<GoogleMapController> _controllerCompleter = Completer();
   bool currentLocationFething = false;
   TextEditingController searchPlaceController = TextEditingController();
   GetPlaces getPlaces = GetPlaces();
@@ -33,15 +36,13 @@ class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
   bool isLoading = true;
   late String mapDarkStyle;
 
-  void _changeCameraPosition(double lat, double lng) {
-    
-    CameraPosition newPosition = CameraPosition(
-      target: LatLng(lat, lng),
-      zoom: 18, // Zoom level
+  Future<void> _changeCameraPosition(double lat, double lng) async {
+    final controller = await _controllerCompleter.future;
+    controller.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(target: LatLng(lat, lng), zoom: 18),
+      ),
     );
-
-    // Animate the camera to the new position
-    _mapController?.animateCamera(CameraUpdate.newCameraPosition(newPosition));
   }
 
   getAddress() {
@@ -86,22 +87,22 @@ print(value.longitude);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:  scaffoldWhiteColor,
+      backgroundColor:  Colors.black,
       appBar: AppBar(
         scrolledUnderElevation: 0,
             elevation: 0,
-        backgroundColor:  scaffoldWhiteColor,
+        backgroundColor:  blackColor,
         centerTitle: true,
         shape: ContinuousRectangleBorder(
           borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(10),
-            bottomRight: Radius.circular(10),
+            bottomLeft: Radius.circular(0),
+            bottomRight: Radius.circular(0),
           ),
         ),
         title: Text(
           "Select Location",
           style: GoogleFonts.mulish(
-              color: blackColor, fontSize: 22.69, fontWeight: FontWeight.w400),
+              color: WhiteColor, fontSize: 22.69, fontWeight: FontWeight.w400),
         ),
         leading: Padding(
           padding: const EdgeInsets.only(left: 24.0),
@@ -116,7 +117,7 @@ print(value.longitude);
                 children: [
                   SvgPicture.asset(
                     colorFilter:
-                        ColorFilter.mode(blackColor, BlendMode.srcIn),
+                        ColorFilter.mode(WhiteColor, BlendMode.srcIn),
                     "lib/images/back.svg",
                     width: 24, // optional
                     height: 24, // optional
@@ -142,6 +143,9 @@ print(value.longitude);
                     style: LightMapStyle,
                     onMapCreated: (GoogleMapController controller) {
                       _mapController = controller;
+                      if (!_controllerCompleter.isCompleted) {
+                        _controllerCompleter.complete(controller);
+                      }
                     },
                     mapType: MapType.normal,
                     initialCameraPosition: CameraPosition(
@@ -170,12 +174,10 @@ print(value.longitude);
                     },
                   ),
                 ),
-                // Add this widget just above the Center widget that contains your pin
-                // Add this to your Stack children (replace your current Positioned widgets)
                 if (MediaQuery.of(context).viewInsets.bottom == 0)
                 Positioned(
                   bottom: MediaQuery.of(context).size.height * 0.44 +
-                      25, // 25 is half of pin height
+                      25,
                   left: 0,
                   right: 0,
                   child: Column(
@@ -201,7 +203,7 @@ print(value.longitude);
                             Text(
                               "Order will be delivered here",
                               style: GoogleFonts.mulish(
-                                color: blackColor,
+                                color: WhiteColor,
                                 fontSize: 16,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -210,7 +212,7 @@ print(value.longitude);
                             Text(
                               "Place the pin to your exact location",
                               style: GoogleFonts.mulish(
-                                color: blackColor,
+                                color: WhiteColor,
                                 fontSize: 12.6,
                                 fontWeight: FontWeight.w500,
                               ),

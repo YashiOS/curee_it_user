@@ -33,14 +33,14 @@ class _LocationScreenState extends State<LocationScreen> {
     setState(() {
       fetchingAddress=true;
     });
-    var url = Uri.parse(
-      '$baseUrl/address/savedAddress?userId=${User.userId}',
-    );
+    var url = Uri.parse('$baseUrl/address/savedAddress');
 
     print('userID is ${User.userId}');
-    var response = await http.get(url, headers: {
-      'Content-Type': 'application/json',
-    });
+    final request = http.Request('GET', url)
+      ..headers['Content-Type'] = 'application/json'
+      ..body = json.encode({'userId': User.userId});
+    final streamed = await http.Client().send(request);
+    final response = await http.Response.fromStream(streamed);
 
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
@@ -143,7 +143,7 @@ class _LocationScreenState extends State<LocationScreen> {
                 child: Container(
                   padding: const EdgeInsets.only(top: 8, bottom: 8, left: 8),
                   decoration: BoxDecoration(
-                    color: lightWhiteColor, // dark background
+                    color: blackColor, // dark background
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Row(
@@ -163,7 +163,7 @@ class _LocationScreenState extends State<LocationScreen> {
                         child: Text(
                           "Search for your location",
                           style: GoogleFonts.mulish(
-                            color: blackColor,
+                            color: WhiteColor,
                             fontWeight: FontWeight.w300,
                             fontSize: 17,
                           ),
@@ -184,7 +184,7 @@ class _LocationScreenState extends State<LocationScreen> {
                   style: GoogleFonts.mulish(
                     fontSize: 18,
                     fontWeight: FontWeight.w500,
-                    color: blackColor,
+                    color: WhiteColor,
                   ),
                 ),
               ),
@@ -233,7 +233,7 @@ class _LocationScreenState extends State<LocationScreen> {
                                       ),
                                       decoration: BoxDecoration(
                                         borderRadius: BorderRadius.circular(8),
-                                        color: lightWhiteColor,
+                                        color: blackColor,
                                       ),
                                       margin: EdgeInsets.only(bottom: 16),
                                       child: Container(
@@ -274,7 +274,7 @@ class _LocationScreenState extends State<LocationScreen> {
                                                       fontSize: 15,
                                                       fontWeight:
                                                           FontWeight.w500,
-                                                      color: blackColor,
+                                                      color: WhiteColor,
                                                     ),
                                                   ),
                                                   SizedBox(
@@ -286,7 +286,7 @@ class _LocationScreenState extends State<LocationScreen> {
                                                       fontSize: 13,
                                                       fontWeight:
                                                           FontWeight.w300,
-                                                      color: blackColor,
+                                                      color: WhiteColor,
                                                     ),
                                                   ),
                                                 ],
