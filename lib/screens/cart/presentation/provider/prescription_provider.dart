@@ -21,9 +21,9 @@ class PrescriptionState {
   final String prescriptionStatus;
   final String AddPrescriptionButton;
   final int countdown;
-  final bool payNow; // Compressed base64 strings
+  final bool payNow;
+  final bool doctorCallLocked;
 
- 
   PrescriptionState({
     this.images = const [],
     this.base64List = const [],
@@ -32,6 +32,7 @@ class PrescriptionState {
     this.AddPrescriptionButton = 'Upload Prescription',
     this.countdown = 30,
     this.payNow = false,
+    this.doctorCallLocked = false,
   });
 
   PrescriptionState copyWith({
@@ -42,7 +43,7 @@ class PrescriptionState {
     String? AddPrescriptionButton,
     int? countdown,
     bool? payNow,
-
+    bool? doctorCallLocked,
   }) {
     return PrescriptionState(
       AvailableId: availableId ?? this.AvailableId,
@@ -52,6 +53,7 @@ class PrescriptionState {
       AddPrescriptionButton: AddPrescriptionButton ?? this.AddPrescriptionButton,
       countdown: countdown ?? this.countdown,
       payNow: payNow ?? this.payNow,
+      doctorCallLocked: doctorCallLocked ?? this.doctorCallLocked,
     );
   }
 }
@@ -60,8 +62,9 @@ class PrescriptionState {
 class PrescriptionNotifier extends StateNotifier<PrescriptionState> {
   final PrescriptionUsecases usecases;
   final ImagePicker _picker = ImagePicker();
-    Timer? pollingTimer;
+  Timer? pollingTimer;
   Timer? countdownTimer;
+  Timer? doctorStatusTimer;
   int elapsedSeconds = 0;
 
   PrescriptionNotifier(this.usecases) : super(PrescriptionState()) {}
@@ -190,6 +193,81 @@ class PrescriptionNotifier extends StateNotifier<PrescriptionState> {
       print("Error checking prescription status: $e");
       return "Error";
     }
+  }
+
+  Future<void> submitDoctorCallConsent(String userId, bool allowDoctorCall) async {
+    try {
+      final availableId = await usecases.submitDoctorCallConsent(userId, allowDoctorCall);
+
+      if (allowDoctorCall) {
+        state = state.copyWith(
+          availableId: availableId,
+          payNow: false,
+          doctorCallLocked: true,
+          prescriptionStatus: 'Pending doctor review',
+        );
+        startDoctorStatusPolling(userId, availableId);
+      } else {
+        resetWithoutPrescription();
+      }
+    } catch (e) {
+      print('Doctor call consent request failed: $e');
+      rethrow;
+    }
+  }
+
+  void startDoctorStatusPolling(String userId, String availableId) {
+    if (availableId.isEmpty) {
+      return;
+    }
+
+    doctorStatusTimer?.cancel();
+
+    doctorStatusTimer = Timer.periodic(const Duration(seconds: 5), (timer) async {
+      try {
+        final status = await usecases.checkDoctorStatus(userId, availableId);
+        print('doctorStatus => $status');
+
+        if (status.trim() == 'Rejected by doctor') {
+          timer.cancel();
+          state = state.copyWith(
+            doctorCallLocked: false,
+            payNow: false,
+            prescriptionStatus: status,
+            AddPrescriptionButton: 'Upload Prescription',
+          );
+          return;
+        }
+
+        state = state.copyWith(
+          doctorCallLocked: true,
+          payNow: false,
+          prescriptionStatus: status,
+        );
+      } catch (e) {
+        print('Doctor status polling failed: $e');
+      }
+    });
+  }
+
+  void continueWithoutPrescription() {
+    state = state.copyWith(
+      payNow: false,
+      doctorCallLocked: true,
+      prescriptionStatus: 'Pending doctor review',
+      AddPrescriptionButton: 'Continue without Prescription',
+    );
+  }
+
+  void resetWithoutPrescription() {
+    doctorStatusTimer?.cancel();
+    doctorStatusTimer = null;
+    state = state.copyWith(
+      payNow: false,
+      doctorCallLocked: false,
+      prescriptionStatus: 'Declined',
+      AddPrescriptionButton: 'Upload Prescription',
+    );
   }
 
   void removeImage(int index) async {

@@ -1,7 +1,4 @@
 import 'package:cureeit_user_app/Networking/api_service.dart';
-import 'package:cureeit_user_app/screens/home/domain/entities/cartItemEntity.dart';
-import 'package:cureeit_user_app/screens/home/domain/repositiries/cartRepo/cart_repository_implementation.dart';
-import 'package:cureeit_user_app/screens/home/domain/usecases/cart_useCase.dart';
 import 'package:cureeit_user_app/screens/login/domain/entities/loginEntity.dart';
 import 'package:cureeit_user_app/screens/login/domain/repositiries/loginRepo/login_repository_impl.dart';
 import 'package:cureeit_user_app/screens/login/domain/usecases/loginUseCase.dart';

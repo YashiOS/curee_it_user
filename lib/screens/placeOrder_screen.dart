@@ -3,14 +3,12 @@ import 'dart:io';
 import 'package:cureeit_user_app/screens/order_tracking_screen.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:cureeit_user_app/BaseUrl.dart';
 import 'package:cureeit_user_app/user/user.dart';
 import 'package:cureeit_user_app/selected_Address/currentAddress.dart';
-import 'package:cureeit_user_app/utils/widgets/LoadingIndicater.dart';
 import 'package:loading_indicator/loading_indicator.dart';
 
 class MedicineAvailabilityScreen extends StatefulWidget {

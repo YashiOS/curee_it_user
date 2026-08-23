@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:cureeit_user_app/BaseUrl.dart';
 import 'package:cureeit_user_app/cartManager/cartManager.dart';
 import 'package:cureeit_user_app/screens/cart/presentation/cart_screen.dart';
-import 'package:cureeit_user_app/screens/search.dart';
 import 'package:cureeit_user_app/user/user.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
@@ -13,7 +12,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-import 'package:loading_indicator/loading_indicator.dart';
 
 class ItemDetailScreen extends StatefulWidget {
   final String productId;
@@ -431,7 +429,7 @@ _debounceTimer=Timer(Duration(seconds: 1), ()async{
                                                               0.027,
                                                       fontWeight: FontWeight.bold,
                                                       color: Colors.grey
-                                                          .withOpacity(0.4)),
+                                                          .withValues(alpha: 0.4)),
                                                 )),
                                     )),
                               ),

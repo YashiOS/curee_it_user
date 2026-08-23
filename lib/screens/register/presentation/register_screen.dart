@@ -36,7 +36,7 @@ class _LoginScreenState extends ConsumerState<RegisterScreen> {
       );
       return;
     }
-    if (name == "" && name == null) {
+    if (name == "") {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Name can not be empty "),

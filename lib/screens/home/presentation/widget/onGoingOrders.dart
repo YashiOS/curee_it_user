@@ -43,7 +43,7 @@ class _OngoingOrdersSectionState extends State<OngoingOrdersSection> {
   color: lightGreenColor,
   borderRadius: BorderRadius.circular(8),
   border: Border.all(
-    // color: Colors.lightGreen.withOpacity(0.5), // or use your custom light green color
+    // color: Colors.lightGreen.withValues(alpha: 0.5), // or use your custom light green color
     width: 1,
   ),
 ),

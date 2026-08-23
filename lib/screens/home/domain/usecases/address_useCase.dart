@@ -1,7 +1,6 @@
 // lib/screens/home/domain/usecases/address_usecase.dart
 import 'package:cureeit_user_app/screens/home/domain/entities/addressEntity.dart';
 import 'package:cureeit_user_app/screens/home/domain/repositiries/addressRepo/address_repository.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class AddressUseCase {
   final AddressRepository repository;

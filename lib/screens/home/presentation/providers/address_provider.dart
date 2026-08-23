@@ -1,6 +1,7 @@
 import 'package:cureeit_user_app/Networking/api_service.dart';
 import 'package:cureeit_user_app/screens/home/domain/entities/addressEntity.dart';
 import 'package:cureeit_user_app/screens/home/domain/repositiries/addressRepo/address_repository_impl.dart';
+import 'package:cureeit_user_app/selected_Address/currentAddress.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';
 import '../../domain/usecases/address_usecase.dart';
@@ -54,6 +55,11 @@ class AddressNotifier extends StateNotifier<AddressState> {
   Future<void> setCurrentAddress(AddressEntity address, int index) async {
     try {
       await useCase.setCurrentAddress(address, index);
+      // Keep the legacy global Address.CurrentAddress in sync so screens
+      // that still read from it (place order, order tracking) get the
+      // right coordinates without requiring a manual address selection.
+      Address.CurrentAddress = address.toJson();
+      Address.selectedIndex = index;
       state = state.copyWith(currentAddress: address);
     } catch (e) {
       state = state.copyWith(error: e.toString());

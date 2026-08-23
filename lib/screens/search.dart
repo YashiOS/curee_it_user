@@ -53,14 +53,16 @@ class _SearchState extends State<Search> {
     });
 
     try {
-      final response = await http
-          .get(Uri.parse("$baseUrl/search/searchProducts?keyword=$query"));
+      final encodedQuery = Uri.encodeComponent(query);
+      final response = await http.get(
+        Uri.parse("$baseUrl/search/searchAllProducts?keyword=$encodedQuery"),
+      );
 
       if (response.statusCode == 200) {
         final jsonResponse = json.decode(response.body);
         if (jsonResponse["success"] == true) {
           setState(() {
-            _searchResults = jsonResponse["data"];
+            _searchResults = jsonResponse["data"] ?? [];
           });
         } else {
           setState(() {
@@ -357,7 +359,6 @@ class _SearchState extends State<Search> {
     final width = MediaQuery.of(context).size.width;
 
     final containerHeight = height * 0.45; // 🟢 Half screen height
-    final containerWidth = width * 0.3;
     return Scaffold(
       floatingActionButton: _inCartMap.isNotEmpty
           ? FloatingActionButton(
@@ -485,11 +486,9 @@ class _SearchState extends State<Search> {
                           gridDelegate:
                               SliverGridDelegateWithFixedCrossAxisCount(
                             crossAxisCount: 3, // Number of columns
-                            crossAxisSpacing:
-                                4, // Horizontal space between items
-                            mainAxisSpacing: 4, // Vertical space between items
+                            crossAxisSpacing: 12,
+                            mainAxisSpacing: 12,
                             childAspectRatio: width / (height * 1),
-                            //0.463, // Width/height ratio for each item
                           ),
                           itemCount: _searchResults.length,
                           itemBuilder: (context, index) {

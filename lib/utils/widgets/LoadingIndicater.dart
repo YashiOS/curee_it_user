@@ -11,7 +11,7 @@ class BubbleLoadingOverlay extends StatelessWidget {
         // Semi-transparent dark background
         Positioned.fill(
           child: Container(
-            color: const Color.fromARGB(19, 49, 49, 49).withOpacity(0.3),
+            color: const Color.fromARGB(19, 49, 49, 49).withValues(alpha: 0.3),
           ),
         ),
         // Centered loading indicator

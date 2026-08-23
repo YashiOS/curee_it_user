@@ -220,8 +220,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                                         horizontal: 16),
                                     height: 56,
                                     decoration: BoxDecoration(
-                                      color:
-                                          blackColor, // or any color you want
+                                      color: blackColor,
                                       borderRadius: BorderRadius.circular(8),
                                     ),
                                     child: Row(
@@ -231,7 +230,7 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                                         Text(
                                           'Upload Prescription',
                                           style: GoogleFonts.mulish(
-                                            color: blackColor,
+                                            color: lightWhiteColor,
                                             fontSize: 16,
                                             fontWeight: FontWeight.w500,
                                           ),
@@ -256,57 +255,171 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                                 SizedBox.shrink(),
                               if (cartState.prescription_required)
                                 GestureDetector(
-                                  onTap: () {},
-                                  child: Container(
-                                    margin: EdgeInsets.only(
-                                        bottom: 10, left: 18, right: 18),
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 16),
-                                    height: 75,
-                                    decoration: BoxDecoration(
-                                      color:
-                                          WhiteColor, 
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              'Continue without Prescription',
-                                              style: GoogleFonts.mulish(
-                                                color: greyColor,
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w500,
+                                  onTap: prescriptionState.doctorCallLocked
+                                      ? null
+                                      : () async {
+                                          final bool allowDoctorCall =
+                                              await showDialog<bool>(
+                                                    context: context,
+                                                    builder: (dialogContext) =>
+                                                        AlertDialog(
+                                                          backgroundColor:
+                                                              lightWhiteColor,
+                                                          title: Text(
+                                                            'Doctor call permission',
+                                                            style: GoogleFonts.mulish(
+                                                              color: blackColor,
+                                                              fontWeight:
+                                                                  FontWeight.w700,
+                                                              fontSize: 18,
+                                                            ),
+                                                          ),
+                                                          content: Text(
+                                                            'Doctor will contact you for your concern. Do you allow doctor to call you?',
+                                                            style: GoogleFonts.mulish(
+                                                              color: blackColor,
+                                                              fontWeight:
+                                                                  FontWeight.w500,
+                                                              fontSize: 14,
+                                                            ),
+                                                          ),
+                                                          actions: [
+                                                            TextButton(
+                                                              onPressed: () =>
+                                                                  Navigator.pop(
+                                                                      dialogContext,
+                                                                      false),
+                                                              child: Text(
+                                                                'Reject',
+                                                                style: GoogleFonts.mulish(
+                                                                  color: blackColor,
+                                                                  fontWeight:
+                                                                      FontWeight.w600,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                            TextButton(
+                                                              onPressed: () =>
+                                                                  Navigator.pop(
+                                                                      dialogContext,
+                                                                      true),
+                                                              child: Text(
+                                                                'Accept',
+                                                                style: GoogleFonts.mulish(
+                                                                  color: greenColor,
+                                                                  fontWeight:
+                                                                      FontWeight.w700,
+                                                                ),
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                  ) ??
+                                                  false;
+
+                                          if (allowDoctorCall) {
+                                            final userId = userState.user?.userId;
+                                            if (userId == null) {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                    'User session is unavailable.',
+                                                    style: GoogleFonts.mulish(),
+                                                  ),
+                                                ),
+                                              );
+                                              return;
+                                            }
+
+                                            try {
+                                              await ref
+                                                  .read(prescriptionProvider.notifier)
+                                                  .submitDoctorCallConsent(
+                                                      userId, true);
+                                            } catch (e) {
+                                              ScaffoldMessenger.of(context)
+                                                  .showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                    'Unable to save doctor call consent.',
+                                                    style: GoogleFonts.mulish(),
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                          } else {
+                                            ref
+                                                .read(prescriptionProvider.notifier)
+                                                .resetWithoutPrescription();
+                                            if (Navigator.canPop(context)) {
+                                              Navigator.pop(context);
+                                            }
+                                          }
+                                        },
+                                  child: Opacity(
+                                    opacity:
+                                        prescriptionState.doctorCallLocked
+                                            ? 0.55
+                                            : 1,
+                                    child: Container(
+                                      margin: EdgeInsets.only(
+                                          bottom: 10, left: 18, right: 18),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 16),
+                                      height: 75,
+                                      decoration: BoxDecoration(
+                                        color: prescriptionState.payNow
+                                            ? greenColor
+                                            : blackColor,
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                'Continue without Prescription',
+                                                style: GoogleFonts.mulish(
+                                                  color: prescriptionState.payNow
+                                                      ? blackColor
+                                                      : lightWhiteColor,
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w700,
+                                                ),
                                               ),
-                                            ),
-                                            Text(
-                                              'We will call you to confirm your order',
-                                              style: GoogleFonts.mulish(
-                                                color: greyColor,
-                                                fontSize: 13,
-                                                fontWeight: FontWeight.w300,
+                                              Text(
+                                                'We will call you to confirm your order',
+                                                style: GoogleFonts.mulish(
+                                                  color: prescriptionState.payNow
+                                                      ? blackColor.withValues(alpha: 0.72)
+                                                      : lightWhiteColor,
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
                                               ),
-                                            ),
-                                          ],
-                                        ),
-                                        Container(
-                                          width: 16,
-                                          height: 16,
-                                          decoration: BoxDecoration(
-                                            color: lightWhiteColor,
-                                            shape: BoxShape.circle,
+                                            ],
                                           ),
-                                        )
-                                      ],
+                                          Container(
+                                            width: 16,
+                                            height: 16,
+                                            decoration: BoxDecoration(
+                                              color: prescriptionState.payNow
+                                                  ? blackColor
+                                                  : lightWhiteColor,
+                                              shape: BoxShape.circle,
+                                            ),
+                                          )
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 )
@@ -558,7 +671,9 @@ class _CartScreenState extends ConsumerState<CartScreen> {
                                             ),
                                             Builder(
                                               builder: (context) {
-                                                final canPay = !cartState.prescription_required || prescriptionState.payNow;
+                                                final canPay = !cartState.prescription_required ||
+                                                    (prescriptionState.images.isNotEmpty &&
+                                                        prescriptionState.payNow);
                                                 final isPaymentLoading = ref.watch(paymentProvider).loading;
                                                 return GestureDetector(
                                                   onTap: () async {

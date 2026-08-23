@@ -1,12 +1,11 @@
 import 'dart:async';
 
 import 'package:cureeit_user_app/current_address/location_permission_helper.dart';
-import 'package:cureeit_user_app/screens/home/domain/entities/orderEntity.dart';
 import 'package:cureeit_user_app/screens/home/presentation/providers/address_provider.dart';
 import 'package:cureeit_user_app/screens/home/presentation/providers/cart_provider.dart';
 import 'package:cureeit_user_app/screens/home/presentation/providers/order_provider.dart';
 import 'package:cureeit_user_app/screens/home/presentation/providers/service_providers.dart';
-import 'package:cureeit_user_app/screens/home/presentation/widget/addressSelecter_bottomSheet.dart';
+import 'package:cureeit_user_app/screens/home/domain/entities/addressEntity.dart';
 import 'package:cureeit_user_app/screens/home/presentation/widget/onGoingOrders.dart';
 import 'package:cureeit_user_app/screens/home/presentation/widget/product_grid.dart';
 import 'package:cureeit_user_app/screens/location.dart';
@@ -14,10 +13,10 @@ import 'package:cureeit_user_app/screens/otp/domain/entities/userEntity.dart';
 import 'package:cureeit_user_app/screens/otp/presentation/provider/otpProvider.dart';
 import 'package:cureeit_user_app/screens/profile_screen.dart';
 import 'package:cureeit_user_app/screens/search.dart';
-import 'package:cureeit_user_app/screens/search_screen.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -96,6 +95,33 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
     return double.tryParse(value?.toString() ?? '') ?? 0.0;
   }
 
+  AddressEntity? _nearestAddress(
+    List<AddressEntity> addresses,
+    Position position,
+  ) {
+    AddressEntity? nearest;
+    double nearestDistance = double.infinity;
+
+    for (final address in addresses) {
+      final latitude = double.tryParse(address.userLat?.toString() ?? '');
+      final longitude = double.tryParse(address.userLong?.toString() ?? '');
+      if (latitude == null || longitude == null) continue;
+
+      final distance = Geolocator.distanceBetween(
+        position.latitude,
+        position.longitude,
+        latitude,
+        longitude,
+      );
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearest = address;
+      }
+    }
+
+    return nearest;
+  }
+
   void fetchAddresses(User? user) async {
     await ref
         .read(addressNotifierProvider.notifier)
@@ -122,22 +148,29 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
       ref.read(orderNotifierProvider.notifier).checkLocation(
           _toDouble(addresses[0].userLat), _toDouble(addresses[0].userLong));
     } else {
-      await ref.read(addressNotifierProvider.notifier).getCurrentAddress();
-      final address = ref.read(addressNotifierProvider).currentAddress;
-      if (address != null) {
-        ref.read(orderNotifierProvider.notifier).checkLocation(
-            _toDouble(address.userLat), _toDouble(address.userLong));
-      }
-      if (address == null) {
-        AddressSelectorBottomSheet.show(context, addresses,
-            onAddressSelected: (index, address) async {
+      try {
+        final position = await determinePosition();
+        final nearestAddress = _nearestAddress(addresses, position);
+
+        if (nearestAddress != null) {
+          final nearestIndex = addresses.indexOf(nearestAddress);
           await ref
               .read(addressNotifierProvider.notifier)
-              .setCurrentAddress(address, index);
+              .setCurrentAddress(nearestAddress, nearestIndex);
           ref.read(orderNotifierProvider.notifier).checkLocation(
-              _toDouble(address.userLat), _toDouble(address.userLong));
-        });
-      }
+              _toDouble(nearestAddress.userLat),
+              _toDouble(nearestAddress.userLong));
+          return;
+        }
+      } catch (_) {}
+
+      final fallbackAddress = addresses[0];
+      await ref
+          .read(addressNotifierProvider.notifier)
+          .setCurrentAddress(fallbackAddress, 0);
+      ref.read(orderNotifierProvider.notifier).checkLocation(
+          _toDouble(fallbackAddress.userLat),
+          _toDouble(fallbackAddress.userLong));
     }
   }
 
@@ -308,24 +341,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                                 mainAxisSize: MainAxisSize.min,
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Container(
+                                  SizedBox(
                                     width: 80,
-                                    height: 35,
-                                    child: Image.asset(
-                                        "lib/images/siccLog.png"),
+                                    height: 30,
+                                    child: Image.asset("lib/images/siccLog.png"),
                                   ),
                                   Text(
-                                    "Delivering in ${orderState.estimatedTime} mins",
+                                    orderState.estimatedTime != null
+                                        ? "Delivering in ${orderState.estimatedTime} mins"
+                                        : "Fetching delivery time...",
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
                                     style: GoogleFonts.mulish(
                                       color: WhiteColor,
                                       fontSize:
                                           MediaQuery.of(context).size.width *
-                                              0.055,
+                                              0.05,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  Container(
+                                  SizedBox(
                                     width: 280,
+                                    height: 24,
                                     child: Row(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
@@ -586,19 +623,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen>
                   color:  Colors.black,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withValues(alpha: 0.1),
                       offset: Offset(0, -2),
                       blurRadius: 6,
                       spreadRadius: 1,
                     ),
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withValues(alpha: 0.1),
                       offset: Offset(-2, 0),
                       blurRadius: 6,
                       spreadRadius: 1,
                     ),
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
+                      color: Colors.black.withValues(alpha: 0.1),
                       offset: Offset(2, 0),
                       blurRadius: 6,
                       spreadRadius: 1,

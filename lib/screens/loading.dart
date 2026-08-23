@@ -1,7 +1,6 @@
 
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
 
 
 class  LoadingScreen extends StatefulWidget {

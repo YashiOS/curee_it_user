@@ -11,4 +11,12 @@ class PrescriptionUsecases {
   Future<String> checkPrescriptionStatus(String availableId) {
     return repository.checkPrescriptionStatus(availableId);
   }
+
+  Future<String> submitDoctorCallConsent(String userId, bool allowDoctorCall) {
+    return repository.submitDoctorCallConsent(userId, allowDoctorCall);
+  }
+
+  Future<String> checkDoctorStatus(String userId, String availableId) {
+    return repository.checkDoctorStatus(userId, availableId);
+  }
 }

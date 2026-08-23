@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:cureeit_user_app/Networking/api_service.dart';
 import 'package:cureeit_user_app/screens/home/domain/entities/cartItemEntity.dart';
 import 'package:cureeit_user_app/screens/home/domain/repositiries/cartRepo/cart_repository.dart';
-import 'package:http/http.dart' as http;
 
 class CartRepositoryImpl implements CartRepository {
   final ApiService apiService;
@@ -24,7 +23,7 @@ class CartRepositoryImpl implements CartRepository {
 
   @override
   Future<void> addToCart(String userId, String productId, int quantity) async {
-  final res=  await apiService.post('/cart/addToCart', body: {
+    await apiService.post('/cart/addToCart', body: {
       "userId": userId,
       "productId": productId,
       "quantity": quantity,

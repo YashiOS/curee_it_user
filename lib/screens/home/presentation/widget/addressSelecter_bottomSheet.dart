@@ -107,7 +107,7 @@ class _AddressSelectorContentState extends State<AddressSelectorContent> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                address.address ?? '',
+                                address.address,
                                 style: GoogleFonts.mulish(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w500,
@@ -116,7 +116,7 @@ class _AddressSelectorContentState extends State<AddressSelectorContent> {
                               ),
                               const SizedBox(height: 2),
                               Text(
-                                address.type ?? '',
+                                address.type,
                                 style: GoogleFonts.mulish(
                                   fontSize: 13,
                                   fontWeight: FontWeight.w300,

@@ -1,5 +1,4 @@
 import 'package:cureeit_user_app/Networking/api_service.dart';
-import 'package:cureeit_user_app/screens/home/domain/entities/loctionEntity.dart';
 import 'package:cureeit_user_app/screens/home/domain/entities/orderEntity.dart';
 import 'package:cureeit_user_app/screens/home/domain/repositiries/orderRepo/order_repository_implementation.dart';
 import 'package:cureeit_user_app/screens/home/domain/usecases/order_useCase.dart';
@@ -73,13 +72,13 @@ class OrderNotifier extends StateNotifier<OrderState> {
     try {
       final location = await useCase.checkLocation(lat, long);
       state = state.copyWith(currentLocationAvailable: location);
-      final servicibility = await useCase.checkServiceability(lat, long);
       if (location) {
-        if (servicibility==true) {
+        final servicibility = await useCase.checkServiceability(lat, long);
+        if (servicibility == true) {
           final estTime = await useCase.getEstimatedTime(lat, long);
           state = state.copyWith(estimatedTime: estTime);
-        }else{
-          state=state.copyWith(estimatedTime: servicibility);
+        } else {
+          state = state.copyWith(estimatedTime: servicibility);
         }
       }
     } catch (e) {

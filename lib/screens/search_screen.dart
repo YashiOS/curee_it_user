@@ -25,7 +25,7 @@ class _SearchScreenState extends State<SearchScreen> {
       appBar: AppBar(
         scrolledUnderElevation: 0,
             elevation: 0,
-        backgroundColor: Colors.grey.shade100.withOpacity(0.5),
+        backgroundColor: Colors.grey.shade100.withValues(alpha: 0.5),
         leadingWidth: 100,
         leading: Padding(
           padding: const EdgeInsets.only(left: 12.0),

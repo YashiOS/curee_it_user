@@ -82,7 +82,7 @@ class OrdersScreen extends ConsumerWidget {
                     style: GoogleFonts.mulish(
                       fontWeight: FontWeight.w500,
                       fontSize: 20,
-                      color: WhiteColor.withOpacity(0.5),
+                      color: WhiteColor.withValues(alpha: 0.5),
                     ),
                   ),
                 )

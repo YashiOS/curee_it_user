@@ -44,7 +44,7 @@ class UploadPrescriptionBottomSheet extends ConsumerWidget {
             style: GoogleFonts.mulish(
               fontWeight: FontWeight.w600,
               fontSize: 14,
-              color: blackColor,
+              color: lightWhiteColor,
             ),
           ),
           const SizedBox(height: 16),
@@ -55,7 +55,7 @@ class UploadPrescriptionBottomSheet extends ConsumerWidget {
               textAlign: TextAlign.center,
               style: GoogleFonts.mulish(
                 fontSize: 12,
-                color: greyColor,
+                color: lightWhiteColor,
                 fontWeight: FontWeight.w400,
               ),
             ),
@@ -135,7 +135,7 @@ class UploadPrescriptionBottomSheet extends ConsumerWidget {
           decoration: BoxDecoration(
             color:  scaffoldWhiteColor,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: greenColor.withOpacity(0.3), width: 1),
+            border: Border.all(color: greenColor.withValues(alpha: 0.3), width: 1),
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(12),

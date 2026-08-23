@@ -1,29 +1,20 @@
 import 'dart:convert';
 import 'dart:async';
-import 'dart:ui';
 
 import 'package:cureeit_user_app/BaseUrl.dart';
-import 'package:cureeit_user_app/screens/cart/presentation/widget/cart_card.dart';
-import 'package:cureeit_user_app/cards/order_accepted_card.dart';
 import 'package:cureeit_user_app/cartManager/cartManager.dart';
-import 'package:cureeit_user_app/current_address/map_style.dart';
 import 'package:cureeit_user_app/current_address/tracking_map_style.dart';
 import 'package:cureeit_user_app/screens/Order_SuccessScreen.dart';
 import 'package:cureeit_user_app/screens/base_screen.dart';
 import 'package:cureeit_user_app/screens/loading.dart';
 import 'package:cureeit_user_app/selected_Address/currentAddress.dart';
 import 'package:cureeit_user_app/user/user.dart';
-import 'package:cureeit_user_app/utils/cashfree.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_cashfree_pg_sdk/utils/cfenums.dart';
-import 'package:flutter_svg/svg.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
-import 'package:loading_indicator/loading_indicator.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:web_socket_channel/io.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -32,7 +23,7 @@ class OrderTrackingScreen extends StatefulWidget {
   OrderTrackingScreen(
       {super.key, required this.NavigatingFrom, required this.orderId});
   final String? userId = User.userId;
-  late String orderId;
+  final String orderId;
   final String NavigatingFrom;
 
   @override
@@ -40,7 +31,6 @@ class OrderTrackingScreen extends StatefulWidget {
 }
 
 class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
-  late GoogleMapController _mapController;
   bool paymentStart = false;
   var orderTrackingDetails;
   final String apiKey = 'AIzaSyANsLBcGOUyOEFZpqpoLFOqc4MRNSDpng8';
@@ -50,6 +40,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
   String orderId = "";
   bool HittingApi = false;
   bool _isInitLoading = true;
+  bool _trackingUnavailable = false;
   Set<Polyline> polylines = {};
   late BitmapDescriptor bikeIcon = BitmapDescriptor.defaultMarker;
   late BitmapDescriptor homeIcon = BitmapDescriptor.defaultMarker;
@@ -164,15 +155,26 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
 
     if (response.statusCode == 200) {
       final responseBody = jsonDecode(response.body);
-      final data = responseBody;
+      final data = responseBody['data'];
 
+      if (data is! List || data.isEmpty || data.first is! Map) {
+        if (mounted) {
+          setState(() {
+            _isInitLoading = false;
+            _trackingUnavailable = true;
+          });
+        }
+        print('No tracking details found for availableId: $avildId');
+        _stopTimer();
+        return;
+      }
+
+      if (!mounted) return;
       setState(() {
-        if (data["data"].isNotEmpty) {
-          _isInitLoading = false;
-          orderTrackingDetails = Map<String, dynamic>.from(data["data"][0]);
-          if (orderTrackingDetails["status"] == "Available") {
-            acceptedProducts = orderTrackingDetails["acceptedProducts"];
-          }
+        _isInitLoading = false;
+        orderTrackingDetails = Map<String, dynamic>.from(data[0]);
+        if (orderTrackingDetails["status"] == "Available") {
+          acceptedProducts = orderTrackingDetails["acceptedProducts"] ?? [];
         }
       });
       orderId = orderTrackingDetails["orderId"];
@@ -215,11 +217,15 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
         });
       }
     } else {
-      setState(() {
-        _isInitLoading = false;
-      });
-
+      if (mounted) {
+        setState(() {
+          _isInitLoading = false;
+          _trackingUnavailable = true;
+        });
+      }
       print('Failed to load tracking details');
+      _stopTimer();
+      return;
     }
     if (HittingApi == false) {
       _hittingApi();
@@ -304,9 +310,6 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
       final quantity = int.tryParse(item['quantity'].toString()) ?? 1;
       return sum + (price * quantity);
     });
-
-    final double itemTotal =
-        double.tryParse(orderTrackingDetails["itemTotal"].toString()) ?? 0.0;
 
     final grandTotal = totalSellingPrice +
         orderTrackingDetails["gstServiceCharge"] +
@@ -666,8 +669,6 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
         return 'lib/images/onTheWay.png';
       case "Delivered":
         return 'lib/images/delivered.png';
-      case null:
-        return 'lib/images/ordered.png';
       default:
         return 'lib/images/ordered.png'; // default image
     }
@@ -777,6 +778,19 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
       ));
     }
 
+    if (_trackingUnavailable || orderTrackingDetails == null) {
+      return Scaffold(
+        backgroundColor: Colors.black,
+        body: Center(
+          child: Text(
+            'Order tracking details are not available right now.',
+            textAlign: TextAlign.center,
+            style: TextStyle(color: WhiteColor, fontSize: 16),
+          ),
+        ),
+      );
+    }
+
     if (orderTrackingDetails["status"] == "Not Available" ||
         orderTrackingDetails["status"] == "Rejected") {
       return Scaffold(
@@ -873,7 +887,6 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                             height: height * 0.71,
                             child: GoogleMap(
                               onMapCreated: (controller) {
-                                _mapController = controller;
                               },
                               // Update on pan/zoom
 
@@ -939,7 +952,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.1),
+                            color: Colors.black.withValues(alpha: 0.1),
                             blurRadius: 4,
                             offset: Offset(0, 2),
                           ),
@@ -1202,7 +1215,7 @@ class CustomInfoWindow extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.2),
+            color: Colors.black.withValues(alpha: 0.2),
             blurRadius: 10,
             offset: Offset(0, 5),
           ),

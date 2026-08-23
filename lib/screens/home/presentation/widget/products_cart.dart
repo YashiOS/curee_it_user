@@ -48,7 +48,7 @@ class ProductCard extends ConsumerWidget {
         borderRadius: BorderRadius.circular(8),
         boxShadow: [
           BoxShadow(
-            color: Colors.white.withOpacity(0.25), // light shadow
+            color: Colors.white.withValues(alpha: 0.25), // light shadow
             blurRadius: 6, // softness
             offset: Offset(0, 2), // slight downward shadow
           ),
@@ -78,8 +78,7 @@ class ProductCard extends ConsumerWidget {
                   color: scaffoldWhiteColor,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: product.imageMediaUrls[0] != null &&
-                        product.imageMediaUrls[0].toString().isNotEmpty
+                child: product.imageMediaUrls[0].toString().isNotEmpty
                     ? Image.network(
                         product.imageMediaUrls[0],
                         fit: BoxFit.contain,

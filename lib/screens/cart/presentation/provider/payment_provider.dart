@@ -5,7 +5,6 @@ import 'package:cureeit_user_app/screens/Order_SuccessScreen.dart';
 import 'package:cureeit_user_app/screens/cart/domain/entities/paymentEntity.dart';
 import 'package:cureeit_user_app/screens/cart/domain/repositiries/payment/payment_repo_impl.dart';
 import 'package:cureeit_user_app/screens/cart/domain/usecases/payment_useCases.dart';
-import 'package:cureeit_user_app/screens/cart/presentation/provider/prescription_provider.dart';
 import 'package:cureeit_user_app/utils/cashfree.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_cashfree_pg_sdk/utils/cfenums.dart';

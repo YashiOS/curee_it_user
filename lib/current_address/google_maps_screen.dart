@@ -6,11 +6,9 @@ import 'package:cureeit_user_app/current_address/map_style.dart';
 import 'package:cureeit_user_app/current_address/models/get_places.dart';
 import 'package:cureeit_user_app/current_address/models/place_from_coordinates.dart';
 import 'package:cureeit_user_app/screens/add_address_screen.dart';
-import 'package:cureeit_user_app/selected_Address/currentAddress.dart';
 import 'package:cureeit_user_app/user/user.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -23,7 +21,6 @@ class GoogleMapsScreen extends StatefulWidget {
 }
 
 class _GoogleMapsScreenState extends State<GoogleMapsScreen> {
-  GoogleMapController? _mapController;
   final Completer<GoogleMapController> _controllerCompleter = Completer();
   bool currentLocationFething = false;
   TextEditingController searchPlaceController = TextEditingController();
@@ -142,7 +139,6 @@ print(value.longitude);
                   child: GoogleMap(
                     style: LightMapStyle,
                     onMapCreated: (GoogleMapController controller) {
-                      _mapController = controller;
                       if (!_controllerCompleter.isCompleted) {
                         _controllerCompleter.complete(controller);
                       }
@@ -519,7 +515,6 @@ class TrianglePainter extends CustomPainter {
     canvas.drawPath(path, paint);
   }
 
-  @override
   Size get size => Size(20, 10);
 
   @override

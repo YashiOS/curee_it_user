@@ -9,13 +9,11 @@ class OrderDetailScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     String orderNumber = orderData['_id'];
     String purchaseDate = orderData['purchaseDate'];
-    List orderItems = orderData['orderItems'];
     String shippingAddress = orderData['shippingAddress'];
-    double shippingCost = orderData['shippingCost'];
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.grey.shade100.withOpacity(0.5),
+        backgroundColor: Colors.grey.shade100.withValues(alpha: 0.5),
         leadingWidth: 100,
         leading: Padding(
           padding: const EdgeInsets.only(left: 12.0),
@@ -58,7 +56,7 @@ class OrderDetailScreen extends StatelessWidget {
         ],
       ),
       body: Container(
-        color: Colors.grey.shade100.withOpacity(0.5),
+        color: Colors.grey.shade100.withValues(alpha: 0.5),
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
         child: Padding(
@@ -100,7 +98,7 @@ class OrderDetailScreen extends StatelessWidget {
                           fontWeight: FontWeight.w900,
                           fontSize: 10,
                           fontFamily: "Urbanist",
-                          color: Colors.black.withOpacity(0.6)),
+                          color: Colors.black.withValues(alpha: 0.6)),
                     ),
                   ),
                   Container(
@@ -144,7 +142,7 @@ class OrderDetailScreen extends StatelessWidget {
                                         fontWeight: FontWeight.w600,
                                         fontSize: 12,
                                         fontFamily: "Urbanist",
-                                        color: Colors.black.withOpacity(0.5)),
+                                        color: Colors.black.withValues(alpha: 0.5)),
                                   ),
                                 ),
                               ],
@@ -195,7 +193,7 @@ class OrderDetailScreen extends StatelessWidget {
                           fontWeight: FontWeight.w900,
                           fontSize: 10,
                           fontFamily: "Urbanist",
-                          color: Colors.black.withOpacity(0.6)),
+                          color: Colors.black.withValues(alpha: 0.6)),
                     ),
                   ),
                   Container(
@@ -217,7 +215,7 @@ class OrderDetailScreen extends StatelessWidget {
                                     fontWeight: FontWeight.w600,
                                     fontSize: 12,
                                     fontFamily: "Urbanist",
-                                    color: Colors.black.withOpacity(0.6)),
+                                    color: Colors.black.withValues(alpha: 0.6)),
                               ),
                             ),
                             Text(
@@ -226,7 +224,7 @@ class OrderDetailScreen extends StatelessWidget {
                                   fontWeight: FontWeight.w600,
                                   fontSize: 12,
                                   fontFamily: "Urbanist",
-                                  color: Colors.black.withOpacity(0.8)),
+                                  color: Colors.black.withValues(alpha: 0.8)),
                             ),
                           ],
                         ),
@@ -241,7 +239,7 @@ class OrderDetailScreen extends StatelessWidget {
                                     fontWeight: FontWeight.w600,
                                     fontSize: 12,
                                     fontFamily: "Urbanist",
-                                    color: Colors.black.withOpacity(0.6)),
+                                    color: Colors.black.withValues(alpha: 0.6)),
                               ),
                             ),
                             Text(
@@ -250,7 +248,7 @@ class OrderDetailScreen extends StatelessWidget {
                                   fontWeight: FontWeight.w600,
                                   fontSize: 12,
                                   fontFamily: "Urbanist",
-                                  color: Colors.black.withOpacity(0.8)),
+                                  color: Colors.black.withValues(alpha: 0.8)),
                             ),
                           ],
                         ),
@@ -265,7 +263,7 @@ class OrderDetailScreen extends StatelessWidget {
                                     fontWeight: FontWeight.w600,
                                     fontSize: 12,
                                     fontFamily: "Urbanist",
-                                    color: Colors.black.withOpacity(0.6)),
+                                    color: Colors.black.withValues(alpha: 0.6)),
                               ),
                             ),
                             Text(
@@ -274,7 +272,7 @@ class OrderDetailScreen extends StatelessWidget {
                                   fontWeight: FontWeight.w600,
                                   fontSize: 12,
                                   fontFamily: "Urbanist",
-                                  color: Colors.black.withOpacity(0.8)),
+                                  color: Colors.black.withValues(alpha: 0.8)),
                             ),
                           ],
                         ),
@@ -293,7 +291,7 @@ class OrderDetailScreen extends StatelessWidget {
                                     fontWeight: FontWeight.w600,
                                     fontSize: 12,
                                     fontFamily: "Urbanist",
-                                    color: Colors.black.withOpacity(0.6)),
+                                    color: Colors.black.withValues(alpha: 0.6)),
                               ),
                             ),
                             Text(
@@ -302,7 +300,7 @@ class OrderDetailScreen extends StatelessWidget {
                                   fontWeight: FontWeight.w600,
                                   fontSize: 12,
                                   fontFamily: "Urbanist",
-                                  color: Colors.black.withOpacity(0.6)),
+                                  color: Colors.black.withValues(alpha: 0.6)),
                             ),
                           ],
                         ),
@@ -317,7 +315,7 @@ class OrderDetailScreen extends StatelessWidget {
                                     fontWeight: FontWeight.w600,
                                     fontSize: 12,
                                     fontFamily: "Urbanist",
-                                    color: Colors.black.withOpacity(0.6)),
+                                    color: Colors.black.withValues(alpha: 0.6)),
                               ),
                             ),
                             Text(
@@ -326,7 +324,7 @@ class OrderDetailScreen extends StatelessWidget {
                                   fontWeight: FontWeight.w600,
                                   fontSize: 12,
                                   fontFamily: "Urbanist",
-                                  color: Colors.black.withOpacity(0.6)),
+                                  color: Colors.black.withValues(alpha: 0.6)),
                             ),
                           ],
                         ),
@@ -334,7 +332,7 @@ class OrderDetailScreen extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: Container(
                             height: 0.5,
-                            color: Colors.grey.withOpacity(0.2),
+                            color: Colors.grey.withValues(alpha: 0.2),
                           ),
                         ),
                         Row(
@@ -369,7 +367,7 @@ class OrderDetailScreen extends StatelessWidget {
                                 fontWeight: FontWeight.w900,
                                 fontSize: 14,
                                 fontFamily: "Urbanist",
-                                color: Colors.black.withOpacity(0.5)),
+                                color: Colors.black.withValues(alpha: 0.5)),
                           ),
                         ),
                       ],

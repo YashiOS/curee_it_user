@@ -1,7 +1,6 @@
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:cureeit_user_app/screens/base_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:http/http.dart' as http;
@@ -16,9 +15,6 @@ class UpdateScreen extends StatefulWidget {
 }
 
 class _UpdateScreenState extends State<UpdateScreen> {
-  bool _isCheckingUpdate = true;
-  bool _updateAvailable = false;
-
 static const bool DEBUG_MODE = false; 
   static const bool FORCE_SHOW_UPDATE = true;
   static const String MOCK_LATEST_VERSION = "2.0.0";
@@ -39,15 +35,8 @@ static const bool DEBUG_MODE = false;
     await Future.delayed(Duration(seconds: 2));
     
     if (FORCE_SHOW_UPDATE) {
-      setState(() {
-        _updateAvailable = true;
-        _isCheckingUpdate = false;
-      });
       _showUpdateDialog();
     } else {
-      setState(() {
-        _isCheckingUpdate = false;
-      });
       _navigateToHome();
       
     }
@@ -78,24 +67,14 @@ Future<void> _checkForUpdate() async {
       print('Latest Version: $latestVersion');
 
       if (latestVersion != null && _isVersionNewer(latestVersion, currentVersion)) {
-        setState(() {
-          _updateAvailable = true;
-          _isCheckingUpdate = false;
-        });
         _showUpdateDialog();
       } else {
         print("naviagte to home screen");
-        setState(() {
-          _isCheckingUpdate = false;
-        });
         _navigateToHome();
         
       }
     } catch (e) {
       print('Error checking for update: $e');
-      setState(() {
-        _isCheckingUpdate = false;
-      });
      _navigateToHome();
      
     }
@@ -183,15 +162,6 @@ Future<void> _checkForUpdate() async {
     } else {
       throw 'Could not launch store';
     }
-  }
-
-  void _testVersionComparison() {
-    print('=== Version Comparison Tests ===');
-    print('1.0.0 vs 1.0.1: ${_isVersionNewer("1.0.1", "1.0.0")}'); // Should be true
-    print('1.0.1 vs 1.0.0: ${_isVersionNewer("1.0.0", "1.0.1")}'); // Should be false
-    print('1.0.0 vs 1.0.0: ${_isVersionNewer("1.0.0", "1.0.0")}'); // Should be false
-    print('2.0.0 vs 1.9.9: ${_isVersionNewer("2.0.0", "1.9.9")}'); // Should be true
-    print('1.2.3 vs 1.2.4: ${_isVersionNewer("1.2.4", "1.2.3")}'); // Should be true
   }
 
 Future<void> _showUpdateDialog() async {

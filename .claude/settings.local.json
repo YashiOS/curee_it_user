@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(flutter analyze *)",
+      "Bash(xargs -I{} sh -c 'echo \"== {} ==\"; cat {}')",
+      "Bash(dart analyze *)",
+      "Bash(grep -n \"siccLog\\\\|Container\\(\\\\s*$\\\\|height: 80\\\\|height: 75\" /Users/yashsaxena/Documents/curee_it_user/lib/screens/home/presentation/home_screen.dart)",
+      "Bash(xargs cat -n)"
+    ]
+  }
+}

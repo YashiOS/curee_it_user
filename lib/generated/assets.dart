@@ -69,7 +69,6 @@ class Assets {
   static const String imagesMEDKARO = 'lib/images/MEDKARO.png';
   static const String imagesMan = 'lib/images/man.png';
   static const String imagesMedicine1 = 'lib/images/medicine1.png';
-  static const String imagesMedkaro (1) 2 = 'lib/images/Medkaro (1) 2.png';
   static const String imagesMedkaroGadi = 'lib/images/medkaroGadi.png';
   static const String imagesMedkaroLogo = 'lib/images/medkaroLogo.png';
   static const String imagesMedkarolog = 'lib/images/medkarolog.png';
@@ -78,10 +77,9 @@ class Assets {
   static const String imagesNeurobionForte = 'lib/images/neurobionForte.png';
   static const String imagesNonselectedButton = 'lib/images/nonselected_button.png';
   static const String imagesOnTheWay = 'lib/images/onTheWay.png';
-  static const String imagesOrder Again = 'lib/images/Order Again.png';
+  static const String imagesOrderAgain = 'lib/images/Order Again.png';
   static const String imagesOrderCancled = 'lib/images/order_cancled.png';
   static const String imagesOrderTracking = 'lib/images/OrderTracking.png';
-  static const String imagesOrderTracking 2 = 'lib/images/OrderTracking 2.png';
   static const String imagesOrdered = 'lib/images/ordered.png';
   static const String imagesPacking = 'lib/images/packing.png';
   static const String imagesPlusButton = 'lib/images/plus_button.png';
@@ -107,7 +105,6 @@ class Assets {
   static const String imagesUnableSearch = 'lib/images/unableSearch.png';
   static const String imagesUnablesaveButton = 'lib/images/unablesaveButton.png';
   static const String imagesUser = 'lib/images/user.png';
-  static const String imagesVector 9 = 'lib/images/Vector 9.png';
   static const String imagesVerifying = 'lib/images/verifying.png';
   static const String imagesVeryfing = 'lib/images/veryfing.png';
   static const String isInRadiusServicesAvilable = 'lib/isInRadius/ServicesAvilable.dart';

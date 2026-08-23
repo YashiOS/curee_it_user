@@ -3,7 +3,6 @@ import 'package:cureeit_user_app/screens/order again/domain/entities/reorderEnti
 import 'package:cureeit_user_app/screens/order again/domain/repositiries/reorder_repo_impl.dart';
 import 'package:cureeit_user_app/screens/order again/domain/usecases/reorderUsecase.dart';
 import 'package:cureeit_user_app/screens/cart/presentation/cart_screen.dart';
-import 'package:cureeit_user_app/user/user.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/legacy.dart';

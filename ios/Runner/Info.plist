@@ -3,11 +3,11 @@
 <plist version="1.0">
 <dict>
 	<key>NSSpeechRecognitionUsageDescription</key>
-    <string>We need your speech to do voice search.</string>
-    <key>NSMicrophoneUsageDescription</key>
-    <string>We need your mic to do voice search.</string>
+	<string>We need your speech to do voice search.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>We need your mic to do voice search.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
-    <true/>
+	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
@@ -23,17 +23,17 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>3.2</string>
+	<string>3.4</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
-    <key>LSApplicationQueriesSchemes</key>
-    <array>
-    <string>phonepe</string>
-    <string>tez</string>
-    <string>paytmmp</string>
-    <string>bhim</string>
-    <string>credpay</string>
-    </array>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>phonepe</string>
+		<string>tez</string>
+		<string>paytmmp</string>
+		<string>bhim</string>
+		<string>credpay</string>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>

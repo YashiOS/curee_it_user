@@ -1,4 +1,3 @@
-import 'package:cureeit_user_app/screens/cart/presentation/cart_screen.dart';
 import 'package:cureeit_user_app/screens/order_tracking_screen.dart';
 import 'package:cureeit_user_app/utils/theme.dart';
 import 'package:flutter/material.dart';
